@@ -15,6 +15,14 @@ class WC_Reepay_Subscription_Plans{
         'manual' => 'Manual',
     );
 
+    public static $trial = array(
+        '' => 'No Trial',
+        '7days' => '7 days',
+        '14days' => '14 days',
+        '1month' => '1 month',
+        'customize' => 'Customize',
+    );
+
     /**
      * Constructor
      */
@@ -28,19 +36,12 @@ class WC_Reepay_Subscription_Plans{
     public function subscription_pricing_fields(){
         global $post;
 
-        $chosen_price        = get_post_meta( $post->ID, '_reepay_subscription_price', true );
-        $chosen_interval     = get_post_meta( $post->ID, '_reepay_subscription_vat', true );
-        // Set month as the default billing period
-        if ( ! $chosen_period = get_post_meta( $post->ID, '_reepay_subscription_schedule_type', true ) ) {
-            $chosen_period = 'month';
-        }
+        $meta = get_post_meta( $post->ID );
 
         wc_get_template(
             'simple-subscription-fields.php',
             array(
-                'chosen_period' => $chosen_period,
-                'chosen_interval' => $chosen_interval,
-                'chosen_price' => $chosen_price,
+                'meta' => $meta
             ),
             '',
             WC_Reepay_Subscriptions::$plugin_path.'templates/'
@@ -48,18 +49,17 @@ class WC_Reepay_Subscription_Plans{
     }
 
     public function save_subscription_meta($post_id){
-        if($_POST['product-type'] != 'reepay_simple_subscriptions'){
+        if(!empty($_POST['product-type']) && $_POST['product-type'] != 'reepay_simple_subscriptions'){
             return;
         }
 
-        if(!empty($_REQUEST['_reepay_subscription_price']))
-            update_post_meta( $post_id, '_reepay_subscription_price', $_REQUEST['_reepay_subscription_price'] );
-
-        if(!empty($_REQUEST['_reepay_subscription_vat']))
-            update_post_meta( $post_id, '_reepay_subscription_vat', $_REQUEST['_reepay_subscription_vat'] );
-
-        if(!empty($_REQUEST['_reepay_subscription_schedule_type']))
-            update_post_meta( $post_id, '_reepay_subscription_schedule_type', $_REQUEST['_reepay_subscription_schedule_type'] );
+        if(!empty($_REQUEST)){
+            foreach ($_REQUEST as $i => $value){
+                //if(strpos($i, 'reepay_subscription')){
+                    update_post_meta( $post_id, $i, $value );
+                //}
+            }
+        }
 
     }
 
