@@ -55,9 +55,9 @@ class WC_Reepay_Subscription_Plans{
 
         if(!empty($_REQUEST)){
             foreach ($_REQUEST as $i => $value){
-                //if(strpos($i, 'reepay_subscription')){
+                if(strpos($i, 'reepay_subscription')){
                     update_post_meta( $post_id, $i, $value );
-                //}
+                }
             }
         }
 

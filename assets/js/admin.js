@@ -19,7 +19,7 @@ jQuery( function ( $ ) {
         show_fee_settings(this);
     });
 
-    $('input[type=radio][name=_subscription_billing_cycles]').change(function() {
+    $('input[type=radio][name=_reepay_subscription_billing_cycles]').change(function() {
         billing_cycles_settings(this.value);
     });
 
@@ -69,11 +69,11 @@ jQuery( function ( $ ) {
 
     function init(){
         show_settings();
-        show_fee_settings($('#_subscription_fee'))
+        $('#_subscription_fee').trigger('change');
         show_trial_settings($( '#_subscription_trial' ).val())
         show_plan_settings($( '#_subscription_schedule_type' ).val());
         show_notice_settings( $( '#_subscription_notice_period' ).val())
-        billing_cycles_settings( $('input[type=radio][name=_subscription_billing_cycles]:checked').val())
+        billing_cycles_settings( $('input[type=radio][name=_reepay_subscription_billing_cycles]:checked').val())
     }
 
     init();
