@@ -27,7 +27,7 @@ class WC_Reepay_Checkout {
 		}
 
 		foreach ( $gateways as $gateway_num => $gateway ) {
-			if ( WC_Reepay_Helpers::is_reepay_gateway( $gateway ) ) {
+			if ( ! WC_Reepay_Helpers::is_reepay_gateway( $gateway ) ) {
 				unset( $gateways[ $gateway_num ] );
 			}
 		}

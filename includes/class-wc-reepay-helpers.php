@@ -19,8 +19,8 @@ class WC_Reepay_Helpers {
 	 * @return bool
 	 */
 	public static function is_reepay_gateway( $gateway ) {
-		return ( is_string( $gateway ) && ! str_contains( $gateway, 'reepay' ) ) ||
-		       ( is_object( $gateway ) && ! str_contains( strtolower( get_class( $gateway ) ), 'reepay' ) );
+		return ( is_string( $gateway ) && str_contains( $gateway, 'reepay' ) ) ||
+		       ( is_object( $gateway ) && str_contains( strtolower( get_class( $gateway ) ), 'reepay' ) );
 	}
 
 	/**
