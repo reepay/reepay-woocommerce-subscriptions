@@ -61,6 +61,21 @@ class WC_Reepay_Subscription_Plans{
             }
         }
 
+        $params = [
+            'name' => $_REQUEST['post_title'],
+            'description' => $_REQUEST['content'],
+            'amount' => $_REQUEST['_reepay_subscription_price'],
+        ];
+
+        $api = new WC_Reepay_Subscription_API();
+        $api->set_params($params);
+
+        try{
+            $result = $api->request('POST', 'https://api.reepay.com/v1/plan');
+        }catch (Exception $e){
+            //Display error
+        }
+
     }
 
     public function reepay_load_subscription_product_class($php_classname, $product_type){
