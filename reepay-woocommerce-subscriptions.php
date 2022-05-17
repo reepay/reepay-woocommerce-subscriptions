@@ -48,8 +48,10 @@ class WC_Reepay_Subscriptions{
     }
 
     public function includes(){
+	    include_once( self::$plugin_path . '/includes/class-wc-reepay-checkout.php' );
+        include_once( self::$plugin_path . '/includes/class-wc-reepay-helpers.php' );
         include_once( self::$plugin_path . '/includes/class-wc-reepay-plans.php' );
-        include_once( self::$plugin_path . '/includes/class-wc-reepay-checkout.php' );
+        include_once( self::$plugin_path . '/includes/class-wc-reepay-renewals.php' );
     }
 }
 
