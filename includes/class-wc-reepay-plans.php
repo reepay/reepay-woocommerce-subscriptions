@@ -61,21 +61,131 @@ class WC_Reepay_Subscription_Plans{
             }
         }
 
+        $this->create_plan($post_id);
+
+    }
+
+
+    public function create_plan($post_id){
+
+        $type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true);
+        $handle = 'wc_subscription_'.$post_id;
         $params = [
-            'name' => $_REQUEST['post_title'],
-            'description' => $_REQUEST['content'],
-            'amount' => $_REQUEST['_reepay_subscription_price'],
+            'name' => get_the_title( $post_id ),
+            'description' => get_post_field( 'post_content', $post_id ),
+            'amount' => floatval(get_post_meta($post_id, '_reepay_subscription_price', true)),
+            'handle' => $handle,
+            'quantity' => intval(get_post_meta($post_id, '_reepay_subscription_renewal_reminder', true)),
+            'renewal_reminder_email_days' => intval(get_post_meta($post_id, '_reepay_subscription_default_quantity', true)),
+            'schedule_type' => $type,
+            //'fixed_life_time_unit' => '', //@todo Уточнить что за поле в админке
+            //'fixed_life_time_length' => '', //@todo Уточнить что за поле в админке
         ];
+
+        $billing_cycles = boolval(get_post_meta($post_id, '_reepay_subscription_billing_cycles', true));
+        if($billing_cycles){
+            $params['fixed_count'] = intval(get_post_meta($post_id, '_reepay_subscription_billing_cycles_period', true));
+        }
+
+        $trial = get_post_meta($post_id, '_reepay_subscription_trial', true);
+        if(!empty($trial['type'])){
+            $params['trial_reminder_email_days'] = !empty($trial['reminder']) ? intval($trial['reminder']) : 7;
+            if($trial['type'] == 'customize'){
+                $params['trial_interval_unit'] = $trial['unit'];
+                $params['trial_interval_length'] = intval($trial['length']);
+            }else{
+                if($trial['type'] == '7days'){
+                    $params['trial_interval_unit'] = 'days';
+                    $params['trial_interval_length'] = 7;
+                }elseif($trial['type'] == '14days'){
+                    $params['trial_interval_unit'] = 'days';
+                    $params['trial_interval_length'] = 14;
+                }elseif($trial['type'] == '1month'){
+                    $params['trial_interval_unit'] = 'months';
+                    $params['trial_interval_length'] = 1;
+                }
+            }
+        }
+
+        $type_data = get_post_meta($post_id, '_reepay_subscription_'.$type, true);
+        if(is_array($type_data) && !empty($type_data['period'])){
+            $params['partial_period_handling'] = $type_data['period'];
+        }
+
+        $fee = get_post_meta($post_id, '_reepay_subscription_fee', true);
+        if(!empty($fee)){
+            $params['setup_fee'] = !empty($fee['amount']) ? floatval($fee['amount']) : 0;
+            $params['setup_fee_text'] = !empty($fee['text']) ? $fee['text'] : '';
+            $params['setup_fee_handling'] = !empty($fee['handling']) ? $fee['handling'] : '';
+        }
+
+        if(!empty($type_data['proration'])){
+            if($type_data['proration'] == 'full_day'){
+                $params['partial_proration_days'] = true;
+            }else{
+                $params['partial_proration_days'] = false;
+            }
+        }
+
+        if(!empty($type_data['proration_minimum'])){
+            $params['minimum_prorated_amount'] = floatval($type_data['proration_minimum']);
+        }
+
+        $vat = get_post_meta($post_id, '_reepay_subscription_vat', true);
+        if($vat == 'include'){
+            $params['amount_incl_vat'] = true;
+        }else{
+            $params['amount_incl_vat'] = false;
+        }
+
+        $fixation_periods = get_post_meta($post_id, '_reepay_subscription_contract_periods', true);
+        if($fixation_periods){
+            $params['fixation_periods'] = intval($fixation_periods);
+            $fixation_periods_full = get_post_meta($post_id, '_reepay_subscription_contract_periods_full', true);
+            $params['fixation_periods_full'] = boolval($fixation_periods_full);
+        }
+
+        $notice_periods = get_post_meta($post_id, '_reepay_subscription_notice_period', true);
+        if($notice_periods){
+            $params['notice_periods'] = intval($notice_periods);
+            $notice_period_start = get_post_meta($post_id, '_subscription_notice_period_start', true);
+            $params['notice_periods_after_current'] = boolval($notice_period_start);
+        }
+
+        if($type == 'month_fixedday' || $type == 'weekly_fixedday'){
+            $params['schedule_fixed_day'] = intval($type_data['day']);
+        }
+
+        if($length = intval($this->get_interval($post_id, $type, $type_data))){
+            $params['interval_length'] = $length;
+        }
 
         $api = new WC_Reepay_Subscription_API();
         $api->set_params($params);
 
         try{
             $result = $api->request('POST', 'https://api.reepay.com/v1/plan');
+            update_post_meta($post_id, '_reepay_subscription_handle', $handle);
         }catch (Exception $e){
-            //Display error
+            //WC_Admin_Notices::add_custom_notice( 'reepay_subscription_plan', $e->getMessage() );
+            var_dump($e->getMessage());
+            return;
         }
+    }
 
+
+    public function get_interval($post_id, $type, $type_data){
+        if($type == 'daily'){
+            return get_post_meta($post_id, '_reepay_subscription_daily', true);
+        }elseif($type == 'month_startdate'){
+            return get_post_meta($post_id, '_reepay_subscription_month_startdate', true);
+        }elseif($type == 'month_fixedday' || $type == 'month_lastday'){
+            return $type_data['month'];
+        }elseif($type == 'weekly_fixedday'){
+            return $type_data['week'];
+        }else{ //@todo Primo, ultimo, half_yearly, month_startdate_12, manual
+            return false;
+        }
     }
 
     public function reepay_load_subscription_product_class($php_classname, $product_type){

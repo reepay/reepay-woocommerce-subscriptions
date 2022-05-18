@@ -83,13 +83,13 @@ class WC_Reepay_Subscription_API{
 
                     sleep(10);
                     $request_retry = true;
-                    $result = $this->request($method, $url, $params);
+                    $result = $this->request($method, $url);
                     $request_retry = false;
 
                     return  $result;
                 }
-
-                throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', WC_Reepay_Subscriptions::$domain ), $body, $http_code));
+                $error = json_decode($body)->error;
+                throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', WC_Reepay_Subscriptions::$domain ), $error, $http_code));
             default:
                 if ( $this->debug === 'yes' ) {
                     throw new Exception($body);

@@ -2,3 +2,7 @@
     width: 24.75% !important;
     margin-right: 3.8%;
 }
+
+.reepay_subscription_pricing .advanced-fields .wrap input{
+    width: 45% !important;
+}

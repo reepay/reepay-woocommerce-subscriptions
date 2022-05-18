@@ -6,23 +6,32 @@
             <?php esc_html_e( 'Subscription pricing (kr)', WC_Reepay_Subscriptions::$domain ); ?>
         </label>
         <span class="wrap">
-            <input type="number" id="_subscription_price" name="_reepay_subscription_price" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $meta['_reepay_subscription_price'][0] ) ); ?>" />
+            <input type="number" id="_subscription_price" name="_reepay_subscription_price" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $meta['_reepay_subscription_price'][0] ) ); ?>" required/>
             <select id="_subscription_price_vat" name="_reepay_subscription_vat" class="wc_input_subscription_period_interval">
                 <option value="include" <?php selected( 'include', $meta['_reepay_subscription_vat'][0], true ) ?>><?php esc_html_e( 'Incl. VAT', WC_Reepay_Subscriptions::$domain ); ?></option>
                 <option value="exclude" <?php selected( 'exclude', $meta['_reepay_subscription_vat'][0], true ) ?>><?php esc_html_e( 'Excl. VAT', WC_Reepay_Subscriptions::$domain ); ?></option>
             </select>
-            <select id="_subscription_schedule_type" name="_reepay_subscription_schedule_type" class="wc_input_subscription_period_interval">
+            <select id="_subscription_schedule_type" name="_reepay_subscription_schedule_type" class="wc_input_subscription_period_interval" required>
                 <?php foreach ( WC_Reepay_Subscription_Plans::$schedule_types as $value => $label ) { ?>
                     <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $meta['_reepay_subscription_schedule_type'][0], true ) ?>><?php echo esc_html( $label ); ?></option>
                 <?php } ?>
             </select>
         </span>
     </p>
+    <p class="form-field advanced-fields">
+        <label for="_reepay_subscription_renewal_reminder">
+            <?php esc_html_e( 'Advanced', WC_Reepay_Subscriptions::$domain ); ?>
+        </label>
+        <span class="wrap">
+            <input type="number" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo esc_attr( $meta['_reepay_subscription_renewal_reminder'][0] ); ?>"/>
+            <input type="number" id="_reepay_subscription_default_quantity" name="_reepay_subscription_default_quantity" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Default Quantity', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo esc_attr( $meta['_reepay_subscription_default_quantity'][0] ); ?>"/>
+        </span>
+    </p>
 
     <!--Daily-->
     <p class="form-field type-fields fields-daily hidden">
-        <label for="_subscription_days"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
-        <input type="number" id="_subscription_days" name="_subscription_days" value="<?= !empty($meta['_subscription_days'][0]) ? $meta['_subscription_days'][0] : 1?>">
+        <label for="_reepay_subscription_daily"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
+        <input type="number" id="_reepay_subscription_daily" name="_reepay_subscription_daily" value="<?= !empty($meta['_subscription_days'][0]) ? $meta['_subscription_days'][0] : 1?>">
         &nbsp<?php esc_html_e( 'Day', WC_Reepay_Subscriptions::$domain ); ?>
     </p>
 
@@ -278,6 +287,11 @@
         <label for="_subscription_contract_periods"><?php esc_html_e( 'Minimum Contract Period', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_contract_periods" name="_reepay_subscription_contract_periods" placeholder="<?php esc_html_e( 'Periods', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($meta['_reepay_subscription_contract_periods'][0]) ? $meta['_reepay_subscription_contract_periods'][0] : 0?>" />
     </p>
+    <p class="form-field fields-contract_periods hidden">
+        <label for="_reepay_subscription_contract_periods_full"></label>
+        <?php esc_html_e( 'When the subscription is created', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_reepay_subscription_contract_periods_full" name="_reepay_subscription_contract_periods_full" value="false" <?php checked( 'false', $meta['_reepay_subscription_contract_periods_full'][0], true ); ?>/>
+        &nbsp&nbsp <?php esc_html_e( 'When the first period starts', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_reepay_subscription_contract_periods_full" name="_reepay_subscription_contract_periods_full" value="true" <?php checked( 'true', $meta['_reepay_subscription_contract_periods_full'][0], true ); ?>/>
+    </p>
 </div>
 
 <div class="options_group show_if_reepay_subscription">
@@ -295,8 +309,8 @@
 <div class="options_group show_if_reepay_subscription">
     <p class="form-field">
         <label for="_subscription_billing_cycles"><?php esc_html_e( 'Billing Cycles', WC_Reepay_Subscriptions::$domain ); ?></label>
-        <?php esc_html_e( 'Auto Renew until cancelled', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_subscription_billing_cycles" name="_reepay_subscription_billing_cycles" value="true" <?php checked( 'true', $meta['_reepay_subscription_billing_cycles'][0], true ); ?>/>
-        &nbsp&nbsp <?php esc_html_e( 'Fixed Number of billing cycles', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_subscription_billing_cycles" name="_reepay_subscription_billing_cycles" value="false" <?php checked( 'false', $meta['_reepay_subscription_billing_cycles'][0], true ); ?>/>
+        <?php esc_html_e( 'Auto Renew until cancelled', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_subscription_billing_cycles" name="_reepay_subscription_billing_cycles" value="false" <?php checked( 'false', $meta['_reepay_subscription_billing_cycles'][0], true ); ?>/>
+        &nbsp&nbsp <?php esc_html_e( 'Fixed Number of billing cycles', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_subscription_billing_cycles" name="_reepay_subscription_billing_cycles" value="true" <?php checked( 'true', $meta['_reepay_subscription_billing_cycles'][0], true ); ?>/>
     </p>
     <p class="form-field fields-billing_cycles hidden">
         <label for="_subscription_billing_cycles_period"><?php esc_html_e( 'Number of billing cycles', WC_Reepay_Subscriptions::$domain ); ?></label>
