@@ -43,7 +43,7 @@
     </p>
 
     <!--Fixed day of month-->
-    <?php $month_fixedday = unserialize($meta['_reepay_subscription_month_fixedday'][0]) ?>
+    <?php $month_fixedday = !empty($meta['_reepay_subscription_month_fixedday']) ? unserialize($meta['_reepay_subscription_month_fixedday'][0]) : array() ?>
     <p class="form-field type-fields fields-month_fixedday hidden">
         <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_fixedday" name="_reepay_subscription_month_fixedday[month]" value="<?= !empty($month_fixedday['month']) ? $month_fixedday['month'] : 1?>">
@@ -79,7 +79,7 @@
     </p>
 
     <!--Last day of month-->
-    <?php $month_lastday = unserialize($meta['_reepay_subscription_month_lastday'][0]) ?>
+    <?php $month_lastday = !empty($meta['_reepay_subscription_month_lastday']) ? unserialize($meta['_reepay_subscription_month_lastday'][0]) : array() ?>
     <p class="form-field type-fields fields-month_lastday hidden">
         <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_lastday" value="<?= !empty($month_lastday['month']) ? $month_lastday['month'] : 0?>" name="_reepay_subscription_month_lastday[month]">
@@ -107,7 +107,7 @@
     </p>
 
     <!--Quarterly Primo-->
-    <?php $primo = unserialize($meta['_reepay_subscription_primo'][0]) ?>
+    <?php $primo = !empty($meta['_reepay_subscription_primo']) ? unserialize($meta['_reepay_subscription_primo'][0]) : array() ?>
     <p class="form-field type-fields fields-primo hidden">
         <label for="_subscription_primo"><?php _e( 'Charge first day of every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( '3rd Month', WC_Reepay_Subscriptions::$domain ); ?></strong>
@@ -138,7 +138,7 @@
     </p>
 
     <!--Quarterly Ultimo-->
-    <?php $ultimo = unserialize($meta['_reepay_subscription_ultimo'][0]) ?>
+    <?php $ultimo = !empty($meta['_reepay_subscription_ultimo']) ? unserialize($meta['_reepay_subscription_ultimo'][0]) : array() ?>
     <p class="form-field type-fields fields-ultimo hidden">
         <label for="_subscription_ultimo"><?php _e( 'Charge last day of every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( '3rd Month', WC_Reepay_Subscriptions::$domain ); ?></strong>
@@ -169,7 +169,7 @@
     </p>
 
     <!--Half-yearly-->
-    <?php $half_yearly = unserialize($meta['_reepay_subscription_half_yearly'][0]) ?>
+    <?php $half_yearly = !empty($meta['_reepay_subscription_half_yearly']) ? unserialize($meta['_reepay_subscription_half_yearly'][0]) : array() ?>
     <p class="form-field type-fields fields-half_yearly hidden">
         <label for="_subscription_half_yearly"><?php _e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( '6th Month', WC_Reepay_Subscriptions::$domain ); ?></strong>
@@ -206,7 +206,7 @@
 
 
     <!--Yearly-->
-    <?php $month_startdate_12 = unserialize($meta['_reepay_subscription_month_startdate_12'][0]) ?>
+    <?php $month_startdate_12 = !empty($meta['_reepay_subscription_month_startdate_12']) ? unserialize($meta['_reepay_subscription_month_startdate_12'][0]) : array() ?>
     <p class="form-field type-fields fields-month_startdate_12 hidden">
         <label for="_subscription_half_yearly"><?php _e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( '12th Month', WC_Reepay_Subscriptions::$domain ); ?></strong>
@@ -242,7 +242,7 @@
 
 
     <!--Fixed day of week-->
-    <?php $weekly_fixedday = unserialize($meta['_reepay_subscription_weekly_fixedday'][0]) ?>
+    <?php $weekly_fixedday = !empty($meta['_reepay_subscription_weekly_fixedday']) ? unserialize($meta['_reepay_subscription_weekly_fixedday'][0]) : array() ?>
     <p class="form-field type-fields fields-weekly_fixedday hidden">
         <label for="_subscription_weekly_fixedday"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_weekly_fixedday" name="_reepay_subscription_weekly_fixedday[week]">
@@ -318,7 +318,7 @@
     </p>
 </div>
 
-<?php $trial = unserialize($meta['_reepay_subscription_trial'][0]) ?>
+<?php $trial = !empty($meta['_reepay_subscription_trial']) ? unserialize($meta['_reepay_subscription_trial'][0]) : array()?>
 <div class="options_group reepay_subscription_trial show_if_reepay_subscription">
     <p class="form-field">
         <label for="_subscription_trial"><?php esc_html_e( 'Trial', WC_Reepay_Subscriptions::$domain ); ?></label>
@@ -342,7 +342,7 @@
     </p>
 </div>
 
-<?php $fee = unserialize($meta['_reepay_subscription_fee'][0]) ?>
+<?php $fee = !empty($meta['_reepay_subscription_fee']) ? unserialize($meta['_reepay_subscription_fee'][0]) : array()?>
 <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
     <p class="form-field">
         <label for="_subscription_fee"><?php esc_html_e( 'Include setup fee', WC_Reepay_Subscriptions::$domain ); ?></label>

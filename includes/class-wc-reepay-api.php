@@ -55,7 +55,7 @@ class WC_Reepay_Subscription_API{
         $response = wp_remote_request( $url, $args );
         $body = wp_remote_retrieve_body( $response );
         $http_code = wp_remote_retrieve_response_code( $response );
-        $code = $http_code / 100;
+        $code = round($http_code / 100);
 
         if ( $this->debug === 'yes' ) {
             $time = microtime(true) - $start;
@@ -88,7 +88,12 @@ class WC_Reepay_Subscription_API{
 
                     return  $result;
                 }
+
                 $error = json_decode($body)->error;
+                $message = json_decode($body)->message;
+                if(!empty($message)){
+                    $error .= ' - '.$message;
+                }
                 throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', WC_Reepay_Subscriptions::$domain ), $error, $http_code));
             default:
                 if ( $this->debug === 'yes' ) {
