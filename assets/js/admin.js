@@ -27,6 +27,20 @@ jQuery( function ( $ ) {
         billing_cycles_settings(this.value);
     });
 
+    $('input[type=radio][name=_reepay_discount_apply_to]').on('change', function() {
+        apply_to_settings(this.value);
+    }).each(function() {
+        apply_to_settings(this.value);
+    });
+
+    function apply_to_settings(value) {
+        if (value === 'custom') {
+            $('.active_if_apply_to_custom input').attr('disabled', false)
+        } else {
+            $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
+        }
+    }
+
     function show_settings(){
         if ( 'reepay_simple_subscriptions' === $( 'select#product-type' ).val() ) {
             $( '.show_if_reepay_subscription' ).show();
