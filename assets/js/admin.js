@@ -15,11 +15,15 @@ jQuery( function ( $ ) {
         show_notice_settings($(this).val());
     } );
 
+    $( '#_subscription_contract_periods' ).on( 'change', function () {
+        show_contract_settings($(this).val());
+    } );
+
     $('#_subscription_fee').change(function() {
         show_fee_settings(this);
     });
 
-    $('input[type=radio][name=_subscription_billing_cycles]').change(function() {
+    $('input[type=radio][name=_reepay_subscription_billing_cycles]').change(function() {
         billing_cycles_settings(this.value);
     });
 
@@ -59,8 +63,16 @@ jQuery( function ( $ ) {
         }
     }
 
+    function show_contract_settings(val){
+        if(parseInt(val) > 0){
+            $('.fields-contract_periods').show();
+        }else{
+            $('.fields-contract_periods').hide();
+        }
+    }
+
     function billing_cycles_settings(val){
-        if(val == 'false'){
+        if(val == 'true'){
             $('.fields-billing_cycles').show();
         }else{
             $('.fields-billing_cycles').hide();
@@ -69,11 +81,12 @@ jQuery( function ( $ ) {
 
     function init(){
         show_settings();
-        show_fee_settings($('#_subscription_fee'))
+        $('#_subscription_fee').trigger('change');
         show_trial_settings($( '#_subscription_trial' ).val())
         show_plan_settings($( '#_subscription_schedule_type' ).val());
         show_notice_settings( $( '#_subscription_notice_period' ).val())
-        billing_cycles_settings( $('input[type=radio][name=_subscription_billing_cycles]:checked').val())
+        show_contract_settings( $( '#_subscription_contract_periods' ).val())
+        billing_cycles_settings( $('input[type=radio][name=_reepay_subscription_billing_cycles]:checked').val())
     }
 
     init();
