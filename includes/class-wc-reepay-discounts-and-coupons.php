@@ -51,41 +51,66 @@ class WC_Reepay_Discounts_And_Coupons
             }
         }
 
+        $apply_items = $_REQUEST['_reepay_discount_apply_to_items'] ?? [];
+        $apply_plans = $_REQUEST['_reepay_discount_eligible_plans'];
+
+
+        $amount = null;
+        $percentage = null;
+
+        if ($coupon->get_discount_type() === 'reepay_percentage') {
+            $amount = null;
+            $percentage = $coupon->get_amount();
+        }
+
+        if ($coupon->get_discount_type() === 'reepay_fixed_product') {
+            $amount = $coupon->get_amount();
+            $percentage = null;
+        }
+
+
+        $discountHandle = 'discount'.$post_id;
+        $couponHandle = 'coupon'.$post_id;
+
+        $end = $coupon->get_date_expires()->diff(new DateTime());
+
+
 
         $params = [
-            "name" => "Gold member discount",
-            "description" => "Discount for members part of the Gold programme",
-            "amount" => null,
-            "percentage" => 25,
-            "handle" => "discount001",
-            "apply_to" => ['plan'],
-            "fixed_count" => 12,
-            "fixed_period_unit" => "months",
-            "fixed_period" => 12
-        ];
-
-        $paramsCoupon = [
-            "name" => "Join now offer",
-            "handle" => "coupon001",
-            "code" => "fall2016",
-            "discount" => "discount001",
-            "all_plans" => "true",
-            "eligible_plans" => [],
-            "max_redemptions" => 100,
-            "valid_until" => "2015-05-14T00:00:00"
+            "name" => $coupon->get_description(),
+            "description" => $coupon->get_description(),
+            "amount" => $amount,
+            "percentage" => $percentage,
+            "handle" => $discountHandle,
+            "apply_to" => $apply_items,
+            "fixed_count" => $coupon->get_usage_limit(),
+            "fixed_period_unit" => "days",
+            "fixed_period" => $end->days,
         ];
 
         $api = new WC_Reepay_Subscription_API();
         $api->set_params($params);
+        $discountObj = $api->request('POST', 'https://api.reepay.com/v1/discount');
+
+
+        $paramsCoupon = [
+            "name" => $coupon->get_description(),
+            "handle" => $couponHandle,
+            "code" => $coupon->get_code(),
+            "discount" => $discountObj->handle,
+            "all_plans" => empty($apply_plans),
+            "eligible_plans" => $apply_plans,
+            "max_redemptions" => $coupon->get_usage_limit(),
+            "valid_until" => $end->format(DATE_ISO8601),
+        ];
 
         $apiCoupons = new WC_Reepay_Subscription_API();
         $apiCoupons->set_params($paramsCoupon);
+        $result2 = $apiCoupons->request('POST', 'https://api.reepay.com/v1/coupon');
 
-        $handle = 'discount'.$post_id;
         try{
-            $result = $api->request('POST', 'https://api.reepay.com/v1/discount');
-            $result2 = $apiCoupons->request('POST', 'https://api.reepay.com/v1/coupon');
-            update_post_meta($post_id, '_reepay_subscription_handle', $handle);
+            update_post_meta($post_id, '_reepay_discount_handle', $discountHandle);
+            update_post_meta($post_id, '_reepay_coupon_handle', $couponHandle);
         }catch (Exception $e){
             var_dump($e->getMessage());
             return;

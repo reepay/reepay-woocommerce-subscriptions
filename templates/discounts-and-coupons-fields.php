@@ -14,3 +14,17 @@
         <br>
     <?php endforeach; ?>
 </p>
+<p class="form-field">
+    <label for="_reepay_discount_all_plans"><?php esc_html_e( 'Availability', WC_Reepay_Subscriptions::$domain ); ?></label>
+    <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans" value="1" <?php checked( '1', $meta['_reepay_discount_all_plans'][0] ); ?>/> &nbsp<?php esc_html_e( 'All plans', WC_Reepay_Subscriptions::$domain ); ?>
+</p>
+<p class="form-field">
+    <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans" value="0" <?php checked( '0', $meta['_reepay_discount_all_plans'][0] ); ?>/> &nbsp<?php esc_html_e( 'Selected plans', WC_Reepay_Subscriptions::$domain ); ?>
+</p>
+<p class="form-field show_if_all_plans">
+    <select name="_reepay_discount_eligible_plans[]" id="_reepay_discount_eligible_plans" multiple="multiple">
+        <option value="plan-bd31c">Plan 1</option>
+        <option value="wc_subscription_36">Reepay Subscribtion</option>
+        <option value="wc_subscription_55">Test reepay 123</option>
+    </select>
+</p>
