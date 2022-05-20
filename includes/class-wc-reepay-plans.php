@@ -31,35 +31,28 @@ class WC_Reepay_Subscription_Plans{
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'subscription_pricing_fields' ) );
         add_action( 'save_post', array( $this, 'save_subscription_meta' ), 11 );
         add_filter( 'woocommerce_product_class', array( $this, 'reepay_load_subscription_product_class' ),10,2);
-        add_action( 'before_delete_post', array( $this, 'delete_reepay_plan' ) );
     }
 
     public function subscription_pricing_fields(){
         global $post;
 
         $meta = get_post_meta( $post->ID );
+        $handle = get_post_meta($post->ID, '_reepay_subscription_handle', true);
+
+        $is_update = false;
+        if(!empty($handle)){
+            $is_update = true;
+        }
 
         wc_get_template(
             'simple-subscription-fields.php',
             array(
-                'meta' => $meta
+                'meta' => $meta,
+                'is_update' => $is_update
             ),
             '',
             WC_Reepay_Subscriptions::$plugin_path.'templates/'
         );
-    }
-
-    public function delete_reepay_plan($post_id){
-        $_product = wc_get_product( $post_id );
-        $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
-        if( $_product->is_type( 'reepay_simple_subscriptions' ) && !empty($handle) ) {
-            try{
-                $api = new WC_Reepay_Subscription_API();
-                $result = $api->request('DELETE', 'https://api.reepay.com/v1/plan/'.$handle);
-            }catch (Exception $e){
-                WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
-            }
-        }
     }
 
     public function save_subscription_meta($post_id){
@@ -77,8 +70,6 @@ class WC_Reepay_Subscription_Plans{
                     $this->save_meta($post_id);
                     $this->create_plan($post_id);
                 }
-
-
             }
         }
     }
@@ -110,6 +101,12 @@ class WC_Reepay_Subscription_Plans{
         return false;
     }
 
+    public function get_type($type){
+        if($type == 'primo' || $type == 'ultimo' || $type == 'half_yearly' || $type == 'month_startdate_12'){
+            return 'month_fixedday';
+        }
+        return $type;
+    }
 
     public function create_plan($post_id){
         $type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true);
@@ -120,7 +117,7 @@ class WC_Reepay_Subscription_Plans{
         $params['amount'] = floatval(get_post_meta($post_id, '_reepay_subscription_price', true)) * 100;
         $params['handle'] = $handle;
         $params['quantity'] = intval(get_post_meta($post_id, '_reepay_subscription_default_quantity', true));
-        $params['schedule_type'] = $type;
+        $params['schedule_type'] = $this->get_type($type);
         //$params['fixed_life_time_unit'] = ''; //@todo Уточнить что за поле в админке
         //$params['fixed_life_time_length'] = ''; //@todo Уточнить что за поле в админке
         //$params['fixed_trial_days'] = ''; //@todo Уточнить что за поле в админке
@@ -172,6 +169,10 @@ class WC_Reepay_Subscription_Plans{
 
         if($type == 'month_fixedday' || $type == 'weekly_fixedday'){
             $params['schedule_fixed_day'] = intval($type_data['day']);
+        }elseif($type == 'primo' || $type == 'half_yearly' || $type == 'month_startdate_12'){
+            $params['schedule_fixed_day'] = 1;
+        }elseif($type == 'ultimo'){
+            $params['schedule_fixed_day'] = 28;
         }
 
         if($length = intval($this->get_interval($post_id, $type, $type_data))){
@@ -241,7 +242,13 @@ class WC_Reepay_Subscription_Plans{
             return $type_data['month'];
         }elseif($type == 'weekly_fixedday'){
             return $type_data['week'];
-        }else{ //@todo Primo, ultimo, half_yearly, month_startdate_12, manual
+        }elseif($type == 'primo' || $type == 'ultimo'){
+            return 3;
+        }elseif($type == 'half_yearly'){
+            return 6;
+        }elseif($type == 'month_startdate_12'){
+            return 12;
+        }else{
             return false;
         }
     }
