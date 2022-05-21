@@ -167,7 +167,7 @@ class WC_Reepay_Subscription_Plans{
             $result = $api->request('POST', 'https://api.reepay.com/v1/plan');
             update_post_meta($post_id, '_reepay_subscription_handle', $handle);
         }catch (Exception $e){
-            //WC_Admin_Notices::add_custom_notice( 'reepay_subscription_plan', $e->getMessage() );
+            //WC_Admin_Notices::add_custom_notice( 'reepay_subscription_plan',$e->getMessage() );
             var_dump($e->getMessage());
             return;
         }

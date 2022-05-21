@@ -42,17 +42,10 @@ class WC_Reepay_Discounts_And_Coupons
         add_action( 'woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2 );
     }
 
-    function save_coupon_text_field( $post_id, WC_Coupon $coupon ) {
-        if(!empty($_REQUEST)){
-            foreach ($_REQUEST as $i => $value){
-                if(strpos($i, 'reepay_discount')){
-                    update_post_meta( $post_id, $i, $value );
-                }
-            }
-        }
-
+    function create_discount(WC_Coupon $coupon) {
+        $post_id = $coupon->get_id();
         $apply_items = $_REQUEST['_reepay_discount_apply_to_items'] ?? [];
-        $apply_plans = $_REQUEST['_reepay_discount_eligible_plans'];
+
 
 
         $amount = null;
@@ -70,12 +63,8 @@ class WC_Reepay_Discounts_And_Coupons
 
 
         $discountHandle = 'discount'.$post_id;
-        $couponHandle = 'coupon'.$post_id;
 
         $end = $coupon->get_date_expires()->diff(new DateTime());
-
-
-
         $params = [
             "name" => $coupon->get_description(),
             "description" => $coupon->get_description(),
@@ -91,13 +80,31 @@ class WC_Reepay_Discounts_And_Coupons
         $api = new WC_Reepay_Subscription_API();
         $api->set_params($params);
         $discountObj = $api->request('POST', 'https://api.reepay.com/v1/discount');
+        update_post_meta($post_id, '_reepay_discount_handle', $discountHandle);
+        return $discountObj;
+    }
+
+    function update_discount(WC_Coupon $coupon) {
+
+    }
+
+    function delete_discount(WC_Coupon $coupon) {
+
+    }
+
+    function create_coupon(WC_Coupon $coupon, $discount_handle) {
+
+        $post_id = $coupon->get_id();
+        $couponHandle = 'coupon'.$post_id;
+        $apply_plans = $_REQUEST['_reepay_discount_eligible_plans'];
+        $end = $coupon->get_date_expires();
 
 
         $paramsCoupon = [
             "name" => $coupon->get_description(),
             "handle" => $couponHandle,
             "code" => $coupon->get_code(),
-            "discount" => $discountObj->handle,
+            "discount" => $discount_handle,
             "all_plans" => empty($apply_plans),
             "eligible_plans" => $apply_plans,
             "max_redemptions" => $coupon->get_usage_limit(),
@@ -107,23 +114,88 @@ class WC_Reepay_Discounts_And_Coupons
         $apiCoupons = new WC_Reepay_Subscription_API();
         $apiCoupons->set_params($paramsCoupon);
         $result2 = $apiCoupons->request('POST', 'https://api.reepay.com/v1/coupon');
+        update_post_meta($post_id, '_reepay_coupon_handle', $couponHandle);
+        return $result2;
+    }
 
-        try{
-            update_post_meta($post_id, '_reepay_discount_handle', $discountHandle);
-            update_post_meta($post_id, '_reepay_coupon_handle', $couponHandle);
-        }catch (Exception $e){
-            var_dump($e->getMessage());
+    function update_coupon(WC_Coupon $coupon) {
+
+    }
+
+    function delete_coupon(WC_Coupon $coupon) {
+
+    }
+
+    public function save_subscription_meta($post_id){
+        if(!empty($_POST['product-type']) && $_POST['product-type'] != 'reepay_simple_subscriptions'){
             return;
+        }
+
+        if(!empty($_REQUEST)){
+            $title = get_the_title( $post_id );
+            if(!empty($title) && $title != 'AUTO-DRAFT'){
+                $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
+                if(!empty($handle)){
+                    if($this->update_plan($post_id, $handle)) $this->save_meta($post_id);
+                }else{
+                    $this->save_meta($post_id);
+                    $this->create_plan($post_id);
+                }
+            }
+        }
+    }
+
+    function save_coupon_text_field( $post_id, WC_Coupon $coupon ) {
+        $type = $coupon->get_discount_type();
+
+        if($type !== 'reepay_percentage' && $type !== 'reepay_fixed_product'){
+            return;
+        }
+
+        if(!empty($_REQUEST)){
+            foreach ($_REQUEST as $i => $value){
+                if(strpos($i, 'reepay_discount')){
+                    update_post_meta( $post_id, $i, $value );
+                }
+            }
+        }
+
+        $discountHandle = get_post_meta($post_id, '_reepay_discount_handle', true);
+        $couponHandle = get_post_meta($post_id, '_reepay_coupon_handle', true);
+
+
+        if (empty($discountHandle) && empty($couponHandle)) {
+            $discount = $this->create_discount($coupon);
+            $this->create_coupon($coupon, $discount);
+        } else if (!empty($discountHandle) && !empty($couponHandle)) {
+            $this->update_discount($coupon);
+            $this->update_coupon($coupon);
         }
     }
 
     function add_coupon_text_field() {
         $meta = get_post_meta(get_the_ID());
         $meta['_reepay_discount_apply_to_items'][0] = unserialize($meta['_reepay_discount_apply_to_items'][0]);
+        $plansQuery = new WP_Query([
+            'post_type' => 'product',
+            'post_status' => 'publish',
+            'meta_query' => [[
+                'key' => '_reepay_subscription_handle',
+                'compare' => 'EXISTS',
+            ]]
+        ]);
+        $plans = [];
+        foreach ($plansQuery->posts as $item) {
+            $handle = get_post_meta($item->ID, '_reepay_subscription_handle', true);
+            $plans[$handle] = $item->post_title;
+        }
+
+
         wc_get_template(
             'discounts-and-coupons-fields.php',
             array(
                 'meta' => $meta,
+                'plans' => $plans,
             ),
             '',
             WC_Reepay_Subscriptions::$plugin_path.'templates/'
