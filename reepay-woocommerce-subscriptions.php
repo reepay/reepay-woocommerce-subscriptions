@@ -52,6 +52,7 @@ class WC_Reepay_Subscriptions{
         include_once( self::$plugin_path . '/includes/class-wc-reepay-discounts-and-coupons.php' );
         include_once( self::$plugin_path . '/includes/class-wc-reepay-api.php' );
         include_once( self::$plugin_path . '/includes/class-wc-reepay-log.php' );
+        include_once( self::$plugin_path . '/includes/class-wc-reepay-admin-notice.php' );
     }
 }
 
