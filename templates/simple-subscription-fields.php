@@ -1,17 +1,17 @@
 <?php
 ?>
-<div class="options_group reepay_subscription_pricing show_if_reepay_subscription hidden">
+<div class="options_group reepay_subscription_pricing show_if_reepay_subscription show_if_reepay_variable_subscription hidden">
     <p class="form-field pricing-fields">
         <label for="_subscription_price">
             <?php esc_html_e( 'Subscription pricing (kr)', WC_Reepay_Subscriptions::$domain ); ?>
         </label>
         <span class="wrap">
-            <input type="number" id="_subscription_price" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_price" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $meta['_reepay_subscription_price'][0] ) ); ?>" required/>
+            <input type="number" id="_subscription_price" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_price" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $meta['_reepay_subscription_price'][0] ) ); ?>"/>
             <select id="_subscription_price_vat" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_vat" class="wc_input_subscription_period_interval">
                 <option value="include" <?php selected( 'include', $meta['_reepay_subscription_vat'][0], true ) ?>><?php esc_html_e( 'Incl. VAT', WC_Reepay_Subscriptions::$domain ); ?></option>
                 <option value="exclude" <?php selected( 'exclude', $meta['_reepay_subscription_vat'][0], true ) ?>><?php esc_html_e( 'Excl. VAT', WC_Reepay_Subscriptions::$domain ); ?></option>
             </select>
-            <select id="_subscription_schedule_type" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_schedule_type" class="wc_input_subscription_period_interval" required>
+            <select id="_subscription_schedule_type" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_schedule_type" class="wc_input_subscription_period_interval">
                 <?php foreach ( WC_Reepay_Subscription_Plans::$schedule_types as $value => $label ) { ?>
                     <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $meta['_reepay_subscription_schedule_type'][0], true ) ?>><?php echo esc_html( $label ); ?></option>
                 <?php } ?>

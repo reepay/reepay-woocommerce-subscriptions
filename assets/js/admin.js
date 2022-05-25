@@ -2,6 +2,11 @@ jQuery( function ( $ ) {
     $( 'body' ).on( 'woocommerce-product-type-change', function () {
         show_settings()
     } );
+    $( '#variable_product_options' ).trigger( 'reload' );
+
+    $( '#variable_product_options' ).on( 'reload', function () {
+        show_settings();
+    } );
 
     $( '#_subscription_schedule_type' ).on( 'change', function () {
         show_plan_settings($(this).val());
@@ -32,6 +37,14 @@ jQuery( function ( $ ) {
             $( '.show_if_reepay_subscription' ).show();
         }else{
             $( '.show_if_reepay_subscription' ).hide();
+        }
+
+        if ( 'reepay_variable_subscriptions' === $( 'select#product-type' ).val() ) {
+            $( '.show_if_variable' ).show();
+            $( '.show_if_reepay_variable_subscription' ).show();
+        }else{
+            $( '.show_if_variable' ).hide();
+            $( '.show_if_reepay_variable_subscription' ).hide();
         }
     }
 
