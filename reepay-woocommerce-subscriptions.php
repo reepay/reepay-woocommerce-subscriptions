@@ -104,3 +104,5 @@ class WooCommerce_Reepay_Subscriptions{
 function reepay_s() {
 	return WooCommerce_Reepay_Subscriptions::get_instance();
 }
+
+reepay_s();
