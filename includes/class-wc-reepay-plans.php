@@ -99,9 +99,7 @@ class WC_Reepay_Subscription_Plans{
         $params = $this->get_default_params($post_id, $type_data);
 
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params($params);
-            $result = $api->request('PUT', 'https://api.reepay.com/v1/plan/'.$handle);
+            $result = reepay_s()->api()->request("plan/$handle", 'PUT', $params);
             return true;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
@@ -189,9 +187,7 @@ class WC_Reepay_Subscription_Plans{
         }
 
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params($params);
-            $result = $api->request('POST', 'https://api.reepay.com/v1/plan');
+            $result = reepay_s()->api()->request('plan', 'POST', $params);
             update_post_meta($post_id, '_reepay_subscription_handle', $handle);
             return true;
         }catch (Exception $e){
