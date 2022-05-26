@@ -37,7 +37,7 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 
     public function reepay_variable_create_subscription_product_class(){
-        include_once( WC_Reepay_Subscriptions::$plugin_path . '/includes/class-wc-reepay-plan-variable-product.php' );
+        include_once( reepay_s()->s('plugin_path') . '/includes/class-wc-reepay-plan-variable-product.php' );
     }
 
     public function reepay_variable_load_subscription_product_class($php_classname, $product_type){
@@ -48,7 +48,7 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 
     public function add_reepay_variable_type( $types ){
-        $types['reepay_variable_subscriptions'] = __( 'Reepay Variable Subscription', WC_Reepay_Subscriptions::$domain );
+        $types['reepay_variable_subscriptions'] = __( 'Reepay Variable Subscription', reepay_s()->s('domain') );
 
         return $types;
     }

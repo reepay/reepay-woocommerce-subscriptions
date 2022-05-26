@@ -45,7 +45,7 @@ class WC_RS_Log{
         }
 
         $logger->log( $level, $message, array(
-            'source'  => WC_Reepay_Subscriptions::$domain,
+            'source'  => reepay_s()->s('domain'),
             '_legacy' => TRUE
         ) );
     }
