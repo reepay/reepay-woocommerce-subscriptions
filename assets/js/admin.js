@@ -41,7 +41,6 @@ jQuery( function ( $ ) {
         $apply_to_inputs.on('change', function() {
             apply_to_settings(this.value);
         })
-        apply_to_settings($apply_to_inputs.closest(':checked').val())
 
         $apply_to_all_plans_input.on('change', function() {
             apply_to_plans(this.value);
@@ -81,11 +80,12 @@ jQuery( function ( $ ) {
         }
 
         function show_existing_coupon_settings(value) {
-            console.log(value)
             if (value === 'true') {
                 $('.show_if_use_existing_coupon').show()
+                $('.hide_if_use_existing_coupon').hide()
             } else {
                 $('.show_if_use_existing_coupon').hide()
+                $('.hide_if_use_existing_coupon').show()
             }
         }
     }
