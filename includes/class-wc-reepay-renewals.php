@@ -7,11 +7,6 @@
  */
 class WC_Reepay_Renewals {
 	/**
-	 * @var WC_Reepay_Api
-	 */
-	public $api;
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {
