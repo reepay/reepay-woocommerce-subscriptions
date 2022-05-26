@@ -35,11 +35,17 @@ class WC_Reepay_Subscription_Plans{
         add_action( 'woocommerce_variation_options_pricing', 'bbloomer_add_custom_field_to_variations', 10, 3 );
     }
 
-    public function subscription_pricing_fields(){
-        global $post;
+    public function subscription_pricing_fields($variable = false, $variation_id = 0){
 
-        $meta = get_post_meta( $post->ID );
-        $handle = get_post_meta($post->ID, '_reepay_subscription_handle', true);
+        if($variation_id){
+            $post_id = $variation_id;
+        }else{
+            global $post;
+            $post_id = $post->ID;
+        }
+
+        $meta = get_post_meta( $post_id );
+        $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
 
         $is_update = false;
         if(!empty($handle)){
@@ -50,7 +56,8 @@ class WC_Reepay_Subscription_Plans{
             'simple-subscription-fields.php',
             array(
                 'meta' => $meta,
-                'is_update' => $is_update
+                'is_update' => $is_update,
+                'variable' => $variable
             ),
             '',
             WC_Reepay_Subscriptions::$plugin_path.'templates/'
