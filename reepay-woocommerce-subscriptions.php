@@ -16,9 +16,9 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WC_Reepay_Subscriptions{
+class WooCommerce_Reepay_Subscriptions{
 	/**
-	 * @var WC_Reepay_Subscriptions
+	 * @var WooCommerce_Reepay_Subscriptions
 	 */
 	private static $instance;
 
@@ -52,7 +52,7 @@ class WC_Reepay_Subscriptions{
     }
 
 	/**
-	 * @return WC_Reepay_Subscriptions
+	 * @return WooCommerce_Reepay_Subscriptions
 	 */
 	public static function get_instance() {
 		if ( self::$instance === null ) {
@@ -87,8 +87,8 @@ class WC_Reepay_Subscriptions{
 }
 
 /**
- * @return WC_Reepay_Subscriptions
+ * @return WooCommerce_Reepay_Subscriptions
  */
 function reepay_s() {
-	return WC_Reepay_Subscriptions::get_instance();
+	return WooCommerce_Reepay_Subscriptions::get_instance();
 }

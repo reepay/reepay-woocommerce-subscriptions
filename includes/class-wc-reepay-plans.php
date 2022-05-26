@@ -60,7 +60,7 @@ class WC_Reepay_Subscription_Plans{
                 'variable' => $variable
             ),
             '',
-            WC_Reepay_Subscriptions::$plugin_path.'templates/'
+            WooCommerce_Reepay_Subscriptions::$plugin_path.'templates/'
         );
     }
 
@@ -265,13 +265,13 @@ class WC_Reepay_Subscription_Plans{
     }
 
     public function add_reepay_type( $types ){
-        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', WC_Reepay_Subscriptions::$domain );
+        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', WooCommerce_Reepay_Subscriptions::$domain );
 
         return $types;
     }
 
     public function reepay_create_subscription_product_class(){
-        include_once( WC_Reepay_Subscriptions::$plugin_path . '/includes/class-wc-reepay-plan-simple-product.php' );
+        include_once( WooCommerce_Reepay_Subscriptions::$plugin_path . '/includes/class-wc-reepay-plan-simple-product.php' );
     }
 }
 

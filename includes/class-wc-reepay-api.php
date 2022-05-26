@@ -101,10 +101,10 @@ class WC_Reepay_Subscription_API{
             case 0:
                 if ( is_wp_error($response) ){
                     wc_add_notice($response->get_error_message(), 'error');
-                    throw new Exception(sprintf(__('Error: %s. Code: %s.', WC_Reepay_Subscriptions::$domain ), $response->get_error_message(), $code));
+                    throw new Exception(sprintf(__('Error: %s. Code: %s.', WooCommerce_Reepay_Subscriptions::$domain ), $response->get_error_message(), $code));
                 }
             case 1:
-                throw new Exception(sprintf(__('Invalid HTTP Code: %s', WC_Reepay_Subscriptions::$domain ), $http_code));
+                throw new Exception(sprintf(__('Invalid HTTP Code: %s', WooCommerce_Reepay_Subscriptions::$domain ), $http_code));
             case 2:
             case 3:
                 return json_decode($body, true);
@@ -113,7 +113,7 @@ class WC_Reepay_Subscription_API{
                 if ( mb_strpos( $body, 'Request rate limit exceeded', 0, 'UTF-8' ) !== false ) {
                     global $request_retry;
                     if ($request_retry) {
-                        throw new Exception( __('Reepay: Request rate limit exceeded', WC_Reepay_Subscriptions::$domain ) );
+                        throw new Exception( __('Reepay: Request rate limit exceeded', WooCommerce_Reepay_Subscriptions::$domain ) );
                     }
 
                     sleep(10);
@@ -129,12 +129,12 @@ class WC_Reepay_Subscription_API{
                 if(!empty($message)){
                     $error .= ' - '.$message;
                 }
-                throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', WC_Reepay_Subscriptions::$domain ), $error, $http_code));
+                throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', WooCommerce_Reepay_Subscriptions::$domain ), $error, $http_code));
             default:
                 if ( $this->debug ) {
                     throw new Exception($body);
                 }else{
-                    throw new Exception(sprintf(__('Invalid HTTP Code: %s', WC_Reepay_Subscriptions::$domain ), $http_code));
+                    throw new Exception(sprintf(__('Invalid HTTP Code: %s', WooCommerce_Reepay_Subscriptions::$domain ), $http_code));
                 }
 
         }
