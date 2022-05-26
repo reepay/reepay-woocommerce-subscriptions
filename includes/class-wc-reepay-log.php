@@ -6,7 +6,7 @@ class WC_RS_Log{
     /**
      * Constructor
      */
-    public function __construct() {
+    private function __construct() {
         $this->test_mode = 'yes';
         $this->debug = 'yes';
     }
