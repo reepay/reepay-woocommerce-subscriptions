@@ -7,18 +7,13 @@
  */
 class WC_Reepay_Renewals {
 	/**
-	 * @var WC_Reepay_Subscription_API
-	 */
-	private $api;
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		$this->api = new WC_Reepay_Subscription_API();
-
+		var_dump('!1!');
 		if(!empty($_GET['test_reepay'])) {
-			$this->api->request();
+			var_dump(reepay_s()->api()->request('invoice'));
+			die();
 		}
 
 		add_action( 'reepay_payment_finalize ', [ $this, 'add_renewal' ] );
@@ -30,7 +25,7 @@ class WC_Reepay_Renewals {
 	 * @see https://reference.reepay.com/api/#get-invoice
 	 */
 	public function add_renewal( $result ) {
-		$this->api->set_params();
+//		$this->api->set_params();
 	}
 }
 
