@@ -17,6 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class WC_Reepay_Subscriptions{
+	/**
+	 * @var WC_Reepay_Subscriptions
+	 */
+	private static $instance;
+
+	/**
+	 * @var WC_Reepay_Subscription_API
+	 */
+	private $api;
+
     public static $plugin_url;
     public static $domain;
     public static $plugin_path;
@@ -25,7 +35,7 @@ class WC_Reepay_Subscriptions{
     /**
      * Constructor
      */
-    public function __construct() {
+    private function __construct() {
         self::$domain = 'reepay-woocommerce-subscriptions';
         self::$plugin_url = plugin_dir_url(__FILE__);
         self::$plugin_path = plugin_dir_path(__FILE__);
@@ -37,7 +47,27 @@ class WC_Reepay_Subscriptions{
             $this->includes();
             add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
         }
+
+        $this->api = WC_Reepay_Subscription_API::get_instance();
     }
+
+	/**
+	 * @return WC_Reepay_Subscriptions
+	 */
+	public static function get_instance() {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * @return WC_Reepay_Subscription_API
+	 */
+	public function api() {
+    	return $this->api;
+	}
 
     public function admin_enqueue_scripts(){
         wp_enqueue_script('admin-reepay-subscription', self::$plugin_url . 'assets/js/admin.js', ['jquery'], self::$version, true);
@@ -58,4 +88,9 @@ class WC_Reepay_Subscriptions{
     }
 }
 
-new WC_Reepay_Subscriptions();
+/**
+ * @return WC_Reepay_Subscriptions
+ */
+function reepay_s() {
+	return WC_Reepay_Subscriptions::get_instance();
+}
