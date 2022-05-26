@@ -1,21 +1,37 @@
 <?php
 
 class WC_RS_Log{
+	/**
+	 * @var WC_RS_Log
+	 */
     private static $instance;
 
-    /**
-     * Constructor
-     */
+	/**
+	 * @var bool
+	 */
+	private $test_mode;
+
+	/**
+	 * @var bool
+	 */
+	private $debug;
+
+	/**
+	 * Constructor
+	 */
     private function __construct() {
-        $this->test_mode = 'yes';
-        $this->debug = 'yes';
+        $this->test_mode = WooCommerce_Reepay_Subscriptions::s('test_mode');
+        $this->debug = WooCommerce_Reepay_Subscriptions::s('debug');
     }
 
-    public static function i() {
-        if ( is_null( self::$instance ) )
-        {
-            self::$instance = new self();
-        }
+	/**
+	 * @return WC_RS_Log
+	 */
+    public static function get_instance() {
+	    if ( is_null( self::$instance ) ) {
+		    self::$instance = new self();
+	    }
+
         return self::$instance;
     }
 
@@ -32,7 +48,7 @@ class WC_RS_Log{
      */
     public function log( $message, $level = 'info' ) {
         // Is Enabled
-        if ( $this->debug !== 'yes' ) {
+	    if ( ! $this->debug ) {
             return;
         }
 
