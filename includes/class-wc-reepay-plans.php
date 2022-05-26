@@ -202,21 +202,23 @@ class WC_Reepay_Subscription_Plans{
         $params = [
             'name' => get_the_title( $post_id ),
             'description' => get_post_field( 'post_content', $post_id ),
-            'renewal_reminder_email_days' => intval($_REQUEST['_reepay_subscription_renewal_reminder']),
             //'fixed_trial_days' => '', //@todo Уточнить что за поле в админке
         ];
 
-        $trial = $_REQUEST['_reepay_subscription_trial'];
-        if(!empty($trial['reminder'])){
-            $params['trial_reminder_email_days'] = intval($trial['reminder']);
-        }
+	    if(!empty($_REQUEST['_reepay_subscription_renewal_reminder'])){
+		    $params['renewal_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_renewal_reminder']);
+	    }
+
+	    if(!empty($_REQUEST['_reepay_subscription_trial'])){
+		    $params['trial_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_trial']);
+	    }
 
         if(is_array($type_data) && !empty($type_data['period'])){
             $params['partial_period_handling'] = $type_data['period'];
         }
 
-        $fee = $_REQUEST['_reepay_subscription_fee'];
-        if(!empty($fee)){
+        if(!empty($_REQUEST['_reepay_subscription_fee'])){
+	        $fee = $_REQUEST['_reepay_subscription_fee'];
             $params['setup_fee'] = !empty($fee['amount']) ? floatval($fee['amount']) * 100 : 0;
             $params['setup_fee_text'] = !empty($fee['text']) ? $fee['text'] : '';
             $params['setup_fee_handling'] = !empty($fee['handling']) ? $fee['handling'] : '';
