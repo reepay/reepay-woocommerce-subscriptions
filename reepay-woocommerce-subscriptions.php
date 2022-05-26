@@ -28,19 +28,26 @@ class WooCommerce_Reepay_Subscriptions{
 	private $api;
 
 	/**
-	 * @var array<string, string>
+	 * @var WC_RS_Log
 	 */
-	private $settings;
+	private $log;
+
+	/**
+	 * @var array<string, mixed>
+	 */
+	private static $settings;
 
     /**
      * Constructor
      */
     private function __construct() {
-    	$this->settings = [
+    	self::$settings = [
     		'domain' => 'reepay-woocommerce-subscriptions',
     		'plugin_url' => plugin_dir_url(__FILE__),
     		'plugin_path' => plugin_dir_path(__FILE__),
     		'version' => time(),
+		    'debug' => true,
+		    'test_mode' => true
 	    ];
 
         // Check if WooCommerce is active
@@ -51,6 +58,7 @@ class WooCommerce_Reepay_Subscriptions{
         }
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
+        $this->log = WC_RS_Log::get_instance();
     }
 
 	/**
@@ -68,7 +76,14 @@ class WooCommerce_Reepay_Subscriptions{
 	 * @return WC_Reepay_Subscription_API
 	 */
 	public function api() {
-    	return $this->api;
+		return $this->api;
+	}
+
+	/**
+	 * @return WC_RS_Log
+	 */
+	public function log() {
+		return $this->log;
 	}
 
 	/**
@@ -77,8 +92,8 @@ class WooCommerce_Reepay_Subscriptions{
 	 *
 	 * @return mixed
 	 */
-	public function s($property_name = null) {
-		return isset($property_name) ? ($this->settings[$property_name] ?? null) : $this->settings;
+	public static function s($property_name = null) {
+		return isset($property_name) ? (self::$settings[$property_name] ?? null) : self::$settings;
 	}
 
     public function admin_enqueue_scripts(){

@@ -40,8 +40,8 @@ class WC_Reepay_Subscription_API{
 	    $this->private_key = 'priv_3728a84bd1d89da26f4da17a75aa81c3';
 
         $this->private_key_test = 'priv_3728a84bd1d89da26f4da17a75aa81c3';
-        $this->test_mode = 'yes' === 'yes'; //ToDo replace with settings;
-        $this->debug = 'yes' === 'yes'; //ToDo replace with settings;
+        $this->test_mode = WooCommerce_Reepay_Subscriptions::s('test_mode');
+        $this->debug = WooCommerce_Reepay_Subscriptions::s('debug');
     }
 
 	/**
@@ -67,7 +67,7 @@ class WC_Reepay_Subscription_API{
         $start = microtime(true);
 		$url = $this->url . $endpoint;
 
-        WC_RS_Log::i()->log(sprintf('Request: %s %s %s', $method, $url, json_encode( $params, JSON_PRETTY_PRINT ) ) ); ;
+        reepay_s()->log()->log(sprintf('Request: %s %s %s', $method, $url, json_encode( $params, JSON_PRETTY_PRINT ) ) ); ;
 
 
         $key = $this->test_mode ? $this->private_key_test : $this->private_key;
@@ -94,7 +94,7 @@ class WC_Reepay_Subscription_API{
 
         if ( $this->debug ) {
             $time = microtime(true) - $start;
-            WC_RS_Log::i()->log( sprintf( '[%.4F] HTTP Code: %s. Response: %s', $time, wp_remote_retrieve_response_code( $response ), $body ) );
+	        reepay_s()->log()->log( sprintf( '[%.4F] HTTP Code: %s. Response: %s', $time, wp_remote_retrieve_response_code( $response ), $body ) );
         }
 
         switch ($code) {
