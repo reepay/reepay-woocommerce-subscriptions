@@ -23,7 +23,18 @@
     <?php endif; ?>
     <div class="hide_if_use_existing_coupon">
         <p class="form-field">
-            <label for="_discounts_apply_to"><?php esc_html_e( 'Apply to', WC_Reepay_Subscriptions::$domain ); ?></label>
+            <label for="_reepay_discount_name"><?php esc_html_e( 'Name', WC_Reepay_Subscriptions::$domain ); ?></label>
+            <input
+                    type="text"
+                    id="_reepay_discount_name"
+                    name="_reepay_discount_name"
+                    value="<?= $meta['_reepay_discount_name'][0] ?? ''?>"
+                    required
+            />
+        </p>
+
+        <p class="form-field">
+            <label for="_reepay_discount_apply_to"><?php esc_html_e( 'Apply to', WC_Reepay_Subscriptions::$domain ); ?></label>
             <input
                     type="radio"
                     id="_reepay_discount_apply_to"
