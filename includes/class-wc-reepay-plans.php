@@ -30,14 +30,22 @@ class WC_Reepay_Subscription_Plans{
         add_filter( 'product_type_selector', array( $this, 'add_reepay_type' ) );
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'subscription_pricing_fields' ) );
         add_action( 'save_post', array( $this, 'save_subscription_meta' ), 11 );
-        add_filter( 'woocommerce_product_class', array( $this, 'reepay_load_subscription_product_class' ),10,2);
+        add_filter( 'woocommerce_product_class', array( $this, 'reepay_load_subscription_product_class' ), 10, 2);
+        add_action( 'init', array( $this, 'reepay_create_subscription_product_class' ) );
+        add_action( 'woocommerce_variation_options_pricing', 'bbloomer_add_custom_field_to_variations', 10, 3 );
     }
 
-    public function subscription_pricing_fields(){
-        global $post;
+    public function subscription_pricing_fields($variable = false, $variation_id = 0){
 
-        $meta = get_post_meta( $post->ID );
-        $handle = get_post_meta($post->ID, '_reepay_subscription_handle', true);
+        if($variation_id){
+            $post_id = $variation_id;
+        }else{
+            global $post;
+            $post_id = $post->ID;
+        }
+
+        $meta = get_post_meta( $post_id );
+        $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
 
         $is_update = false;
         if(!empty($handle)){
@@ -48,7 +56,8 @@ class WC_Reepay_Subscription_Plans{
             'simple-subscription-fields.php',
             array(
                 'meta' => $meta,
-                'is_update' => $is_update
+                'is_update' => $is_update,
+                'variable' => $variable
             ),
             '',
             WC_Reepay_Subscriptions::$plugin_path.'templates/'
@@ -187,7 +196,6 @@ class WC_Reepay_Subscription_Plans{
             return true;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
-
         }
 
         return false;
@@ -262,20 +270,13 @@ class WC_Reepay_Subscription_Plans{
 
     public function add_reepay_type( $types ){
         $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', WC_Reepay_Subscriptions::$domain );
-        $types['reepay_variable_subscriptions'] = __( 'Reepay Variable Subscription', WC_Reepay_Subscriptions::$domain );
 
         return $types;
+    }
+
+    public function reepay_create_subscription_product_class(){
+        include_once( WC_Reepay_Subscriptions::$plugin_path . '/includes/class-wc-reepay-plan-simple-product.php' );
     }
 }
 
 new WC_Reepay_Subscription_Plans();
-
-add_action( 'init', 'reepay_create_subscription_product_class' );
-
-function reepay_create_subscription_product_class(){
-    class WC_Product_Reepay_Simple_Subscription extends WC_Product {
-        public function get_type() {
-            return 'reepay_simple_subscriptions'; // so you can use $product = wc_get_product(); $product->get_type()
-        }
-    }
-}

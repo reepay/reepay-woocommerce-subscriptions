@@ -1,17 +1,17 @@
 <?php
 ?>
-<div class="options_group reepay_subscription_pricing show_if_reepay_subscription hidden">
-    <p class="form-field pricing-fields">
+<div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
+    <p class="form-field pricing-fields <?= $variable ? 'dimensions_field form-row' : '' ?> ">
         <label for="_subscription_price">
             <?php esc_html_e( 'Subscription pricing (kr)', WC_Reepay_Subscriptions::$domain ); ?>
         </label>
         <span class="wrap">
-            <input type="number" id="_subscription_price" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_price" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $meta['_reepay_subscription_price'][0] ) ); ?>" required/>
+            <input type="number" id="_subscription_price" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_price" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $meta['_reepay_subscription_price'][0] ) ); ?>"/>
             <select id="_subscription_price_vat" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_vat" class="wc_input_subscription_period_interval">
                 <option value="include" <?php selected( 'include', $meta['_reepay_subscription_vat'][0], true ) ?>><?php esc_html_e( 'Incl. VAT', WC_Reepay_Subscriptions::$domain ); ?></option>
                 <option value="exclude" <?php selected( 'exclude', $meta['_reepay_subscription_vat'][0], true ) ?>><?php esc_html_e( 'Excl. VAT', WC_Reepay_Subscriptions::$domain ); ?></option>
             </select>
-            <select id="_subscription_schedule_type" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_schedule_type" class="wc_input_subscription_period_interval" required>
+            <select id="_subscription_schedule_type" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_schedule_type" class="wc_input_subscription_period_interval">
                 <?php foreach ( WC_Reepay_Subscription_Plans::$schedule_types as $value => $label ) { ?>
                     <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $meta['_reepay_subscription_schedule_type'][0], true ) ?>><?php echo esc_html( $label ); ?></option>
                 <?php } ?>
@@ -20,14 +20,14 @@
     </p>
 
     <!--Daily-->
-    <p class="form-field type-fields fields-daily hidden">
+    <p class="form-field type-fields fields-daily <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_reepay_subscription_daily"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_reepay_subscription_daily" name="_reepay_subscription_daily" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($meta['_subscription_days'][0]) ? $meta['_subscription_days'][0] : 1?>">
         &nbsp<?php esc_html_e( 'Day', WC_Reepay_Subscriptions::$domain ); ?>
     </p>
 
     <!--Monthly-->
-    <p class="form-field type-fields fields-month_startdate hidden">
+    <p class="form-field type-fields fields-month_startdate <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_startdate"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_startdate" name="_reepay_subscription_month_startdate" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($meta['_reepay_subscription_month_startdate'][0]) ? $meta['_reepay_subscription_month_startdate'][0] : 1?>">
         &nbsp<?php esc_html_e( 'Month', WC_Reepay_Subscriptions::$domain ); ?>
@@ -35,12 +35,12 @@
 
     <!--Fixed day of month-->
     <?php $month_fixedday = !empty($meta['_reepay_subscription_month_fixedday']) ? unserialize($meta['_reepay_subscription_month_fixedday'][0]) : array() ?>
-    <p class="form-field type-fields fields-month_fixedday hidden">
+    <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_fixedday" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_fixedday[month]" value="<?= !empty($month_fixedday['month']) ? $month_fixedday['month'] : 1?>">
         &nbsp<?php esc_html_e( 'Month', WC_Reepay_Subscriptions::$domain ); ?>
     </p>
-    <p class="form-field type-fields fields-month_fixedday hidden">
+    <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_fixedday_day"><?php esc_html_e( 'On this day of the month', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_fixedday_day" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_fixedday[day]" class="wc_input_subscription_period_interval">
             <?php for ($i = 1; $i <= 28; $i++) :?>
@@ -48,7 +48,7 @@
             <?php endfor;?>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_fixedday hidden">
+    <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_fixedday_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_fixedday_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_fixedday[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $month_fixedday['period'], true ) ?>>Bill prorated (Default)</option>
@@ -57,26 +57,26 @@
             <option value="no_bill" <?php selected( 'no_bill', $month_fixedday['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_fixedday hidden">
+    <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_fixedday_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_fixedday_proration" <?= $is_update ? 'disabled' : '' ?> name="_subscription_month_fixedday[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $month_fixedday['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'full_day', $month_fixedday['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_fixedday hidden">
+    <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_fixedday_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_fixedday_proration_minimum"  value="<?= !empty($month_fixedday['proration_minimum']) ? $month_fixedday['proration_minimum'] : 0?>"  name="_reepay_subscription_month_fixedday[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>"/>
     </p>
 
     <!--Last day of month-->
     <?php $month_lastday = !empty($meta['_reepay_subscription_month_lastday']) ? unserialize($meta['_reepay_subscription_month_lastday'][0]) : array() ?>
-    <p class="form-field type-fields fields-month_lastday hidden">
+    <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_lastday" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($month_lastday['month']) ? $month_lastday['month'] : 0?>" name="_reepay_subscription_month_lastday[month]">
         &nbsp<?php esc_html_e( 'Month', WC_Reepay_Subscriptions::$domain ); ?>
     </p>
-    <p class="form-field type-fields fields-month_lastday hidden">
+    <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_lastday_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_lastday_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_lastday[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $month_lastday['period'], true ) ?>>Bill prorated (Default)</option>
@@ -85,14 +85,14 @@
             <option value="no_bill" <?php selected( 'no_bill', $month_lastday['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_lastday hidden">
+    <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_lastday_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_lastday_proration" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_lastday[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $month_lastday['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'by_minute', $month_lastday['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_lastday hidden">
+    <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_lastday_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_lastday_proration_minimum" value="<?= !empty($month_lastday['proration_minimum']) ? $month_lastday['proration_minimum'] : 0?>" name="_subscription_month_lastday[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo esc_attr( wc_format_localized_price( $chosen_price ) ); ?>" />
     </p>
@@ -107,7 +107,7 @@
         <label for="_subscription_primo"><?php _e( 'Fixed Months:', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( 'Jan, Apr, Jul, Oct', WC_Reepay_Subscriptions::$domain ); ?></strong>
     </p>
-    <p class="form-field type-fields fields-primo hidden">
+    <p class="form-field type-fields fields-primo <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_primo_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_primo_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_primo[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $primo['period'], true ) ?>>Bill prorated (Default)</option>
@@ -116,14 +116,14 @@
             <option value="no_bill" <?php selected( 'no_bill', $primo['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-primo hidden">
+    <p class="form-field type-fields fields-primo <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_primo_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_primo_proration" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_primo[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $primo['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'by_minute', $primo['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-primo hidden">
+    <p class="form-field type-fields fields-primo <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_primo_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_primo_proration_minimum" name="_reepay_subscription_primo[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($primo['proration_minimum']) ? $primo['proration_minimum'] : 0?>" />
     </p>
@@ -138,7 +138,7 @@
         <label for="_subscription_ultimo"><?php _e( 'Fixed Months:', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( 'Jan, Apr, Jul, Oct', WC_Reepay_Subscriptions::$domain ); ?></strong>
     </p>
-    <p class="form-field type-fields fields-ultimo hidden">
+    <p class="form-field type-fields fields-ultimo <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_ultimo_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_ultimo_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_ultimo[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $ultimo['period'], true ) ?>>Bill prorated (Default)</option>
@@ -147,14 +147,14 @@
             <option value="no_bill" <?php selected( 'no_bill', $ultimo['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-ultimo hidden">
+    <p class="form-field type-fields fields-ultimo <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_ultimo_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_ultimo_proration" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_ultimo[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $ultimo['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'by_minute', $ultimo['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-ultimo hidden">
+    <p class="form-field type-fields fields-ultimo <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_ultimo_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_ultimo_proration_minimum" name="_reepay_subscription_ultimo[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>"  value="<?= !empty($ultimo['proration_minimum']) ? $ultimo['proration_minimum'] : 0?>" />
     </p>
@@ -173,7 +173,7 @@
         <label for="_subscription_half_yearly"><?php _e( 'Fixed Months:', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( 'Jan, Jul', WC_Reepay_Subscriptions::$domain ); ?></strong>
     </p>
-    <p class="form-field type-fields fields-half_yearly hidden">
+    <p class="form-field type-fields fields-half_yearly <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_half_yearly_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_half_yearly_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_half_yearly[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $half_yearly['period'], true ) ?>>Bill prorated (Default)</option>
@@ -182,14 +182,14 @@
             <option value="no_bill" <?php selected( 'no_bill', $half_yearly['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-half_yearly hidden">
+    <p class="form-field type-fields fields-half_yearly <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_half_yearly_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_half_yearly_proration" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_half_yearly[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $half_yearly['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'by_minute', $half_yearly['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-half_yearly hidden">
+    <p class="form-field type-fields fields-half_yearly <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_half_yearly_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_half_yearly_proration_minimum" name="_reepay_subscription_half_yearly[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($half_yearly['proration_minimum']) ? $half_yearly['proration_minimum'] : 0?>" />
     </p>
@@ -197,19 +197,19 @@
 
     <!--Yearly-->
     <?php $month_startdate_12 = !empty($meta['_reepay_subscription_month_startdate_12']) ? unserialize($meta['_reepay_subscription_month_startdate_12'][0]) : array() ?>
-    <p class="form-field type-fields fields-month_startdate_12 hidden">
+    <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_half_yearly"><?php _e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( '12th Month', WC_Reepay_Subscriptions::$domain ); ?></strong>
     </p>
-    <p class="form-field type-fields fields-month_startdate_12 hidden">
+    <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_startdate_12"><?php _e( 'On this day of the month:', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( '1st', WC_Reepay_Subscriptions::$domain ); ?></strong>
     </p>
-    <p class="form-field type-fields fields-month_startdate_12 hidden">
+    <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_startdate_12"><?php _e( 'Fixed Months:', WC_Reepay_Subscriptions::$domain ); ?></label>
         <strong><?php _e( 'Jan', WC_Reepay_Subscriptions::$domain ); ?></strong>
     </p>
-    <p class="form-field type-fields fields-month_startdate_12 hidden">
+    <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_startdate_12_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_startdate_12_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_startdate_12[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $month_startdate_12['period'], true ) ?>>Bill prorated (Default)</option>
@@ -218,14 +218,14 @@
             <option value="no_bill" <?php selected( 'no_bill', $month_startdate_12['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_startdate_12 hidden">
+    <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_startdate_12_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_month_startdate_12_proration" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_startdate_12[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $month_startdate_12['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'by_minute', $month_startdate_12['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-month_startdate_12 hidden">
+    <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_month_startdate_12_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_month_startdate_12_proration_minimum" name="_reepay_subscription_month_startdate_12[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($month_startdate_12['proration_minimum']) ? $month_startdate_12['proration_minimum'] : 0?>" />
     </p>
@@ -233,12 +233,12 @@
 
     <!--Fixed day of week-->
     <?php $weekly_fixedday = !empty($meta['_reepay_subscription_weekly_fixedday']) ? unserialize($meta['_reepay_subscription_weekly_fixedday'][0]) : array() ?>
-    <p class="form-field type-fields fields-weekly_fixedday hidden">
+    <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_weekly_fixedday"><?php esc_html_e( 'Charge every', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_weekly_fixedday" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday[week]">
         &nbsp<?php esc_html_e( 'Week', WC_Reepay_Subscriptions::$domain ); ?>
     </p>
-    <p class="form-field type-fields fields-weekly_fixedday hidden">
+    <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_weekly_fixedday_day"><?php esc_html_e( 'On this day of the month', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_weekly_fixedday_day" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday[day]" class="wc_input_subscription_period_interval">
             <option value="1" <?php selected( '1', $weekly_fixedday['day'], true ) ?>>Monday</option>
@@ -250,7 +250,7 @@
             <option value="7" <?php selected( '7', $weekly_fixedday['day'], true ) ?>>Sunday</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-weekly_fixedday hidden">
+    <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_weekly_fixedday_period"><?php esc_html_e( 'Partial Period Handling', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_weekly_fixedday_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday[period]" class="wc_input_subscription_period_interval">
             <option value="bill_prorated" <?php selected( 'bill_prorated', $weekly_fixedday['period'], true ) ?>>Bill prorated (Default)</option>
@@ -259,33 +259,33 @@
             <option value="no_bill" <?php selected( 'bill_prorated', $weekly_fixedday['period'], true ) ?>>Do not consider the partial period a billing period</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-weekly_fixedday hidden">
+    <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_weekly_fixedday_proration"><?php esc_html_e( 'Proration setting', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_weekly_fixedday_proration" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday[proration]" class="wc_input_subscription_period_interval">
             <option value="full_day" <?php selected( 'full_day', $weekly_fixedday['proration'], true ) ?>>Full day proration</option>
             <option value="by_minute" <?php selected( 'by_minute', $weekly_fixedday['proration'], true ) ?>>By the minute proration</option>
         </select>
     </p>
-    <p class="form-field type-fields fields-weekly_fixedday hidden">
+    <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_weekly_fixedday_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_weekly_fixedday_proration_minimum" name="_reepay_subscription_weekly_fixedday[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($weekly_fixedday['proration_minimum']) ? $weekly_fixedday['proration_minimum'] : 0?>" />
     </p>
 
     <!--Advanced-->
-    <p class="form-field advanced-fields">
+    <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
         <label for="_reepay_subscription_renewal_reminder">
             <?php esc_html_e( 'Advanced', WC_Reepay_Subscriptions::$domain ); ?>
         </label>
         <span class="wrap">
-            <input type="number" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo !empty($meta['_reepay_subscription_renewal_reminder'][0]) ? esc_attr($meta['_reepay_subscription_renewal_reminder'][0]) : 1?>"/>
-            <input type="number" id="_reepay_subscription_default_quantity" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_default_quantity" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Default Quantity', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo !empty($meta['_reepay_subscription_default_quantity'][0]) ? esc_attr($meta['_reepay_subscription_default_quantity'][0]) : 1?>"/>
+            <input type="number" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo !empty($meta['_reepay_subscription_renewal_reminder'][0]) ? esc_attr($meta['_reepay_subscription_renewal_reminder'][0]) : ''?>"/>
+            <input type="number" id="_reepay_subscription_default_quantity" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_default_quantity" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Default Quantity', WC_Reepay_Subscriptions::$domain ); ?>" value="<?php echo !empty($meta['_reepay_subscription_default_quantity'][0]) ? esc_attr($meta['_reepay_subscription_default_quantity'][0]) : ''?>"/>
         </span>
     </p>
 </div>
 
 
 <div class="options_group show_if_reepay_subscription">
-    <p class="form-field">
+    <p class="form-field <?= $variable ? 'form-row' : '' ?>">
         <label for="_subscription_contract_periods"><?php esc_html_e( 'Minimum Contract Period', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_contract_periods" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_contract_periods" <?= $is_update ? 'disabled' : '' ?> placeholder="<?php esc_html_e( 'Periods', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($meta['_reepay_subscription_contract_periods'][0]) ? $meta['_reepay_subscription_contract_periods'][0] : 0?>" />
     </p>
@@ -309,12 +309,12 @@
 </div>
 
 <div class="options_group show_if_reepay_subscription">
-    <p class="form-field">
+    <p class="form-field <?= $variable ? 'form-row' : '' ?>">
         <label for="_subscription_billing_cycles"><?php esc_html_e( 'Billing Cycles', WC_Reepay_Subscriptions::$domain ); ?></label>
         <?php esc_html_e( 'Auto Renew until cancelled', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" id="_subscription_billing_cycles" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_billing_cycles" value="false" <?php checked( 'false', $meta['_reepay_subscription_billing_cycles'][0], true ); ?>/>
         &nbsp&nbsp <?php esc_html_e( 'Fixed Number of billing cycles', WC_Reepay_Subscriptions::$domain ); ?> &nbsp<input type="radio" <?= $is_update ? 'disabled' : '' ?> id="_subscription_billing_cycles" name="_reepay_subscription_billing_cycles" value="true" <?php checked( 'true', $meta['_reepay_subscription_billing_cycles'][0], true ); ?>/>
     </p>
-    <p class="form-field fields-billing_cycles hidden">
+    <p class="form-field fields-billing_cycles <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_billing_cycles_period"><?php esc_html_e( 'Number of billing cycles', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_billing_cycles_period" name="_reepay_subscription_billing_cycles_period" <?= $is_update ? 'disabled' : '' ?> placeholder="*" value="<?= !empty($meta['_reepay_subscription_billing_cycles_period'][0]) ? $meta['_reepay_subscription_billing_cycles_period'][0] : 0?>" />
     </p>
@@ -322,7 +322,7 @@
 
 <?php $trial = !empty($meta['_reepay_subscription_trial']) ? unserialize($meta['_reepay_subscription_trial'][0]) : array()?>
 <div class="options_group reepay_subscription_trial show_if_reepay_subscription">
-    <p class="form-field">
+    <p class="form-field <?= $variable ? 'form-row' : '' ?>">
         <label for="_subscription_trial"><?php esc_html_e( 'Trial', WC_Reepay_Subscriptions::$domain ); ?></label>
         <select id="_subscription_trial" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial[type]" class="wc_input_subscription_period_interval">
             <?php foreach ( WC_Reepay_Subscription_Plans::$trial as $value => $label ) { ?>
@@ -330,7 +330,7 @@
             <?php } ?>
         </select>
     </p>
-    <p class="form-field trial-fields fields-customize hidden">
+    <p class="form-field trial-fields fields-customize <?= $variable ? 'form-row' : '' ?> hidden">
         <label for="_subscription_trial_length"><?php esc_html_e( 'Trial Length', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_trial_length" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial[length]" placeholder="<?php esc_html_e( 'Length', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($trial['length']) ? $trial['length'] : 0?>" />
         <select id="_subscription_trial_unit" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial[unit]" class="wc_input_subscription_period_interval">
@@ -338,7 +338,7 @@
             <option value="months" <?php selected( 'months', $trial['unit'], true ) ?>>Months</option>
         </select>
     </p>
-    <p class="form-field trial-fields fields-7days fields-14days fields-1month fields-customize hidden">
+    <p class="form-field <?= $variable ? 'form-row' : '' ?>  trial-fields fields-7days fields-14days fields-1month fields-customize hidden">
         <label for="_subscription_billing_trial_reminder"><?php esc_html_e( 'Optional Trial Reminder Schedule', WC_Reepay_Subscriptions::$domain ); ?></label>
         <input type="number" id="_subscription_trial_reminder"  name="_reepay_subscription_trial[reminder]" placeholder="<?php esc_html_e( 'Days', WC_Reepay_Subscriptions::$domain ); ?>" value="<?= !empty($trial['reminder']) ? $trial['reminder'] : 0?>" />
     </p>
@@ -351,7 +351,7 @@
         <input type="checkbox" id="_subscription_fee" name="_reepay_subscription_fee[enabled]" value="yes" <?php checked( 'yes', $fee['enabled'], true ); ?> />
     </p>
 
-    <p class="form-field fee-fields hidden">
+    <p class="form-field fee-fields <?= $variable ? 'dimensions_field form-row' : '' ?> hidden">
         <label for="_subscription_fee_amount"><?php esc_html_e( 'Setup Fee (kr)', WC_Reepay_Subscriptions::$domain ); ?></label>
         <span class="wrap">
             <input type="number" id="_subscription_fee_amount" name="_reepay_subscription_fee[amount]" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'Amount', WC_Reepay_Subscriptions::$domain ); ?>" step="any" min="0" value="<?= !empty($fee['amount']) ? $fee['amount'] : 0?>" />
