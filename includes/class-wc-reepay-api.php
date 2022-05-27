@@ -40,8 +40,8 @@ class WC_Reepay_Subscription_API{
 	    $this->private_key = 'priv_3728a84bd1d89da26f4da17a75aa81c3';
 
         $this->private_key_test = 'priv_3728a84bd1d89da26f4da17a75aa81c3';
-        $this->test_mode = WooCommerce_Reepay_Subscriptions::s('test_mode');
-        $this->debug = WooCommerce_Reepay_Subscriptions::s('debug');
+        $this->test_mode = WooCommerce_Reepay_Subscriptions::settings('test_mode');
+        $this->debug = WooCommerce_Reepay_Subscriptions::settings('debug');
     }
 
 	/**
@@ -101,10 +101,10 @@ class WC_Reepay_Subscription_API{
             case 0:
                 if ( is_wp_error($response) ){
                     wc_add_notice($response->get_error_message(), 'error');
-                    throw new Exception(sprintf(__('Error: %s. Code: %s.', reepay_s()->s('domain') ), $response->get_error_message(), $code));
+                    throw new Exception(sprintf(__('Error: %s. Code: %s.', reepay_s()->settings('domain') ), $response->get_error_message(), $code));
                 }
             case 1:
-                throw new Exception(sprintf(__('Invalid HTTP Code: %s', reepay_s()->s('domain') ), $http_code));
+                throw new Exception(sprintf(__('Invalid HTTP Code: %s', reepay_s()->settings('domain') ), $http_code));
             case 2:
             case 3:
                 return json_decode($body, true);

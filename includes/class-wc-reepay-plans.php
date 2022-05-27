@@ -58,10 +58,10 @@ class WC_Reepay_Subscription_Plans{
                 'meta' => $meta,
                 'is_update' => $is_update,
                 'variable' => $variable,
-	            'domain' => reepay_s()->s('domain')
+	            'domain' => reepay_s()->settings('domain')
             ),
             '',
-            reepay_s()->s('plugin_path').'templates/'
+            reepay_s()->settings('plugin_path').'templates/'
         );
     }
 
@@ -268,13 +268,13 @@ class WC_Reepay_Subscription_Plans{
     }
 
     public function add_reepay_type( $types ){
-        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', reepay_s()->s('domain') );
+        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', reepay_s()->settings('domain') );
 
         return $types;
     }
 
     public function reepay_create_subscription_product_class(){
-        include_once( reepay_s()->s('plugin_path') . '/includes/class-wc-reepay-plan-simple-product.php' );
+        include_once( reepay_s()->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-product.php' );
     }
 }
 
