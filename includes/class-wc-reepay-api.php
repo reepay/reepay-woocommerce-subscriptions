@@ -37,9 +37,9 @@ class WC_Reepay_Subscription_API{
     private function __construct() {
 	    $this->url = 'https://api.reepay.com/v1/';
 
-	    $this->private_key = 'priv_3728a84bd1d89da26f4da17a75aa81c3';
+	    $this->private_key = WooCommerce_Reepay_Subscriptions::settings('api_private_key');
 
-        $this->private_key_test = 'priv_3728a84bd1d89da26f4da17a75aa81c3';
+        $this->private_key_test = WooCommerce_Reepay_Subscriptions::settings('api_private_key_test');
         $this->test_mode = WooCommerce_Reepay_Subscriptions::settings('test_mode');
         $this->debug = WooCommerce_Reepay_Subscriptions::settings('debug');
     }
@@ -113,7 +113,7 @@ class WC_Reepay_Subscription_API{
                 if ( mb_strpos( $body, 'Request rate limit exceeded', 0, 'UTF-8' ) !== false ) {
                     global $request_retry;
                     if ($request_retry) {
-                        throw new Exception( __('Reepay: Request rate limit exceeded', reepay_s()->s('domain') ) );
+                        throw new Exception( __('Reepay: Request rate limit exceeded', reepay_s()->settings('domain') ) );
                     }
 
                     sleep(10);
@@ -129,12 +129,12 @@ class WC_Reepay_Subscription_API{
                 if(!empty($message)){
                     $error .= ' - '.$message;
                 }
-                throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', reepay_s()->s('domain') ), $error, $http_code));
+                throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', reepay_s()->settings('domain') ), $error, $http_code));
             default:
                 if ( $this->debug ) {
                     throw new Exception($body);
                 }else{
-                    throw new Exception(sprintf(__('Invalid HTTP Code: %s', reepay_s()->s('domain') ), $http_code));
+                    throw new Exception(sprintf(__('Invalid HTTP Code: %s', reepay_s()->settings('domain') ), $http_code));
                 }
 
         }

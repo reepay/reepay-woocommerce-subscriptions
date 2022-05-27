@@ -47,7 +47,9 @@ class WooCommerce_Reepay_Subscriptions{
     		'plugin_path' => plugin_dir_path(__FILE__),
     		'version' => time(),
 		    'debug' => true,
-		    'test_mode' => true
+		    'test_mode' => true,
+		    'api_private_key' => 'priv_3728a84bd1d89da26f4da17a75aa81c3',
+		    'api_private_key_test' => 'priv_3728a84bd1d89da26f4da17a75aa81c3',
 	    ];
 
         // Check if WooCommerce is active
