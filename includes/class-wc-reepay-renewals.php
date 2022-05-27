@@ -55,7 +55,7 @@ class WC_Reepay_Renewals {
 					/**
 					 * @see https://reference.reepay.com/api/#set-payment-method
 					 */
-					$res = reepay_s()->api()->request( 'subscription', 'POST', [
+					$res = reepay_s()->api()->request( "subscription/{$res['handle']}/pm", 'POST', [
 						'handle'      => $res['handle'],
 //						'source'          => null,
 //						'payment_method_reference' => null,
