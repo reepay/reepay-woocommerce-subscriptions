@@ -20,8 +20,8 @@ class WC_RS_Log{
 	 * Constructor
 	 */
     private function __construct() {
-        $this->test_mode = WooCommerce_Reepay_Subscriptions::s('test_mode');
-        $this->debug = WooCommerce_Reepay_Subscriptions::s('debug');
+        $this->test_mode = WooCommerce_Reepay_Subscriptions::settings('test_mode');
+        $this->debug = WooCommerce_Reepay_Subscriptions::settings('debug');
     }
 
 	/**
@@ -61,7 +61,7 @@ class WC_RS_Log{
         }
 
         $logger->log( $level, $message, array(
-            'source'  => reepay_s()->s('domain'),
+            'source'  => reepay_s()->settings('domain'),
             '_legacy' => TRUE
         ) );
     }
