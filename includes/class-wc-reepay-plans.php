@@ -209,8 +209,8 @@ class WC_Reepay_Subscription_Plans{
 		    $params['renewal_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_renewal_reminder']);
 	    }
 
-	    if(!empty($_REQUEST['_reepay_subscription_trial'])){
-		    $params['trial_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_trial']);
+	    if(!empty($_REQUEST['_reepay_subscription_trial']) && !empty($_REQUEST['_reepay_subscription_trial']['reminder'])){
+		    $params['trial_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_trial']['reminder']);
 	    }
 
         if(is_array($type_data) && !empty($type_data['period'])){
