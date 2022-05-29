@@ -10,21 +10,32 @@ class WC_Reepay_Renewals {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'plugins_loaded', [ $this, 'test' ] );
-		add_action( 'reepay_payment_finalize ', [ $this, 'add_renewal' ] );
+		add_action( 'reepay_webhook_invoice_authorized', [ $this, 'add_renewal' ] );
 	}
 
-	public function test( $data ) {
-		if ( ! empty( $_GET['test_reepay'] ) ) {
-			$res = null;
+	/**
+	 * @param  array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'invoice' => string
+	 *     'customer' => string
+	 *     'transaction' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 *     'order_id' => int
+	 * ] $data
+	 */
+	public function add_renewal( $data ) {
+		$res = null;
 
-			try {
-				/**
-				 * @see https://reference.reepay.com/api/#create-subscription
-				 */
-				$res = reepay_s()->api()->request( 'subscription', 'POST', [
-					'customer'      => $data['customer'],
-					'plan'          => $data['plan'],
+		try {
+			/**
+			 * @see https://reference.reepay.com/api/#create-subscription
+			 */
+			$res = reepay_s()->api()->request( 'subscription', 'POST', [
+				'customer'       => $data['customer'],
+				'plan'           => $data['plan'],
 //					'amount' => null,
 //					'quantity' => null,
 //					'test' => null,
@@ -37,7 +48,7 @@ class WC_Reepay_Renewals {
 //					'generate_handle' => null,
 //					'start_date' => null,
 //					'end_date' => null,
-					'grace_duration' => 172800,
+				'grace_duration' => 172800,
 //					'no_trial' => null,
 //					'no_setup_fee' => null,
 //					'trial_period' => null,
@@ -45,36 +56,26 @@ class WC_Reepay_Renewals {
 //					'coupon_codes' => null,
 //					'add_ons' => null,
 //					'additional_costs' => null,
-					'signup_method' => 'source',
+				'signup_method'  => 'source',
+			] );
+		} catch ( Exception $e ) {
+		}
+
+		if ( ! empty( $res ) ) {
+			try {
+				/**
+				 * @see https://reference.reepay.com/api/#set-payment-method
+				 */
+				$res = reepay_s()->api()->request( "subscription/{$res['handle']}/pm", 'POST', [
+					'handle' => $res['handle'],
+//						'source'          => null,
+//						'payment_method_reference' => null,
 				] );
 			} catch ( Exception $e ) {
 			}
-
-			if ( ! empty( $res ) ) {
-				try {
-					/**
-					 * @see https://reference.reepay.com/api/#set-payment-method
-					 */
-					$res = reepay_s()->api()->request( "subscription/{$res['handle']}/pm", 'POST', [
-						'handle'      => $res['handle'],
-//						'source'          => null,
-//						'payment_method_reference' => null,
-					] );
-				} catch ( Exception $e ) {
-				}
-			}
-
-			die();
 		}
-	}
 
-	/**
-	 * @param  array<string, mixed>  $data
-	 *
-	 * @see https://reference.reepay.com/api/#get-invoice
-	 */
-	public function add_renewal( $data ) {
-
+		die();
 	}
 }
 
