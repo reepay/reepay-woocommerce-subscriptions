@@ -57,10 +57,11 @@ class WC_Reepay_Subscription_Plans{
             array(
                 'meta' => $meta,
                 'is_update' => $is_update,
-                'variable' => $variable
+                'variable' => $variable,
+	            'domain' => reepay_s()->settings('domain')
             ),
             '',
-            WC_Reepay_Subscriptions::$plugin_path.'templates/'
+            reepay_s()->settings('plugin_path').'templates/'
         );
     }
 
@@ -99,9 +100,7 @@ class WC_Reepay_Subscription_Plans{
         $params = $this->get_default_params($post_id, $type_data);
 
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params($params);
-            $result = $api->request('PUT', 'https://api.reepay.com/v1/plan/'.$handle);
+            $result = reepay_s()->api()->request("plan/$handle", 'PUT', $params);
             return true;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
@@ -189,9 +188,7 @@ class WC_Reepay_Subscription_Plans{
         }
 
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params($params);
-            $result = $api->request('POST', 'https://api.reepay.com/v1/plan');
+            $result = reepay_s()->api()->request('plan', 'POST', $params);
             update_post_meta($post_id, '_reepay_subscription_handle', $handle);
             return true;
         }catch (Exception $e){
@@ -205,21 +202,23 @@ class WC_Reepay_Subscription_Plans{
         $params = [
             'name' => get_the_title( $post_id ),
             'description' => get_post_field( 'post_content', $post_id ),
-            'renewal_reminder_email_days' => intval($_REQUEST['_reepay_subscription_renewal_reminder']),
             //'fixed_trial_days' => '', //@todo Уточнить что за поле в админке
         ];
 
-        $trial = $_REQUEST['_reepay_subscription_trial'];
-        if(!empty($trial['reminder'])){
-            $params['trial_reminder_email_days'] = intval($trial['reminder']);
-        }
+	    if(!empty($_REQUEST['_reepay_subscription_renewal_reminder'])){
+		    $params['renewal_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_renewal_reminder']);
+	    }
+
+	    if(!empty($_REQUEST['_reepay_subscription_trial']) && !empty($_REQUEST['_reepay_subscription_trial']['reminder'])){
+		    $params['trial_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_trial']['reminder']);
+	    }
 
         if(is_array($type_data) && !empty($type_data['period'])){
             $params['partial_period_handling'] = $type_data['period'];
         }
 
-        $fee = $_REQUEST['_reepay_subscription_fee'];
-        if(!empty($fee)){
+        if(!empty($_REQUEST['_reepay_subscription_fee'])){
+	        $fee = $_REQUEST['_reepay_subscription_fee'];
             $params['setup_fee'] = !empty($fee['amount']) ? floatval($fee['amount']) * 100 : 0;
             $params['setup_fee_text'] = !empty($fee['text']) ? $fee['text'] : '';
             $params['setup_fee_handling'] = !empty($fee['handling']) ? $fee['handling'] : '';
@@ -269,13 +268,13 @@ class WC_Reepay_Subscription_Plans{
     }
 
     public function add_reepay_type( $types ){
-        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', WC_Reepay_Subscriptions::$domain );
+        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', reepay_s()->settings('domain') );
 
         return $types;
     }
 
     public function reepay_create_subscription_product_class(){
-        include_once( WC_Reepay_Subscriptions::$plugin_path . '/includes/class-wc-reepay-plan-simple-product.php' );
+        include_once( reepay_s()->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-product.php' );
     }
 }
 

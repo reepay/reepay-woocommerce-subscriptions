@@ -16,20 +16,41 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WC_Reepay_Subscriptions{
-    public static $plugin_url;
-    public static $domain;
-    public static $plugin_path;
-    public static $version;
+class WooCommerce_Reepay_Subscriptions{
+	/**
+	 * @var WooCommerce_Reepay_Subscriptions
+	 */
+	private static $instance;
+
+	/**
+	 * @var WC_Reepay_Subscription_API
+	 */
+	private $api;
+
+	/**
+	 * @var WC_RS_Log
+	 */
+	private $log;
+
+	/**
+	 * @var array<string, mixed>
+	 */
+	private static $settings;
 
     /**
      * Constructor
      */
-    public function __construct() {
-        self::$domain = 'reepay-woocommerce-subscriptions';
-        self::$plugin_url = plugin_dir_url(__FILE__);
-        self::$plugin_path = plugin_dir_path(__FILE__);
-        self::$version = time();
+    private function __construct() {
+    	self::$settings = [
+    		'domain' => 'reepay-woocommerce-subscriptions',
+    		'plugin_url' => plugin_dir_url(__FILE__),
+    		'plugin_path' => plugin_dir_path(__FILE__),
+    		'version' => time(),
+		    'debug' => true,
+		    'test_mode' => true,
+		    'api_private_key' => 'priv_3728a84bd1d89da26f4da17a75aa81c3',
+		    'api_private_key_test' => 'priv_3728a84bd1d89da26f4da17a75aa81c3',
+	    ];
 
         // Check if WooCommerce is active
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
@@ -37,23 +58,71 @@ class WC_Reepay_Subscriptions{
             $this->includes();
             add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
         }
+
+        $this->api = WC_Reepay_Subscription_API::get_instance();
+        $this->log = WC_RS_Log::get_instance();
     }
 
+	/**
+	 * @return WooCommerce_Reepay_Subscriptions
+	 */
+	public static function get_instance() {
+		if ( self::$instance === null ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * @return WC_Reepay_Subscription_API
+	 */
+	public function api() {
+		return $this->api;
+	}
+
+	/**
+	 * @return WC_RS_Log
+	 */
+	public function log() {
+		return $this->log;
+	}
+
+	/**
+	 * Return plugin settings
+	 * @param  string  $property_name
+	 *
+	 * @return mixed
+	 */
+	public static function settings($property_name = null) {
+		return isset($property_name) ? (self::$settings[$property_name] ?? null) : self::$settings;
+	}
+
     public function admin_enqueue_scripts(){
-        wp_enqueue_script('admin-reepay-subscription', self::$plugin_url . 'assets/js/admin.js', ['jquery'], self::$version, true);
-        wp_enqueue_style('admin-reepay-subscription', self::$plugin_url . 'assets/css/admin.css');
+        wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
+        wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         /*wp_localize_script('admin-reepay-subscriptiony', 'reepay', [
             'ajaxUrl' => admin_url('admin-ajax.php')
         ]);*/
     }
 
     public function includes(){
-        include_once( self::$plugin_path . '/includes/class-wc-reepay-plans.php' );
-        include_once( self::$plugin_path . '/includes/class-wc-reepay-plans-variable.php' );
-        include_once( self::$plugin_path . '/includes/class-wc-reepay-api.php' );
-        include_once( self::$plugin_path . '/includes/class-wc-reepay-log.php' );
-        include_once( self::$plugin_path . '/includes/class-wc-reepay-admin-notice.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-api.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-log.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-admin-notice.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-helpers.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-checkout.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plans.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plans-variable.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
     }
 }
 
-new WC_Reepay_Subscriptions();
+/**
+ * @return WooCommerce_Reepay_Subscriptions
+ */
+function reepay_s() {
+	return WooCommerce_Reepay_Subscriptions::get_instance();
+}
+
+reepay_s();
