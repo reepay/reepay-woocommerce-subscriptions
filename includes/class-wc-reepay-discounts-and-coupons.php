@@ -3,27 +3,6 @@
 class WC_Reepay_Discounts_And_Coupons
 {
 
-    public static $coupon_types = array(
-        'daily' => 'Day(s)',
-        'month_startdate' => 'Month(s)',
-        'month_fixedday' => 'Fixed day of month',
-        'month_lastday' => 'Last day of month',
-        'primo' => 'Quarterly Primo',
-        'ultimo' => 'Quarterly Ultimo',
-        'half_yearly' => 'Half-yearly',
-        'month_startdate_12' => 'Yearly',
-        'weekly_fixedday' => 'Fixed day of week',
-        'manual' => 'Manual',
-    );
-
-    public static $trial = array(
-        '' => 'No Trial',
-        '7days' => '7 days',
-        '14days' => '14 days',
-        '1month' => '1 month',
-        'customize' => 'Customize',
-    );
-
     public static $apply_to = array(
         'setup_fee' => 'Setup fee',
         'plan' => 'Plan',
@@ -43,9 +22,6 @@ class WC_Reepay_Discounts_And_Coupons
     }
 
     function get_discount_default_params(WC_Coupon $coupon) {
-
-        $amount = null;
-        $percentage = null;
 
         $name = get_post_meta($coupon->get_id(), '_reepay_discount_name', true);
 
@@ -85,7 +61,7 @@ class WC_Reepay_Discounts_And_Coupons
             "eligible_plans" => $apply_plans,
         ];
         if ($max_redemptions = $coupon->get_usage_limit()) {
-            $paramsCoupon["max_redemptions"] = $coupon->get_usage_limit();
+            $paramsCoupon["max_redemptions"] = $max_redemptions;
         }
         if (!empty($end)) {
             $paramsCoupon["valid_until"] = $end->format(DATE_ISO8601);
