@@ -14,11 +14,16 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 
     public function save_reepay_variation($variation_id, $i){
-        if(!empty($_POST['product-type']) && $_POST['product-type'] != 'reepay_variable_subscriptions'){
+        if(!empty($_REQUEST['product-type']) && $_REQUEST['product-type'] != 'reepay_variable_subscriptions'){
             return;
         }
 
-        if(!empty($_POST)){
+        if(!empty($_REQUEST)){
+            if(!empty($_REQUEST['_reepay_subscription_price'])){
+                $_REQUEST['variable_regular_price'][$i] = $_REQUEST['_reepay_subscription_price'][$i];
+                update_post_meta( $variation_id, '_regular_price', $_REQUEST['_reepay_subscription_price'][$i]);
+                update_post_meta( $variation_id, '_price', $_REQUEST['_reepay_subscription_price'][$i] );
+            }
             $title = get_the_title( $variation_id );
             if(!empty($title) && $title != 'AUTO-DRAFT'){
                 $handle = get_post_meta($variation_id, '_reepay_subscription_handle', true);
@@ -33,7 +38,7 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 
     public function add_custom_field_to_variations( $loop, $variation_data, $variation ) {
-        $this->subscription_pricing_fields(true, $variation->ID);
+        $this->subscription_pricing_fields(true, $variation->ID, $loop);
     }
 
     public function reepay_variable_create_subscription_product_class(){

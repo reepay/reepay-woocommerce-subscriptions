@@ -296,5 +296,3 @@ class WC_Reepay_Discounts_And_Coupons
 }
 
 new WC_Reepay_Discounts_And_Coupons();
-
-add_action('init', 'reepay_create_subscription_product_class');
