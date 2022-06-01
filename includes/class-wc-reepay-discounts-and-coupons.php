@@ -71,10 +71,8 @@ class WC_Reepay_Discounts_And_Coupons
 
     function use_existing_coupon(WC_Coupon $wc_coupon, $handle) {
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params([]);
-            $couponObj = $api->request('GET', 'https://api.reepay.com/v1/coupon/' . $handle);
-            $discountObj = $api->request('GET', 'https://api.reepay.com/v1/discount/' . $couponObj['discount']);
+            $couponObj = reepay_s()->api()->request('coupon/' . $handle, 'GET');
+            $discountObj = reepay_s()->api()->request('discount/' . $couponObj['discount'], 'GET');
 
             $wc_coupon->set_code($couponObj['code']);
             $wc_coupon->set_description($discountObj['description']);
@@ -132,9 +130,7 @@ class WC_Reepay_Discounts_And_Coupons
 
 
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params($params);
-            $discountObj = $api->request('POST', 'https://api.reepay.com/v1/discount');
+            $discountObj = reepay_s()->api()->request('discount', 'POST', $params);
             update_post_meta($post_id, '_reepay_discount_handle', $params['handle']);
             return $discountObj;
         }catch (Exception $e){
@@ -148,9 +144,7 @@ class WC_Reepay_Discounts_And_Coupons
 
 
         try{
-            $api = new WC_Reepay_Subscription_API();
-            $api->set_params($params);
-            $discountObj = $api->request('PUT', 'https://api.reepay.com/v1/discount');
+            $discountObj = reepay_s()->api()->request('discount', 'PUT', $params);
             return $discountObj;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
@@ -161,8 +155,7 @@ class WC_Reepay_Discounts_And_Coupons
 
 
     function get_coupons() {
-        $apiCoupons = new WC_Reepay_Subscription_API();
-        return $apiCoupons->request('GET', 'https://api.reepay.com/v1/coupon')['content'] ?? [];
+        return reepay_s()->api()->request('coupon', 'GET')['content'] ?? [];
     }
     function get_plans() {
         $plansQuery = new WP_Query([
@@ -194,9 +187,7 @@ class WC_Reepay_Discounts_And_Coupons
 
 
         try{
-            $apiCoupons = new WC_Reepay_Subscription_API();
-            $apiCoupons->set_params($paramsCoupon);
-            $result2 = $apiCoupons->request('POST', 'https://api.reepay.com/v1/coupon');
+            $result2 = reepay_s()->api()->request('coupon', 'POST', $paramsCoupon);
             update_post_meta($post_id, '_reepay_coupon_handle', $paramsCoupon['handle']);
             return $result2;
         }catch (Exception $e){
@@ -211,9 +202,7 @@ class WC_Reepay_Discounts_And_Coupons
         $handle = get_post_meta($coupon->get_id(), '_reepay_coupon_handle', true);
 
         try{
-            $apiCoupons = new WC_Reepay_Subscription_API();
-            $apiCoupons->set_params($paramsCoupon);
-            $result = $apiCoupons->request('POST', 'https://api.reepay.com/v1/coupon/' . $handle);
+            $result = reepay_s()->api()->request('coupon/' . $handle, 'POST', $paramsCoupon);
             return $result;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
@@ -284,7 +273,7 @@ class WC_Reepay_Discounts_And_Coupons
                 'is_update' => $is_update,
             ),
             '',
-            WC_Reepay_Subscriptions::$plugin_path.'templates/'
+            reepay_s()->settings('plugin_path').'templates/'
         );
     }
     public function add_coupon_types($discount_types)
