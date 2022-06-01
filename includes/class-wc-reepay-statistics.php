@@ -13,7 +13,6 @@ class WC_Reepay_Statistics{
         register_deactivation_hook( REEPAY_PLUGIN_FILE, [static::class, 'plugin_deactivated'] );
         register_uninstall_hook( REEPAY_PLUGIN_FILE, [static::class, 'plugin_deleted'] );
         add_action( 'upgrader_process_complete', [static::class, 'upgrade_completed'], 10, 2 );
-        add_action( 'woocommerce_update_options_reepay_subscriptions', [static::class, 'update_settings'], 9 );
     }
     public static function send_event($event) {
         $params = [

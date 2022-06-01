@@ -52,7 +52,7 @@ class WooCommerce_Reepay_Subscriptions{
     		'domain' => 'reepay-woocommerce-subscriptions',
     		'plugin_url' => plugin_dir_url(__FILE__),
     		'plugin_path' => plugin_dir_path(__FILE__),
-    		'version' => time(),
+    		'version' => static::$version,
 		    'debug' => get_option('_reepay_debug') === 'yes',
 		    'test_mode' => get_option('_reepay_test_mode') === 'yes',
 		    'api_private_key' => get_option('_reepay_api_private_key'),
