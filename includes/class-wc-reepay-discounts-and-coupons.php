@@ -71,8 +71,8 @@ class WC_Reepay_Discounts_And_Coupons
 
     function use_existing_coupon(WC_Coupon $wc_coupon, $handle) {
         try{
-            $couponObj = reepay_s()->api()->request('coupon/' . $handle, 'GET');
-            $discountObj = reepay_s()->api()->request('discount/' . $couponObj['discount'], 'GET');
+            $couponObj = reepay_s()->api()->request('coupon/' . $handle);
+            $discountObj = reepay_s()->api()->request('discount/' . $couponObj['discount']);
 
             $wc_coupon->set_code($couponObj['code']);
             $wc_coupon->set_description($discountObj['description']);
@@ -155,7 +155,7 @@ class WC_Reepay_Discounts_And_Coupons
 
 
     function get_coupons() {
-        return reepay_s()->api()->request('coupon', 'GET')['content'] ?? [];
+        return reepay_s()->api()->request('coupon')['content'] ?? [];
     }
     function get_plans() {
         $plansQuery = new WP_Query([
