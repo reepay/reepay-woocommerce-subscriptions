@@ -105,7 +105,7 @@ class WooCommerce_Reepay_Subscriptions{
 
     public function update_settings() {
         if ($_POST['_reepay_api_private_key'] !== static::settings('api_private_key')) {
-            WC_Statistics::private_key_activated();
+            WC_Reepay_Statistics::private_key_activated();
         }
 
         woocommerce_update_options( static::get_settings() );
