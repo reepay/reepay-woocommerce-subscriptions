@@ -54,10 +54,9 @@ class WooCommerce_Reepay_Subscriptions{
 
         // Check if WooCommerce is active
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        if(is_plugin_active_for_network('woocommerce/woocommerce.php') or is_plugin_active('woocommerce/woocommerce.php')) {
-            $this->includes();
-            add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
-        }
+
+        $this->includes();
+        add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
 
         add_filter( 'woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50 );
         add_action( 'woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab'] );
