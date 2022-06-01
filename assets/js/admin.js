@@ -116,6 +116,17 @@ jQuery( function ( $ ) {
         }
     }
 
+
+    function choose_change_settings(val){
+        if(val == 'new'){
+            $('.reepay_subscription_settings').show();
+            $('.reepay_subscription_choose_exist').hide();
+        }else{
+            $('.reepay_subscription_settings').hide();
+            $('.reepay_subscription_choose_exist').show();
+        }
+    }
+
     function show_trial_settings(type){
         var subs_block = $('.reepay_subscription_trial');
         subs_block.find('.trial-fields').hide();
@@ -149,12 +160,17 @@ jQuery( function ( $ ) {
     function init(tab){
         let tab_ = $(tab);
         show_settings();
-        tab_.find('#_subscription_fee').trigger('change');
+        if(tab_.find('#_subscription_fee').is(':checked')) {
+            $('.fee-fields').show();
+        }else{
+            $('.fee-fields').hide();
+        }
         show_trial_settings(tab_.find('#_subscription_trial').val());
         show_plan_settings(tab_.find('#_subscription_schedule_type').val());
         show_notice_settings( tab_.find('#_subscription_notice_period').val());
         show_contract_settings( tab_.find('#_subscription_contract_periods').val());
         billing_cycles_settings( tab_.find('input[type=radio][name=_reepay_subscription_billing_cycles]:checked').val());
+        choose_change_settings(tab_.find('#_reepay_subscription_choose:checked').val());
 
         $( tab + ' #_subscription_schedule_type' ).on( 'change', function () {
             show_plan_settings($(this).val());
@@ -172,8 +188,12 @@ jQuery( function ( $ ) {
             show_contract_settings($(this).val());
         } );
 
-        $( tab + ' #_subscription_fee').change(function() {
+        $( tab + ' #_subscription_fee').on( 'change', function () {
             show_fee_settings(this);
+        });
+
+        $(tab + ' #_reepay_subscription_choose').change(function() {
+            choose_change_settings(this.value);
         });
 
         $(tab + ' input[type=radio][name=_reepay_subscription_billing_cycles]').change(function() {
