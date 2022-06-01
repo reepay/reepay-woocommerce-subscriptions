@@ -1,0 +1,58 @@
+<?php
+
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
+class WC_Statistics{
+
+    /**
+     * Constructor
+     */
+    public function __construct() {
+        register_deactivation_hook( __FILE__, [$this, 'plugin_deactivation'] );
+        register_uninstall_hook( __FILE__, [$this, 'plugin_deleted'] );
+        add_action( 'upgrader_process_complete', [$this, 'upe_upgrade_completed'], 10, 2 );
+        add_action( 'woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings'], 9 );
+    }
+    public static function send_event($event) {
+        $params = [
+            'plugin' => 'WOOCOMMERCE-REEPAY-SUBSCRIPTION',
+            'version' => reepay_s()->settings('version'),
+            'privatekey' => reepay_s()->settings('api_private_key'),
+            'url' => home_url(),
+            'event' => $event,
+        ];
+
+        $url = 'https://hook.reepay.integromat.celonis.com/1dndgwx6cwsvl3shsee29yyqf4d648xf';
+
+        return wp_remote_post($url, [
+            'headers' => [
+                'Content-Type' => 'application/json',
+            ],
+            'body' => json_encode($params, JSON_PRETTY_PRINT),
+        ]);
+    }
+
+    public static function plugin_deactivated() {
+        static::send_event('deactivated');
+    }
+
+    public static function plugin_deleted() {
+        static::send_event('deleted');
+    }
+
+    public static function private_key_activated() {
+        static::send_event('activated');
+    }
+
+    public static function upe_upgrade_completed($upgrader_object, $options) {
+        foreach( $options['plugins'] as $plugin ) {
+            if( strpos($plugin, __FILE__) ) {
+                static::send_event('updated');
+            }
+        }
+    }
+}
+
+new WC_Statistics();

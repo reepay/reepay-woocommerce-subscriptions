@@ -38,6 +38,11 @@ class WooCommerce_Reepay_Subscriptions{
 	private static $settings;
 
     /**
+     * @var string
+     */
+    public static $version = '1.0.0';
+
+    /**
      * Constructor
      */
     private function __construct() {
@@ -63,62 +68,11 @@ class WooCommerce_Reepay_Subscriptions{
         add_action( 'woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab'] );
         add_action( 'woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings'] );
 
-        register_deactivation_hook( __FILE__, [$this, 'plugin_deactivation'] );
-        register_uninstall_hook( __FILE__, [$this, 'plugin_deleted'] );
-        add_action( 'upgrader_process_complete', [$this, 'upe_upgrade_completed'], 10, 2 );
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
     }
 
-
-    public function plugin_deactivated() {
-        $params = [
-            'plugin' => 'WOOCOMMERCE-REEPAY-SUBSCRIPTION',
-            'version' => static::settings('version'),
-            'privatekey' => static::settings('api_private_key'),
-            'url' => home_url(),
-            'event' => 'activated',
-        ];
-        //https://hook.reepay.integromat.celonis.com/1dndgwx6cwsvl3shsee29yyqf4d648xf
-    }
-
-    public function plugin_updated($upgrader_object, $options) {
-        foreach( $options['plugins'] as $plugin ) {
-            if( strpos($plugin, __FILE__) ) {
-                $params = [
-                    'plugin' => 'WOOCOMMERCE-REEPAY-SUBSCRIPTION',
-                    'version' => static::settings('version'),
-                    'privatekey' => static::settings('api_private_key'),
-                    'url' => home_url(),
-                    'event' => 'updated',
-                ];
-                //https://hook.reepay.integromat.celonis.com/1dndgwx6cwsvl3shsee29yyqf4d648xf
-            }
-        }
-    }
-
-    public function plugin_deleted() {
-        $params = [
-            'plugin' => 'WOOCOMMERCE-REEPAY-SUBSCRIPTION',
-            'version' => static::settings('version'),
-            'privatekey' => static::settings('api_private_key'),
-            'url' => home_url(),
-            'event' => 'deleted',
-        ];
-        //https://hook.reepay.integromat.celonis.com/1dndgwx6cwsvl3shsee29yyqf4d648xf
-    }
-
-    public function private_key_activated() {
-        $params = [
-            'plugin' => 'WOOCOMMERCE-REEPAY-SUBSCRIPTION',
-            'version' => static::settings('version'),
-            'privatekey' => static::settings('api_private_key'),
-            'url' => home_url(),
-            'event' => 'activated',
-        ];
-        //https://hook.reepay.integromat.celonis.com/1dndgwx6cwsvl3shsee29yyqf4d648xf
-    }
 
     public function add_settings_tab( $settings_tabs ) {
         $settings_tabs['reepay_subscriptions'] = __( 'Reepay Subscriptions Settings', reepay_s()->settings('domain') );
@@ -131,7 +85,7 @@ class WooCommerce_Reepay_Subscriptions{
 
     public function update_settings() {
         if ($_POST['_reepay_api_private_key'] !== static::settings('api_private_key')) {
-            $this->private_key_activated();
+            WC_Statistics::private_key_activated();
         }
 
         woocommerce_update_options( static::get_settings() );
