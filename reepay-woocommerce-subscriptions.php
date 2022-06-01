@@ -41,9 +41,10 @@ class WooCommerce_Reepay_Subscriptions{
      * Constructor
      */
     private function __construct() {
+
         // Check if WooCommerce is active
         include_once(ABSPATH . 'wp-admin/includes/plugin.php');
-        if(!is_plugin_active_for_network('woocommerce/woocommerce.php') or !is_plugin_active('woocommerce/woocommerce.php')) {
+        if(!is_plugin_active_for_network('woocommerce/woocommerce.php') && !is_plugin_active('woocommerce/woocommerce.php')) {
             return;
         }
 
@@ -62,13 +63,28 @@ class WooCommerce_Reepay_Subscriptions{
 
         $this->includes();
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
-
+        add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links'] );
         add_filter( 'woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50 );
         add_action( 'woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab'] );
         add_action( 'woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings'] );
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
+    }
+
+    /**
+     * Add relevant links to plugins page
+     *
+     * @param  array $links
+     *
+     * @return array
+     */
+    public function plugin_action_links( $links ) {
+        $plugin_links = array(
+            '<a href="' . admin_url( 'admin.php?page=wc-settings&tab=reepay_subscriptions' ) . '">' . __( 'Settings', 'reepay-checkout-gateway' ) . '</a>'
+        );
+
+        return array_merge( $plugin_links, $links );
     }
 
     public function add_settings_tab( $settings_tabs ) {
