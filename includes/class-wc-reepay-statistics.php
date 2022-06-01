@@ -4,16 +4,16 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-class WC_Statistics{
+class WC_Reepay_Statistics{
 
     /**
      * Constructor
      */
     public function __construct() {
-        register_deactivation_hook( __FILE__, [$this, 'plugin_deactivation'] );
-        register_uninstall_hook( __FILE__, [$this, 'plugin_deleted'] );
-        add_action( 'upgrader_process_complete', [$this, 'upe_upgrade_completed'], 10, 2 );
-        add_action( 'woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings'], 9 );
+        register_deactivation_hook( REEPAY_PLUGIN_FILE, [static::class, 'plugin_deactivated'] );
+        register_uninstall_hook( REEPAY_PLUGIN_FILE, [static::class, 'plugin_deleted'] );
+        add_action( 'upgrader_process_complete', [static::class, 'upgrade_completed'], 10, 2 );
+        add_action( 'woocommerce_update_options_reepay_subscriptions', [static::class, 'update_settings'], 9 );
     }
     public static function send_event($event) {
         $params = [
@@ -46,7 +46,7 @@ class WC_Statistics{
         static::send_event('activated');
     }
 
-    public static function upe_upgrade_completed($upgrader_object, $options) {
+    public static function upgrade_completed($upgrader_object, $options) {
         foreach( $options['plugins'] as $plugin ) {
             if( strpos($plugin, __FILE__) ) {
                 static::send_event('updated');
@@ -55,4 +55,4 @@ class WC_Statistics{
     }
 }
 
-new WC_Statistics();
+new WC_Reepay_Statistics();
