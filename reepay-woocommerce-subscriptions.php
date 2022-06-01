@@ -41,6 +41,12 @@ class WooCommerce_Reepay_Subscriptions{
      * Constructor
      */
     private function __construct() {
+        // Check if WooCommerce is active
+        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        if(!is_plugin_active_for_network('woocommerce/woocommerce.php') or !is_plugin_active('woocommerce/woocommerce.php')) {
+            return;
+        }
+
     	self::$settings = [
     		'domain' => 'reepay-woocommerce-subscriptions',
     		'plugin_url' => plugin_dir_url(__FILE__),
@@ -52,8 +58,7 @@ class WooCommerce_Reepay_Subscriptions{
 		    'api_private_key_test' => get_option('_reepay_api_private_key_test'),
 	    ];
 
-        // Check if WooCommerce is active
-        include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+
 
         $this->includes();
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
