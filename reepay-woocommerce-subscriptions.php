@@ -230,6 +230,7 @@ class WooCommerce_Reepay_Subscriptions{
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plans.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plans-variable.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php' );
     }
 }
 

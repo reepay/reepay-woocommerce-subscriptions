@@ -35,7 +35,7 @@ class WC_Reepay_Subscription_Plans{
         add_action( 'woocommerce_variation_options_pricing', 'bbloomer_add_custom_field_to_variations', 10, 3 );
     }
 
-    public function subscription_pricing_fields($variable = false, $variation_id = 0){
+    public function subscription_pricing_fields($variable = false, $variation_id = 0, $loop = 0){
 
         if($variation_id){
             $post_id = $variation_id;
@@ -44,7 +44,6 @@ class WC_Reepay_Subscription_Plans{
             $post_id = $post->ID;
         }
 
-        $meta = get_post_meta( $post_id );
         $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
 
         $is_update = false;
@@ -52,12 +51,55 @@ class WC_Reepay_Subscription_Plans{
             $is_update = true;
         }
 
+        $_reepay_subscription_price = get_post_meta($post_id, '_reepay_subscription_price', true);
+        $_reepay_subscription_vat = get_post_meta($post_id, '_reepay_subscription_vat', true);
+        $_reepay_subscription_schedule_type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true);
+        $_reepay_subscription_daily = get_post_meta($post_id, '_reepay_subscription_daily', true);
+        $_reepay_subscription_month_fixedday = get_post_meta($post_id, '_reepay_subscription_month_fixedday', true);
+        $_reepay_subscription_month_lastday = get_post_meta($post_id, '_reepay_subscription_month_lastday', true);
+        $_reepay_subscription_primo = get_post_meta($post_id, '_reepay_subscription_primo', true);
+        $_reepay_subscription_ultimo = get_post_meta($post_id, '_reepay_subscription_ultimo', true);
+        $_reepay_subscription_half_yearly = get_post_meta($post_id, '_reepay_subscription_half_yearly', true);
+        $_reepay_subscription_month_startdate_12 = get_post_meta($post_id, '_reepay_subscription_month_startdate_12', true);
+        $_reepay_subscription_weekly_fixedday = get_post_meta($post_id, '_reepay_subscription_weekly_fixedday', true);
+        $_reepay_subscription_renewal_reminder = get_post_meta($post_id, '_reepay_subscription_renewal_reminder', true);
+        $_reepay_subscription_default_quantity = get_post_meta($post_id, '_reepay_subscription_default_quantity', true);
+        $_reepay_subscription_contract_periods = get_post_meta($post_id, '_reepay_subscription_contract_periods', true);
+        $_reepay_subscription_contract_periods_full = get_post_meta($post_id, '_reepay_subscription_contract_periods_full', true);
+        $_reepay_subscription_notice_period = get_post_meta($post_id, '_reepay_subscription_notice_period', true);
+        $_reepay_subscription_notice_period_start = get_post_meta($post_id, '_reepay_subscription_notice_period_start', true);
+        $_reepay_subscription_billing_cycles = get_post_meta($post_id, '_reepay_subscription_billing_cycles', true);
+        $_reepay_subscription_billing_cycles_period = get_post_meta($post_id, '_reepay_subscription_billing_cycles_period', true);
+        $_reepay_subscription_trial = get_post_meta($post_id, '_reepay_subscription_trial', true);
+        $_reepay_subscription_fee = get_post_meta($post_id, '_reepay_subscription_fee', true);
+
         wc_get_template(
-            'simple-subscription-fields.php',
+            'plan-subscription-fields.php',
             array(
-                'meta' => $meta,
                 'is_update' => $is_update,
+                '_reepay_subscription_price' => $variable ? $_reepay_subscription_price[$loop] : $_reepay_subscription_price,
+                '_reepay_subscription_vat' => $variable ? $_reepay_subscription_vat[$loop] : $_reepay_subscription_vat,
+                '_reepay_subscription_schedule_type' => $variable ? $_reepay_subscription_schedule_type[$loop] : $_reepay_subscription_schedule_type,
+                '_reepay_subscription_daily' => $variable ? $_reepay_subscription_daily[$loop] : $_reepay_subscription_daily,
+                '_reepay_subscription_month_fixedday' => $variable ? $_reepay_subscription_month_fixedday[$loop] : $_reepay_subscription_month_fixedday,
+                '_reepay_subscription_month_lastday' => $variable ? $_reepay_subscription_month_lastday[$loop] : $_reepay_subscription_month_lastday,
+                '_reepay_subscription_primo' => $variable ? $_reepay_subscription_primo[$loop] : $_reepay_subscription_primo,
+                '_reepay_subscription_ultimo' => $variable ? $_reepay_subscription_ultimo[$loop] : $_reepay_subscription_ultimo,
+                '_reepay_subscription_half_yearly' => $variable ? $_reepay_subscription_half_yearly[$loop] : $_reepay_subscription_half_yearly,
+                '_reepay_subscription_month_startdate_12' => $variable ? $_reepay_subscription_month_startdate_12[$loop] : $_reepay_subscription_month_startdate_12,
+                '_reepay_subscription_weekly_fixedday' => $variable ? $_reepay_subscription_weekly_fixedday[$loop] : $_reepay_subscription_weekly_fixedday,
+                '_reepay_subscription_renewal_reminder' => $variable ? $_reepay_subscription_renewal_reminder[$loop] : $_reepay_subscription_renewal_reminder,
+                '_reepay_subscription_default_quantity' => $variable ? $_reepay_subscription_default_quantity[$loop] : $_reepay_subscription_default_quantity,
+                '_reepay_subscription_contract_periods' => $variable ? $_reepay_subscription_contract_periods[$loop] : $_reepay_subscription_contract_periods,
+                '_reepay_subscription_contract_periods_full' => $variable ? $_reepay_subscription_contract_periods_full[$loop] : $_reepay_subscription_contract_periods_full,
+                '_reepay_subscription_notice_period' => $variable ? $_reepay_subscription_notice_period[$loop] : $_reepay_subscription_notice_period,
+                '_reepay_subscription_notice_period_start' => $variable ? $_reepay_subscription_notice_period_start[$loop] : $_reepay_subscription_notice_period_start,
+                '_reepay_subscription_billing_cycles' => $variable ? $_reepay_subscription_billing_cycles[$loop] : $_reepay_subscription_billing_cycles,
+                '_reepay_subscription_billing_cycles_period' => $variable ? $_reepay_subscription_billing_cycles_period[$loop] : $_reepay_subscription_billing_cycles_period,
+                '_reepay_subscription_trial' => $variable ? $_reepay_subscription_trial[$loop] : $_reepay_subscription_trial,
+                '_reepay_subscription_fee' => $variable ? $_reepay_subscription_fee[$loop] : $_reepay_subscription_fee,
                 'variable' => $variable,
+                'loop' => $loop,
 	            'domain' => reepay_s()->settings('domain')
             ),
             '',
@@ -66,11 +108,18 @@ class WC_Reepay_Subscription_Plans{
     }
 
     public function save_subscription_meta($post_id){
-        if(!empty($_POST['product-type']) && $_POST['product-type'] != 'reepay_simple_subscriptions'){
+
+        if(!empty($_REQUEST['product-type']) && $_REQUEST['product-type'] != 'reepay_simple_subscriptions'){
             return;
         }
 
         if(!empty($_REQUEST)){
+            if(!empty($_REQUEST['_reepay_subscription_price'])){
+                $_REQUEST['_regular_price'] = $_REQUEST['_reepay_subscription_price'];
+                update_post_meta( $post_id, '_regular_price', $_REQUEST['_reepay_subscription_price'] );
+                update_post_meta( $post_id, '_price', $_REQUEST['_reepay_subscription_price'] );
+            }
+
             $title = get_the_title( $post_id );
             if(!empty($title) && $title != 'AUTO-DRAFT'){
                 $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
@@ -95,7 +144,7 @@ class WC_Reepay_Subscription_Plans{
 
     public function update_plan($post_id, $handle){
         $type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true);
-        $type_data = $_REQUEST['_reepay_subscription_'.$type];
+        $type_data = !empty($_REQUEST['_reepay_subscription_'.$type]) ? $_REQUEST['_reepay_subscription_'.$type] : array();
 
         $params = $this->get_default_params($post_id, $type_data);
 
