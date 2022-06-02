@@ -47,7 +47,7 @@ class WC_Reepay_Statistics{
 
     public static function upgrade_completed($upgrader_object, $options) {
         foreach( $options['plugins'] as $plugin ) {
-            if( strpos($plugin, __FILE__) ) {
+            if( strpos($plugin, REEPAY_PLUGIN_FILE) ) {
                 static::send_event('updated');
             }
         }
