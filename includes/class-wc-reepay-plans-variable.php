@@ -24,13 +24,7 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
                 update_post_meta( $variation_id, '_reepay_choose_exist', $_REQUEST['_reepay_choose_exist'] );
                 update_post_meta( $variation_id, '_reepay_subscription_choose', $_REQUEST['_reepay_choose_exist'] );
 
-                $plan_data = $this->get_plan($_REQUEST['_reepay_choose_exist'][$i]);
-                if(!empty($plan_data)){
-                    $this->set_price($variation_id, $plan_data['amount'] / 100);
-                    //@todo уточнить нужно ли будет сохранять все поля в мету
-                }else{
-                    $this->plan_error(__( 'Plan not found', reepay_s()->settings('domain') ));
-                }
+                $this->save_remote_plan($variation_id, $_REQUEST['_reepay_choose_exist'][$i]);
             }else{
                 $this->plan_error(__( 'Please choose the plan', reepay_s()->settings('domain') ));
             }

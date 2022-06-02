@@ -1,5 +1,5 @@
 <?php
-class WC_Product_Reepay_Simple_Subscription extends WC_Product {
+class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 
     public function get_type() {
         return 'reepay_simple_subscriptions';

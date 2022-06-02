@@ -36,7 +36,11 @@ class WC_Reepay_Subscription_Plans{
         add_action( 'save_post', array( $this, 'save_subscription_meta' ), 11 );
         add_filter( 'woocommerce_product_class', array( $this, 'reepay_load_subscription_product_class' ), 10, 2);
         add_action( 'init', array( $this, 'reepay_create_subscription_product_class' ) );
-        add_action( 'woocommerce_variation_options_pricing', 'bbloomer_add_custom_field_to_variations', 10, 3 );
+        add_action( "woocommerce_reepay_simple_subscriptions_add_to_cart", array( $this, 'add_to_cart' ));
+    }
+
+    public function add_to_cart(){
+        do_action( 'woocommerce_simple_add_to_cart' );
     }
 
     public function get_plan($handle){
