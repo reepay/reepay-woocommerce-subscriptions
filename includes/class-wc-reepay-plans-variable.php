@@ -18,10 +18,11 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
             return;
         }
 
-        if($_REQUEST['_reepay_subscription_choose'] == 'exist'){
+        if(!empty($_REQUEST['_reepay_subscription_choose']) && $_REQUEST['_reepay_subscription_choose'] == 'exist'){
             if(!empty($_REQUEST['_reepay_choose_exist'])){
                 update_post_meta( $variation_id, '_reepay_subscription_handle', $_REQUEST['_reepay_choose_exist'] );
                 update_post_meta( $variation_id, '_reepay_choose_exist', $_REQUEST['_reepay_choose_exist'] );
+                update_post_meta( $variation_id, '_reepay_subscription_choose', $_REQUEST['_reepay_choose_exist'] );
 
                 $plan_data = $this->get_plan($_REQUEST['_reepay_choose_exist'][$i]);
                 if(!empty($plan_data)){
