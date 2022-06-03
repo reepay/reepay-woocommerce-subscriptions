@@ -16,6 +16,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
+define('REEPAY_PLUGIN_FILE', __FILE__);
+
 class WooCommerce_Reepay_Subscriptions{
 	/**
 	 * @var WooCommerce_Reepay_Subscriptions
@@ -38,6 +40,11 @@ class WooCommerce_Reepay_Subscriptions{
 	private static $settings;
 
     /**
+     * @var string
+     */
+    public static $version = '1.0.0';
+
+    /**
      * Constructor
      */
     private function __construct() {
@@ -52,7 +59,7 @@ class WooCommerce_Reepay_Subscriptions{
     		'domain' => 'reepay-woocommerce-subscriptions',
     		'plugin_url' => plugin_dir_url(__FILE__),
     		'plugin_path' => plugin_dir_path(__FILE__),
-    		'version' => time(),
+    		'version' => static::$version,
 		    'debug' => get_option('_reepay_debug') === 'yes',
 		    'test_mode' => get_option('_reepay_test_mode') === 'yes',
 		    'api_private_key' => get_option('_reepay_api_private_key'),
@@ -97,6 +104,10 @@ class WooCommerce_Reepay_Subscriptions{
     }
 
     public function update_settings() {
+        if ($_POST['_reepay_api_private_key'] !== static::settings('api_private_key')) {
+            WC_Reepay_Statistics::private_key_activated();
+        }
+
         woocommerce_update_options( static::get_settings() );
     }
 
@@ -195,6 +206,7 @@ class WooCommerce_Reepay_Subscriptions{
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-statistics.php' );
     }
 }
 

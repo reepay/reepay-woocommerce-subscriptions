@@ -5,9 +5,9 @@
         <label for="_subscription_price">
             <?php esc_html_e( 'Creation type', $domain ); ?>
         </label>
-        <?php esc_html_e( 'Create new subscription', $domain ); ?> &nbsp
+        <?php esc_html_e( 'Create new plan', $domain ); ?> &nbsp
         <input type="radio" id="_reepay_subscription_choose" name="_reepay_subscription_choose<?= $variable ? '['.$loop.']' : '' ?>" value="new" <?php checked( 'new', $_reepay_subscription_choose, true ); ?>>
-        &nbsp&nbsp<?php esc_html_e( 'Choose existing subscription', $domain ); ?> &nbsp
+        &nbsp&nbsp<?php esc_html_e( 'Choose existing plan', $domain ); ?> &nbsp
         <input type="radio" id="_reepay_subscription_choose" name="_reepay_subscription_choose<?= $variable ? '['.$loop.']' : '' ?>" value="exist" <?php checked( 'exist', $_reepay_subscription_choose, true ); ?>>
     </p>
 </div>
@@ -103,12 +103,12 @@
         <?php $month_lastday = $_reepay_subscription_month_lastday ?>
         <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', $domain ); ?></label>
-            <input type="number" id="_subscription_month_lastday" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($month_lastday['month']) ? $month_lastday['month'] : 0?>" name="_reepay_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]">
+            <input type="number" id="_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($month_lastday['month']) ? $month_lastday['month'] : 0?>" name="_reepay_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]">
             &nbsp<?php esc_html_e( 'Month', $domain ); ?>
         </p>
         <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_lastday_period"><?php esc_html_e( 'Partial Period Handling', $domain ); ?></label>
-            <select id="_subscription_month_lastday_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_lastday[period]" class="wc_input_subscription_period_interval">
+            <select id="_subscription_month_lastday_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[period]" class="wc_input_subscription_period_interval">
                 <option value="bill_prorated" <?php selected( 'bill_prorated', $month_lastday['period'], true ) ?>>Bill prorated (Default)</option>
                 <option value="bill_full" <?php selected( 'bill_full', $month_lastday['period'], true ) ?>>Bill for full period</option>
                 <option value="bill_zero_amount" <?php selected( 'bill_zero_amount', $month_lastday['period'], true ) ?>>Bill a zero amount</option>
