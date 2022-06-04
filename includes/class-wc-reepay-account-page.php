@@ -37,10 +37,75 @@ class WC_Reepay_Account_Page {
     }
 
 	public function subscriptions_endpoint() {
-	    $subscriptions = [];
+
+
+
+	    if (!empty($_GET['cancel_subscription'])) {
+
+            $handle = $_GET['cancel_subscription'];
+
+            $params = [
+            ];
+
+            try {
+                $result = reepay_s()->api()->request("subscription/{$handle}/cancel", 'POST', $params);
+            } catch (Exception $exception) {
+                wc_add_notice($exception->getMessage(), 'error');
+            }
+        }
+
+
+	    if (!empty($_GET['uncancel_subscription'])) {
+
+            $handle = $_GET['uncancel_subscription'];
+
+            $params = [
+            ];
+
+            $result = reepay_s()->api()->request("subscription/{$handle}/uncancel", 'POST', $params);
+        }
+
+	    if (!empty($_GET['put_on_hold'])) {
+	        $handle = $_GET['put_on_hold'];
+            $compensation_method = "none";
+
+	        $params = [
+                "compensation_method" => $compensation_method,
+            ];
+
+            $result = reepay_s()->api()->request("subscription/{$handle}/on_hold", 'POST', $params);
+        }
+
+	    if (!empty($_GET['reactivate'])) {
+	        $handle = $_GET['reactivate'];
+            $compensation_method = "none";
+
+	        $params = [
+            ];
+
+            $result = reepay_s()->api()->request("subscription/{$handle}/reactivate", 'POST', $params);
+        }
+
+	    if (!empty($_GET['change_payment_method'])) {
+
+        }
+
+
+
+
+	    $params = [];
+        $subsResult = reepay_s()->api()->request("subscription", 'GET', $params);
+        $planResult = reepay_s()->api()->request("plan", 'GET', $params);
+        $plans = [];
+        foreach ($planResult as $item) {
+            $plans[$item['handle']] = $item;
+        }
+	    $subscriptions = $subsResult['content'];
         wc_get_template(
-            'subscriptions.php',
+            'my-account/subscriptions.php',
             array(
+                'subscriptions' => $subscriptions,
+                'plans' => $plans,
             ),
             '',
             reepay_s()->settings('plugin_path').'templates/'
