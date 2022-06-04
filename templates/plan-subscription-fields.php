@@ -1,7 +1,7 @@
 <?php
 ?>
 <div class="options_group reepay_subscription_choose show_if_reepay_subscription">
-    <p class="form-field choose-fields <?= $variable ? 'dimensions_field form-row' : '' ?> ">
+    <p class="form-field choose-fields <?= $variable ? 'form-row' : '' ?> ">
         <label for="_subscription_price">
             <?php esc_html_e( 'Creation type', $domain ); ?>
         </label>
@@ -269,7 +269,7 @@
             &nbsp<?php esc_html_e( 'Week', $domain ); ?>
         </p>
         <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
-            <label for="_subscription_weekly_fixedday_day"><?php esc_html_e( 'On this day of the month', $domain ); ?></label>
+            <label for="_subscription_weekly_fixedday_day"><?php esc_html_e( 'On this day of the week', $domain ); ?></label>
             <select id="_subscription_weekly_fixedday_day" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday<?= $variable ? '['.$loop.']' : '' ?>[day]" class="wc_input_subscription_period_interval">
                 <option value="1" <?php selected( '1', $weekly_fixedday['day'], true ) ?>>Monday</option>
                 <option value="2" <?php selected( '2', $weekly_fixedday['day'], true ) ?>>Tuesday</option>
@@ -355,7 +355,7 @@
             <label for="_subscription_trial"><?php esc_html_e( 'Trial', $domain ); ?></label>
             <select id="_subscription_trial" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[type]" class="wc_input_subscription_period_interval">
                 <?php foreach ( WC_Reepay_Subscription_Plans::$trial as $value => $label ) { ?>
-                    <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $trial['type'], true ) ?>><?php echo esc_html( $label ); ?></option>
+                    <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $trial['type'], true ) ?>><?php echo esc_html_e( $label ); ?></option>
                 <?php } ?>
             </select>
         </p>

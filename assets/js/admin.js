@@ -118,12 +118,14 @@ jQuery( function ( $ ) {
 
 
     function choose_change_settings(val){
-        if(val == 'new'){
-            $('.reepay_subscription_settings').show();
-            $('.reepay_subscription_choose_exist').hide();
-        }else{
-            $('.reepay_subscription_settings').hide();
-            $('.reepay_subscription_choose_exist').show();
+        if ( 'reepay_simple_subscriptions' === $( 'select#product-type' ).val() || 'reepay_variable_subscriptions' === $( 'select#product-type' ).val() ) {
+            if(val == 'new'){
+                $('.reepay_subscription_settings').show();
+                $('.reepay_subscription_choose_exist').hide();
+            }else{
+                $('.reepay_subscription_settings').hide();
+                $('.reepay_subscription_choose_exist').show();
+            }
         }
     }
 

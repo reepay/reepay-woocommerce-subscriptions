@@ -14,7 +14,11 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 
     public function save_reepay_variation($variation_id, $i){
-        if(!empty($_REQUEST['product-type']) && $_REQUEST['product-type'] != 'reepay_variable_subscriptions'){
+        if(empty($_REQUEST['product-type'])){
+            return;
+        }
+
+        if($_REQUEST['product-type'] != 'reepay_simple_subscriptions'){
             return;
         }
 
@@ -29,6 +33,11 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
                 $this->plan_error(__( 'Please choose the plan', reepay_s()->settings('domain') ));
             }
         }else{
+
+            /*if(get_post_meta($variation_id, '_reepay_subscription_choose', true)[$i] == 'exist'){
+                delete_post_meta( $variation_id, '_reepay_subscription_handle' );
+            }*/
+
             if(!empty($_REQUEST['_reepay_subscription_price'])){
                 $this->set_price($variation_id, $_REQUEST['_reepay_subscription_price'][$i]);
             }
@@ -37,13 +46,21 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
             if(!empty($title) && $title != 'AUTO-DRAFT'){
                 $handle = get_post_meta($variation_id, '_reepay_subscription_handle', true);
                 $this->default_params = $this->get_default_params_variable($variation_id, $i);
-                $this->params = $this->get_params_variable($variation_id, $i);
+
                 if(!empty($handle)){
                     if($this->update_plan($handle)) $this->save_meta($variation_id);
                 }else{
-                    $handle = 'wc_subscription_'.$i.'_'.$variation_id;
-                    $this->save_meta($variation_id);
-                    $this->create_plan($variation_id, $handle);
+                    $handle = get_post_meta($variation_id, '_reepay_subscription_handle', true);
+                    $this->default_params = $this->get_default_params_variable($variation_id, $i);
+                    if(!empty($handle) && $_REQUEST['_reepay_subscription_choose'] != 'new'){
+                        if($this->update_plan($handle)) $this->save_meta($variation_id);
+                    }else{
+                        $handle = 'wc_subscription_'.$i.'_'.$variation_id;
+                        if($this->save_meta($variation_id)){
+                            $this->params = $this->get_params_variable($variation_id, $i);
+                            $this->create_plan($variation_id, $handle);
+                        }
+                    }
                 }
             }
         }
@@ -118,7 +135,7 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
             $params['schedule_fixed_day'] = 28;
         }
 
-        if($length = intval($this->get_interval($post_id, $type, $type_data))){
+        if($length = intval(self::get_interval($post_id, $type, $type_data))){
             $params['interval_length'] = $length;
         }
 
