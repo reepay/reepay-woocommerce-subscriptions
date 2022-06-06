@@ -18,16 +18,18 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
             return;
         }
 
-        if($_REQUEST['product-type'] != 'reepay_simple_subscriptions'){
+        if($_REQUEST['product-type'] != 'reepay_variable_subscriptions'){
             return;
         }
 
-        if(!empty($_REQUEST['_reepay_subscription_choose']) && $_REQUEST['_reepay_subscription_choose'] == 'exist'){
+        if(!empty($_REQUEST['_reepay_subscription_choose']) && $_REQUEST['_reepay_subscription_choose'][$i] == 'exist'){
             if(!empty($_REQUEST['_reepay_choose_exist'])){
                 update_post_meta( $variation_id, '_reepay_subscription_handle', $_REQUEST['_reepay_choose_exist'] );
                 update_post_meta( $variation_id, '_reepay_choose_exist', $_REQUEST['_reepay_choose_exist'] );
-                update_post_meta( $variation_id, '_reepay_subscription_choose', $_REQUEST['_reepay_choose_exist'] );
+                update_post_meta( $variation_id, '_reepay_subscription_choose', $_REQUEST['_reepay_subscription_choose'] );
 
+                $this->variable = true;
+                $this->loop = $i;
                 $this->save_remote_plan($variation_id, $_REQUEST['_reepay_choose_exist'][$i]);
             }else{
                 $this->plan_error(__( 'Please choose the plan', reepay_s()->settings('domain') ));
@@ -190,6 +192,8 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 
     public function add_custom_field_to_variations( $loop, $variation_data, $variation ) {
+        $this->variable = true;
+        $this->loop = $loop;
         $this->subscription_pricing_fields(true, $variation->ID, $loop);
     }
 

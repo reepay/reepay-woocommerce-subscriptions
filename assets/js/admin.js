@@ -14,6 +14,10 @@ jQuery( function ( $ ) {
         init(tab);
     } );
 
+    $( 'body' ).on( 'woocommerce_variations_added', function () {
+        init('#variable_product_options');
+    } );
+
     $( '#variable_product_options' ).on( 'reload', function () {
         show_settings();
     } );

@@ -38,10 +38,16 @@ class WC_Reepay_Subscription_Plans{
 
     public $default_params;
 
+    public $variable;
+
+    public $loop;
+
     /**
      * Constructor
      */
     public function __construct() {
+        $this->variable = false;
+        $this->loop = 0;
         add_filter( 'product_type_selector', array( $this, 'add_reepay_type' ) );
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'subscription_pricing_fields' ) );
         add_action( 'save_post', array( $this, 'save_subscription_meta' ), 11 );
@@ -89,8 +95,9 @@ class WC_Reepay_Subscription_Plans{
         return false;
     }
 
-    public function subscription_pricing_fields($variable = false, $variation_id = 0, $loop = 0){
-
+    public function subscription_pricing_fields($variation_id = 0){
+        $variable = $this->variable;
+        $loop = $this->loop;
         if($variation_id){
             $post_id = $variation_id;
         }else{
@@ -186,17 +193,30 @@ class WC_Reepay_Subscription_Plans{
         update_post_meta( $post_id, '_price', $price );
     }
 
+    public function get_remote_value($post_id, $value_remote, $field){
+        if($this->variable){
+            $value = get_post_meta($post_id, $field, true);
+            $value[$this->loop] = $value_remote;
+        }else{
+            $value = $value_remote;
+        }
+        return $value;
+    }
+
     public function save_remote_plan($post_id, $handle){
         $plan_data = $this->get_plan($handle);
         if(!empty($plan_data)){
             $this->set_price($post_id, $plan_data['amount'] / 100); //@todo уточнить нужно ли добавлять fee в цену или выводить отдельно
 
             if(!empty($plan_data['amount'])){
-                update_post_meta($post_id, '_reepay_subscription_price', intval($plan_data['amount']) / 100);
+                $amount = intval($plan_data['amount']) / 100;
+                $price = $this->get_remote_value($post_id, $amount, '_reepay_subscription_price');
+                update_post_meta($post_id, '_reepay_subscription_price', $price);
             }
 
             if(!empty($plan_data['vat'])){
-                update_post_meta($post_id, '_reepay_subscription_vat', $plan_data['vat']);
+                $vat = $this->get_remote_value($post_id, $plan_data['vat'], '_reepay_subscription_vat');
+                update_post_meta($post_id, '_reepay_subscription_vat', $vat);
             }
 
             if(!empty($plan_data['setup_fee'])){
@@ -206,6 +226,8 @@ class WC_Reepay_Subscription_Plans{
                     'text' => $plan_data['setup_fee_text'],
                     'handling' => $plan_data['setup_fee_handling'],
                 ];
+
+                $fee = $this->get_remote_value($post_id, $fee, '_reepay_subscription_fee');
                 update_post_meta($post_id, '_reepay_subscription_fee', $fee);
             }
 
@@ -225,38 +247,50 @@ class WC_Reepay_Subscription_Plans{
                     'unit' => $plan_data['trial_interval_unit'],
                     'reminder' => $plan_data['trial_reminder_email_days'],
                 ];
+
+                $trial = $this->get_remote_value($post_id, $trial, '_reepay_subscription_trial');
                 update_post_meta($post_id, '_reepay_subscription_trial', $trial);
             }
 
             if($plan_data["fixed_count"]){
-                update_post_meta($post_id, '_reepay_subscription_billing_cycles', 'true');
-                update_post_meta($post_id, '_reepay_subscription_billing_cycles_period', $plan_data["fixed_count"]);
+                $billing_cycles = $this->get_remote_value($post_id, 'true', '_reepay_subscription_billing_cycles');
+                update_post_meta($post_id, '_reepay_subscription_billing_cycles', $billing_cycles);
+
+                $billing_cycles_period = $this->get_remote_value($post_id, $plan_data["fixed_count"], '_reepay_subscription_billing_cycles_period');
+                update_post_meta($post_id, '_reepay_subscription_billing_cycles_period', $billing_cycles_period);
             }else{
-                update_post_meta($post_id, '_reepay_subscription_billing_cycles', 'false');
+                $billing_cycles = $this->get_remote_value($post_id, 'false', '_reepay_subscription_billing_cycles');
+                update_post_meta($post_id, '_reepay_subscription_billing_cycles', $billing_cycles);
             }
 
             if(!empty($plan_data['notice_periods'])){
-                update_post_meta($post_id, '_reepay_subscription_notice_period', $plan_data['notice_periods']);
+                $notice_period = $this->get_remote_value($post_id, $plan_data['notice_periods'], '_reepay_subscription_notice_period');
+                update_post_meta($post_id, '_reepay_subscription_notice_period', $notice_period);
             }
 
             if(isset($plan_data['notice_periods_after_current'])){
-                update_post_meta($post_id, '_reepay_subscription_notice_period_start', $plan_data['notice_periods_after_current'] ? 'true' : 'false');
+                $notice_period_start = $this->get_remote_value($post_id, $plan_data['notice_periods_after_current'] ? 'true' : 'false', '_reepay_subscription_notice_period_start');
+                update_post_meta($post_id, '_reepay_subscription_notice_period_start', $notice_period_start);
             }
 
             if(!empty($plan_data['fixation_periods'])){
-                update_post_meta($post_id, '_reepay_subscription_contract_periods', $plan_data['fixation_periods']);
+                $contract_periods = $this->get_remote_value($post_id, $plan_data['fixation_periods'], '_reepay_subscription_contract_periods');
+                update_post_meta($post_id, '_reepay_subscription_contract_periods', $contract_periods);
             }
 
             if(isset($plan_data['fixation_periods_full'])){
-                update_post_meta($post_id, '_reepay_subscription_contract_periods_full', $plan_data['fixation_periods_full'] ? 'true' : 'false');
+                $contract_periods_full = $this->get_remote_value($post_id, $plan_data['fixation_periods_full'] ? 'true' : 'false', '_reepay_subscription_contract_periods_full');
+                update_post_meta($post_id, '_reepay_subscription_contract_periods_full', $contract_periods_full);
             }
 
             if(!empty($plan_data['quantity'])){
-                update_post_meta($post_id, '_reepay_subscription_default_quantity', $plan_data['quantity']);
+                $default_quantity = $this->get_remote_value($post_id, $plan_data['quantity'], '_reepay_subscription_default_quantity');
+                update_post_meta($post_id, '_reepay_subscription_default_quantity', $default_quantity);
             }
 
             if(!empty($plan_data['renewal_reminder_email_days'])){
-                update_post_meta($post_id, '_reepay_subscription_renewal_reminder', $plan_data['renewal_reminder_email_days']);
+                $renewal_reminder = $this->get_remote_value($post_id, $plan_data['renewal_reminder_email_days'], '_reepay_subscription_renewal_reminder');
+                update_post_meta($post_id, '_reepay_subscription_renewal_reminder', $renewal_reminder);
             }
 
             if(!empty($plan_data['schedule_type'])){
@@ -276,13 +310,15 @@ class WC_Reepay_Subscription_Plans{
                     }
                 }
 
+                $type = $this->get_remote_value($post_id, $type, '_reepay_subscription_schedule_type');
                 update_post_meta($post_id, '_reepay_subscription_schedule_type', $type);
             }
 
 
             if(!empty($plan_data['interval_length'])){
-                update_post_meta($post_id, '_reepay_subscription_daily', $plan_data['interval_length']);
-                update_post_meta($post_id, '_reepay_subscription_month_startdate', $plan_data['interval_length']);
+                $subscription_daily = $this->get_remote_value($post_id, $plan_data['interval_length'], '_reepay_subscription_daily');
+                update_post_meta($post_id, '_reepay_subscription_daily', $subscription_daily);
+                update_post_meta($post_id, '_reepay_subscription_month_startdate', $subscription_daily);
 
 
                 $type_data = [
@@ -293,21 +329,25 @@ class WC_Reepay_Subscription_Plans{
                     'proration_minimum' => !empty($plan_data['minimum_prorated_amount']) ? $plan_data['minimum_prorated_amount'] : '',
 
                 ];
-                update_post_meta($post_id, '_reepay_subscription_month_fixedday', $type_data);
+                $month_fixedday = $this->get_remote_value($post_id, $type_data, '_reepay_subscription_month_fixedday');
+                update_post_meta($post_id, '_reepay_subscription_month_fixedday', $month_fixedday);
 
                 unset($type_data['day']);
-                update_post_meta($post_id, '_reepay_subscription_month_lastday', $type_data);
+                $month_lastday = $this->get_remote_value($post_id, $type_data, '_reepay_subscription_month_lastday');
+                update_post_meta($post_id, '_reepay_subscription_month_lastday', $month_lastday);
 
                 unset($type_data['month']);
-                update_post_meta($post_id, '_reepay_subscription_primo', $type_data);
-                update_post_meta($post_id, '_reepay_subscription_month_startdate_12', $type_data);
-                update_post_meta($post_id, '_reepay_subscription_half_yearly', $type_data);
-                update_post_meta($post_id, '_reepay_subscription_ultimo', $type_data);
+                $primo = $this->get_remote_value($post_id, $type_data, '_reepay_subscription_primo');
+                update_post_meta($post_id, '_reepay_subscription_primo', $primo);
+                update_post_meta($post_id, '_reepay_subscription_month_startdate_12', $primo);
+                update_post_meta($post_id, '_reepay_subscription_half_yearly', $primo);
+                update_post_meta($post_id, '_reepay_subscription_ultimo', $primo);
 
 
                 $type_data['week'] = $plan_data['interval_length'];
                 $type_data['day'] = !empty($plan_data['schedule_fixed_day']) ? $plan_data['schedule_fixed_day'] : '';
-                update_post_meta($post_id, '_reepay_subscription_weekly_fixedday', $type_data);
+                $weekly_fixedday = $this->get_remote_value($post_id, $type_data, '_reepay_subscription_weekly_fixedday');
+                update_post_meta($post_id, '_reepay_subscription_weekly_fixedday', $weekly_fixedday);
             }
         }else{
             $this->plan_error(__( 'Plan not found', reepay_s()->settings('domain') ));
