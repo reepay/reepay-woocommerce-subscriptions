@@ -67,13 +67,17 @@ class WC_Reepay_Account_Page {
 
 	    if (!empty($_GET['put_on_hold'])) {
 	        $handle = $_GET['put_on_hold'];
-            $compensation_method = "none";
+            $compensation_method = WooCommerce_Reepay_Subscriptions::settings('compensation_method');
 
 	        $params = [
                 "compensation_method" => $compensation_method,
             ];
 
-            $result = reepay_s()->api()->request("subscription/{$handle}/on_hold", 'POST', $params);
+            try {
+                $result = reepay_s()->api()->request("subscription/{$handle}/on_hold", 'POST', $params);
+            } catch (Exception $e) {
+                WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
+            }
         }
 
 	    if (!empty($_GET['reactivate'])) {
