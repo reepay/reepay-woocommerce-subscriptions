@@ -38,7 +38,7 @@ class WC_RS_Log{
     /**
      * Logging method.
      *
-     * @param string $message Log message.
+     * @param mixed $message Log message.
      * @param string $level   Optional. Default 'info'.
      *     emergency|alert|critical|error|warning|notice|info|debug
      *
