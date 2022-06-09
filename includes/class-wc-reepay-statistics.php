@@ -16,7 +16,7 @@ class WC_Reepay_Statistics{
     }
     public static function send_event($event) {
         $params = [
-            'plugin' => 'WOOCOMMERCE-REEPAY-SUBSCRIPTION',
+            'plugin' => 'WOOCOMMERCE-SUBSCRIPTION',
             'version' => reepay_s()->settings('version'),
             'privatekey' => reepay_s()->settings('api_private_key'),
             'url' => home_url(),
@@ -24,13 +24,14 @@ class WC_Reepay_Statistics{
         ];
 
         $url = 'https://hook.reepay.integromat.celonis.com/1dndgwx6cwsvl3shsee29yyqf4d648xf';
-
-        return wp_remote_post($url, [
+        $res = wp_remote_post($url, [
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
             'body' => json_encode($params, JSON_PRETTY_PRINT),
         ]);
+
+        return $res;
     }
 
     public static function plugin_deactivated() {

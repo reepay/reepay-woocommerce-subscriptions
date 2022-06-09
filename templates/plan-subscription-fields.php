@@ -1,7 +1,7 @@
 <?php
 ?>
 <div class="options_group reepay_subscription_choose show_if_reepay_subscription">
-    <p class="form-field choose-fields <?= $variable ? 'dimensions_field form-row' : '' ?> ">
+    <p class="form-field choose-fields <?= $variable ? 'form-row' : '' ?> ">
         <label for="_subscription_price">
             <?php esc_html_e( 'Creation type', $domain ); ?>
         </label>
@@ -269,7 +269,7 @@
             &nbsp<?php esc_html_e( 'Week', $domain ); ?>
         </p>
         <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
-            <label for="_subscription_weekly_fixedday_day"><?php esc_html_e( 'On this day of the month', $domain ); ?></label>
+            <label for="_subscription_weekly_fixedday_day"><?php esc_html_e( 'On this day of the week', $domain ); ?></label>
             <select id="_subscription_weekly_fixedday_day" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday<?= $variable ? '['.$loop.']' : '' ?>[day]" class="wc_input_subscription_period_interval">
                 <option value="1" <?php selected( '1', $weekly_fixedday['day'], true ) ?>>Monday</option>
                 <option value="2" <?php selected( '2', $weekly_fixedday['day'], true ) ?>>Tuesday</option>
@@ -355,7 +355,7 @@
             <label for="_subscription_trial"><?php esc_html_e( 'Trial', $domain ); ?></label>
             <select id="_subscription_trial" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[type]" class="wc_input_subscription_period_interval">
                 <?php foreach ( WC_Reepay_Subscription_Plans::$trial as $value => $label ) { ?>
-                    <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $trial['type'], true ) ?>><?php echo esc_html( $label ); ?></option>
+                    <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $trial['type'], true ) ?>><?php echo esc_html_e( $label ); ?></option>
                 <?php } ?>
             </select>
         </p>
@@ -386,12 +386,26 @@
             <input type="number" id="_subscription_fee_amount" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[amount]" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'Amount', $domain ); ?>" step="any" min="0" value="<?= !empty($fee['amount']) ? $fee['amount'] : 0?>" />
             <input type="text" id="_subscription_fee_text" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[text]" placeholder="<?php esc_attr_e( 'Text', $domain ); ?>"  value="<?= !empty($fee['text']) ? $fee['text'] : ''?>" />
             <select id="_subscription_fee_handling" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[handling]" class="wc_input_subscription_period_interval">
-                <option value="first" <?php selected( 'first', $fee['handling'], true ) ?>>Include setup fee as order line on the first scheduled invoice</option>
-                <option value="separate" <?php selected( 'separate', $fee['handling'], true ) ?>>Create a separate invoice for the setup fee</option>
-                <option value="separate_conditional" <?php selected( 'separate_conditional', $fee['handling'], true ) ?>>Create a separate invoice for the setup fee, if the first invoice is not created in conjunction with the creation</option>
+                <option value="first" <?php selected( 'first', $fee['handling'], true ) ?>><?php esc_html_e( 'Include setup fee as order line on the first scheduled invoice', $domain ); ?></option>
+                <option value="separate" <?php selected( 'separate', $fee['handling'], true ) ?>><?php esc_html_e( 'Create a separate invoice for the setup fee', $domain ); ?></option>
+                <option value="separate_conditional" <?php selected( 'separate_conditional', $fee['handling'], true ) ?>><?php esc_html_e( 'Create a separate invoice for the setup fee, if the first invoice is not created in conjunction with the creation', $domain ); ?></option>
             </select>
         </span>
         </p>
+    </div>
+    <div class="options_group reepay_subscription_compensation show_if_reepay_subscription">
+        <p class="form-field">
+            <label for="_subscription_compensation"><?php esc_html_e( 'Compensation method', $domain ); ?></label>
+            <select id="_subscription_compensation" name="_reepay_subscription_compensation<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
+                <option value="none" <?php selected( 'none', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'None', $domain ); ?></option>
+                <option value="full_refund" <?php selected( 'full_refund', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Full refund', $domain ); ?></option>
+                <option value="prorated_refund" <?php selected( 'prorated_refund', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated refund', $domain ); ?></option>
+                <option value="full_credit" <?php selected( 'full_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Full credit', $domain ); ?></option>
+                <option value="prorated_credit" <?php selected( 'prorated_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated credit', $domain ); ?></option>
+            </select>
+        </p>
+
+
     </div>
 </div>
 
