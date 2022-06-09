@@ -54,7 +54,7 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
                 }else{
                     $handle = get_post_meta($variation_id, '_reepay_subscription_handle', true);
                     $this->default_params = $this->get_default_params_variable($variation_id, $i);
-                    if(!empty($handle) && $_REQUEST['_reepay_subscription_choose'] != 'new'){
+                    if(!empty($handle)){
                         if($this->update_plan($handle)) $this->save_meta($variation_id);
                     }else{
                         $handle = 'wc_subscription_'.$i.'_'.$variation_id;
