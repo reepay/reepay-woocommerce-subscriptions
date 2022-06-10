@@ -38,16 +38,36 @@ function my_date($dateStr) {
     return (new DateTime($dateStr))->format('d M Y');
 }
 
-?>
+$user_payment_methods = wc_get_customer_saved_methods_list(get_current_user_id());
 
+$user_payment_methods2 = [];
+
+foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
+    $user_payment_methods2[] = WC_Payment_Tokens::get($user_payment_method['method']['id']);
+}
+
+?>
 <?php foreach($args['subscriptions'] as $subscription): ?>
     <?php
     $plan = $args['plans'][$subscription['plan']];
     $is_expired = $subscription['state'] === 'expired';
+    $payment_methods = reepay_s()->api()->request("subscription/".$subscription['handle']."/pm")
+
     ?>
     <h1><?= $plan['name'] ?></h1>
     <table>
         <tbody>
+        <tr>
+            <td>
+                Payment methods:
+            </td>
+            <td>
+                <?php foreach($payment_methods as $payment_method): ?>
+                    <?= $payment_method['card']['cart_type'] ?> <?= $payment_method['card']['masked_card'] ?>
+                    <br>
+                <?php endforeach; ?>
+            </td>
+        </tr>
         <?php if (!$is_expired): ?>
             <tr>
                 <td>Actions:</td>
@@ -65,6 +85,11 @@ function my_date($dateStr) {
                             <a href="?cancel_subscription=<?= $subscription['handle'] ?>">Cancel Subscription</a>
                         <?php endif; ?>
                     <?php endif; ?>
+                    <br>
+                    <?php foreach($user_payment_methods2 ?? [] as $payment_method): ?>
+                        <a href="?change_payment_method=<?= $subscription['handle'] ?>&token_id=<?= $payment_method->get_id() ?>">Change payment method to <?= $payment_method->get_masked_card() ?> <?= $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></a>
+                        <br>
+                    <?php endforeach; ?>
             </tr>
         <?php endif; ?>
         <tr>

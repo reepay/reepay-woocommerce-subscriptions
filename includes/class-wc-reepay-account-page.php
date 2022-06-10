@@ -82,12 +82,23 @@ class WC_Reepay_Account_Page {
 
 	    if (!empty($_GET['reactivate'])) {
 	        $handle = $_GET['reactivate'];
-            $compensation_method = "none";
 
 	        $params = [
             ];
 
             $result = reepay_s()->api()->request("subscription/{$handle}/reactivate", 'POST', $params);
+        }
+
+	    if (!empty($_GET['change_payment_method'])) {
+	        $handle = $_GET['change_payment_method'];
+	        $token_id = $_GET['token_id'];
+            $token = WC_Payment_Tokens::get($token_id);
+
+	        $params = [
+	            'source' => $token->get_token(),
+            ];
+
+            $result = reepay_s()->api()->request("subscription/{$handle}/pm", 'POST', $params);
         }
 
 	    if (!empty($_GET['change_payment_method'])) {
