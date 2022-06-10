@@ -10,24 +10,131 @@ class WC_Reepay_Subscription_Addons{
         add_action( 'woocommerce_product_data_panels', array( $this, 'panel_addons' ) );
         add_action( 'woocommerce_process_product_meta', array( $this, 'save_addons' ), 1 );
         add_action( 'woocommerce_before_add_to_cart_button', array( $this, 'addons_display' ));
-        add_action( 'woocommerce_add_to_cart', array( $this, 'addons_add_to_cart' ), 10, 6);
+        add_action( 'woocommerce_add_cart_item_data', array( $this, 'add_cart_item_data' ), 10, 6);
+        add_filter( 'woocommerce_add_cart_item', array( $this, 'add_cart_item' ), 20, 1 );
+        // Load cart data per page load.
+        add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session' ), 20, 2 );
     }
 
-    public function addons_add_to_cart($cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data){
-        foreach ($_POST as $key => $item){
-            if(strpos($key, 'addon-') !== false){
-                $handle = str_replace('addon-', '', $key);
-                /*var_dump($_POST);
-                exit;*/
+    /**
+     * Get cart item from session.
+     *
+     * @param array $cart_item Cart item data.
+     * @param array $values    Cart item values.
+     * @return array
+     */
+    public function get_cart_item_from_session( $cart_item, $values ) {
+        if ( ! empty( $values['addons'] ) ) {
+            $cart_item['addons'] = $values['addons'];
+            $cart_item = $this->add_cart_item( $cart_item );
+        }
+
+        return $cart_item;
+    }
+
+    /**
+     * Adjust add-on price if set on cart.
+     *
+     * @param array $cart_item Cart item data.
+     * @return array
+     */
+    public function add_cart_item( $cart_item ) {
+
+        if ( ! empty( $cart_item['addons'] ) && apply_filters( 'woocommerce_product_addons_adjust_price', true, $cart_item ) ) {
+            $price = $cart_item['data']->get_price();
+
+            foreach ( $cart_item['addons'] as $addon ) {
+                if ( (float) $addon['amount'] > 0) {
+                    if(!empty($addon['quantity'])){
+                        $price += (float) $addon['amount'] * (int) $addon['quantity'];
+                    }else{
+                        $price += (float) $addon['amount'];
+                    }
+
+                }
+            }
+
+            $cart_item['data']->set_price( $price );
+        }
+
+        return $cart_item;
+    }
+
+    function get_product_addons($product_id){
+        $product = wc_get_product($product_id);
+        return array_filter((array)$product->get_meta('_product_addons'));
+    }
+
+    /**
+     * Add cart item data.
+     *
+     * @param array $cart_item_meta Cart item meta data.
+     * @param int   $product_id     Product ID.
+     * @param bool  $test           If this is a test i.e. just getting data but not adding to cart. Used to prevent uploads.
+     * @return array
+     */
+    public function add_cart_item_data( $cart_item_meta, $product_id, $post_data = null, $test = false ) {
+
+        if ( !$post_data && isset( $_POST ) ) {
+            $post_data = $_POST;
+        }
+
+        if ( empty( $post_data ) ) {
+            $post_data = $cart_item_meta;
+        }
+
+
+        if ( ! empty( $post_data['add-to-cart'] )) {
+            $product_id = $post_data['add-to-cart'];
+        }
+
+        $product_addons = $this->get_product_addons( $product_id );
+
+        if ( empty( $cart_item_meta['addons'] ) ) {
+            $cart_item_meta['addons'] = array();
+        }
+
+
+
+        if ( is_array( $product_addons ) && ! empty( $product_addons ) ) {;
+
+            foreach ( $product_addons as $i => $addon ) {
+
+                if(isset($post_data[ 'addon-' . $addon['handle'] ])){
+                    $data = array();
+                    $value = $post_data[ 'addon-' . $addon['handle'] ];
+
+                    if($value != 'yes' && !intval($value)){
+                        continue;
+                    }
+
+                    $data[$i] = [
+                        'name' => $addon['name'],
+                        'handle' => $addon['handle'],
+                        'add_on' => $addon['handle'],
+                        'amount' => $addon['amount'],
+                        'description' => $addon['description'],
+                        'fixed_amount' => true,
+                        'amount_incl_vat' => $addon['vat_type'] == 'include',
+                    ];
+
+                    if($value != 'yes' && intval($value) != 0){
+
+                        $data[$i]['quantity'] = intval($value);
+                    }
+
+                    $cart_item_meta['addons'] = array_merge( $cart_item_meta['addons'], apply_filters( 'woocommerce_product_addon_cart_item_data', $data, $addon, $product_id, $post_data ) );
+                }
             }
         }
 
+        return $cart_item_meta;
     }
 
     public function addons_display(){
         global $product;
         $product_addons = array_filter((array)$product->get_meta('_product_addons'));
-        var_dump($product_addons);
+
         if(!empty($product_addons)){
             wc_get_template(
                 'plan-addons-subscription-frontend.php',
@@ -118,6 +225,8 @@ class WC_Reepay_Subscription_Addons{
 
         return false;
     }
+
+
 
     /**
      * Process meta box.
