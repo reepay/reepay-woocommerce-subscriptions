@@ -388,7 +388,7 @@ class WC_Reepay_Subscription_Plans{
                 if(!empty($title) && $title != 'AUTO-DRAFT'){
                     $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
                     $this->default_params = $this->get_default_params($post_id);
-                    if(!empty($handle) && $_REQUEST['_reepay_subscription_choose'] != 'new'){
+                    if(!empty($handle)){
                         if($this->update_plan($handle)) $this->save_meta($post_id);
                     }else{
                         $handle = 'wc_subscription_'.$post_id;
