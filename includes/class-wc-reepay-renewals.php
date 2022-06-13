@@ -16,6 +16,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
+		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
 	}
 
 	/**
@@ -149,7 +150,6 @@ class WC_Reepay_Renewals {
 	 *     'customer' => string
 	 *     'event_type' => string
 	 *     'event_id' => string
-	 *     'order_id' => int
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
@@ -178,7 +178,6 @@ class WC_Reepay_Renewals {
 	 *     'customer' => string
 	 *     'event_type' => string
 	 *     'event_id' => string
-	 *     'order_id' => int
 	 * ] $data
 	 */
 	public function hold_subscription( $data ) {
@@ -207,7 +206,6 @@ class WC_Reepay_Renewals {
 	 *     'customer' => string
 	 *     'event_type' => string
 	 *     'event_id' => string
-	 *     'order_id' => int
 	 * ] $data
 	 */
 	public function cancel_subscription( $data ) {
@@ -224,6 +222,34 @@ class WC_Reepay_Renewals {
 		}
 
 		self::create_child_order( $parent_order, 'wc-cancelled' );
+	}
+
+	/**
+	 *
+	 * @param  array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'subscription' => string
+	 *     'customer' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 * ] $data
+	 */
+	public function uncancel_subscription( $data ) {
+		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		if ( empty( $parent_order ) ) {
+			reepay_s()->log()->log( [
+				'source' => 'WC_Reepay_Renewals::uncancel_subscription',
+				'error'  => 'undefined parent order',
+				'data'   => $data
+			], 'error' );
+
+			return;
+		}
+
+		self::create_child_order( $parent_order, 'wc-completed' );
 	}
 
 	/**
