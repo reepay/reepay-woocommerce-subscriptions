@@ -11,7 +11,11 @@ class WC_Reepay_Renewals {
 	 */
 	public function __construct() {
 		add_action( 'reepay_webhook_invoice_authorized', [ $this, 'create_subscription' ] );
+		add_action( 'reepay_webhook_invoice_settled', [ $this, 'create_subscription' ] );
+
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
+		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
+		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
 	}
 
 	/**
@@ -34,6 +38,16 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
+		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
+			reepay_s()->log()->log( [
+				'source' => 'WC_Reepay_Renewals::create_subscription',
+				'error'  => 'Subscription already exists',
+				'data'   => $data
+			], 'error' );
+
+			return;
+		}
+
 		$token = self::get_payment_token_order( $order );
 
 		if ( empty( $token ) ) {
@@ -48,10 +62,10 @@ class WC_Reepay_Renewals {
 
 		$token = $token->get_token();
 
-		foreach ($order->get_items() as $item_id => $order_item) {
-			$product    = $order_item->get_product();
+		foreach ( $order->get_items() as $item_id => $order_item ) {
+			$product = $order_item->get_product();
 
-			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
+			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id() . '_' . time();
 
 			$new_subscription = null;
 			try {
@@ -91,7 +105,7 @@ class WC_Reepay_Renewals {
 					'source' => 'WC_Reepay_Renewals::create_subscription',
 					'error'  => 'create-subscription',
 					'data'   => $data,
-					'plan' => $product->get_meta( '_reepay_subscription_handle' )
+					'plan'   => $product->get_meta( '_reepay_subscription_handle' )
 				], 'error' );
 
 				return;
@@ -119,14 +133,154 @@ class WC_Reepay_Renewals {
 			}
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
+			$order->save();
 		}
 	}
 
+	/**
+	 *
+	 * @param  array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'invoice' => string
+	 *     'subscription' => string
+	 *     'customer' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 *     'order_id' => int
+	 * ] $data
+	 */
 	public function renew_subscription( $data ) {
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
+		if ( empty( $parent_order ) ) {
+			reepay_s()->log()->log( [
+				'source' => 'WC_Reepay_Renewals::renew_subscription',
+				'error'  => 'undefined parent order',
+				'data'   => $data
+			], 'error' );
+
+			return;
+		}
+
+		self::create_child_order( $parent_order, 'wc-completed' );
+	}
+
+	/**
+	 *
+	 * @param  array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'subscription' => string
+	 *     'customer' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 *     'order_id' => int
+	 * ] $data
+	 */
+	public function hold_subscription( $data ) {
+		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		if ( empty( $parent_order ) ) {
+			reepay_s()->log()->log( [
+				'source' => 'WC_Reepay_Renewals::hold_subscription',
+				'error'  => 'undefined parent order',
+				'data'   => $data
+			], 'error' );
+
+			return;
+		}
+
+		self::create_child_order( $parent_order, 'wc-on-hold' );
+	}
+
+	/**
+	 *
+	 * @param  array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'subscription' => string
+	 *     'customer' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 *     'order_id' => int
+	 * ] $data
+	 */
+	public function cancel_subscription( $data ) {
+		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		if ( empty( $parent_order ) ) {
+			reepay_s()->log()->log( [
+				'source' => 'WC_Reepay_Renewals::cancel_subscription',
+				'error'  => 'undefined parent order',
+				'data'   => $data
+			], 'error' );
+
+			return;
+		}
+
+		self::create_child_order( $parent_order, 'wc-cancelled' );
+	}
+
+	/**
+	 * Get payment token.
+	 *
+	 * @param  WC_Order  $order
+	 *
+	 * @return WC_Payment_Token_Reepay|false
+	 */
+	public static function get_payment_token_order( WC_Order $order ) {
+		$token = $order->get_meta( '_reepay_token' );
+		if ( empty( $token ) ) {
+			return false;
+		}
+
+		return self::get_payment_token( $token );
+	}
+
+	/**
+	 * Get Payment Token by Token string.
+	 *
+	 * @param  string  $token
+	 *
+	 * @return null|bool|WC_Payment_Token
+	 */
+	public static function get_payment_token( $token ) {
+		global $wpdb;
+
+		$query    = "SELECT token_id FROM {$wpdb->prefix}woocommerce_payment_tokens WHERE token = '%s';";
+		$token_id = $wpdb->get_var( $wpdb->prepare( $query, $token ) );
+		if ( ! $token_id ) {
+			return false;
+		}
+
+		return WC_Payment_Tokens::get( $token_id );
+	}
+
+	/**
+	 * @param  string  $handle
+	 *
+	 * @return bool|WC_Order|WC_Order_Refund
+	 */
+	public static function get_order_by_subscription_handle( $handle ) {
+		// $handle - "subscription_handle_<order_id>_<product_id>_<timestamp>"
+		$parts = explode( '_', $handle );
+
+		return wc_get_order( (int) $parts[2] );
+	}
+
+	/**
+	 * @param  WC_Order  $parent_order
+	 * @param  string  $status
+	 *
+	 * @return WC_Order|WP_Error
+	 */
+	public static function create_child_order( $parent_order, $status ) {
 		$order = wc_create_order( [
-			'status'      => 'wc-completed',
+			'status'      => $status,
 			'parent'      => $parent_order->get_id(),
 			'customer_id' => $parent_order->get_customer_id(),
 		] );
@@ -184,58 +338,13 @@ class WC_Reepay_Renewals {
 		}
 
 		foreach ( $parent_order->get_items() as $item ) {
-			$test = $order->add_product( $item['product_id'], $item['qty'] );
+			$order->add_product( wc_get_product( $item['product_id'] ), $item['qty'] );
 		}
 
 		$order->save();
 		$order->calculate_totals();
-	}
 
-	/**
-	 * Get payment token.
-	 *
-	 * @param  WC_Order  $order
-	 *
-	 * @return WC_Payment_Token_Reepay|false
-	 */
-	public static function get_payment_token_order( WC_Order $order ) {
-		$token = $order->get_meta( '_reepay_token' );
-		if ( empty( $token ) ) {
-			return false;
-		}
-
-		return self::get_payment_token( $token );
-	}
-
-	/**
-	 * Get Payment Token by Token string.
-	 *
-	 * @param  string  $token
-	 *
-	 * @return null|bool|WC_Payment_Token
-	 */
-	public static function get_payment_token( $token ) {
-		global $wpdb;
-
-		$query    = "SELECT token_id FROM {$wpdb->prefix}woocommerce_payment_tokens WHERE token = '%s';";
-		$token_id = $wpdb->get_var( $wpdb->prepare( $query, $token ) );
-		if ( ! $token_id ) {
-			return false;
-		}
-
-		return WC_Payment_Tokens::get( $token_id );
-	}
-
-	/**
-	 * @param  string  $handle
-	 *
-	 * @return bool|WC_Order|WC_Order_Refund
-	 */
-	public static function get_order_by_subscription_handle( $handle ) {
-		// $handle - "subscription_handle_<order_id>_<product_id>"
-		$parts = explode( '_', $handle );
-
-		return wc_get_order( (int) $parts[2] );
+		return $order;
 	}
 }
 
