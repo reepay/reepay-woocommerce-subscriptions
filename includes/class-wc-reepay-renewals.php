@@ -19,6 +19,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
+	 * 
 	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
