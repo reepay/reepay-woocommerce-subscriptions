@@ -144,18 +144,6 @@ class WooCommerce_Reepay_Subscriptions{
                 'desc' => __( 'Private key for test api', reepay_s()->settings('domain') ),
                 'id'   => '_reepay_api_private_key_test'
             ),
-            'compensation_method' => array(
-                'name' => __( 'Compensation method', reepay_s()->settings('domain') ),
-                'type' => 'radio',
-                'desc' => __( 'How should the customer be compensated for the remaining period?', reepay_s()->settings('domain') ),
-                'id'   => '_reepay_compensation_method',
-                'options' => [
-                    'none' => 'No Compensation',
-                    'prorated_credit' => 'Prorated Credit',
-                    'full_credit' => 'Full Credit',
-                ]
-
-            ),
             'section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'reepay_section_end'

@@ -60,17 +60,7 @@ class WC_Reepay_Account_Page {
         if (!empty($_GET['put_on_hold'])) {
             $handle = $_GET['put_on_hold'];
             $plan_handle = $_GET['plan'];
-            $query = new WP_Query([
-                'post_type' => 'product',
-                'post_status' => 'publish',
-                'posts_per_page' => 1,
-                'meta_query' => [[
-                    'key' => '_reepay_subscription_handle',
-                    'value' => $plan_handle,
-                ]]
-            ]);
-
-            $plan = $query->post;
+            $plan = WC_Reepay_Subscription_Plans::wc_get_plan($handle);
             if (!empty($plan)) {
                 $compensation_method = get_post_meta($plan->ID, '_reepay_subscription_compensation', true);
 
@@ -127,19 +117,7 @@ class WC_Reepay_Account_Page {
 	    return __("Subscriptions", reepay_s()->settings('domain'));
     }
 
-
-    public function get_subscriptions() {
-
-    }
-
 	public function subscriptions_endpoint() {
-
-
-
-
-
-
-
 	    $params = [];
         $subsResult = reepay_s()->api()->request("subscription", 'GET', $params);
         $planResult = reepay_s()->api()->request("plan", 'GET', $params);
