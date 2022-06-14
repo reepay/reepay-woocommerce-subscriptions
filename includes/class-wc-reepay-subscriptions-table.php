@@ -68,10 +68,15 @@ class Subscriptions_Table extends \WP_List_Table {
         }
 
         if ( ! empty( $search ) ) {
-            $params['search'] = 'handle;' . $search;
+            $params['search'] = 'text;' . $search;
         }
 
         $orderby = sanitize_sql_orderby( filter_input( INPUT_GET, 'orderby' ) );
+        $order = sanitize_sql_orderby( filter_input( INPUT_GET, 'order' ) );
+
+        if ($orderby === 'date' && $order === 'asc') {
+            $params['sort'] = 'created';
+        }
 
         $subsResult = reepay_s()->api()->request("subscription?" . http_build_query($params), 'GET');
 
