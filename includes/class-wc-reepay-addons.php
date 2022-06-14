@@ -14,6 +14,59 @@ class WC_Reepay_Subscription_Addons{
         add_filter( 'woocommerce_add_cart_item', array( $this, 'add_cart_item' ), 20, 1 );
         // Load cart data per page load.
         add_filter( 'woocommerce_get_cart_item_from_session', array( $this, 'get_cart_item_from_session' ), 20, 2 );
+        // Get item data to display.
+        add_filter( 'woocommerce_get_item_data', array( $this, 'get_item_data' ), 10, 2 );
+        // Add meta to order.
+        add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'order_line_item' ), 10, 3 );
+    }
+
+
+    /**
+     * Include add-ons line item meta.
+     *
+     * @param  WC_Order_Item_Product $item          Order item data.
+     * @param  string                $cart_item_key Cart item key.
+     * @param  array                 $values        Order item values.
+     */
+    public function order_line_item( $item, $cart_item_key, $values ) {
+        if ( ! empty( $values['addons'] ) ) {
+            foreach ( $values['addons'] as $addon ) {
+                $key = $addon['name'];
+                $price = $addon['amount'];
+                if ( ! empty( $addon['quantity'] ) && apply_filters( 'woocommerce_addons_add_price_to_name', '__return_true' ) ) {
+                    $key .= ' x'.$addon['quantity'];
+                    $price = $price * intval($addon['quantity']);
+                }
+
+                $item->add_meta_data( $key, '+'. wc_price($price) );
+            }
+        }
+    }
+
+    /**
+     * Get item data.
+     *
+     * @param array $other_data Other data.
+     * @param array $cart_item  Cart item data.
+     * @return array
+     */
+    public function get_item_data( $other_data, $cart_item ) {	//echo '<pre>' . print_r($cart_item, true) . '</pre>'; die;
+        if ( ! empty( $cart_item['addons'] ) ) {
+            foreach ( $cart_item['addons'] as $addon ) {
+                $name = $addon['name'];
+                $price = $addon['amount'];
+
+                if ( ! empty( $addon['quantity'] ) && apply_filters( 'woocommerce_addons_add_price_to_name', '__return_true' ) ) {
+                    $name .= ' x'.$addon['quantity'];
+                    $price = $price * intval($addon['quantity']);
+                }
+                $other_data[] = array(
+                    'name'    => $name,
+                    'display' => wc_price($price),
+                );
+            }
+        }
+        return $other_data;
     }
 
     /**
@@ -172,15 +225,6 @@ class WC_Reepay_Subscription_Addons{
         $product_addons = array_filter((array)$product->get_meta('_product_addons'));
         $addons_list = $this->get_reepay_addons_list();
 
-
-        if(!empty($addons_list['content'])){
-            foreach ($addons_list['content'] as $i => $addon){
-                if($addon['state'] != 'active'){
-                    unset($addons_list['content'][$i]);
-                }
-            }
-        }
-
         wc_get_template(
             'admin-addons-panel.php',
             array(
@@ -196,6 +240,14 @@ class WC_Reepay_Subscription_Addons{
     public function get_reepay_addons_list(){
         try{
             $result = reepay_s()->api()->request("add_on?size=100");
+
+            if(!empty($result['content'])){
+                foreach ($result['content'] as $i => $addon){
+                    if($addon['state'] != 'active'){
+                        unset($result['content'][$i]);
+                    }
+                }
+            }
             return $result;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
