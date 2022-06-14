@@ -85,6 +85,23 @@ class WC_Reepay_Subscription_Plans{
         return false;
     }
 
+    public static function get_plans_wc() {
+        $plansQuery = new WP_Query([
+            'post_type' => 'product',
+            'post_status' => 'publish',
+            'meta_query' => [[
+                'key' => '_reepay_subscription_handle',
+                'compare' => 'EXISTS',
+            ]]
+        ]);
+        $plans = [];
+        foreach ($plansQuery->posts as $item) {
+            $handle = get_post_meta($item->ID, '_reepay_subscription_handle', true);
+            $plans[$handle] = $item->post_title;
+        }
+        return $plans;
+    }
+
     public function get_reepay_plans_list(){
         try{
             $result = reepay_s()->api()->request("plan?only_active=true");
