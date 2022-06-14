@@ -37,11 +37,14 @@ class WC_Reepay_Renewals {
 		$order = wc_get_order( $data['order_id'] );
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
-			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Renewals::create_subscription',
-				'error'  => 'Subscription already exists',
-				'data'   => $data
-			], 'error' );
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::create_subscription',
+					'error'  => 'Subscription already exists',
+					'data'   => $data
+				],
+				'notice' => "Subscription {$data['order_id']} already exists, an attempt was made to re-create"
+			] );
 
 			return;
 		}
@@ -49,11 +52,14 @@ class WC_Reepay_Renewals {
 		$token = self::get_payment_token_order( $order );
 
 		if ( empty( $token ) ) {
-			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Renewals::create_subscription',
-				'error'  => 'Empty token',
-				'data'   => $data
-			], 'error' );
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::create_subscription',
+					'error'  => 'Empty token',
+					'data'   => $data
+				],
+				'notice' => "Subscription {$data['order_id']} has no payment token"
+			] );
 
 			return;
 		}
@@ -99,12 +105,15 @@ class WC_Reepay_Renewals {
 			}
 
 			if ( empty( $new_subscription ) ) {
-				reepay_s()->log()->log( [
-					'source' => 'WC_Reepay_Renewals::create_subscription',
-					'error'  => 'create-subscription',
-					'data'   => $data,
-					'plan'   => $product->get_meta( '_reepay_subscription_handle' )
-				], 'error' );
+				self::log( [
+					'log'    => [
+						'source' => 'WC_Reepay_Renewals::create_subscription',
+						'error'  => 'create-subscription',
+						'data'   => $data,
+						'plan'   => $product->get_meta( '_reepay_subscription_handle' )
+					],
+					'notice' => "Subscription {$data['order_id']} - unable to create subscription"
+				] );
 
 				return;
 			}
@@ -121,11 +130,14 @@ class WC_Reepay_Renewals {
 			}
 
 			if ( empty( $payment_method ) ) {
-				reepay_s()->log()->log( [
-					'source' => 'WC_Reepay_Renewals::create_subscription',
-					'error'  => 'set-payment-method',
-					'data'   => $data
-				], 'error' );
+				self::log( [
+					'log'    => [
+						'source' => 'WC_Reepay_Renewals::create_subscription',
+						'error'  => 'set-payment-method',
+						'data'   => $data
+					],
+					'notice' => "Subscription {$data['order_id']} - unable to assign payment method to subscription"
+				] );
 
 				return;
 			}
@@ -152,11 +164,14 @@ class WC_Reepay_Renewals {
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $parent_order ) ) {
-			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Renewals::renew_subscription',
-				'error'  => 'undefined parent order',
-				'data'   => $data
-			], 'error' );
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::renew_subscription',
+					'error'  => 'undefined parent order',
+					'data'   => $data
+				],
+				'notice' => "Subscription {$data['subscription']} - undefined order"
+			] );
 
 			return;
 		}
@@ -180,11 +195,14 @@ class WC_Reepay_Renewals {
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $parent_order ) ) {
-			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Renewals::hold_subscription',
-				'error'  => 'undefined parent order',
-				'data'   => $data
-			], 'error' );
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::hold_subscription',
+					'error'  => 'undefined parent order',
+					'data'   => $data
+				],
+				'notice' => "Subscription {$data['subscription']} - undefined order"
+			] );
 
 			return;
 		}
@@ -208,11 +226,14 @@ class WC_Reepay_Renewals {
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $parent_order ) ) {
-			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Renewals::cancel_subscription',
-				'error'  => 'undefined parent order',
-				'data'   => $data
-			], 'error' );
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::cancel_subscription',
+					'error'  => 'undefined parent order',
+					'data'   => $data
+				],
+				'notice' => "Subscription {$data['subscription']} - undefined order"
+			] );
 
 			return;
 		}
@@ -236,11 +257,14 @@ class WC_Reepay_Renewals {
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $parent_order ) ) {
-			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Renewals::uncancel_subscription',
-				'error'  => 'undefined parent order',
-				'data'   => $data
-			], 'error' );
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::uncancel_subscription',
+					'error'  => 'undefined parent order',
+					'data'   => $data
+				],
+				'notice' => "Subscription {$data['subscription']} - undefined order"
+			] );
 
 			return;
 		}
@@ -388,6 +412,19 @@ class WC_Reepay_Renewals {
 		}
 
 		return $coupons;
+	}
+
+	/**
+	 * @param  array  $data
+	 */
+	public static function log( $data ) {
+		if ( ! empty( $data['log'] ) ) {
+			reepay_s()->log()->log( $data['log'], 'error' );
+		}
+
+		if ( ! empty( $data['notice'] ) ) {
+			WC_Reepay_Subscription_Admin_Notice::add_notice( $data['notice'] );
+		}
 	}
 }
 
