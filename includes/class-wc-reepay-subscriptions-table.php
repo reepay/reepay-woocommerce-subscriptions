@@ -1,19 +1,4 @@
 <?php
-/**
- * Plugin Name:       Admin Table Tutorial
- * Plugin URI:        www.vijayan.in
- * Description:       This plugin is created for the purpose to understand the WordPress admin table.
- * Author:            Vijayan
- * Author URI:        www.vijayan.in
- * Text Domain:       admin-table-tut
- * Domain Path:       /languages
- * Version:           0.1.0
- * Requires at least: 5.4
- * Requires PHP:      7.2
- *
- * @package         Admin_Table_Tut
- */
-
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,12 +14,6 @@ if ( ! class_exists( \WP_List_Table::class ) ) {
  * @see WP_List_Table
  */
 class Subscriptions_Table extends \WP_List_Table {
-
-    /**
-     * Const to declare number of posts to show per page in the table.
-     */
-    const POSTS_PER_PAGE = 10;
-
 
     /**
      * Draft_List_Table constructor.
@@ -56,7 +35,7 @@ class Subscriptions_Table extends \WP_List_Table {
      *
      * @return WP_Query Custom query object with passed arguments.
      */
-    protected function get_posts_object() {
+    protected function get_subscriptions() {
 
         $params = [];
         $search = esc_sql( filter_input( INPUT_GET, 's' ) );
@@ -97,7 +76,6 @@ class Subscriptions_Table extends \WP_List_Table {
      */
     public function get_columns() {
         return array(
-//            'cb'     => '<input type="checkbox"/>',
             'status' => __( 'Status', reepay_s()->settings('domain') ),
             'plan'   => __( 'Plan', reepay_s()->settings('domain') ),
             'handle'   => __( 'Subscription Handle', reepay_s()->settings('domain') ),
@@ -192,20 +170,6 @@ class Subscriptions_Table extends \WP_List_Table {
     }
 
     /**
-     * Column cb.
-     *
-     * @param  array $item Item data.
-     * @return string
-     */
-    public function column_cb( $item ) {
-        return sprintf(
-            '<input type="checkbox" name="%1$s_id[]" value="%2$s" />',
-            esc_attr( $this->_args['singular'] ),
-            esc_attr( $item['id'] )
-        );
-    }
-
-    /**
      * Prepare the data for the WP List Table
      *
      * @return void
@@ -218,9 +182,7 @@ class Subscriptions_Table extends \WP_List_Table {
         $this->_column_headers = array( $columns, $hidden, $sortable, $primary );
         $data                  = array();
 
-        $this->process_bulk_action();
-
-        $subscriptions = $this->get_posts_object();
+        $subscriptions = $this->get_subscriptions();
 
         if ( !empty($subscriptions['content']) ) {
 
@@ -247,27 +209,7 @@ class Subscriptions_Table extends \WP_List_Table {
         );
     }
 
-    /**
-     * Get bulk actions.
-     *
-     * @return array
-     */
-    public function get_bulk_actions() {
-        return array(
-            'trash' => __( 'Move to Trash', 'admin-table-tut' ),
-        );
-    }
 
-    /**
-     * Get bulk actions.
-     *
-     * @return void
-     */
-    public function process_bulk_action() {
-        if ( 'trash' === $this->current_action() ) {
-            //todo
-        }
-    }
     /**
      * Generates the table navigation above or below the table
      *
@@ -278,13 +220,7 @@ class Subscriptions_Table extends \WP_List_Table {
         ?>
         <div class="tablenav <?php echo esc_attr( $which ); ?>">
 
-            <?php if ( $this->has_items() ) : ?>
-                <div class="alignleft actions bulkactions">
-                    <?php $this->bulk_actions( $which ); ?>
-                </div>
             <?php
-            endif;
-            $this->extra_tablenav( $which );
             $this->pagination( $which );
             ?>
 
