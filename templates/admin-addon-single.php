@@ -40,7 +40,7 @@ global $post;
                     <select id="_subscription_choose_exist"  name="addon_choose_exist[<?php echo $loop; ?>]" class="wc_input_subscription_period_interval">
                         <option value=""><?php esc_html_e( 'Select plan', $domain ); ?></option>
                         <?php foreach ($addons_list as $addon_rem):?>
-                            <option value="<?=$addon_rem['handle']?>" <?php selected( $addon_rem['handle'], $addon['exist'], true ) ?>><?=$addon_rem['name']?></option>
+                            <option value="<?=$addon_rem['handle']?>" <?php !empty($addon['exist']) ?? selected( $addon_rem['handle'], $addon['exist'], true ) ?>><?=$addon_rem['name']?></option>
                         <?php endforeach; ?>
                     </select>
                 <?php else: ?>
