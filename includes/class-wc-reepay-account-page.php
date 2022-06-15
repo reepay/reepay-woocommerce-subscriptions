@@ -34,11 +34,8 @@ class WC_Reepay_Account_Page {
 
             $handle = $_GET['cancel_subscription'];
 
-            $params = [
-            ];
-
             try {
-                $result = reepay_s()->api()->request("subscription/{$handle}/cancel", 'POST', $params);
+                $result = reepay_s()->api()->request("subscription/{$handle}/cancel", 'POST');
             } catch (Exception $exception) {
                 wc_add_notice($exception->getMessage(), 'error');
             }
@@ -50,10 +47,7 @@ class WC_Reepay_Account_Page {
 
             $handle = $_GET['uncancel_subscription'];
 
-            $params = [
-            ];
-
-            $result = reepay_s()->api()->request("subscription/{$handle}/uncancel", 'POST', $params);
+            $result = reepay_s()->api()->request("subscription/{$handle}/uncancel", 'POST');
             wp_redirect(wc_get_endpoint_url('subscriptions'));
         }
 
@@ -83,10 +77,7 @@ class WC_Reepay_Account_Page {
         if (!empty($_GET['reactivate'])) {
             $handle = $_GET['reactivate'];
 
-            $params = [
-            ];
-
-            $result = reepay_s()->api()->request("subscription/{$handle}/reactivate", 'POST', $params);
+            $result = reepay_s()->api()->request("subscription/{$handle}/reactivate", 'POST');
             wp_redirect(wc_get_endpoint_url('subscriptions'));
         }
 
@@ -118,9 +109,8 @@ class WC_Reepay_Account_Page {
     }
 
 	public function subscriptions_endpoint() {
-	    $params = [];
-        $subsResult = reepay_s()->api()->request("subscription", 'GET', $params);
-        $planResult = reepay_s()->api()->request("plan", 'GET', $params);
+        $subsResult = reepay_s()->api()->request("subscription", 'GET');
+        $planResult = reepay_s()->api()->request("plan", 'GET');
         $plans = [];
         foreach ($planResult as $item) {
             $plans[$item['handle']] = $item;
