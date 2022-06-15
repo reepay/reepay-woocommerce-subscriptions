@@ -152,8 +152,14 @@ class WC_Reepay_Account_Page {
     }
 
 	public function add_subscriptions_menu_item($menu_items) {
-        $menu_items["subscriptions"] = $this->get_title();
-        return $menu_items;
+	    $returnArr = [];
+        foreach ($menu_items as $key => $menu_item) {
+            $returnArr[$key] = $menu_item;
+            if ($key === 'orders') {
+                $returnArr["subscriptions"] = $this->get_title();
+            }
+	    }
+        return $returnArr;
     }
 
     function get_status($subscription) {
