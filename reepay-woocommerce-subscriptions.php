@@ -209,6 +209,8 @@ class WooCommerce_Reepay_Subscriptions{
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-statistics.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons-shipping.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-list.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-table.php' );
     }
 }
 
