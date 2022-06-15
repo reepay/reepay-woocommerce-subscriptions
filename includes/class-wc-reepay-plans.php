@@ -102,6 +102,19 @@ class WC_Reepay_Subscription_Plans{
         return $plans;
     }
 
+    public static function wc_get_plan($handle) {
+        $query = new WP_Query([
+            'post_type' => 'product',
+            'post_status' => 'publish',
+            'posts_per_page' => 1,
+            'meta_query' => [[
+                'key' => '_reepay_subscription_handle',
+                'value' => $handle,
+            ]]
+        ]);
+        return $query->post ?? null;
+    }
+
     public function get_reepay_plans_list(){
         try{
             $result = reepay_s()->api()->request("plan?only_active=true");
