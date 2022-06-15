@@ -1,42 +1,5 @@
 <?php
 
-function get_status($subscription, $plan) {
-    if ($subscription['is_cancelled'] === true) {
-        return 'cancelled';
-    }
-    if ($subscription['state'] === 'expired') {
-        return 'expired';
-    }
-
-    if ($subscription['state'] === 'on_hold') {
-        return 'on_hold';
-    }
-
-    if ($subscription['state'] === 'is_cancelled') {
-        return 'is_cancelled';
-    }
-
-    if ($subscription['state'] === 'active') {
-        if (isset($subscription['trial_end'])) {
-            $now = new DateTime();
-            $trial_end = new DateTime($subscription['trial_end']);
-            if ($trial_end > $now) {
-                return 'trial';
-            }
-        }
-        return 'active';
-    }
-
-    return $subscription['state'];
-}
-
-function is_trial() {
-
-}
-
-function my_date($dateStr) {
-    return (new DateTime($dateStr))->format('d M Y');
-}
 
 $user_payment_methods = wc_get_customer_saved_methods_list(get_current_user_id());
 
@@ -51,7 +14,6 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
     <?php
     $plan = $args['plans'][$subscription['plan']];
     $is_expired = $subscription['state'] === 'expired';
-    $payment_methods = reepay_s()->api()->request("subscription/".$subscription['handle']."/pm")
 
     ?>
     <h1><?= $plan['name'] ?></h1>
@@ -62,8 +24,8 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                 Payment methods:
             </td>
             <td>
-                <?php foreach($payment_methods as $payment_method): ?>
-                    <?= $payment_method['card']['cart_type'] ?> <?= $payment_method['card']['masked_card'] ?>
+                <?php foreach($subscription['payment_methods'] as $payment_method): ?>
+                    <?= $payment_method['card']['card_type'] ?> <?= $payment_method['card']['masked_card'] ?>
                     <br>
                 <?php endforeach; ?>
             </td>
@@ -95,10 +57,10 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
         <tr>
             <td>Status:</td>
             <td>
-                <?php if ($is_expired): ?>
-                    Expired <?= my_date($subscription['expired_date']) ?>
+                <?php if ($subscription['state'] === 'expired'): ?>
+                    Expired <?= $subscription['formatted_expired_date'] ?>
                 <?php else: ?>
-                    <?= get_status($subscription, $plan) ?>
+                    <?= $subscription['formatted_status'] ?>
                     <?php if ($subscription['renewing'] === false): ?>
                         Non-renewing
                     <?php endif; ?>
@@ -109,7 +71,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
             <td>First period start:</td>
             <td>
                 <?php if (!empty($subscription['first_period_start'])): ?>
-                    <?= my_date($subscription['first_period_start']) ?>
+                    <?= $subscription['formatted_first_period_start'] ?>
                 <?php endif; ?>
             </td>
         </tr>
@@ -117,7 +79,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
             <td>Current period:</td>
             <td>
                 <?php if (!empty($subscription['current_period_start'])): ?>
-                    <?= my_date($subscription['current_period_start']) . '-' .  my_date($subscription['next_period_start']) ?>
+                    <?= $subscription['formatted_current_period_start'] . '-' .  $subscription['formatted_next_period_start'] ?>
                 <?php else: ?>
                     No Active period
                 <?php endif; ?>

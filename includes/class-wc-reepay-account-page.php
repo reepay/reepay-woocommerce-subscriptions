@@ -116,10 +116,34 @@ class WC_Reepay_Account_Page {
             $plans[$item['handle']] = $item;
         }
 	    $subscriptions = $subsResult['content'];
+
+        $subscriptionsArr = [];
+
+        foreach ($subscriptions as $subscription) {
+            $payment_methods = reepay_s()->api()->request("subscription/".$subscription['handle']."/pm");
+            $subscriptionsArr[] = [
+                'state' => $subscription['state'],
+                'handle' => $subscription['handle'],
+                'is_cancelled' => $subscription['is_cancelled'],
+                'renewing' => $subscription['renewing'],
+                'first_period_start' => $subscription['first_period_start'],
+                'formatted_first_period_start' => $this->format_date($subscription['first_period_start']),
+                'current_period_start' => $subscription['current_period_start'] ?? null,
+                'formatted_current_period_start' => $this->format_date($subscription['current_period_start'] ?? null),
+                'next_period_start' => $subscription['next_period_start'] ?? null,
+                'formatted_next_period_start' => $this->format_date($subscription['next_period_start'] ?? null),
+                'expired_date' => $subscription['expired_date'] ?? null,
+                'formatted_expired_date' => $this->format_date($subscription['expired_date'] ?? null),
+                'formatted_status' => $this->get_status($subscription),
+                'payment_methods' => $payment_methods,
+                'plan' => $subscription['plan']
+            ];
+        }
+
         wc_get_template(
             'my-account/subscriptions.php',
             array(
-                'subscriptions' => $subscriptions,
+                'subscriptions' => $subscriptionsArr,
                 'plans' => $plans,
             ),
             '',
@@ -130,6 +154,42 @@ class WC_Reepay_Account_Page {
 	public function add_subscriptions_menu_item($menu_items) {
         $menu_items["subscriptions"] = $this->get_title();
         return $menu_items;
+    }
+
+    function get_status($subscription) {
+        if ($subscription['is_cancelled'] === true) {
+            return 'cancelled';
+        }
+        if ($subscription['state'] === 'expired') {
+            return 'expired';
+        }
+
+        if ($subscription['state'] === 'on_hold') {
+            return 'on_hold';
+        }
+
+        if ($subscription['state'] === 'is_cancelled') {
+            return 'is_cancelled';
+        }
+
+        if ($subscription['state'] === 'active') {
+            if (isset($subscription['trial_end'])) {
+                $now = new DateTime();
+                $trial_end = new DateTime($subscription['trial_end']);
+                if ($trial_end > $now) {
+                    return 'trial';
+                }
+            }
+            return 'active';
+        }
+
+        return $subscription['state'];
+    }
+
+    function format_date($dateStr) {
+        if (!empty($dateStr)) {
+            return (new DateTime($dateStr))->format('d M Y');
+        }
     }
 }
 
