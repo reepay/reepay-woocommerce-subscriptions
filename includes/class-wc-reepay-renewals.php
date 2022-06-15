@@ -86,7 +86,7 @@ class WC_Reepay_Renewals {
 //					'metadata' => null,
 					'source'          => $token,
 //					'create_customer' => null,
-					'plan_version'    => null,
+//					'plan_version'    => null,
 					'amount_incl_vat' => $product->get_meta( '_reepay_subscription_vat' ) == 'include',
 //					'generate_handle' => null,
 //					'start_date' => null,
@@ -97,11 +97,14 @@ class WC_Reepay_Renewals {
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
 					'coupon_codes'    => self::get_reepay_coupons( $order ),
-//					'add_ons' => null,
+					'add_ons' => $order_item->get_meta('addons'),
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				] );
 			} catch ( Exception $e ) {
+				self::log( [
+					'notice' => $e->getMessage()
+				] );
 			}
 
 			if ( empty( $new_subscription ) ) {
@@ -127,6 +130,9 @@ class WC_Reepay_Renewals {
 					'source' => $token,
 				] );
 			} catch ( Exception $e ) {
+				self::log( [
+					'notice' => $e->getMessage()
+				] );
 			}
 
 			if ( empty( $payment_method ) ) {
