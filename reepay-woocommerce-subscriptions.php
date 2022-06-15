@@ -147,7 +147,7 @@ class WooCommerce_Reepay_Subscriptions{
             'section_end' => array(
                 'type' => 'sectionend',
                 'id' => 'reepay_section_end'
-            )
+            ),
         );
 
         return apply_filters( 'wc_settings_tab_reepay_subscriptions', $settings );
@@ -206,6 +206,7 @@ class WooCommerce_Reepay_Subscriptions{
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-statistics.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons-shipping.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-list.php' );
