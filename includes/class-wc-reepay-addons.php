@@ -347,6 +347,27 @@ class WC_Reepay_Subscription_Addons{
         return $product_addon;
     }
 
+    public function add_plan_to_addon($post_id, $handle){
+        $plan_handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
+
+        try{
+            $result = reepay_s()->api()->request("add_on/".$handle);
+            if(!$result['all_plans']){
+                if(empty($result['eligible_plans'])){
+                    $result['eligible_plans'] = [$plan_handle];
+                }elseif(!in_array($result['eligible_plans'], $plan_handle)){
+                    $result['eligible_plans'][] = $plan_handle;
+                }
+
+                reepay_s()->api()->request("add_on/$handle", 'PUT', $result);
+            }
+
+        }catch (Exception $e){
+            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
+        }
+
+    }
+
     /**
      * Put posted addon data into an array.
      *
@@ -372,6 +393,7 @@ class WC_Reepay_Subscription_Addons{
 
                 if($addon_choose[ $i ] == 'exist' && !empty($addon_exist[$i])){
                     $data = $this->get_reepay_addon_data($addon_exist[$i]);
+                    $this->add_plan_to_addon($post_id, $addon_exist[$i]);
                     $data['choose'] = $addon_choose[$i];
                     $data['position'] = $addon_position[$i];
                 }else{
