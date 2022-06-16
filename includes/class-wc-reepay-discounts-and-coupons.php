@@ -153,10 +153,10 @@ class WC_Reepay_Discounts_And_Coupons
 
     function update_discount(WC_Coupon $coupon) {
         $params = $this->get_discount_default_params($coupon);
-
+        $handle = get_post_meta($coupon->get_id(), '_reepay_discount_handle', true);
 
         try{
-            $discountObj = reepay_s()->api()->request('discount', 'PUT', $params);
+            $discountObj = reepay_s()->api()->request('discount/' . $handle, 'PUT', $params);
             return $discountObj;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
@@ -198,7 +198,7 @@ class WC_Reepay_Discounts_And_Coupons
         $handle = get_post_meta($coupon->get_id(), '_reepay_coupon_handle', true);
 
         try{
-            $result = reepay_s()->api()->request('coupon/' . $handle, 'POST', $paramsCoupon);
+            $result = reepay_s()->api()->request('coupon/' . $handle, 'PUT', $paramsCoupon);
             return $result;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
