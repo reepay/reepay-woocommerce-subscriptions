@@ -122,9 +122,6 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 					'vat_type'    => $instance_settings['reepay_shipping_addon_vat_type'],
 				], $shipping_method->get_instance_option_key() );
 
-				__log( '!123!' );
-				__log( $created_addon );
-
 				$instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
 			} else {
 				//get existing method
