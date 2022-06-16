@@ -257,7 +257,22 @@ class WC_Reepay_Subscription_Addons{
         );
     }
 
-    public function get_reepay_addons_list(){
+	/**
+	 * @param bool $drop_cache
+	 *
+	 * @return mixed
+	 */
+	public function get_reepay_addons_list( $drop_cache = false ){
+        static $addons_list = null;
+
+        if($drop_cache) {
+            $addons_list = null;
+        }
+
+	    if ( ! is_null( $addons_list ) ) {
+            return $addons_list;
+	    }
+
         try{
             $result = reepay_s()->api()->request("add_on?size=100");
 
@@ -268,7 +283,10 @@ class WC_Reepay_Subscription_Addons{
                     }
                 }
             }
-            return $result;
+
+            $addons_list = $result;
+
+            return $addons_list;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
