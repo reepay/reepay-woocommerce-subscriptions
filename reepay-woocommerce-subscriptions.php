@@ -74,6 +74,7 @@ class WooCommerce_Reepay_Subscriptions{
         add_filter( 'woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50 );
         add_action( 'woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab'] );
         add_action( 'woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings'] );
+        register_activation_hook( REEPAY_PLUGIN_FILE, 'flush_rewrite_rules' );
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
