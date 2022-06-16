@@ -52,6 +52,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                         <a href="?change_payment_method=<?= $subscription['handle'] ?>&token_id=<?= $payment_method->get_id() ?>">Change payment method to <?= $payment_method->get_masked_card() ?> <?= $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></a>
                         <br>
                     <?php endforeach; ?>
+                    <a href="<?= wc_get_endpoint_url('add-payment-method') . '?reepay_subscription=' . $subscription['handle'] ?>" class="button">Add payment method</a>
             </tr>
         <?php endif; ?>
         <tr>

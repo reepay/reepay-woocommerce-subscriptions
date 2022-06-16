@@ -17,7 +17,31 @@ class WC_Reepay_Account_Page {
         add_action('woocommerce_account_subscriptions_endpoint', [$this, 'subscriptions_endpoint']);
         add_filter('woocommerce_account_menu_items', [$this, 'add_subscriptions_menu_item'] );
         add_filter('woocommerce_get_query_vars', [$this, 'subscriptions_query_vars'], 0);
+
+        add_filter('woocommerce_reepay_payment_accept_url', [$this, 'add_subscription_arg']);
+        add_filter('woocommerce_reepay_payment_cancel_url', [$this, 'add_subscription_arg']);
+        add_action('woocommerce_reepay_payment_method_added', [$this, 'payment_method_added']);
         return add_filter( 'woocommerce_endpoint_subscriptions_title', [$this, 'get_title'] );
+    }
+
+    public function add_subscription_arg($url) {
+	    if ($_GET['reepay_subscription']) {
+	        return add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url);
+        }
+	    return $url;
+    }
+
+    public function payment_method_added(WC_Payment_Token $token) {
+	    $handle = $_GET['reepay_subscription'] ?? '';
+	    if (!empty($handle)) {
+            try {
+                reepay_s()->api()->request('/subscription/' . $handle, 'POST', [
+                    'source' => $token->get_token(),
+                ]);
+            } catch (Exception $exception) {
+                wc_add_notice($exception->getMessage());
+            }
+        }
     }
 
     public function init() {
