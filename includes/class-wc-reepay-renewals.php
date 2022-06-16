@@ -443,15 +443,16 @@ class WC_Reepay_Renewals {
 
 		return [
 			[
-				'name'        => $shm_data['reepay_shipping_addon_name'],
-				'description' => $shm_data['reepay_shipping_addon_description'],
-				'type'        => 'on_off',
-				'amount'      => $shm_data['reepay_shipping_addon_amount'],
-				'vat'         => $shm_data['reepay_shipping_addon_vat'],
-				'vat_type'    => $shm_data['reepay_shipping_addon_vat_type'],
-				'handle'      => $shm_data['reepay_shipping_addon'],
-				'exist'       => $shm_data['reepay_shipping_addon'],
-				'add_on'      => $shm_data['reepay_shipping_addon'],
+				'name'          => $shm_data['reepay_shipping_addon_name'],
+				'description'   => $shm_data['reepay_shipping_addon_description'],
+				'type'          => 'on_off',
+				'fixed_amount ' => true,
+				'amount'        => $shm_data['reepay_shipping_addon_amount'],
+				'vat'           => $shm_data['reepay_shipping_addon_vat'],
+				'vat_type'      => $shm_data['reepay_shipping_addon_vat_type'],
+				'handle'        => $shm_data['reepay_shipping_addon'],
+				'exist'         => $shm_data['reepay_shipping_addon'],
+				'add_on'        => $shm_data['reepay_shipping_addon'],
 			]
 		];
 	}

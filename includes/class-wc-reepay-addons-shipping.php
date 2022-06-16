@@ -66,6 +66,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			'type'    => 'price',
 			'default' => '',
 			'class'   => 'addon-shipping-new',
+			'custom_attributes' => array('readonly' => 'readonly'),
 		);
 
 		$settings['reepay_shipping_addon_vat'] = array(
@@ -115,12 +116,13 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 				$created_addon = $this->save_to_reepay( [
 					'name'        => $instance_settings['reepay_shipping_addon_name'],
 					'description' => $instance_settings['reepay_shipping_addon_description'],
-					'amount'      => $instance_settings['reepay_shipping_addon_amount'],
+					'amount'      => $instance_settings['cost'],
 					'vat'         => $instance_settings['reepay_shipping_addon_vat'],
 					'type'        => 'on_off',
 					'vat_type'    => $instance_settings['reepay_shipping_addon_vat_type'],
 				], $shipping_method->get_instance_option_key() );
 
+				$instance_settings['reepay_shipping_addon_amount'] = $created_addon['cost'];
 				$instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
 			} else {
 				//get existing method
@@ -128,7 +130,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 
 				$instance_settings['reepay_shipping_addon_name']        = $addon_data['name'];
 				$instance_settings['reepay_shipping_addon_description'] = $addon_data['description'];
-				$instance_settings['reepay_shipping_addon_amount']      = $addon_data['amount'] * 100;
+				$instance_settings['reepay_shipping_addon_amount']      = $instance_settings['cost'];
 				$instance_settings['reepay_shipping_addon_vat']         = $addon_data['vat'] / 100;
 				$instance_settings['reepay_shipping_addon_vat_type']    = $addon_data['type'];
 			}
