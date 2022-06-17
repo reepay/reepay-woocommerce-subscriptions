@@ -19,14 +19,6 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
     <h1><?= $plan['name'] ?></h1>
     <table>
         <tbody>
-        <tr>
-            <td>
-                Payment methods:
-            </td>
-            <td>
-                <?= $subscription_payment_method['card']['card_type'] ?> <?= $subscription_payment_method['card']['masked_card'] ?>
-            </td>
-        </tr>
         <?php if (!$is_expired): ?>
             <tr>
                 <td>Actions:</td>
