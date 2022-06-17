@@ -35,13 +35,16 @@ class WC_Reepay_Account_Page {
 	    $handle = $_GET['reepay_subscription'] ?? '';
 	    if (!empty($handle)) {
             try {
-                reepay_s()->api()->request('/subscription/' . $handle, 'POST', [
+                reepay_s()->api()->request('subscription/' . $handle . '/pm', 'POST', [
                     'source' => $token->get_token(),
                 ]);
             } catch (Exception $exception) {
                 wc_add_notice($exception->getMessage());
             }
         }
+        wc_add_notice( __( 'Payment method successfully added.', 'reepay-checkout-gateway' ) );
+        wp_redirect( wc_get_account_endpoint_url( 'subscriptions' ) );
+        exit;
     }
 
     public function init() {
