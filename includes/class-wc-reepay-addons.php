@@ -263,28 +263,24 @@ class WC_Reepay_Subscription_Addons{
 	 * @return mixed
 	 */
 	public function get_reepay_addons_list( $drop_cache = false ){
-        static $addons_list = null;
+		$addons_list = $drop_cache ? null : get_option('reepay_s_addons_list');
 
-        if($drop_cache) {
-            $addons_list = null;
-        }
-
-	    if ( ! is_null( $addons_list ) ) {
+	    if ( ! empty( $addons_list ) ) {
             return $addons_list;
 	    }
 
         try{
-            $result = reepay_s()->api()->request("add_on?size=100");
+	        $addons_list = reepay_s()->api()->request("add_on?size=100");
 
-            if(!empty($result['content'])){
-                foreach ($result['content'] as $i => $addon){
+            if(!empty($addons_list['content'])){
+                foreach ($addons_list['content'] as $i => $addon){
                     if($addon['state'] != 'active'){
-                        unset($result['content'][$i]);
+                        unset($addons_list['content'][$i]);
                     }
                 }
             }
 
-            $addons_list = $result;
+	        update_option( 'reepay_s_addons_list', $addons_list );
 
             return $addons_list;
         }catch (Exception $e){
