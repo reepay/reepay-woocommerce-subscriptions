@@ -83,6 +83,16 @@ jQuery( function ( $ ) {
                 $('.hide_if_use_existing_coupon').show()
             }
         }
+
+    }
+
+    setInterval(update_subscriptions_table, 2000)
+
+    function update_subscriptions_table() {
+        return $.get(location.href)
+            .then(html => {
+               $('.wp-list-table').replaceWith($(html).find('.wp-list-table'))
+            })
     }
 
     function show_settings(){
