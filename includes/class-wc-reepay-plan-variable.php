@@ -22,9 +22,15 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
      * @return bool|int
      */
     public function update_post_meta( $post_id, $key, $value ) {
-        $value = get_post_meta($post_id, $key, true);
-        $value[$this->loop] = $value;
-        return parent::update_post_meta($post_id, $key, $value);
+        $value = get_post_meta( $post_id, $key, true );
+
+        if ( empty( $value ) ) {
+            return false;
+        }
+
+        $value[ $this->loop ] = $value;
+
+        return parent::update_post_meta( $post_id, $key, $value );
     }
 
 	/**
