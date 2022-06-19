@@ -1,5 +1,5 @@
 <?php
-class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans {
+class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_Simple {
 
     /**
      * Constructor
@@ -144,8 +144,6 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
         return $params;
     }
 
-
-
     public function get_default_params_variable($post_id, $i){
 
         $type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true)[$i];
@@ -215,4 +213,4 @@ class WC_Reepay_Subscription_Plans_Variable extends WC_Reepay_Subscription_Plans
     }
 }
 
-new WC_Reepay_Subscription_Plans_Variable();
+new WC_Reepay_Subscription_Plan_Variable();

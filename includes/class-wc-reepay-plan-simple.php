@@ -1,6 +1,6 @@
 <?php
 
-class WC_Reepay_Subscription_Plans{
+class WC_Reepay_Subscription_Plan_Simple{
 
     const TYPE_DAILY = 'daily';
     const TYPE_MONTH_START_DATE = 'month_startdate';
@@ -169,6 +169,7 @@ class WC_Reepay_Subscription_Plans{
         $_reepay_subscription_billing_cycles_period = get_post_meta($post_id, '_reepay_subscription_billing_cycles_period', true);
         $_reepay_subscription_trial = get_post_meta($post_id, '_reepay_subscription_trial', true);
         $_reepay_subscription_fee = get_post_meta($post_id, '_reepay_subscription_fee', true);
+	    $_reepay_subscription_compensation = 'none'; //@todo добавить получение значения
 
         if(empty($_reepay_subscription_choose)){
             if($variable){
@@ -208,6 +209,7 @@ class WC_Reepay_Subscription_Plans{
                 '_reepay_subscription_billing_cycles_period' => $variable ? $_reepay_subscription_billing_cycles_period[$loop] : $_reepay_subscription_billing_cycles_period,
                 '_reepay_subscription_trial' => $variable ? $_reepay_subscription_trial[$loop] : $_reepay_subscription_trial,
                 '_reepay_subscription_fee' => $variable ? $_reepay_subscription_fee[$loop] : $_reepay_subscription_fee,
+                '_reepay_subscription_compensation' => $_reepay_subscription_compensation,
                 'variable' => $variable,
                 'loop' => $loop,
 	            'domain' => reepay_s()->settings('domain')
@@ -442,7 +444,6 @@ class WC_Reepay_Subscription_Plans{
         return true;
     }
 
-
     public function update_plan($handle){
         $params = $this->params;
         try{
@@ -597,7 +598,6 @@ class WC_Reepay_Subscription_Plans{
         return $params;
     }
 
-
     public static function get_interval($post_id, $type, $type_data){
         if($type == 'daily'){
             return get_post_meta($post_id, '_reepay_subscription_daily', true);
@@ -644,4 +644,4 @@ class WC_Reepay_Subscription_Plans{
     }
 }
 
-new WC_Reepay_Subscription_Plans();
+new WC_Reepay_Subscription_Plan_Simple();

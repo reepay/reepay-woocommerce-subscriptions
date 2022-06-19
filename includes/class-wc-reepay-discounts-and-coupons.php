@@ -339,7 +339,7 @@ class WC_Reepay_Discounts_And_Coupons
         }
         $meta['_reepay_discount_eligible_plans'][0] = $apply_to_plans;
 
-        $plans = WC_Reepay_Subscription_Plans::get_plans_wc();
+        $plans = WC_Reepay_Subscription_Plan_Simple::get_plans_wc();
         $coupons = $this->get_coupons();
 
         $handle = get_post_meta(get_the_ID(), '_reepay_coupon_handle', true);
