@@ -14,11 +14,18 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         add_action( 'woocommerce_save_product_variation', array( $this, 'save_reepay_variation' ), 10, 2 );
     }
 
-	public function get_remote_value($post_id, $value_remote, $field){
-		$value = get_post_meta($post_id, $field, true);
-		$value[$this->loop] = $value_remote;
-		return $value;
-	}
+    /**
+     * @param int    $post_id
+     * @param string $key
+     * @param mixed  $value
+     *
+     * @return bool|int
+     */
+    public function update_post_meta( $post_id, $key, $value ) {
+        $value = get_post_meta($post_id, $key, true);
+        $value[$this->loop] = $value;
+        return parent::update_post_meta($post_id, $key, $value);
+    }
 
 	/**
 	 * @param  int  $post_id
@@ -33,8 +40,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		foreach ( self::$meta_fields as $meta_field ) {
 			$data[ $meta_field ] = $data[ $meta_field ][$this->loop];
 		}
-
-		__log('get_subscription_template_data');
 
 		return $data;
 	}
