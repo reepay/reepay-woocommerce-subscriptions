@@ -1,5 +1,6 @@
 <?php
 class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_Simple {
+	public $loop = 0;
 
     /**
      * Constructor
@@ -13,7 +14,32 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         add_action( 'woocommerce_save_product_variation', array( $this, 'save_reepay_variation' ), 10, 2 );
     }
 
-    public function save_reepay_variation($variation_id, $i){
+	public function get_remote_value($post_id, $value_remote, $field){
+		$value = get_post_meta($post_id, $field, true);
+		$value[$this->loop] = $value_remote;
+		return $value;
+	}
+
+	/**
+	 * @param  int  $post_id
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_subscription_template_data( $post_id ) {
+		$data = parent::get_subscription_template_data( $post_id );
+
+		$data['variable'] = true;
+
+		foreach ( self::$meta_fields as $meta_field ) {
+			$data[ $meta_field ] = $data[ $meta_field ][$this->loop];
+		}
+
+		__log('get_subscription_template_data');
+
+		return $data;
+	}
+
+	public function save_reepay_variation($variation_id, $i){
         if(empty($_REQUEST['product-type'])){
             return;
         }
@@ -28,7 +54,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
                 update_post_meta( $variation_id, '_reepay_choose_exist', $_REQUEST['_reepay_choose_exist'] );
                 update_post_meta( $variation_id, '_reepay_subscription_choose', $_REQUEST['_reepay_subscription_choose'] );
 
-                $this->variable = true;
                 $this->loop = $i;
                 $this->save_remote_plan($variation_id, $_REQUEST['_reepay_choose_exist'][$i]);
             }else{
@@ -190,9 +215,8 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
     }
 
     public function add_custom_field_to_variations( $loop, $variation_data, $variation ) {
-        $this->variable = true;
-        $this->loop = $loop;
-        $this->subscription_pricing_fields(true, $variation->ID, $loop);
+		$this->loop = $loop;
+        $this->subscription_pricing_fields();
     }
 
     public function reepay_variable_create_subscription_product_class(){

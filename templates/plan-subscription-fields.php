@@ -1,4 +1,7 @@
 <?php
+
+$variable = $variable ?? false;
+
 ?>
 <div class="options_group reepay_subscription_choose show_if_reepay_subscription">
     <p class="form-field choose-fields <?= $variable ? 'form-row' : '' ?> ">
