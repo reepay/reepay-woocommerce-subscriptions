@@ -60,7 +60,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		return $data;
 	}
 
-	public function save_subscription_meta($variation_id, $i){
+	public function save_subscription_meta($variation_id, $i = null){
         if ( empty( $_REQUEST ) ||
              empty( $_REQUEST['product-type'] ) ||
              $_REQUEST['product-type'] != 'reepay_variable_subscriptions' ) {
@@ -89,34 +89,23 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
             }
 
             $title = get_the_title( $variation_id );
-            if(!empty($title) && $title != 'AUTO-DRAFT'){
-                $handle = get_post_meta($variation_id, '_reepay_subscription_handle', true);
-                $this->default_params = $this->get_default_params($variation_id, $i);
+            if ( ! empty( $title ) && $title != 'AUTO-DRAFT' ) {
+                $handle = get_post_meta( $variation_id, '_reepay_subscription_handle', true );
 
-                if(!empty($handle)){
-                    if ( $this->update_plan( $handle ) ) {
-                        $this->save_meta( $variation_id );
+                if ( ! empty( $handle ) ) {
+                    if ( $this->update_plan( $handle, $this->get_params( $variation_id, $i ) ) ) {
+                        $this->save_meta_from_request( $variation_id );
                     }
-                }else{
-                    $handle = get_post_meta($variation_id, '_reepay_subscription_handle', true);
-
-                    if(!empty($handle)){
-                        if ( $this->update_plan( $handle ) ) {
-                            $this->save_meta( $variation_id );
-                        }
-                    }else{
-                        $handle = 'wc_subscription_'.$i.'_'.$variation_id;
-                        if($this->save_meta($variation_id)){
-                            $this->params = $this->get_params_variable($variation_id, $i);
-                            $this->create_plan($variation_id, $handle);
-                        }
-                    }
+                } else {
+                    $handle = 'wc_subscription_' . $i . '_' . $variation_id;
+                    $this->save_meta_from_request( $variation_id );
+                    $this->create_plan( $variation_id, $handle, $this->get_params( $variation_id, $i ) );
                 }
             }
         }
     }
 
-    public function get_params_variable($post_id, $i){
+    public function get_params($post_id, $i = null){
         $handle = 'wc_subscription_'.$i.'_'.$post_id;
 
         $params = $this->get_default_params($post_id, $i);

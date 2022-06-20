@@ -398,9 +398,8 @@ class WC_Reepay_Subscription_Plan_Simple {
                     }
                 } else {
                     $handle = 'wc_subscription_' . $post_id;
-                    if ( $this->save_meta_from_request( $post_id ) ) {
-                        $this->create_plan( $post_id, $handle, $this->get_params( $post_id ) );
-                    }
+                    $this->save_meta_from_request( $post_id );
+                    $this->create_plan( $post_id, $handle, $this->get_params( $post_id ) );
                 }
             }
         }
@@ -412,8 +411,6 @@ class WC_Reepay_Subscription_Plan_Simple {
                 update_post_meta( $post_id, $key, $value );
             }
         }
-
-        return true;
     }
 
     public function update_plan( $handle, $params ) {
