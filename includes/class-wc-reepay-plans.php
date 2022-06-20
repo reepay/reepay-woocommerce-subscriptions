@@ -85,6 +85,23 @@ class WC_Reepay_Subscription_Plans{
         return false;
     }
 
+    public static function get_plans_wc() {
+        $plansQuery = new WP_Query([
+            'post_type' => 'product',
+            'post_status' => 'publish',
+            'meta_query' => [[
+                'key' => '_reepay_subscription_handle',
+                'compare' => 'EXISTS',
+            ]]
+        ]);
+        $plans = [];
+        foreach ($plansQuery->posts as $item) {
+            $handle = get_post_meta($item->ID, '_reepay_subscription_handle', true);
+            $plans[$handle] = $item->post_title;
+        }
+        return $plans;
+    }
+
     public static function wc_get_plan($handle) {
         $query = new WP_Query([
             'post_type' => 'product',
@@ -152,7 +169,6 @@ class WC_Reepay_Subscription_Plans{
         $_reepay_subscription_billing_cycles_period = get_post_meta($post_id, '_reepay_subscription_billing_cycles_period', true);
         $_reepay_subscription_trial = get_post_meta($post_id, '_reepay_subscription_trial', true);
         $_reepay_subscription_fee = get_post_meta($post_id, '_reepay_subscription_fee', true);
-        $_reepay_subscription_compensation = get_post_meta($post_id, '_reepay_subscription_compensation', true);
 
         if(empty($_reepay_subscription_choose)){
             if($variable){
@@ -192,19 +208,13 @@ class WC_Reepay_Subscription_Plans{
                 '_reepay_subscription_billing_cycles_period' => $variable ? $_reepay_subscription_billing_cycles_period[$loop] : $_reepay_subscription_billing_cycles_period,
                 '_reepay_subscription_trial' => $variable ? $_reepay_subscription_trial[$loop] : $_reepay_subscription_trial,
                 '_reepay_subscription_fee' => $variable ? $_reepay_subscription_fee[$loop] : $_reepay_subscription_fee,
-                '_reepay_subscription_compensation' => $variable ? $_reepay_subscription_compensation[$loop] : $_reepay_subscription_compensation,
                 'variable' => $variable,
                 'loop' => $loop,
-	            'domain' => reepay_s()->settings('domain'),
-	            'class' => $this
+	            'domain' => reepay_s()->settings('domain')
             ),
             '',
             reepay_s()->settings('plugin_path').'templates/'
         );
-    }
-
-    public function check_value($value){
-
     }
 
     public function set_price($post_id, $price){
@@ -345,7 +355,7 @@ class WC_Reepay_Subscription_Plans{
                     'month' => $plan_data['interval_length'],
                     'day' => !empty($plan_data['schedule_fixed_day']) ? $plan_data['schedule_fixed_day'] : '',
                     'period' => !empty($plan_data['partial_period_handling']) ? $plan_data['partial_period_handling'] : '',
-                    'proration' => !empty($plan_data['proration']) ? 'full_day' : 'by_minute',
+                    'proration' => $plan_data['proration'] ? 'full_day' : 'by_minute',
                     'proration_minimum' => !empty($plan_data['minimum_prorated_amount']) ? $plan_data['minimum_prorated_amount'] : '',
 
                 ];
