@@ -136,8 +136,8 @@ class WC_Reepay_Account_Page {
     }
 
 	public function subscriptions_endpoint() {
-        $subsResult = reepay_s()->api()->request("subscription", 'GET');
-        $planResult = reepay_s()->api()->request("plan", 'GET');
+        $subsResult = reepay_s()->api()->request("subscription");
+        $planResult = reepay_s()->api()->request("plan");
         $plans = [];
         foreach ($planResult as $item) {
             $plans[$item['handle']] = $item;

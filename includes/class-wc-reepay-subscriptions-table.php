@@ -57,7 +57,7 @@ class Subscriptions_Table extends \WP_List_Table {
             $params['sort'] = 'created';
         }
 
-        $subsResult = reepay_s()->api()->request("subscription?" . http_build_query($params), 'GET');
+        $subsResult = reepay_s()->api()->request("subscription?" . http_build_query($params));
 
         return $subsResult;
     }
