@@ -169,8 +169,15 @@ class WC_Reepay_Subscription_Plan_Simple {
      * @return array|bool
      */
     public function get_reepay_plans_list() {
+        static $plans = null;
+
+        if ( ! is_null( $plans ) ) {
+            return $plans;
+        }
+
         try {
-            return reepay_s()->api()->request( "plan?only_active=true" ) ?: false;
+            $plans = reepay_s()->api()->request( "plan?only_active=true" ) ?: false;
+            return $plans;
         }catch( Exception $e ) {
             $this->plan_error( $e->getMessage() );
         }
