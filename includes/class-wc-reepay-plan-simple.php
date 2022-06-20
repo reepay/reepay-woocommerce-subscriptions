@@ -364,7 +364,7 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
     public function save_subscription_meta( $post_id ) {
-        if ( empty( $_REQUEST ) || empty( $_REQUEST['product-type'] || $_REQUEST['product-type'] != 'reepay_simple_subscriptions') ) {
+        if ( empty( $_REQUEST ) || empty( $_REQUEST['product-type'] ) || $_REQUEST['product-type'] != 'reepay_simple_subscriptions' ) {
             return;
         }
 
