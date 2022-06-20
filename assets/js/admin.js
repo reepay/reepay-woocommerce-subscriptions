@@ -99,7 +99,9 @@ jQuery( function ( $ ) {
 
     }
 
-    setInterval(update_subscriptions_table, 2000)
+    if (('.wp-list-table').length) {
+        setInterval(update_subscriptions_table, 6000)
+    }
 
     function update_subscriptions_table() {
         return $.get(location.href)
