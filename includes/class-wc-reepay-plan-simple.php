@@ -67,12 +67,35 @@ class WC_Reepay_Subscription_Plan_Simple {
      * Constructor
      */
     public function __construct() {
-        add_filter( 'product_type_selector', array( $this, 'add_reepay_type' ) );
+        add_action( 'init', array( $this, 'create_subscription_product_class' ) );
+        add_filter( 'woocommerce_product_class', array( $this, 'load_subscription_product_class' ), 10, 2 );
+        add_filter( 'product_type_selector', array( $this, 'add_subscription_product_type' ) );
+
+        $this->register_actions();
+    }
+
+    protected function register_actions() {
+        add_action( "woocommerce_reepay_simple_subscriptions_add_to_cart", array( $this, 'add_to_cart' ) );
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'subscription_pricing_fields' ) );
         add_action( 'save_post', array( $this, 'save_subscription_meta' ), 11 );
-        add_filter( 'woocommerce_product_class', array( $this, 'reepay_load_subscription_product_class' ), 10, 2 );
-        add_action( 'init', array( $this, 'reepay_create_subscription_product_class' ) );
-        add_action( "woocommerce_reepay_simple_subscriptions_add_to_cart", array( $this, 'add_to_cart' ) );
+    }
+
+    public function create_subscription_product_class() {
+        include_once( reepay_s()->settings( 'plugin_path' ) . '/includes/class-wc-reepay-plan-simple-product.php' );
+    }
+
+    public function load_subscription_product_class( $php_classname, $product_type ) {
+        if ( $product_type == 'reepay_simple_subscriptions' ) {
+            $php_classname = 'WC_Product_Reepay_Simple_Subscription';
+        }
+
+        return $php_classname;
+    }
+
+    public function add_subscription_product_type( $types ) {
+        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', reepay_s()->settings( 'domain' ) );
+
+        return $types;
     }
 
     public function add_to_cart() {
@@ -141,7 +164,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
         return $query->post??null;
     }
-
 
     /**
      * @return array|bool
@@ -565,24 +587,6 @@ class WC_Reepay_Subscription_Plan_Simple {
         } else {
             return false;
         }
-    }
-
-    public function reepay_load_subscription_product_class( $php_classname, $product_type ) {
-        if ( $product_type == 'reepay_simple_subscriptions' ) {
-            $php_classname = 'WC_Product_Reepay_Simple_Subscription';
-        }
-
-        return $php_classname;
-    }
-
-    public function add_reepay_type( $types ) {
-        $types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', reepay_s()->settings( 'domain' ) );
-
-        return $types;
-    }
-
-    public function reepay_create_subscription_product_class() {
-        include_once( reepay_s()->settings( 'plugin_path' ) . '/includes/class-wc-reepay-plan-simple-product.php' );
     }
 
     protected function plan_error( $message ) {
