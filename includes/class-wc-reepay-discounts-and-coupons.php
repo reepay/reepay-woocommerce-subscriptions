@@ -30,6 +30,7 @@ class WC_Reepay_Discounts_And_Coupons
         add_action( 'woocommerce_coupon_options', [$this, 'add_coupon_text_field'], 10 );
         add_action( 'woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2 );
         add_filter('woocommerce_coupon_is_valid', [$this, 'validate_coupon'], 10, 4);
+        add_filter('woocommerce_coupon_is_valid_for_product', [$this, 'validate_coupon_for_product'], 10, 4);
         add_filter('woocommerce_coupon_get_discount_amount', [$this, 'apply_discount'], 10, 5);
 
         add_filter("woocommerce_coupon_error",[$this, "plugin_coupon_error_message"],10,3);
@@ -269,6 +270,14 @@ class WC_Reepay_Discounts_And_Coupons
         return $discount;
     }
 
+    function validate_applied_for_plans(WC_Product $product, $apply_to_plans = []) {
+        if (count($apply_to_plans) > 0) {
+            $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
+            return in_array($plan_handle, $apply_to_plans);
+        }
+        return true;
+    }
+
     function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts){
         if ( ! $coupon->is_type( array_keys(static::$coupon_types) ) ) {
             return $valid;
@@ -277,11 +286,25 @@ class WC_Reepay_Discounts_And_Coupons
         $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true);
         if (count($apply_to_plans) > 0) {
             foreach ($discounts->get_items_to_validate() as $item) {
-                $plan_handle = get_post_meta($item->product->get_id(), '_reepay_subscription_handle', true);
-                $valid = in_array($plan_handle, $apply_to_plans);
+                $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
                 if (!$valid) {
-                    throw new Exception(__('Invalid coupon', 'woocommerce'), 117);
+                    throw new Exception(__('Invalid coupon', 'woocommerce'), 113);
                 }
+            }
+        }
+
+        return $valid;
+    }
+
+    function validate_coupon_for_product($valid, WC_Product $product, WC_Coupon $coupon, $values){
+        if ( $coupon->is_type( array_keys(static::$coupon_types) ) ) {
+            return true;
+        }
+
+        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true);
+        if (count($apply_to_plans) > 0) {
+            if (!$this->validate_applied_for_plans($product, $apply_to_plans)) {
+                return false;
             }
         }
 
