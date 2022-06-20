@@ -14,44 +14,53 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
     <?php
     $plan = $args['plans'][$subscription['plan']];
     $is_expired = $subscription['state'] === 'expired';
-
+    $subscription_payment_method = $subscription['payment_methods'][0] ?? [];
     ?>
     <h1><?= $plan['name'] ?></h1>
     <table>
         <tbody>
-        <tr>
-            <td>
-                Payment methods:
-            </td>
-            <td>
-                <?php foreach($subscription['payment_methods'] as $payment_method): ?>
-                    <?= $payment_method['card']['card_type'] ?> <?= $payment_method['card']['masked_card'] ?>
-                    <br>
-                <?php endforeach; ?>
-            </td>
-        </tr>
         <?php if (!$is_expired): ?>
             <tr>
                 <td>Actions:</td>
                 <td>
                     <?php if ($subscription['state'] === 'on_hold'): ?>
-                        <a href="?reactivate=<?= $subscription['handle'] ?>">Reactivate</a>
+                        <a href="?reactivate=<?= $subscription['handle'] ?>" class="button">Reactivate</a>
                     <?php else: ?>
-                        <a href="?put_on_hold=<?= $subscription['handle'] ?>&plan=<?= $plan['handle'] ?>">Put on hold</a>
+                        <a href="?put_on_hold=<?= $subscription['handle'] ?>&plan=<?= $plan['handle'] ?>" class="button">Put on hold</a>
                     <?php endif; ?>
 
                     <?php if ($subscription['state'] !== 'on_hold'): ?>
                         <?php if ($subscription['is_cancelled'] === true): ?>
-                            <a href="?uncancel_subscription=<?= $subscription['handle'] ?>">Uncancel</a>
+                            <a href="?uncancel_subscription=<?= $subscription['handle'] ?>" class="button">Uncancel</a>
                         <?php else: ?>
-                            <a href="?cancel_subscription=<?= $subscription['handle'] ?>">Cancel Subscription</a>
+                            <a href="?cancel_subscription=<?= $subscription['handle'] ?>" class="button">Cancel Subscription</a>
                         <?php endif; ?>
                     <?php endif; ?>
                     <br>
-                    <?php foreach($user_payment_methods2 ?? [] as $payment_method): ?>
-                        <a href="?change_payment_method=<?= $subscription['handle'] ?>&token_id=<?= $payment_method->get_id() ?>">Change payment method to <?= $payment_method->get_masked_card() ?> <?= $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></a>
-                        <br>
-                    <?php endforeach; ?>
+            </tr>
+
+            <tr>
+                <td>Payment methods:</td>
+                <td></td>
+            </tr>
+            <?php foreach($user_payment_methods2 ?? [] as $payment_method): ?>
+                <tr>
+                    <td><?= $payment_method->get_masked_card() ?> <?= $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></td>
+                    <td>
+                        <?php if ($payment_method->get_token() === $subscription_payment_method['id']): ?>
+                            Current
+                        <?php else: ?>
+                            <a href="?change_payment_method=<?= $subscription['handle'] ?>&token_id=<?= $payment_method->get_id() ?>" class="button">Change</a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+
+
+                <br>
+            <?php endforeach; ?>
+            <tr>
+                <td></td>
+                <td><a href="<?= wc_get_endpoint_url('add-payment-method') . '?reepay_subscription=' . $subscription['handle'] ?>" class="button">Add payment method</a></td>
             </tr>
         <?php endif; ?>
         <tr>
