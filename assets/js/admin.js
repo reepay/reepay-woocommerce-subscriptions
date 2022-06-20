@@ -100,7 +100,7 @@ jQuery( function ( $ ) {
     }
 
     if (('.wp-list-table').length) {
-        setInterval(update_subscriptions_table, 6000)
+        setInterval(update_subscriptions_table, 3000)
     }
 
     function update_subscriptions_table() {
