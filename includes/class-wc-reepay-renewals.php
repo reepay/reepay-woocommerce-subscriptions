@@ -71,6 +71,8 @@ class WC_Reepay_Renewals {
 
 			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id() . '_' . time();
 
+			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' ) ?? [] );
+
 			$new_subscription = null;
 			try {
 				/**
@@ -86,7 +88,7 @@ class WC_Reepay_Renewals {
 //					'metadata' => null,
 					'source'          => $token,
 //					'create_customer' => null,
-					'plan_version'    => null,
+//					'plan_version'    => null,
 					'amount_incl_vat' => $product->get_meta( '_reepay_subscription_vat' ) == 'include',
 //					'generate_handle' => null,
 //					'start_date' => null,
@@ -97,11 +99,14 @@ class WC_Reepay_Renewals {
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
 					'coupon_codes'    => self::get_reepay_coupons( $order ),
-//					'add_ons' => null,
+					'add_ons'         => $addons,
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				] );
 			} catch ( Exception $e ) {
+				self::log( [
+					'notice' => $e->getMessage()
+				] );
 			}
 
 			if ( empty( $new_subscription ) ) {
@@ -127,6 +132,9 @@ class WC_Reepay_Renewals {
 					'source' => $token,
 				] );
 			} catch ( Exception $e ) {
+				self::log( [
+					'notice' => $e->getMessage()
+				] );
 			}
 
 			if ( empty( $payment_method ) ) {
@@ -412,6 +420,41 @@ class WC_Reepay_Renewals {
 		}
 
 		return $coupons;
+	}
+
+	/**
+	 * @param  WC_Order  $order
+	 *
+	 * @return array
+	 */
+	public static function get_shipping_addons( $order ) {
+		$methods = $order->get_shipping_methods();
+
+		if ( empty( $methods ) ) {
+			return [];
+		}
+
+		$shm      = array_shift( $methods );
+		$shm_data = get_option( 'woocommerce_' . $shm->get_method_id() . '_' . $shm->get_instance_id() . '_settings' );
+
+		if ( empty( $shm_data ) ) {
+			return [];
+		}
+
+		return [
+			[
+				'name'          => $shm_data['reepay_shipping_addon_name'],
+				'description'   => $shm_data['reepay_shipping_addon_description'],
+				'type'          => 'on_off',
+				'fixed_amount ' => true,
+				'amount'        => $shm_data['reepay_shipping_addon_amount'],
+				'vat'           => $shm_data['reepay_shipping_addon_vat'],
+				'vat_type'      => $shm_data['reepay_shipping_addon_vat_type'],
+				'handle'        => $shm_data['reepay_shipping_addon'],
+				'exist'         => $shm_data['reepay_shipping_addon'],
+				'add_on'        => $shm_data['reepay_shipping_addon'],
+			]
+		];
 	}
 
 	/**
