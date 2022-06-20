@@ -224,7 +224,6 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
     public function set_price( $post_id, $price ) {
-        $_REQUEST['_regular_price'] = $price;
         update_post_meta( $post_id, '_regular_price', $price );
         update_post_meta( $post_id, '_price', $price );
     }
@@ -413,9 +412,9 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
     public function save_meta_from_request( $post_id ) {
-        foreach ( $_REQUEST as $key => $value ) {
-            if ( in_array( $key, self::$meta_fields ) ) {
-                update_post_meta( $post_id, $key, $value );
+        foreach ( self::$meta_fields as $key ) {
+            if ( isset( $_REQUEST[ $key ] ) ) {
+                update_post_meta( $post_id, $key, $_REQUEST[ $key ] );
             }
         }
     }
