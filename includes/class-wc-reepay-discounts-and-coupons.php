@@ -29,8 +29,11 @@ class WC_Reepay_Discounts_And_Coupons
         add_filter('woocommerce_coupon_discount_types', [$this, 'add_coupon_types'], 10, 1);
         add_action( 'woocommerce_coupon_options', [$this, 'add_coupon_text_field'], 10 );
         add_action( 'woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2 );
-        add_filter('woocommerce_coupon_is_valid_for_product', [$this, 'validate_coupon'], 10, 4);
+        add_filter('woocommerce_coupon_is_valid', [$this, 'validate_coupon'], 10, 4);
         add_filter('woocommerce_coupon_get_discount_amount', [$this, 'apply_discount'], 10, 5);
+
+        add_filter("woocommerce_coupon_error",[$this, "plugin_coupon_error_message"],10,3);
+
     }
 
     function get_discount_default_params(WC_Coupon $coupon) {
@@ -117,6 +120,12 @@ class WC_Reepay_Discounts_And_Coupons
         }
     }
 
+    function plugin_coupon_error_message($err,$err_code, WC_Coupon $coupon) {
+        if( $coupon->is_type( array_keys(static::$coupon_types) ) && intval($err_code) === 117 ) {
+            return __('Coupon is not applied for this plans', reepay_s()->settings('domain'));
+        }
+        return $err;
+    }
 
     function create_discount(WC_Coupon $coupon) {
 
@@ -260,69 +269,24 @@ class WC_Reepay_Discounts_And_Coupons
         return $discount;
     }
 
-    function validate_coupon($valid, WC_Product $product, WC_Coupon $coupon, $values){
+    function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts){
         if ( ! $coupon->is_type( array_keys(static::$coupon_types) ) ) {
             return $valid;
         }
 
-        $product_cats = wp_get_post_terms( $product->id, 'product_cat', array( "fields" => "ids" ) );
-
-        // SPECIFIC PRODUCTS ARE DISCOUNTED
-        if ( sizeof( $coupon->product_ids ) > 0 ) {
-            if ( in_array( $product->id, $coupon->product_ids ) || ( isset( $product->variation_id ) && in_array( $product->variation_id, $coupon->product_ids ) ) || in_array( $product->get_parent(), $coupon->product_ids ) ) {
-                $valid = true;
-            }
-        }
-
-        // CATEGORY DISCOUNTS
-        if ( sizeof( $coupon->product_categories ) > 0 ) {
-            if ( sizeof( array_intersect( $product_cats, $coupon->product_categories ) ) > 0 ) {
-                $valid = true;
-            }
-        }
-
-        // IF ALL ITEMS ARE DISCOUNTED
-        if ( ! sizeof( $coupon->product_ids ) && ! sizeof( $coupon->product_categories ) ) {
-            $valid = true;
-        }
-
-        // SPECIFIC PRODUCT IDs EXLCUDED FROM DISCOUNT
-        if ( sizeof( $coupon->exclude_product_ids ) > 0 ) {
-            if ( in_array( $product->id, $coupon->exclude_product_ids ) || ( isset( $product->variation_id ) && in_array( $product->variation_id, $coupon->exclude_product_ids ) ) || in_array( $product->get_parent(), $coupon->exclude_product_ids ) ) {
-                $valid = false;
-            }
-        }
-
-        // SPECIFIC CATEGORIES EXLCUDED FROM THE DISCOUNT
-        if ( sizeof( $coupon->exclude_product_categories ) > 0 ) {
-            if ( sizeof( array_intersect( $product_cats, $coupon->exclude_product_categories ) ) > 0 ) {
-                $valid = false;
-            }
-        }
-
-        // SALE ITEMS EXCLUDED FROM DISCOUNT
-        if ( $coupon->exclude_sale_items == 'yes' ) {
-            $product_ids_on_sale = wc_get_product_ids_on_sale();
-
-            if ( isset( $product->variation_id ) ) {
-                if ( in_array( $product->variation_id, $product_ids_on_sale, true ) ) {
-                    $valid = false;
-                }
-            } elseif ( in_array( $product->id, $product_ids_on_sale, true ) ) {
-                $valid = false;
-            }
-        }
-
         $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true);
-
-        if (!empty($apply_to_plans)) {
-            $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
-            $valid = in_array($plan_handle, $apply_to_plans);
+        if (count($apply_to_plans) > 0) {
+            foreach ($discounts->get_items_to_validate() as $item) {
+                $plan_handle = get_post_meta($item->product->get_id(), '_reepay_subscription_handle', true);
+                $valid = in_array($plan_handle, $apply_to_plans);
+                if (!$valid) {
+                    throw new Exception(__('Invalid coupon', 'woocommerce'), 117);
+                }
+            }
         }
 
         return $valid;
     }
-
 
     function add_coupon_text_field() {
         $meta = get_post_meta(get_the_ID());
