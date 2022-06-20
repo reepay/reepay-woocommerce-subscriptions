@@ -14,6 +14,19 @@ jQuery( function ( $ ) {
         init(tab);
     } );
 
+    $( 'body' ).on( 'init_tooltips', function () {
+        $( '.addon-shipping-new' ).closest('tr').addClass('hidden');
+        $( '.addon-shipping-choose' ).on( 'change', function () {
+            if($(this).val() == 'new'){
+                $( '.addon-shipping-new' ).closest('tr').removeClass('hidden');
+            }else{
+                $( '.addon-shipping-new' ).closest('tr').addClass('hidden');
+            }
+        } );
+    } );
+
+
+
     $( 'body' ).on( 'woocommerce_variations_added', function () {
         init('#variable_product_options');
     } );
