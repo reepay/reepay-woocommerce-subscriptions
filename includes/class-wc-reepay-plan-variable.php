@@ -52,11 +52,12 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		$data = parent::get_subscription_template_data( $post_id );
 
 		$data['variable'] = true;
+		$data['loop'] = $this->loop;
 
 		foreach ( self::$meta_fields as $meta_field ) {
-			$data[ $meta_field ] = $data[ $meta_field ][$this->loop];
+			$data[ $meta_field ] = $data[ $meta_field ][$this->loop] ?? '';
 		}
-
+		
 		return $data;
 	}
 
@@ -89,7 +90,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
             }
 
             $title = get_the_title( $variation_id );
-            if ( ! empty( $title ) && $title != 'AUTO-DRAFT' ) {
+            if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
                 $handle = get_post_meta( $variation_id, '_reepay_subscription_handle', true );
 
                 if ( ! empty( $handle ) ) {
@@ -226,9 +227,20 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         return $params;
     }
 
+    /**
+     * @param int     $loop           Position in the loop.
+     * @param array   $variation_data Variation data.
+     * @param WP_Post $variation      Post data.
+     */
     public function add_custom_field_to_variations( $loop, $variation_data, $variation ) {
+        global $post;
+        $_post = $post;
+        $post = $variation;
+
 		$this->loop = $loop;
         $this->subscription_pricing_fields();
+
+        $post = $_post;
     }
 }
 
