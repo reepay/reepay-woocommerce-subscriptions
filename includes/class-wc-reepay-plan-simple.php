@@ -445,7 +445,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
     public function get_params( $post_id ) {
         $handle = $this->generate_subscription_handle( $post_id );
-
         $params = $this->get_default_params( $post_id );
 
         $type      = get_post_meta( $post_id, '_reepay_subscription_schedule_type', true );
@@ -494,14 +493,14 @@ class WC_Reepay_Subscription_Plan_Simple {
         if ( $fixation_periods ) {
             $params['fixation_periods']      = intval( $fixation_periods );
             $fixation_periods_full           = get_post_meta( $post_id, '_reepay_subscription_contract_periods_full', true );
-            $params['fixation_periods_full'] = $fixation_periods_full == 'true';
+            $params['fixation_periods_full'] = boolval( $fixation_periods_full );
         }
 
         $notice_periods = get_post_meta( $post_id, '_reepay_subscription_notice_period', true );
         if ( $notice_periods ) {
             $params['notice_periods']               = intval( $notice_periods );
             $notice_period_start                    = get_post_meta( $post_id, '_subscription_notice_period_start', true );
-            $params['notice_periods_after_current'] = $notice_period_start == 'true';
+            $params['notice_periods_after_current'] = boolval( $notice_period_start );
         }
 
         if ( $type == 'month_fixedday' || $type == 'weekly_fixedday' ) {
