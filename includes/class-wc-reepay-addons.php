@@ -30,7 +30,23 @@ class WC_Reepay_Subscription_Addons{
      */
     public function order_line_item( $item, $cart_item_key, $values ) {
         if ( ! empty( $values['addons'] ) ) {
+            $addons_info = [];
+
             foreach ( $values['addons'] as $addon ) {
+	            $result = reepay_s()->api()->request("add_on/{$addon['handle']}");
+
+	             $addons_info[] = [
+		            'name' => $result['name'],
+		            'description' => $result['description'],
+		            'type' => $result['type'],
+		            'amount' => $result['amount'] / 100,
+		            'vat' => $result['vat'] * 100,
+		            'handle' => $result['handle'],
+		            'exist' => $result['handle'],
+		            'add_on' => $result['handle'],
+		            'vat_type' => $result['amount_incl_vat'] ? 'include' : 'exclude',
+	            ];
+
                 $key = $addon['name'];
                 $price = $addon['amount'];
                 if ( ! empty( $addon['quantity'] ) && apply_filters( 'woocommerce_addons_add_price_to_name', '__return_true' ) ) {
@@ -40,6 +56,8 @@ class WC_Reepay_Subscription_Addons{
 
                 $item->add_meta_data( $key, '+'. wc_price($price) );
             }
+
+	        $item->add_meta_data( 'addons', $addons_info );
         }
     }
 
@@ -118,14 +136,16 @@ class WC_Reepay_Subscription_Addons{
         return array_filter((array)$product->get_meta('_product_addons'));
     }
 
-    /**
-     * Add cart item data.
-     *
-     * @param array $cart_item_meta Cart item meta data.
-     * @param int   $product_id     Product ID.
-     * @param bool  $test           If this is a test i.e. just getting data but not adding to cart. Used to prevent uploads.
-     * @return array
-     */
+	/**
+	 * Add cart item data.
+	 *
+	 * @param  array  $cart_item_meta  Cart item meta data.
+	 * @param  int  $product_id  Product ID.
+	 * @param  array  $post_data
+	 * @param  bool  $test  If this is a test i.e. just getting data but not adding to cart. Used to prevent uploads.
+	 *
+	 * @return array
+	 */
     public function add_cart_item_data( $cart_item_meta, $product_id, $post_data = null, $test = false ) {
 
         if ( !$post_data && isset( $_POST ) ) {
@@ -237,18 +257,32 @@ class WC_Reepay_Subscription_Addons{
         );
     }
 
-    public function get_reepay_addons_list(){
-        try{
-            $result = reepay_s()->api()->request("add_on?size=100");
+	/**
+	 * @param bool $drop_cache
+	 *
+	 * @return mixed
+	 */
+	public function get_reepay_addons_list( $drop_cache = false ){
+		$addons_list = $drop_cache ? null : get_option('reepay_s_addons_list');
 
-            if(!empty($result['content'])){
-                foreach ($result['content'] as $i => $addon){
+	    if ( ! empty( $addons_list ) ) {
+            return $addons_list;
+	    }
+
+        try{
+	        $addons_list = reepay_s()->api()->request("add_on?size=100");
+
+            if(!empty($addons_list['content'])){
+                foreach ($addons_list['content'] as $i => $addon){
                     if($addon['state'] != 'active'){
-                        unset($result['content'][$i]);
+                        unset($addons_list['content'][$i]);
                     }
                 }
             }
-            return $result;
+
+	        update_option( 'reepay_s_addons_list', $addons_list );
+
+            return $addons_list;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
@@ -259,7 +293,7 @@ class WC_Reepay_Subscription_Addons{
         try{
             $result = reepay_s()->api()->request("add_on/".$handle);
 
-            $addon_data = [
+	        return [
                 'name' => $result['name'],
                 'description' => $result['description'],
                 'type' => $result['type'],
@@ -269,8 +303,6 @@ class WC_Reepay_Subscription_Addons{
                 'exist' => $result['handle'],
                 'vat_type' => $result['amount_incl_vat'] ? 'include' : 'exclude',
             ];
-
-            return $addon_data;
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }

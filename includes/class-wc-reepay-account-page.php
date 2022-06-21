@@ -17,7 +17,34 @@ class WC_Reepay_Account_Page {
         add_action('woocommerce_account_subscriptions_endpoint', [$this, 'subscriptions_endpoint']);
         add_filter('woocommerce_account_menu_items', [$this, 'add_subscriptions_menu_item'] );
         add_filter('woocommerce_get_query_vars', [$this, 'subscriptions_query_vars'], 0);
+
+        add_filter('woocommerce_reepay_payment_accept_url', [$this, 'add_subscription_arg']);
+        add_filter('woocommerce_reepay_payment_cancel_url', [$this, 'add_subscription_arg']);
+        add_action('woocommerce_reepay_payment_method_added', [$this, 'payment_method_added']);
         return add_filter( 'woocommerce_endpoint_subscriptions_title', [$this, 'get_title'] );
+    }
+
+    public function add_subscription_arg($url) {
+	    if ($_GET['reepay_subscription']) {
+	        return add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url);
+        }
+	    return $url;
+    }
+
+    public function payment_method_added(WC_Payment_Token $token) {
+	    $handle = $_GET['reepay_subscription'] ?? '';
+	    if (!empty($handle)) {
+            try {
+                reepay_s()->api()->request('subscription/' . $handle . '/pm', 'POST', [
+                    'source' => $token->get_token(),
+                ]);
+            } catch (Exception $exception) {
+                wc_add_notice($exception->getMessage());
+            }
+        }
+        wc_add_notice( __( 'Payment method successfully added.', 'reepay-checkout-gateway' ) );
+        wp_redirect( wc_get_account_endpoint_url( 'subscriptions' ) );
+        exit;
     }
 
     public function init() {
@@ -109,8 +136,8 @@ class WC_Reepay_Account_Page {
     }
 
 	public function subscriptions_endpoint() {
-        $subsResult = reepay_s()->api()->request("subscription", 'GET');
-        $planResult = reepay_s()->api()->request("plan", 'GET');
+        $subsResult = reepay_s()->api()->request("subscription");
+        $planResult = reepay_s()->api()->request("plan");
         $plans = [];
         foreach ($planResult as $item) {
             $plans[$item['handle']] = $item;
@@ -152,8 +179,14 @@ class WC_Reepay_Account_Page {
     }
 
 	public function add_subscriptions_menu_item($menu_items) {
-        $menu_items["subscriptions"] = $this->get_title();
-        return $menu_items;
+	    $returnArr = [];
+        foreach ($menu_items as $key => $menu_item) {
+            $returnArr[$key] = $menu_item;
+            if ($key === 'orders') {
+                $returnArr["subscriptions"] = $this->get_title();
+            }
+	    }
+        return $returnArr;
     }
 
     function get_status($subscription) {
