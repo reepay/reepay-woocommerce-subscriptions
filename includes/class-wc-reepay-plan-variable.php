@@ -20,6 +20,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
     }
 
     protected function register_actions() {
+        add_action( "woocommerce_reepay_variable_subscriptions_add_to_cart", array( $this, 'add_to_cart' ) );
         add_action( 'woocommerce_variation_options_pricing', array( $this, 'add_custom_field_to_variations' ), 10, 3 );
         add_action( 'woocommerce_save_product_variation', array( $this, 'save_subscription_meta' ), 10, 2 );
     }
@@ -49,10 +50,10 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
     }
 
     public function is_reepay_product_saving() {
-        return empty( $_REQUEST ) ||
-               empty( $_REQUEST['product-type'] ) ||
-               $_REQUEST['product-type'] != 'reepay_variable_subscriptions' ||
-               empty( $_REQUEST['_reepay_subscription_choose'] );
+        return ! empty( $_REQUEST ) &&
+               ! empty( $_REQUEST['product-type'] ) &&
+               $_REQUEST['product-type'] == 'reepay_variable_subscriptions' &&
+               ! empty( $_REQUEST['_reepay_subscription_choose'] );
     }
 
     public function get_meta_from_request() {
@@ -90,6 +91,9 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
         $post = $_post;
     }
+
+    public function add_to_cart() {
+        do_action( 'woocommerce_variable_add_to_cart' );
     }
 }
 
