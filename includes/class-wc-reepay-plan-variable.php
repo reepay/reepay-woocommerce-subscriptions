@@ -23,6 +23,15 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         add_action( "woocommerce_reepay_variable_subscriptions_add_to_cart", array( $this, 'add_to_cart' ) );
         add_action( 'woocommerce_variation_options_pricing', array( $this, 'add_custom_field_to_variations' ), 10, 3 );
         add_action( 'woocommerce_save_product_variation', array( $this, 'save_subscription_meta' ), 10, 2 );
+        add_filter( 'woocommerce_add_to_cart_handler', array( $this, 'variable_add_to_cart_fix' ), 10, 2 );
+    }
+
+    public function variable_add_to_cart_fix($type, $adding_to_cart){
+        if($type == 'reepay_variable_subscriptions'){
+            return 'variable';
+        }
+
+        return $type;
     }
 
 	/**
