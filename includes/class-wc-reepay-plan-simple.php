@@ -370,17 +370,19 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
     public function save_subscription_meta( $post_id ) {
-        if ( empty( $_REQUEST ) || empty( $_REQUEST['product-type'] ) || $_REQUEST['product-type'] != 'reepay_simple_subscriptions' ) {
+        if ( !$this->is_reepay_product_saving() ) {
             return;
         }
 
-        if ( ! empty( $_REQUEST['_reepay_subscription_choose'] ) && $_REQUEST['_reepay_subscription_choose'] == 'exist' ) {
-            if ( ! empty( $_REQUEST['_reepay_choose_exist'] ) ) {
-                update_post_meta( $post_id, '_reepay_subscription_handle', $_REQUEST['_reepay_choose_exist'] );
-                update_post_meta( $post_id, '_reepay_choose_exist', $_REQUEST['_reepay_choose_exist'] );
-                update_post_meta( $post_id, '_reepay_subscription_choose', $_REQUEST['_reepay_subscription_choose'] );
+        $request_data = $this->get_meta_from_request();
 
-                $this->save_remote_plan( $post_id, $_REQUEST['_reepay_choose_exist'] );
+        if ( ! empty( $request_data['_reepay_subscription_choose'] ) && $request_data['_reepay_subscription_choose'] == 'exist' ) {
+            if ( ! empty( $request_data['_reepay_choose_exist'] ) ) {
+                update_post_meta( $post_id, '_reepay_subscription_handle', $request_data['_reepay_choose_exist'] );
+                update_post_meta( $post_id, '_reepay_choose_exist', $request_data['_reepay_choose_exist'] );
+                update_post_meta( $post_id, '_reepay_subscription_choose', $request_data['_reepay_subscription_choose'] );
+
+                $this->save_remote_plan( $post_id, $request_data['_reepay_choose_exist'] );
             } else {
                 $this->plan_error( __( 'Please choose the plan', reepay_s()->settings( 'domain' ) ) );
             }
@@ -390,25 +392,41 @@ class WC_Reepay_Subscription_Plan_Simple {
                 delete_post_meta( $post_id, '_reepay_subscription_handle' );
             }
 
-            if ( ! empty( $_REQUEST['_reepay_subscription_price'] ) ) {
-                $this->set_price( $post_id, $_REQUEST['_reepay_subscription_price'] );
+            if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
+                $this->set_price( $post_id, $request_data['_reepay_subscription_price'] );
             }
 
             $title = get_the_title( $post_id );
-            if ( ! empty( $title ) && $title != 'AUTO-DRAFT' ) {
-                $handle               = get_post_meta( $post_id, '_reepay_subscription_handle', true );
+            if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
+                $handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
 
                 if ( ! empty( $handle ) ) {
                     if ( $this->update_plan( $handle, $this->get_params( $post_id ) ) ) {
                         $this->save_meta_from_request( $post_id );
                     }
                 } else {
-                    $handle = 'wc_subscription_' . $post_id;
+                    $handle = $this->generate_subscription_handle( $post_id );
                     $this->save_meta_from_request( $post_id );
                     $this->create_plan( $post_id, $handle, $this->get_params( $post_id ) );
                 }
             }
         }
+    }
+
+    public function is_reepay_product_saving() {
+        return ! empty( $_REQUEST ) && ! empty( $_REQUEST['product-type'] ) && $_REQUEST['product-type'] == 'reepay_simple_subscriptions';
+    }
+
+    public function get_meta_from_request() {
+        $data = [];
+
+        foreach ( self::$meta_fields as $key ) {
+            if ( isset( $_REQUEST[ $key ] ) ) {
+                $data[ $key ] = $_REQUEST[ $key ];
+            }
+        }
+
+        return $data;
     }
 
     public function save_meta_from_request( $post_id ) {
@@ -445,7 +463,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
     public function get_params( $post_id ) {
         $handle = $this->generate_subscription_handle( $post_id );
-
         $params = $this->get_default_params( $post_id );
 
         $type      = get_post_meta( $post_id, '_reepay_subscription_schedule_type', true );
@@ -494,14 +511,14 @@ class WC_Reepay_Subscription_Plan_Simple {
         if ( $fixation_periods ) {
             $params['fixation_periods']      = intval( $fixation_periods );
             $fixation_periods_full           = get_post_meta( $post_id, '_reepay_subscription_contract_periods_full', true );
-            $params['fixation_periods_full'] = $fixation_periods_full == 'true';
+            $params['fixation_periods_full'] = boolval( $fixation_periods_full );
         }
 
         $notice_periods = get_post_meta( $post_id, '_reepay_subscription_notice_period', true );
         if ( $notice_periods ) {
             $params['notice_periods']               = intval( $notice_periods );
             $notice_period_start                    = get_post_meta( $post_id, '_subscription_notice_period_start', true );
-            $params['notice_periods_after_current'] = $notice_period_start == 'true';
+            $params['notice_periods_after_current'] = boolval( $notice_period_start );
         }
 
         if ( $type == 'month_fixedday' || $type == 'weekly_fixedday' ) {
