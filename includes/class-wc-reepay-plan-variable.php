@@ -48,55 +48,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         return 'wc_subscription_'.$this->loop.'_'.$post_id;
     }
 
-    public function get_params( $post_id ) {
-        return parent::get_params( $post_id );
-    }
-
-    public function get_default_params($post_id){
-
-        $type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true);
-        $type_data = get_post_meta($post_id, '_reepay_subscription_'.$type, true);
-
-        $params = [
-            'name' => get_the_title( $post_id ),
-            'description' => get_post_field( 'post_content', $post_id ),
-            //'fixed_trial_days' => '', //@todo Уточнить что за поле в админке
-        ];
-
-        if(!empty($_REQUEST['_reepay_subscription_renewal_reminder'][$this->loop])){
-            $params['renewal_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_renewal_reminder'][$this->loop]);
-        }
-
-        if(!empty($_REQUEST['_reepay_subscription_trial'][$this->loop]) && !empty($_REQUEST['_reepay_subscription_trial'][$this->loop]['reminder'])){
-            $params['trial_reminder_email_days'] = intval($_REQUEST['_reepay_subscription_trial'][$this->loop]['reminder']);
-        }
-
-        if(is_array($type_data) && !empty($type_data['period'])){
-            $params['partial_period_handling'] = $type_data['period'];
-        }
-
-        if(!empty($_REQUEST['_reepay_subscription_fee'][$this->loop])){
-            $fee = $_REQUEST['_reepay_subscription_fee'][$this->loop];
-            $params['setup_fee'] = !empty($fee['amount']) ? floatval($fee['amount']) * 100 : 0;
-            $params['setup_fee_text'] = !empty($fee['text']) ? $fee['text'] : '';
-            $params['setup_fee_handling'] = !empty($fee['handling']) ? $fee['handling'] : '';
-        }
-
-        if(!empty($type_data['proration'])){
-            if($type_data['proration'] == 'full_day'){
-                $params['partial_proration_days'] = true;
-            }else{
-                $params['partial_proration_days'] = false;
-            }
-        }
-
-        if(!empty($type_data['proration_minimum'])){
-            $params['minimum_prorated_amount'] = floatval($type_data['proration_minimum']);
-        }
-
-        return $params;
-    }
-
     public function is_reepay_product_saving() {
         return empty( $_REQUEST ) ||
                empty( $_REQUEST['product-type'] ) ||

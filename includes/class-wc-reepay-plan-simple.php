@@ -550,6 +550,8 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
     public function get_default_params( $post_id ) {
+        $request_data = $this->get_meta_from_request();
+
         $type      = get_post_meta( $post_id, '_reepay_subscription_schedule_type', true );
         $type_data = get_post_meta( $post_id, '_reepay_subscription_' . $type, true );
 
@@ -559,20 +561,20 @@ class WC_Reepay_Subscription_Plan_Simple {
             //'fixed_trial_days' => '', //@todo Уточнить что за поле в админке
         ];
 
-        if ( ! empty( $_REQUEST['_reepay_subscription_renewal_reminder'] ) ) {
-            $params['renewal_reminder_email_days'] = intval( $_REQUEST['_reepay_subscription_renewal_reminder'] );
+        if ( ! empty( $request_data['_reepay_subscription_renewal_reminder'] ) ) {
+            $params['renewal_reminder_email_days'] = intval( $request_data['_reepay_subscription_renewal_reminder'] );
         }
 
-        if ( ! empty( $_REQUEST['_reepay_subscription_trial'] ) && ! empty( $_REQUEST['_reepay_subscription_trial']['reminder'] ) ) {
-            $params['trial_reminder_email_days'] = intval( $_REQUEST['_reepay_subscription_trial']['reminder'] );
+        if ( ! empty( $request_data['_reepay_subscription_trial'] ) && ! empty( $request_data['_reepay_subscription_trial']['reminder'] ) ) {
+            $params['trial_reminder_email_days'] = intval( $request_data['_reepay_subscription_trial']['reminder'] );
         }
 
         if ( is_array( $type_data ) && ! empty( $type_data['period'] ) ) {
             $params['partial_period_handling'] = $type_data['period'];
         }
 
-        if ( ! empty( $_REQUEST['_reepay_subscription_fee'] ) ) {
-            $fee                          = $_REQUEST['_reepay_subscription_fee'];
+        if ( ! empty( $request_data['_reepay_subscription_fee'] ) ) {
+            $fee                          = $request_data['_reepay_subscription_fee'];
             $params['setup_fee']          = ! empty( $fee['amount'] ) ? floatval( $fee['amount'] )*100 : 0;
             $params['setup_fee_text']     = ! empty( $fee['text'] ) ? $fee['text'] : '';
             $params['setup_fee_handling'] = ! empty( $fee['handling'] ) ? $fee['handling'] : '';
