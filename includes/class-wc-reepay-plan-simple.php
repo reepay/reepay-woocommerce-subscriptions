@@ -439,8 +439,12 @@ class WC_Reepay_Subscription_Plan_Simple {
         return $type;
     }
 
+    public function generate_subscription_handle( $post_id ) {
+        return 'wc_subscription_' . $post_id;
+    }
+
     public function get_params( $post_id ) {
-        $handle = 'wc_subscription_' . $post_id;
+        $handle = $this->generate_subscription_handle( $post_id );
 
         $params = $this->get_default_params( $post_id );
 

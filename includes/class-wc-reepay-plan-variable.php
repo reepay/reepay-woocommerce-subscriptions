@@ -84,9 +84,12 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         }
     }
 
-    public function get_params($post_id, $i = null){
-        $handle = 'wc_subscription_'.$i.'_'.$post_id;
+    public function generate_subscription_handle( $post_id, $i = null ) {
+        return 'wc_subscription_'.$i.'_'.$post_id;
+    }
 
+    public function get_params($post_id, $i = null){
+        $handle = $this->generate_subscription_handle( $post_id, $i );
         $params = $this->get_default_params($post_id, $i);
 
         $type = get_post_meta($post_id, '_reepay_subscription_schedule_type', true);
