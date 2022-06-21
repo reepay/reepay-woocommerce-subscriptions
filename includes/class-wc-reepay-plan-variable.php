@@ -97,7 +97,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         return $params;
     }
 
-<<<<<<< HEAD
     public function is_reepay_product_saving() {
         return empty( $_REQUEST ) ||
                empty( $_REQUEST['product-type'] ) ||
@@ -117,8 +116,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         return $data;
     }
 
-=======
->>>>>>> ddaniel-variable-subscription
     public function save_meta_from_request( $post_id ) {
         foreach ( self::$meta_fields as $key ) {
             if ( isset( $_REQUEST[ $key ] ) ) {
@@ -141,6 +138,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         $this->subscription_pricing_fields();
 
         $post = $_post;
+    }
     }
 }
 
