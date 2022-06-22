@@ -2,6 +2,8 @@
 class WC_Product_Reepay_Variable_Subscription extends WC_Product_Variable {
     public function __construct( $product ) {
         parent::__construct( $product );
+
+        $this->data_store = WC_Data_Store::load( 'product-variable' );
     }
 
     public function get_type() {

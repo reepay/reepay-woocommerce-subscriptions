@@ -81,7 +81,7 @@ class WC_Reepay_Account_Page {
         if (!empty($_GET['put_on_hold'])) {
             $handle = $_GET['put_on_hold'];
             $plan_handle = $_GET['plan'];
-            $plan = WC_Reepay_Subscription_Plans::wc_get_plan($handle);
+            $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($handle);
             if (!empty($plan)) {
                 $compensation_method = get_post_meta($plan->ID, '_reepay_subscription_compensation', true);
 
