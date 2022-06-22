@@ -230,24 +230,46 @@ class WC_Reepay_Renewals {
 	 *     'event_id' => string
 	 * ] $data
 	 */
-	public function cancel_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
+    public function cancel_subscription( $data ) {
+        $parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::cancel_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
+        if ( empty( $parent_order ) ) {
+            self::log( [
+                'log'    => [
+                    'source' => 'WC_Reepay_Renewals::cancel_subscription',
+                    'error'  => 'undefined parent order',
+                    'data'   => $data
+                ],
+                'notice' => "Subscription {$data['subscription']} - undefined order"
+            ] );
 
-			return;
-		}
+            return;
+        }
 
-		self::create_child_order( $parent_order, 'wc-cancelled' );
-	}
+        $query = new WP_Query( array(
+            'post_parent'    => $parent_order->get_id(),
+            'post_type'      => 'shop_order',
+            'post_status'    => 'any',
+            'orderby'        => 'ID',
+            'posts_per_page' => 1,
+            'offset'         => 0,
+        ) );
+
+        if ( ! empty( $query->posts ) && $query->posts[0]->post_status === 'wc-cancelled' ) {
+            self::log( [
+                'log'    => [
+                    'source' => 'WC_Reepay_Renewals::cancel_subscription',
+                    'error'  => 'duplicate cancel status',
+                    'data'   => $data
+                ],
+                'notice' => "Subscription {$data['subscription']} - duplicate cancel status"
+            ] );
+
+            return;
+        }
+
+        self::create_child_order( $parent_order, 'wc-cancelled' );
+    }
 
 	/**
 	 *
