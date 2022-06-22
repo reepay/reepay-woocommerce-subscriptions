@@ -38,6 +38,10 @@ class WC_Reepay_Helpers {
 			 */
 			$product = $cart_item['data'];
 
+            if ( $product->is_type( 'variation' ) ) {
+                $product = wc_get_product( $product->get_parent_id() );
+            }
+
 			if ( str_contains( $product->get_type(), 'reepay' ) ) {
 				$is_reepay_product_in_cart = true;
 				break;
