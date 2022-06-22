@@ -60,6 +60,7 @@ class WC_Reepay_Account_Page {
         if (!empty($_GET['cancel_subscription'])) {
 
             $handle = $_GET['cancel_subscription'];
+            $handle = urlencode($handle);
 
             try {
                 $result = reepay_s()->api()->request("subscription/{$handle}/cancel", 'POST');
@@ -73,6 +74,7 @@ class WC_Reepay_Account_Page {
         if (!empty($_GET['uncancel_subscription'])) {
 
             $handle = $_GET['uncancel_subscription'];
+            $handle = urlencode($handle);
 
             $result = reepay_s()->api()->request("subscription/{$handle}/uncancel", 'POST');
             wp_redirect(wc_get_endpoint_url('subscriptions'));
@@ -80,7 +82,8 @@ class WC_Reepay_Account_Page {
 
         if (!empty($_GET['put_on_hold'])) {
             $handle = $_GET['put_on_hold'];
-            $plan_handle = $_GET['plan'];
+            $handle = urlencode($handle);
+
             $plan = WC_Reepay_Subscription_Plans::wc_get_plan($handle);
             if (!empty($plan)) {
                 $compensation_method = get_post_meta($plan->ID, '_reepay_subscription_compensation', true);
@@ -113,16 +116,14 @@ class WC_Reepay_Account_Page {
             $token_id = $_GET['token_id'];
             $token = WC_Payment_Tokens::get($token_id);
 
+            $handle = urlencode($handle);
+
             $params = [
                 'source' => $token->get_token(),
             ];
 
             $result = reepay_s()->api()->request("subscription/{$handle}/pm", 'POST', $params);
             wp_redirect(wc_get_endpoint_url('subscriptions'));
-        }
-
-        if (!empty($_GET['change_payment_method'])) {
-
         }
     }
 
@@ -136,7 +137,14 @@ class WC_Reepay_Account_Page {
     }
 
 	public function subscriptions_endpoint() {
-        $subsResult = reepay_s()->api()->request("subscription");
+	    $cur_page = urlencode($_GET['page'] ?? 1);
+
+        $subscriptionsParams = [
+          'page' => urlencode($_GET['page'] ?? 1),
+          'size' => 3,
+        ];
+
+        $subsResult = reepay_s()->api()->request("subscription?" . http_build_query($subscriptionsParams));
         $planResult = reepay_s()->api()->request("plan");
         $plans = [];
         foreach ($planResult as $item) {
@@ -172,6 +180,8 @@ class WC_Reepay_Account_Page {
             array(
                 'subscriptions' => $subscriptionsArr,
                 'plans' => $plans,
+                'current' => $cur_page,
+                'total' => $subsResult['total_pages']
             ),
             '',
             reepay_s()->settings('plugin_path').'templates/'
