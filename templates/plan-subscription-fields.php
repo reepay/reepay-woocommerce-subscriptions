@@ -55,14 +55,14 @@ $variable = $variable ?? false;
         <!--Daily-->
         <p class="form-field type-fields fields-daily <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_reepay_subscription_daily"><?php esc_html_e( 'Charge every', $domain ); ?></label>
-            <input type="number" id="_reepay_subscription_daily" name="_reepay_subscription_daily<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($_reepay_subscription_daily) ? $_reepay_subscription_daily : 1?>">
+            <input type="number" min="0" id="_reepay_subscription_daily" name="_reepay_subscription_daily<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($_reepay_subscription_daily) ? $_reepay_subscription_daily : 1?>">
             &nbsp<?php esc_html_e( 'Day', $domain ); ?>
         </p>
 
         <!--Monthly-->
         <p class="form-field type-fields fields-month_startdate <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_startdate"><?php esc_html_e( 'Charge every', $domain ); ?></label>
-            <input type="number" id="_subscription_month_startdate" name="_reepay_subscription_month_startdate<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($_reepay_subscription_month_startdate) ? $_reepay_subscription_month_startdate : 1?>">
+            <input type="number" min="0" id="_subscription_month_startdate" name="_reepay_subscription_month_startdate<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($_reepay_subscription_month_startdate) ? $_reepay_subscription_month_startdate : 1?>">
             &nbsp<?php esc_html_e( 'Month', $domain ); ?>
         </p>
 
@@ -70,7 +70,7 @@ $variable = $variable ?? false;
         <?php $month_fixedday = $_reepay_subscription_month_fixedday ?>
         <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', $domain ); ?></label>
-            <input type="number" id="_subscription_month_fixedday" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_fixedday<?= $variable ? '['.$loop.']' : '' ?>[month]" value="<?= !empty($month_fixedday['month']) ? $month_fixedday['month'] : 1?>">
+            <input type="number" min="0" id="_subscription_month_fixedday" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_month_fixedday<?= $variable ? '['.$loop.']' : '' ?>[month]" value="<?= !empty($month_fixedday['month']) ? $month_fixedday['month'] : 1?>">
             &nbsp<?php esc_html_e( 'Month', $domain ); ?>
         </p>
         <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
@@ -99,14 +99,14 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-month_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_fixedday_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_month_fixedday_proration_minimum"  value="<?= !empty($month_fixedday['proration_minimum']) ? $month_fixedday['proration_minimum'] : 0?>"  name="_reepay_subscription_month_fixedday<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>"/>
+            <input type="number" min="0" id="_subscription_month_fixedday_proration_minimum"  value="<?= !empty($month_fixedday['proration_minimum']) ? $month_fixedday['proration_minimum'] : 0?>"  name="_reepay_subscription_month_fixedday<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>"/>
         </p>
 
         <!--Last day of month-->
         <?php $month_lastday = $_reepay_subscription_month_lastday ?>
         <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_fixedday"><?php esc_html_e( 'Charge every', $domain ); ?></label>
-            <input type="number" id="_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($month_lastday['month']) ? $month_lastday['month'] : 0?>" name="_reepay_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]">
+            <input type="number" min="0" id="_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]" <?= $is_update ? 'disabled' : '' ?> value="<?= !empty($month_lastday['month']) ? $month_lastday['month'] : 0?>" name="_reepay_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[month]">
             &nbsp<?php esc_html_e( 'Month', $domain ); ?>
         </p>
         <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
@@ -127,7 +127,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-month_lastday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_lastday_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_month_lastday_proration_minimum" value="<?= !empty($month_lastday['proration_minimum']) ? $month_lastday['proration_minimum'] : 0?>" name="_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" />
+            <input type="number" min="0" id="_subscription_month_lastday_proration_minimum" value="<?= !empty($month_lastday['proration_minimum']) ? $month_lastday['proration_minimum'] : 0?>" name="_subscription_month_lastday<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" />
         </p>
 
         <!--Quarterly Primo-->
@@ -158,7 +158,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-primo <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_primo_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_primo_proration_minimum" name="_reepay_subscription_primo<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($primo['proration_minimum']) ? $primo['proration_minimum'] : 0?>" />
+            <input type="number" min="0" id="_subscription_primo_proration_minimum" name="_reepay_subscription_primo<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($primo['proration_minimum']) ? $primo['proration_minimum'] : 0?>" />
         </p>
 
         <!--Quarterly Ultimo-->
@@ -189,7 +189,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-ultimo <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_ultimo_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_ultimo_proration_minimum" name="_reepay_subscription_ultimo<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>"  value="<?= !empty($ultimo['proration_minimum']) ? $ultimo['proration_minimum'] : 0?>" />
+            <input type="number" min="0" id="_subscription_ultimo_proration_minimum" name="_reepay_subscription_ultimo<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>"  value="<?= !empty($ultimo['proration_minimum']) ? $ultimo['proration_minimum'] : 0?>" />
         </p>
 
         <!--Half-yearly-->
@@ -224,7 +224,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-half_yearly <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_half_yearly_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_half_yearly_proration_minimum" name="_reepay_subscription_half_yearly<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($half_yearly['proration_minimum']) ? $half_yearly['proration_minimum'] : 0?>" />
+            <input type="number" min="0" id="_subscription_half_yearly_proration_minimum" name="_reepay_subscription_half_yearly<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($half_yearly['proration_minimum']) ? $half_yearly['proration_minimum'] : 0?>" />
         </p>
 
 
@@ -260,7 +260,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-month_startdate_12 <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_startdate_12_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_month_startdate_12_proration_minimum" name="_reepay_subscription_month_startdate_12<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($month_startdate_12['proration_minimum']) ? $month_startdate_12['proration_minimum'] : 0?>" />
+            <input type="number" min="0" id="_subscription_month_startdate_12_proration_minimum" name="_reepay_subscription_month_startdate_12<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($month_startdate_12['proration_minimum']) ? $month_startdate_12['proration_minimum'] : 0?>" />
         </p>
 
 
@@ -268,7 +268,7 @@ $variable = $variable ?? false;
         <?php $weekly_fixedday = $_reepay_subscription_weekly_fixedday ?>
         <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_weekly_fixedday"><?php esc_html_e( 'Charge every', $domain ); ?></label>
-            <input type="number" id="_subscription_weekly_fixedday" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday<?= $variable ? '['.$loop.']' : '' ?>[week]">
+            <input type="number" min="0" id="_subscription_weekly_fixedday" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_weekly_fixedday<?= $variable ? '['.$loop.']' : '' ?>[week]">
             &nbsp<?php esc_html_e( 'Week', $domain ); ?>
         </p>
         <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
@@ -301,7 +301,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field type-fields fields-weekly_fixedday <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_weekly_fixedday_proration_minimum"><?php esc_html_e( 'Minimum prorated amount', $domain ); ?></label>
-            <input type="number" id="_subscription_weekly_fixedday_proration_minimum" name="_reepay_subscription_weekly_fixedday<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($weekly_fixedday['proration_minimum']) ? $weekly_fixedday['proration_minimum'] : 0?>" />
+            <input type="number" min="0" id="_subscription_weekly_fixedday_proration_minimum" name="_reepay_subscription_weekly_fixedday<?= $variable ? '['.$loop.']' : '' ?>[proration_minimum]" placeholder="<?php esc_attr_e( 'kr 0.00', $domain ); ?>" value="<?= !empty($weekly_fixedday['proration_minimum']) ? $weekly_fixedday['proration_minimum'] : 0?>" />
         </p>
 
         <!--Advanced-->
@@ -310,8 +310,8 @@ $variable = $variable ?? false;
                 <?php esc_html_e( 'Advanced', $domain ); ?>
             </label>
             <span class="wrap">
-            <input type="number" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_renewal_reminder) ? esc_attr($_reepay_subscription_renewal_reminder) : ''?>"/>
-            <input type="number" id="_reepay_subscription_default_quantity" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_default_quantity<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Default Quantity', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_default_quantity) ? esc_attr($_reepay_subscription_default_quantity) : '1'?>"/>
+            <input type="number" min="0" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_renewal_reminder) ? esc_attr($_reepay_subscription_renewal_reminder) : ''?>"/>
+            <input type="number" min="0" id="_reepay_subscription_default_quantity" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_default_quantity<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Default Quantity', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_default_quantity) ? esc_attr($_reepay_subscription_default_quantity) : '1'?>"/>
         </span>
         </p>
     </div>
@@ -319,7 +319,7 @@ $variable = $variable ?? false;
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field <?= $variable ? 'form-row' : '' ?>">
             <label for="_subscription_contract_periods"><?php esc_html_e( 'Minimum Contract Period', $domain ); ?></label>
-            <input type="number" id="_subscription_contract_periods" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_contract_periods<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> placeholder="<?php esc_html_e( 'Periods', $domain ); ?>" value="<?= !empty($_reepay_subscription_contract_periods) ? $_reepay_subscription_contract_periods : 0?>" />
+            <input type="number" min="0" id="_subscription_contract_periods" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_contract_periods<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> placeholder="<?php esc_html_e( 'Periods', $domain ); ?>" value="<?= !empty($_reepay_subscription_contract_periods) ? $_reepay_subscription_contract_periods : 0?>" />
         </p>
         <p class="form-field fields-contract_periods hidden">
             <label for="_reepay_subscription_contract_periods_full"></label>
@@ -331,7 +331,7 @@ $variable = $variable ?? false;
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field">
             <label for="_subscription_notice_period"><?php esc_html_e( 'Notice period', $domain ); ?></label>
-            <input type="number" id="_subscription_notice_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_notice_period<?= $variable ? '['.$loop.']' : '' ?>" placeholder="<?php esc_html_e( 'Periods', $domain ); ?>" value="<?= !empty($_reepay_subscription_notice_period) ? $_reepay_subscription_notice_period : 0?>" />
+            <input type="number" min="0" id="_subscription_notice_period" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_notice_period<?= $variable ? '['.$loop.']' : '' ?>" placeholder="<?php esc_html_e( 'Periods', $domain ); ?>" value="<?= !empty($_reepay_subscription_notice_period) ? $_reepay_subscription_notice_period : 0?>" />
         </p>
         <p class="form-field fields-notice_period hidden">
             <label for="_subscription_notice_period_start"></label>
@@ -348,7 +348,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field fields-billing_cycles <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_billing_cycles_period"><?php esc_html_e( 'Number of billing cycles', $domain ); ?></label>
-            <input type="number" id="_subscription_billing_cycles_period" name="_reepay_subscription_billing_cycles_period<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> placeholder="*" value="<?= !empty($_reepay_subscription_billing_cycles_period) ? $_reepay_subscription_billing_cycles_period : 0?>" />
+            <input type="number" min="0" id="_subscription_billing_cycles_period" name="_reepay_subscription_billing_cycles_period<?= $variable ? '['.$loop.']' : '' ?>" <?= $is_update ? 'disabled' : '' ?> placeholder="*" value="<?= !empty($_reepay_subscription_billing_cycles_period) ? $_reepay_subscription_billing_cycles_period : 0?>" />
         </p>
     </div>
 
@@ -364,7 +364,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field trial-fields fields-customize <?= $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_trial_length"><?php esc_html_e( 'Trial Length', $domain ); ?></label>
-            <input type="number" id="_subscription_trial_length" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[length]" placeholder="<?php esc_html_e( 'Length', $domain ); ?>" value="<?= !empty($trial['length']) ? $trial['length'] : 0?>" />
+            <input type="number" min="0" id="_subscription_trial_length" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[length]" placeholder="<?php esc_html_e( 'Length', $domain ); ?>" value="<?= !empty($trial['length']) ? $trial['length'] : 0?>" />
             <select id="_subscription_trial_unit" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[unit]" class="wc_input_subscription_period_interval">
                 <option value="days" <?php !empty($trial['unit']) ?? selected( 'days', $trial['unit'], true ) ?>>Days</option>
                 <option value="months" <?php !empty($trial['unit']) ?? selected( 'months', $trial['unit'], true ) ?>>Months</option>
@@ -372,7 +372,7 @@ $variable = $variable ?? false;
         </p>
         <p class="form-field <?= $variable ? 'form-row' : '' ?>  trial-fields fields-7days fields-14days fields-1month fields-customize hidden">
             <label for="_subscription_billing_trial_reminder"><?php esc_html_e( 'Optional Trial Reminder Schedule', $domain ); ?></label>
-            <input type="number" id="_subscription_trial_reminder"  name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[reminder]" placeholder="<?php esc_html_e( 'Days', $domain ); ?>" value="<?= !empty($trial['reminder']) ? $trial['reminder'] : 0?>" />
+            <input type="number" min="0" id="_subscription_trial_reminder"  name="_reepay_subscription_trial<?= $variable ? '['.$loop.']' : '' ?>[reminder]" placeholder="<?php esc_html_e( 'Days', $domain ); ?>" value="<?= !empty($trial['reminder']) ? $trial['reminder'] : 0?>" />
         </p>
     </div>
 
@@ -386,7 +386,7 @@ $variable = $variable ?? false;
         <p class="form-field fee-fields <?= $variable ? 'dimensions_field form-row' : '' ?> hidden">
             <label for="_subscription_fee_amount"><?php esc_html_e( 'Setup Fee (kr)', $domain ); ?></label>
             <span class="wrap">
-            <input type="number" id="_subscription_fee_amount" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[amount]" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'Amount', $domain ); ?>" step="any" min="0" value="<?= !empty($fee['amount']) ? $fee['amount'] : 0?>" />
+            <input type="number" min="0" id="_subscription_fee_amount" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[amount]" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'Amount', $domain ); ?>" step="any" min="0" value="<?= !empty($fee['amount']) ? $fee['amount'] : 0?>" />
             <input type="text" id="_subscription_fee_text" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[text]" placeholder="<?php esc_attr_e( 'Text', $domain ); ?>"  value="<?= !empty($fee['text']) ? $fee['text'] : ''?>" />
             <select id="_subscription_fee_handling" name="_reepay_subscription_fee<?= $variable ? '['.$loop.']' : '' ?>[handling]" class="wc_input_subscription_period_interval">
                 <option value="first" <?php !empty($fee['handling']) ?? selected( 'first', $fee['handling'], true ) ?>><?php esc_html_e( 'Include setup fee as order line on the first scheduled invoice', $domain ); ?></option>
