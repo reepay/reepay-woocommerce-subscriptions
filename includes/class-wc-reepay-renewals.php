@@ -69,7 +69,7 @@ class WC_Reepay_Renewals {
 		foreach ( $order->get_items() as $item_id => $order_item ) {
 			$product = $order_item->get_product();
 
-			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id() . '_' . time();
+			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
 
 			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' ) ?? [] );
 
@@ -152,6 +152,8 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
+
+			return;
 		}
 	}
 
@@ -184,7 +186,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-completed' );
+		self::create_child_order( $parent_order, 'wc-completed', $data  );
 	}
 
 	/**
@@ -215,7 +217,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-on-hold' );
+		self::create_child_order( $parent_order, 'wc-on-hold', $data  );
 	}
 
 	/**
@@ -246,7 +248,7 @@ class WC_Reepay_Renewals {
             return;
         }
 
-        self::create_child_order( $parent_order, 'wc-cancelled' );
+        self::create_child_order( $parent_order, 'wc-cancelled', $data  );
     }
 
 	/**
@@ -277,7 +279,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-completed' );
+		self::create_child_order( $parent_order, 'wc-completed', $data );
 	}
 
 	/**
@@ -321,7 +323,7 @@ class WC_Reepay_Renewals {
 	 * @return bool|WC_Order|WC_Order_Refund
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		// $handle - "subscription_handle_<order_id>_<product_id>_<timestamp>"
+		// $handle - "subscription_handle_<order_id>_<product_id>"
 		$parts = explode( '_', $handle );
 
 		return wc_get_order( (int) $parts[2] );
@@ -330,10 +332,11 @@ class WC_Reepay_Renewals {
 	/**
 	 * @param  WC_Order  $parent_order
 	 * @param  string  $status
+	 * @param  array<string, string>$data
 	 *
 	 * @return WC_Order|WP_Error
 	 */
-	public static function create_child_order( $parent_order, $status ) {
+	public static function create_child_order( $parent_order, $status, $data ) {
 		$query = new WP_Query( array(
 			'post_parent'    => $parent_order->get_id(),
 			'post_type'      => 'shop_order',
