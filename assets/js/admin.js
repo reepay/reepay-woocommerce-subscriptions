@@ -106,14 +106,40 @@ jQuery( function ( $ ) {
     }
 
     if (('.wp-list-table').length) {
-        setInterval(update_subscriptions_table, 3000)
+        init_table();
+        //setInterval(update_subscriptions_table, 3000)
     }
 
     function update_subscriptions_table() {
         return $.get(location.href)
             .then(html => {
                $('.wp-list-table').replaceWith($(html).find('.wp-list-table'))
+                init_table();
             })
+    }
+
+    function init_table(){
+        $('tr.sub-order').hide();
+        $('a.show-sub-orders').on('click', function(e) {
+            e.preventDefault();
+
+            var $self = $(this),
+                el = $('tr.' + $self.data('class') );
+
+            if ( el.is(':hidden') ) {
+                el.show();
+                $self.text( $self.data('hide') );
+            } else {
+                el.hide();
+                $self.text( $self.data('show') );
+            }
+        });
+
+        $('button.toggle-sub-orders').on('click', function(e) {
+            e.preventDefault();
+
+            $('tr.sub-order').toggle();
+        });
     }
 
     function show_settings(){
