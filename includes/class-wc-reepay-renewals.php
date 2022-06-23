@@ -152,6 +152,8 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
+
+			return;
 		}
 	}
 
@@ -184,7 +186,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-completed' );
+		self::create_child_order( $parent_order, 'wc-completed', $data  );
 	}
 
 	/**
@@ -215,7 +217,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-on-hold' );
+		self::create_child_order( $parent_order, 'wc-on-hold', $data  );
 	}
 
 	/**
@@ -246,7 +248,7 @@ class WC_Reepay_Renewals {
             return;
         }
 
-        self::create_child_order( $parent_order, 'wc-cancelled' );
+        self::create_child_order( $parent_order, 'wc-cancelled', $data  );
     }
 
 	/**
@@ -277,7 +279,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-completed' );
+		self::create_child_order( $parent_order, 'wc-completed', $data );
 	}
 
 	/**
@@ -330,10 +332,11 @@ class WC_Reepay_Renewals {
 	/**
 	 * @param  WC_Order  $parent_order
 	 * @param  string  $status
+	 * @param  array<string, string>$data
 	 *
 	 * @return WC_Order|WP_Error
 	 */
-	public static function create_child_order( $parent_order, $status ) {
+	public static function create_child_order( $parent_order, $status, $data ) {
 		$query = new WP_Query( array(
 			'post_parent'    => $parent_order->get_id(),
 			'post_type'      => 'shop_order',
