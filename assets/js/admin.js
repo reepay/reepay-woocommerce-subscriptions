@@ -81,9 +81,9 @@ jQuery( function ( $ ) {
 
         function apply_to_plans(value) {
             if (value === '0') {
-                $('.show_if_selected_plans').show()
+                $('#_reepay_discount_eligible_plans').attr('disabled', false)
             } else {
-                $('.show_if_selected_plans').hide()
+                $('#_reepay_discount_eligible_plans').attr('disabled', true)
             }
         }
 
