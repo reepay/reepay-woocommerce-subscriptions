@@ -246,28 +246,6 @@ class WC_Reepay_Renewals {
             return;
         }
 
-        $query = new WP_Query( array(
-            'post_parent'    => $parent_order->get_id(),
-            'post_type'      => 'shop_order',
-            'post_status'    => 'any',
-            'orderby'        => 'ID',
-            'posts_per_page' => 1,
-            'offset'         => 0,
-        ) );
-
-        if ( ! empty( $query->posts ) && $query->posts[0]->post_status === 'wc-cancelled' ) {
-            self::log( [
-                'log'    => [
-                    'source' => 'WC_Reepay_Renewals::cancel_subscription',
-                    'error'  => 'duplicate cancel status',
-                    'data'   => $data
-                ],
-                'notice' => "Subscription {$data['subscription']} - duplicate cancel status"
-            ] );
-
-            return;
-        }
-
         self::create_child_order( $parent_order, 'wc-cancelled' );
     }
 
@@ -356,6 +334,26 @@ class WC_Reepay_Renewals {
 	 * @return WC_Order|WP_Error
 	 */
 	public static function create_child_order( $parent_order, $status ) {
+		$query = new WP_Query( array(
+			'post_parent'    => $parent_order->get_id(),
+			'post_type'      => 'shop_order',
+			'post_status'    => 'any',
+			'orderby'        => 'ID',
+			'posts_per_page' => 1,
+			'offset'         => 0,
+		) );
+
+		if ( ! empty( $query->posts ) && $query->posts[0]->post_status === $status ) {
+			self::log( [
+				'log'    => [
+					'source' => 'WC_Reepay_Renewals::cancel_subscription',
+					'error'  => 'duplicate status - ' . $status,
+				],
+				'notice' => "Subscription {$data['subscription']} - duplication attempt"
+			] );
+			return new WP_Error('Duplicate order');
+		}
+
 		$order = wc_create_order( [
 			'status'      => $status,
 			'parent'      => $parent_order->get_id(),
