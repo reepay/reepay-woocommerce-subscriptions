@@ -125,7 +125,8 @@ jQuery( function ( $ ) {
 
         const $variablePricing = $('#variable_product_options .variable_pricing');
 
-        if ( 'reepay_variable_subscriptions' === $selectProductType.val() ) {
+        if ('reepay_variable_subscriptions' === $selectProductType.val() ||
+            'variable' === $selectProductType.val()) {
             $variablePricing.children( ':first' ).hide();
             $variablePricing.children( ':nth-child(2)' ).hide();
             $('#variable_product_options .sale_price_dates_fields').hide();
