@@ -40,10 +40,6 @@ $variable = $variable ?? false;
             </label>
             <span class="wrap">
             <input type="number" id="_subscription_price" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_price<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_attr_e( 'e.g. 5.90', $domain ); ?>" step="any" min="0" value="<?php echo esc_attr( wc_format_localized_price( $_reepay_subscription_price ) ); ?>"/>
-            <select id="_subscription_price_vat" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_vat<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
-                <option value="include" <?php selected( 'include', $_reepay_subscription_vat, true ) ?>><?php esc_html_e( 'Incl. VAT', $domain ); ?></option>
-                <option value="exclude" <?php selected( 'exclude', $_reepay_subscription_vat, true ) ?>><?php esc_html_e( 'Excl. VAT', $domain ); ?></option>
-            </select>
             <select id="_subscription_schedule_type" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_schedule_type<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
                 <?php foreach ( WC_Reepay_Subscription_Plan_Simple::$schedule_types as $value => $label ) { ?>
                     <option value="<?php echo esc_attr( $value ); ?>" <?php selected( $value, $_reepay_subscription_schedule_type, true ) ?>><?php echo esc_html( $label ); ?></option>
@@ -407,6 +403,37 @@ $variable = $variable ?? false;
                 <option value="prorated_credit" <?php selected( 'prorated_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated credit', $domain ); ?></option>
             </select>
         </p>
+    </div>
+    <div class="options_group show_if_reepay_subscription">
+        <?php
+        woocommerce_wp_select(
+            array(
+                'id'          => '_tax_status',
+                'value'       => $product_object->get_tax_status( 'edit' ),
+                'label'       => __( 'Tax status', 'woocommerce' ),
+                'options'     => array(
+                    'taxable'  => __( 'Taxable', 'woocommerce' ),
+                    'shipping' => __( 'Shipping only', 'woocommerce' ),
+                    'none'     => _x( 'None', 'Tax status', 'woocommerce' ),
+                ),
+                'desc_tip'    => 'true',
+                'description' => __( 'Define whether or not the entire product is taxable, or just the cost of shipping it.', 'woocommerce' ),
+            )
+        );
+
+        woocommerce_wp_select(
+            array(
+                'id'          => '_tax_class',
+                'value'       => $product_object->get_tax_class( 'edit' ),
+                'label'       => __( 'Tax class', 'woocommerce' ),
+                'options'     => wc_get_product_tax_class_options(),
+                'desc_tip'    => 'true',
+                'description' => __( 'Choose a tax class for this product. Tax classes are used to apply different tax rates specific to certain types of product.', 'woocommerce' ),
+            )
+        );
+
+        do_action( 'woocommerce_product_options_tax' );
+        ?>
     </div>
 </div>
 

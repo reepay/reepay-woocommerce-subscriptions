@@ -89,7 +89,7 @@ class WC_Reepay_Renewals {
 					'source'          => $token,
 //					'create_customer' => null,
 //					'plan_version'    => null,
-					'amount_incl_vat' => $product->get_meta( '_reepay_subscription_vat' ) == 'include',
+					'amount_incl_vat' => wc_prices_include_tax(),
 //					'generate_handle' => null,
 //					'start_date' => null,
 //					'end_date' => null,

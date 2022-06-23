@@ -39,7 +39,6 @@ class WC_Reepay_Subscription_Plan_Simple {
         '_reepay_subscription_choose',
         '_reepay_choose_exist',
         '_reepay_subscription_price',
-        '_reepay_subscription_vat',
         '_reepay_subscription_schedule_type',
         '_reepay_subscription_daily',
         '_reepay_subscription_month_startdate',
@@ -214,6 +213,7 @@ class WC_Reepay_Subscription_Plan_Simple {
         }
 
         $data['is_update'] = ! empty( $data['_reepay_subscription_handle'] ) && $data['_reepay_subscription_choose'] == 'new';
+        $data['product_object'] = wc_get_product( $post_id );
 
         wc_get_template(
             'plan-subscription-fields.php',
@@ -246,10 +246,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
             if ( ! empty( $plan_data['amount'] ) ) {
                 $this->update_post_meta( $post_id, '_reepay_subscription_price', intval( $plan_data['amount'] )/100 );
-            }
-
-            if ( ! empty( $plan_data['vat'] ) ) {
-                $this->update_post_meta( $post_id, '_reepay_subscription_vat', $plan_data['vat'] );
             }
 
             if ( ! empty( $plan_data['setup_fee'] ) ) {
@@ -500,12 +496,7 @@ class WC_Reepay_Subscription_Plan_Simple {
             }
         }
 
-        $vat = get_post_meta( $post_id, '_reepay_subscription_vat', true );
-        if ( $vat == 'include' ) {
-            $params['amount_incl_vat'] = true;
-        } else {
-            $params['amount_incl_vat'] = false;
-        }
+        $params['amount_incl_vat'] = wc_prices_include_tax();
 
         $fixation_periods = get_post_meta( $post_id, '_reepay_subscription_contract_periods', true );
         if ( $fixation_periods ) {
@@ -590,6 +581,29 @@ class WC_Reepay_Subscription_Plan_Simple {
 
         if ( ! empty( $type_data['proration_minimum'] ) ) {
             $params['minimum_prorated_amount'] = floatval( $type_data['proration_minimum'] );
+        }
+
+
+        $product = wc_get_product( $post_id );
+
+        $params['vat'] = 0;
+
+        if ( 'taxable' == $product->get_tax_status() && wc_tax_enabled() ) {
+            $calculate_tax_for = array(
+                'country'   => '*',
+                'state'     => '*',
+                'city'      => '*',
+                'postcode'  => '*',
+            );
+            $calculate_tax_for['tax_class'] = $product->get_tax_class();
+            $tax_rates = WC_Tax::find_rates( $calculate_tax_for );
+            if(!empty($tax_rates)){
+                reset($tax_rates);
+                $first_key = key($tax_rates);
+                if(!empty($tax_rates[$first_key]['rate'])){
+                    $params['vat'] = floatval($tax_rates[$first_key]['rate']) / 100;
+                }
+            }
         }
 
         return $params;
