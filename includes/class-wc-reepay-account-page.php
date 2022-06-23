@@ -7,10 +7,10 @@
  */
 class WC_Reepay_Account_Page {
 
-	/**
-	 * Constructor
-	 */
-	public function __construct()
+    /**
+     * Constructor
+     */
+    public function __construct()
     {
         add_action('init', [$this, 'init']);
         add_action('template_redirect', [$this, 'check_action']);
@@ -25,15 +25,15 @@ class WC_Reepay_Account_Page {
     }
 
     public function add_subscription_arg($url) {
-	    if ($_GET['reepay_subscription']) {
-	        return add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url);
+        if ($_GET['reepay_subscription']) {
+            return add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url);
         }
-	    return $url;
+        return $url;
     }
 
     public function payment_method_added(WC_Payment_Token $token) {
-	    $handle = $_GET['reepay_subscription'] ?? '';
-	    if (!empty($handle)) {
+        $handle = $_GET['reepay_subscription'] ?? '';
+        if (!empty($handle)) {
             try {
                 reepay_s()->api()->request('subscription/' . $handle . '/pm', 'POST', [
                     'source' => $token->get_token(),
@@ -127,13 +127,13 @@ class WC_Reepay_Account_Page {
             $handle = urlencode($handle);
 
             $order = wc_get_orders([
-                'meta_key' => '_reepay_subscription_handle',
-                'meta_value' => $handle,
-            ])[0] ?? null;
+                    'meta_key' => '_reepay_subscription_handle',
+                    'meta_value' => $handle,
+                ])[0] ?? null;
 
 
             if ($order && $order->get_customer_id() === get_current_user_id()) {
-                $plan = WC_Reepay_Subscription_Plans::wc_get_plan($plan_handle);
+                $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($handle);
                 if (!empty($plan)) {
                     $compensation_method = get_post_meta($plan->ID, '_reepay_subscription_compensation', true);
 
@@ -214,15 +214,15 @@ class WC_Reepay_Account_Page {
     }
 
     public function get_title() {
-	    return __("Subscriptions", reepay_s()->settings('domain'));
+        return __("Subscriptions", reepay_s()->settings('domain'));
     }
 
-	public function subscriptions_endpoint($page = 1) {
-	    $cur_page = urlencode($page);
+    public function subscriptions_endpoint($page = 1) {
+        $cur_page = urlencode($page);
 
         $subscriptionsParams = [
-          'page' => urlencode($page),
-          'size' => 3,
+            'page' => urlencode($page),
+            'size' => 3,
         ];
 
         $subsResult = reepay_s()->api()->request("subscription?" . http_build_query($subscriptionsParams));
@@ -233,7 +233,7 @@ class WC_Reepay_Account_Page {
             $plans[$item['handle']] = $item;
         }
 
-	    $subscriptions = $subsResult['content'];
+        $subscriptions = $subsResult['content'];
 
         $subscriptionsArr = [];
 
@@ -271,14 +271,14 @@ class WC_Reepay_Account_Page {
         );
     }
 
-	public function add_subscriptions_menu_item($menu_items) {
-	    $returnArr = [];
+    public function add_subscriptions_menu_item($menu_items) {
+        $returnArr = [];
         foreach ($menu_items as $key => $menu_item) {
             $returnArr[$key] = $menu_item;
             if ($key === 'orders') {
                 $returnArr["subscriptions"] = $this->get_title();
             }
-	    }
+        }
         return $returnArr;
     }
 

@@ -8,7 +8,7 @@
             <?php if($addon['type'] == 'on_off'): ?>
                 <input type="checkbox" name="addon-<?=$addon['handle']?>" value="yes">
             <?php elseif ($addon['type'] == 'quantity'): ?>
-                <input type="number" name="addon-<?=$addon['handle']?>" value="0">
+                <input type="number" min="0" name="addon-<?=$addon['handle']?>" value="0">
             <?php endif; ?>
             <?= $addon['name'] ?> +<?= wc_price($addon['amount']) ?> (<?= $addon['description'] ?>)
         </p>
