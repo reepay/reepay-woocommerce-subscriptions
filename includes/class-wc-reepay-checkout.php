@@ -12,6 +12,7 @@ class WC_Reepay_Checkout {
 	 */
 	public function __construct() {
 		add_filter( 'woocommerce_payment_gateways', [ $this, 'woocommerce_payment_gateways' ], PHP_INT_MAX );
+		add_filter('woocommerce_add_to_cart_validation', [$this, 'woocommerce_add_to_cart_validation'], PHP_INT_MAX, 2 );
 	}
 
 	/**
@@ -22,18 +23,78 @@ class WC_Reepay_Checkout {
 	 * @return mixed
 	 */
 	public function woocommerce_payment_gateways( $gateways ) {
-		if ( ! is_checkout() || ! WC_Reepay_Helpers::is_reepay_product_in_cart() ) {
+		if ( ! is_checkout() || ! self::is_reepay_product_in_cart() ) {
 			return $gateways;
 		}
 
 		foreach ( $gateways as $gateway_num => $gateway ) {
-			if ( ! WC_Reepay_Helpers::is_reepay_gateway( $gateway ) ) {
+			if ( ! self::is_reepay_gateway( $gateway ) ) {
 				unset( $gateways[ $gateway_num ] );
 			}
 		}
 
 		return $gateways;
 	}
+
+	public function woocommerce_add_to_cart_validation( $passed, $added_product_id ) {
+		if ( self::is_reepay_product_in_cart() ) {
+			$passed = false;
+			if(self::is_reepay_product($added_product_id)) {
+				wc_add_notice( __( 'You can only buy one subscription per purchase', reepay_s()->settings( 'domain' ) ), 'error' );
+			} else {
+				wc_add_notice( __( 'You cannot buy a subscription together with other products', reepay_s()->settings( 'domain' ) ), 'error' );
+			}
+		} elseif ( ! wc()->cart->is_empty() ) {
+			$passed = false;
+			wc_add_notice( __( 'You cannot buy a subscription together with other products', reepay_s()->settings( 'domain' ) ), 'error' );
+		}
+
+		return $passed;
+	}
+
+    /**
+     * @param $gateway string|WC_Payment_Gateway
+     *
+     * @return bool
+     */
+    public static function is_reepay_gateway( $gateway ) {
+        return ( is_string( $gateway ) && str_contains( $gateway, 'reepay' ) ) ||
+               ( is_object( $gateway ) && str_contains( strtolower( get_class( $gateway ) ), 'reepay' ) );
+    }
+
+    /**
+     * @return bool
+     */
+    public static function is_reepay_product_in_cart() {
+        $is_reepay_product_in_cart = false;
+
+        /**
+         * @var $cart_item array Item data
+         */
+        foreach ( WC()->cart->get_cart() as $cart_item ) {
+            if ( self::is_reepay_product( $cart_item['data'] ) ) {
+                $is_reepay_product_in_cart = true;
+                break;
+            }
+        }
+
+        return $is_reepay_product_in_cart;
+    }
+
+	/**
+	 * @param mixed $product
+	 *
+	 * @return bool
+	 */
+    public static function is_reepay_product($product) {
+    	$product = wc_get_product($product);
+
+	    if ( $product->is_type( 'variation' ) ) {
+		    $product = wc_get_product( $product->get_parent_id() );
+	    }
+
+    	return str_contains( $product->get_type(), 'reepay' );
+    }
 }
 
 new WC_Reepay_Checkout();
