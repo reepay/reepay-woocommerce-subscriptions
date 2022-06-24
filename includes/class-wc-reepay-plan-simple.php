@@ -208,6 +208,8 @@ class WC_Reepay_Subscription_Plan_Simple {
             $data[ $meta_field ] = get_post_meta( $post_id, $meta_field, true );
         }
 
+        $data['variable'] = false;
+
         return $data;
     }
 
@@ -222,8 +224,6 @@ class WC_Reepay_Subscription_Plan_Simple {
         }
 
         $data['is_exist'] = false;
-
-        $data['variable'] = false;
 
         $data['product_object'] = wc_get_product( $post_id );
 
