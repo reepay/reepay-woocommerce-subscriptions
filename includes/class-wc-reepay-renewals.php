@@ -17,137 +17,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
-        add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11 );
-        add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
-        add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
 	}
-
-    /**
-     * Adds css classes on admin shop order table
-     *
-     * @global WP_Post $post
-     *
-     * @param array $classes
-     * @param int $post_id
-     *
-     * @return array
-     */
-    public function admin_shop_order_row_classes( $classes, $post_id ) {
-        global $post;
-
-        if ( is_search() || ! current_user_can( 'manage_woocommerce' ) ) {
-            return $classes;
-        }
-
-        if ( $post->post_type == 'shop_order' && $post->post_parent != 0 ) {
-            $classes[] = 'sub-order parent-' . $post->post_parent;
-        }
-
-        return $classes;
-    }
-
-    /**
-     * Adds custom column on admin shop order table
-     *
-     * @param string $col
-     *
-     * @return void
-     */
-    public function shop_order_custom_columns($col){
-        /**
-         * @global \WP_Post $post
-         * @global \WC_Order $the_order
-         */
-        global $post, $the_order;
-
-        if ( empty( $the_order ) || $the_order->get_id() !== $post->ID ) {
-            $the_order = new \WC_Order( $post->ID );
-        }
-
-        if ( ! current_user_can( 'manage_woocommerce' ) ) {
-            return;
-        }
-
-        if ( ! in_array( $col, [ 'order_number', 'suborder', 'reepay_sub' ], true ) ) {
-            return;
-        }
-
-        $output = '';
-        switch ( $col ) {
-            case 'order_number':
-                if ( $post->post_parent !== 0 ) {
-                    $output = '<strong>';
-                    $output .= esc_html__( '&nbsp;Sub Order of', reepay_s()->settings( 'domain' ) );
-                    $output .= sprintf( ' <a href="%s">#%s</a>', esc_url( admin_url( 'post.php?action=edit&post=' . $post->post_parent ) ), esc_html( $post->post_parent ) );
-                    $output .= '</strong>';
-                }
-                break;
-
-            case 'suborder':
-                $handle = $the_order->get_meta( '_reepay_subscription_handle', true );
-                if ( !empty($handle) && $post->post_parent == 0 ) {
-                    $output = sprintf( '<a href="#" class="show-sub-orders" data-class="parent-%1$d" data-show="%2$s" data-hide="%3$s">%2$s</a>', esc_attr( $post->ID ), esc_attr__( 'Show history', reepay_s()->settings( 'domain' ) ), esc_attr__( 'Hide history', reepay_s()->settings( 'domain' ) ) );
-                }
-                break;
-
-            case 'reepay_sub':
-                $handle = $the_order->get_meta( '_reepay_subscription_handle', true );
-                if(!empty($handle)){
-                    $admin_page = 'https://admin.reepay.com/#/misha-rudrastyh-team/misha-rudrastyh-team/';
-
-                    $link = $admin_page . 'subscriptions/' . $handle;
-
-                    $output = sprintf( '<a target="_blank" href="%s">%s</a>', $link, 'Reepay subscription - '.$the_order->get_id() );
-                }
-
-                break;
-        }
-
-        if ( ! empty( $output ) ) {
-            echo $output;
-        }
-    }
-
-    /**
-     * Change the columns shown in admin.
-     *
-     * @param array $existing_columns
-     *
-     * @return array
-     */
-    public function admin_shop_order_edit_columns( $existing_columns ) {
-        if ( WC_VERSION > '3.2.6' ) {
-            unset( $existing_columns['wc_actions'] );
-
-            $columns = array_slice( $existing_columns, 0, count( $existing_columns ), true ) +
-                array(
-                    'reepay_sub'     => __( 'Subscription', reepay_s()->settings( 'domain' ) ),
-                    'suborder'   => __( 'Sub Order', reepay_s()->settings( 'domain' ) ),
-                )
-                + array_slice( $existing_columns, count( $existing_columns ), count( $existing_columns ) - 1, true );
-        } else {
-            $existing_columns['reepay_sub']    = __( 'Vendor', reepay_s()->settings( 'domain' ) );
-            $existing_columns['suborder']  = __( 'Sub Order', reepay_s()->settings( 'domain' ) );
-        }
-
-        if ( WC_VERSION > '3.2.6' ) {
-            // Remove seller, suborder column if seller is viewing his own product
-            if ( ! current_user_can( 'manage_woocommerce' ) || ( isset( $_GET['author'] ) && ! empty( $_GET['author'] ) ) ) {
-                unset( $columns['suborder'] );
-                unset( $columns['reepay_sub'] );
-            }
-
-            return $columns;
-        }
-
-        // Remove seller, suborder column if seller is viewing his own product
-        if ( ! current_user_can( 'manage_woocommerce' ) || ( isset( $_GET['author'] ) && ! empty( $_GET['author'] ) ) ) {
-            unset( $existing_columns['suborder'] );
-            unset( $existing_columns['reepay_sub'] );
-        }
-
-        return $existing_columns;
-    }
 
 	/**
 	 *
@@ -199,7 +69,7 @@ class WC_Reepay_Renewals {
 		foreach ( $order->get_items() as $item_id => $order_item ) {
 			$product = $order_item->get_product();
 
-			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id() . '_' . time();
+			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
 
 			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' ) ?? [] );
 
@@ -282,6 +152,8 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
+
+			return;
 		}
 	}
 
@@ -314,7 +186,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-completed' );
+		self::create_child_order( $parent_order, 'wc-completed', $data  );
 	}
 
 	/**
@@ -345,7 +217,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-on-hold' );
+		self::create_child_order( $parent_order, 'wc-on-hold', $data  );
 	}
 
 	/**
@@ -376,7 +248,7 @@ class WC_Reepay_Renewals {
             return;
         }
 
-        self::create_child_order( $parent_order, 'wc-cancelled' );
+        self::create_child_order( $parent_order, 'wc-cancelled', $data  );
     }
 
 	/**
@@ -407,7 +279,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		self::create_child_order( $parent_order, 'wc-completed' );
+		self::create_child_order( $parent_order, 'wc-completed', $data );
 	}
 
 	/**
@@ -451,7 +323,7 @@ class WC_Reepay_Renewals {
 	 * @return bool|WC_Order|WC_Order_Refund
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		// $handle - "subscription_handle_<order_id>_<product_id>_<timestamp>"
+		// $handle - "subscription_handle_<order_id>_<product_id>"
 		$parts = explode( '_', $handle );
 
 		return wc_get_order( (int) $parts[2] );
@@ -460,10 +332,11 @@ class WC_Reepay_Renewals {
 	/**
 	 * @param  WC_Order  $parent_order
 	 * @param  string  $status
+	 * @param  array<string, string>$data
 	 *
 	 * @return WC_Order|WP_Error
 	 */
-	public static function create_child_order( $parent_order, $status ) {
+	public static function create_child_order( $parent_order, $status, $data ) {
 		$query = new WP_Query( array(
 			'post_parent'    => $parent_order->get_id(),
 			'post_type'      => 'shop_order',
