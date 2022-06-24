@@ -133,7 +133,7 @@ class WC_Reepay_Account_Page {
 
 
             if ($order && $order->get_customer_id() === get_current_user_id()) {
-                $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($handle);
+                $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($plan_handle);
                 if (!empty($plan)) {
                     $compensation_method = get_post_meta($plan->ID, '_reepay_subscription_compensation', true);
 
@@ -217,15 +217,20 @@ class WC_Reepay_Account_Page {
         return __("Subscriptions", reepay_s()->settings('domain'));
     }
 
-    public function subscriptions_endpoint($page = 1) {
-        $cur_page = urlencode($page);
+    public function subscriptions_endpoint($next_page_token = '') {
+
+        $customer = 'customer-' . get_current_user_id();
 
         $subscriptionsParams = [
-            'page' => urlencode($page),
-            'size' => 3,
+            'size' => 10,
+            'customer' => $customer,
         ];
 
-        $subsResult = reepay_s()->api()->request("subscription?" . http_build_query($subscriptionsParams));
+        if (!empty($next_page_token)) {
+            $subscriptionsParams['next_page_token'] = $next_page_token;
+        }
+
+        $subsResult = reepay_s()->api()->request("list/subscription?" . http_build_query($subscriptionsParams));
         $planResult = reepay_s()->api()->request("plan");
         $plans = [];
 
@@ -238,7 +243,11 @@ class WC_Reepay_Account_Page {
         $subscriptionsArr = [];
 
         foreach ($subscriptions as $subscription) {
-            $payment_methods = reepay_s()->api()->request("subscription/".$subscription['handle']."/pm");
+            $payment_methods = get_transient($subscription['handle'] . '_payment_methods');
+            if (!$payment_methods) {
+                $payment_methods = reepay_s()->api()->request("subscription/".$subscription['handle']."/pm");
+                set_transient($subscription['handle'] . '_payment_methods', $payment_methods);
+            }
             $subscriptionsArr[] = [
                 'state' => $subscription['state'],
                 'handle' => $subscription['handle'],
@@ -257,14 +266,15 @@ class WC_Reepay_Account_Page {
                 'plan' => $subscription['plan']
             ];
         }
-
+        $previous_token = $_GET['prev_token'] ?? null;
         wc_get_template(
             'my-account/subscriptions.php',
             array(
                 'subscriptions' => $subscriptionsArr,
                 'plans' => $plans,
-                'current' => $cur_page,
-                'total' => $subsResult['total_pages']
+                'current_token' => $next_page_token,
+                'previous_token' => $previous_token,
+                'next_page_token' => $subsResult['next_page_token']
             ),
             '',
             reepay_s()->settings('plugin_path').'templates/'
