@@ -208,6 +208,8 @@ class WC_Reepay_Subscription_Plan_Simple {
             $data[ $meta_field ] = get_post_meta( $post_id, $meta_field, true );
         }
 
+        $data['variable'] = false;
+
         return $data;
     }
 
@@ -221,8 +223,30 @@ class WC_Reepay_Subscription_Plan_Simple {
             $data['_reepay_subscription_choose'] = 'new';
         }
 
-        $data['is_update'] = ! empty( $data['_reepay_subscription_handle'] ) && $data['_reepay_subscription_choose'] == 'new';
+        $data['is_exist'] = false;
+
         $data['product_object'] = wc_get_product( $post_id );
+
+        ob_start();
+        wc_get_template(
+            'plan-subscription-fields-data.php',
+            $data,
+            '',
+            reepay_s()->settings( 'plugin_path' ) . 'templates/'
+        );
+        $data['settings'] =  ob_get_clean();
+
+        $data['is_exist'] = $data['_reepay_subscription_choose'] != 'new';
+        if($data['_reepay_subscription_choose'] != 'new'){
+            ob_start();
+            wc_get_template(
+                'plan-subscription-fields-data.php',
+                $data,
+                '',
+                reepay_s()->settings( 'plugin_path' ) . 'templates/'
+            );
+            $data['settings_exist'] =  ob_get_clean();
+        }
 
         wc_get_template(
             'plan-subscription-fields.php',
@@ -397,14 +421,11 @@ class WC_Reepay_Subscription_Plan_Simple {
             $title = get_the_title( $post_id );
             if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
                 $handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
-
+                $this->save_meta_from_request( $post_id );
                 if ( ! empty( $handle ) ) {
-                    if ( $this->update_plan( $handle, $this->get_params( $post_id ) ) ) {
-                        $this->save_meta_from_request( $post_id );
-                    }
+                    $this->update_plan( $handle, $this->get_params( $post_id ) );
                 } else {
                     $handle = $this->generate_subscription_handle( $post_id );
-                    $this->save_meta_from_request( $post_id );
                     $this->create_plan( $post_id, $handle, $this->get_params( $post_id ) );
                 }
             }
@@ -437,8 +458,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 
     public function update_plan( $handle, $params ) {
         try {
-            $result = reepay_s()->api()->request( "plan/$handle", 'PUT', $params );
+            $params['supersede_mode'] = 'scheduled_sub_update'; //@todo сделать параметр для обновляемых планов выбор обновлять ли уже оформленные подписки
 
+            $result = reepay_s()->api()->request( "plan/$handle", 'POST', $params );
             return true;
         }catch( Exception $e ) {
             $this->plan_error( $e->getMessage() );
@@ -558,7 +580,7 @@ class WC_Reepay_Subscription_Plan_Simple {
             $params['renewal_reminder_email_days'] = intval( $request_data['_reepay_subscription_renewal_reminder'] );
         }
 
-        if ( ! empty( $request_data['_reepay_subscription_trial'] ) && ! empty( $request_data['_reepay_subscription_trial']['reminder'] ) ) {
+        if ( ! empty( $request_data['_reepay_subscription_trial'] ) && ! empty( $request_data['_reepay_subscription_trial']['reminder'] ) && ! empty( $request_data['_reepay_subscription_trial']['type'] ) ) {
             $params['trial_reminder_email_days'] = intval( $request_data['_reepay_subscription_trial']['reminder'] );
         }
 
