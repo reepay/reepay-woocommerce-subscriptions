@@ -303,12 +303,15 @@ $variable = $variable ?? false;
         <!--Advanced-->
         <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
             <label for="_reepay_subscription_renewal_reminder">
-                <?php esc_html_e( 'Advanced', $domain ); ?>
+                <?php esc_html_e( 'Renewal Reminder', $domain ); ?>
             </label>
-            <span class="wrap">
             <input type="number" min="0" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_renewal_reminder) ? esc_attr($_reepay_subscription_renewal_reminder) : ''?>"/>
+        </p>
+        <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
+            <label for="_reepay_subscription_default_quantity">
+                <?php esc_html_e( 'Default Quantity', $domain ); ?>
+            </label>
             <input type="number" min="0" id="_reepay_subscription_default_quantity" <?= $is_update ? 'disabled' : '' ?> name="_reepay_subscription_default_quantity<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Default Quantity', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_default_quantity) ? esc_attr($_reepay_subscription_default_quantity) : '1'?>"/>
-        </span>
         </p>
     </div>
 
