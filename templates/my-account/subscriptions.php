@@ -115,11 +115,11 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
 <?php endforeach; ?>
 
 <div class="woocommerce-pagination woocommerce-pagination--without-numbers woocommerce-Pagination">
-    <?php if ( $args['previous_token'] !== null ) : ?>
-        <a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url( add_query_arg('prev_token', $args['previous_token'], wc_get_endpoint_url( 'subscriptions', $args['previous_token'] )) ); ?>"><?php esc_html_e( 'Previous', 'woocommerce' ); ?></a>
+    <?php if ( $args['current_token'] !== "" && $args['previous_token'] !== null ) : ?>
+        <a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url( wc_get_endpoint_url( 'subscriptions', $args['previous_token'] ) ); ?>"><?php esc_html_e( 'Previous', 'woocommerce' ); ?></a>
     <?php endif; ?>
 
     <?php if ( !empty($args['next_page_token']) ) : ?>
-        <a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button" href="<?php echo esc_url( add_query_arg('prev_token', $args['current_token'], wc_get_endpoint_url( 'subscriptions', $args['next_page_token'] )) ); ?>"><?php esc_html_e( 'Next', 'woocommerce' ); ?></a>
+        <a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button" href="<?php echo esc_url( wc_get_endpoint_url( 'subscriptions', $args['next_page_token'] ) ); ?>"><?php esc_html_e( 'Next', 'woocommerce' ); ?></a>
     <?php endif; ?>
 </div>

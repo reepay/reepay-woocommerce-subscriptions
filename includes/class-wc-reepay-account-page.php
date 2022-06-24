@@ -266,7 +266,11 @@ class WC_Reepay_Account_Page {
                 'plan' => $subscription['plan']
             ];
         }
-        $previous_token = $_GET['prev_token'] ?? null;
+        $previous_token = get_transient($next_page_token . '_previous_token');
+        if ($previous_token === false) {
+            set_transient($subsResult['next_page_token'] . '_previous_token', $next_page_token);
+            $previous_token = '';
+        }
         wc_get_template(
             'my-account/subscriptions.php',
             array(
