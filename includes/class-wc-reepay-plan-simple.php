@@ -221,8 +221,29 @@ class WC_Reepay_Subscription_Plan_Simple {
             $data['_reepay_subscription_choose'] = 'new';
         }
 
-        $data['is_update'] = ! empty( $data['_reepay_subscription_handle'] ) && $data['_reepay_subscription_choose'] == 'new';
+        $data['is_exist'] = false;
         $data['product_object'] = wc_get_product( $post_id );
+
+        ob_start();
+        wc_get_template(
+            'plan-subscription-fields-data.php',
+            $data,
+            '',
+            reepay_s()->settings( 'plugin_path' ) . 'templates/'
+        );
+        $data['settings'] =  ob_get_clean();
+
+        $data['is_exist'] = $data['_reepay_subscription_choose'] != 'new';
+        if($data['_reepay_subscription_choose'] != 'new'){
+            ob_start();
+            wc_get_template(
+                'plan-subscription-fields-data.php',
+                $data,
+                '',
+                reepay_s()->settings( 'plugin_path' ) . 'templates/'
+            );
+            $data['settings_exist'] =  ob_get_clean();
+        }
 
         wc_get_template(
             'plan-subscription-fields.php',
