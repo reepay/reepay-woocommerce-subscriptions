@@ -113,3 +113,10 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
         </tbody>
     </table>
 <?php endforeach; ?>
+<?php
+echo  paginate_links([
+    'total' => $args['total'],
+    'current' => $args['current'],
+])
+
+?>
