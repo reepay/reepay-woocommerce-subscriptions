@@ -171,22 +171,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::renew_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
-
-			return;
-		}
-
-		self::create_child_order( $parent_order, 'wc-completed', $data  );
+		self::create_child_order( $data, 'wc-completed' );
 	}
 
 	/**
@@ -202,22 +187,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function hold_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::hold_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
-
-			return;
-		}
-
-		self::create_child_order( $parent_order, 'wc-on-hold', $data  );
+		self::create_child_order( $data, 'wc-on-hold' );
 	}
 
 	/**
@@ -232,24 +202,9 @@ class WC_Reepay_Renewals {
 	 *     'event_id' => string
 	 * ] $data
 	 */
-    public function cancel_subscription( $data ) {
-        $parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-        if ( empty( $parent_order ) ) {
-            self::log( [
-                'log'    => [
-                    'source' => 'WC_Reepay_Renewals::cancel_subscription',
-                    'error'  => 'undefined parent order',
-                    'data'   => $data
-                ],
-                'notice' => "Subscription {$data['subscription']} - undefined order"
-            ] );
-
-            return;
-        }
-
-        self::create_child_order( $parent_order, 'wc-cancelled', $data  );
-    }
+	public function cancel_subscription( $data ) {
+		self::create_child_order( $data, 'wc-cancelled' );
+	}
 
 	/**
 	 *
@@ -264,22 +219,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function uncancel_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::uncancel_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
-
-			return;
-		}
-
-		self::create_child_order( $parent_order, 'wc-completed', $data );
+		self::create_child_order( $data, 'wc-completed' );
 	}
 
 	/**
@@ -330,13 +270,18 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param  WC_Order  $parent_order
+	 * @param  array<string, string>  $data
 	 * @param  string  $status
-	 * @param  array<string, string>$data
 	 *
 	 * @return WC_Order|WP_Error
 	 */
-	public static function create_child_order( $parent_order, $status, $data ) {
+	public static function create_child_order( $data, $status ) {
+		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		if ( empty( $parent_order ) ) {
+			return new WP_Error( 'Undefined parent order' );
+		}
+
 		$query = new WP_Query( array(
 			'post_parent'    => $parent_order->get_id(),
 			'post_type'      => 'shop_order',
@@ -354,7 +299,8 @@ class WC_Reepay_Renewals {
 				],
 				'notice' => "Subscription {$data['subscription']} - duplication attempt"
 			] );
-			return new WP_Error('Duplicate order');
+
+			return new WP_Error( 'Duplicate order' );
 		}
 
 		$order = wc_create_order( [
