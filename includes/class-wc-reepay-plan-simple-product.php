@@ -3,7 +3,7 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 
 
     public static $types_info = array(
-        WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY => 'For %s may(s)',
+        WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY => 'For %s day(s)',
         WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE => 'For %s month(s), on the first day of the month',
         WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY => 'For %s month(s)',
         WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY => 'For %s month(s), on the last day of the month',
