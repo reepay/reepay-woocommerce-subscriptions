@@ -3,15 +3,14 @@
  * @var string $billing_plan
  * @var string $trial
  * @var string $contract_periods
+ * @var string $domain
  */
 ?>
 
-<div class="reepay_subscription_info">
-    <p><?=$billing_plan?></p>
-    <p><?=$trial?></p>
-	<?php
-	if ( ! empty( $contract_periods ) ) {
-		 echo esc_html__( 'Minimum Contract Period - ', $domain ) . ' ' . $contract_periods;
-	}
-    ?>
-</div>
+<ul class="reepay_subscription_info">
+    <li><?= $billing_plan ?></li>
+    <li><?= $trial ?></li>
+	<?php if ( ! empty( $contract_periods ) ) : ?>
+        <li><?= esc_html__( 'Minimum Contract Period - ', $domain ) . ' ' . $contract_periods ?> </li>
+	<?php endif; ?>
+</ul>

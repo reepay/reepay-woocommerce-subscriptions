@@ -59,11 +59,13 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 	 * @return string
 	 */
     public function get_price_html( $deprecated = '' ) {
-	    if ( is_product() ) {
-		    return parent::get_price_html() . '1';
-	    } else {
-		    return parent::get_price_html() . '2';
-	    }
-    }
+	    $schedule_type = $this->get_meta('_reepay_subscription_schedule_type');
+	    $schedule_type = WC_Reepay_Subscription_Plan_Simple::$schedule_types[$schedule_type] ?? '';
 
+	    if(empty($schedule_type)) {
+		    return parent::get_price_html();
+	    }
+
+	    return parent::get_price_html() . ' / ' . $schedule_type;
+    }
 }
