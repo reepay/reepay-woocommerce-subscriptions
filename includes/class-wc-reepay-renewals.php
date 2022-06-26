@@ -303,11 +303,25 @@ class WC_Reepay_Renewals {
 			return new WP_Error( 'Duplicate order' );
 		}
 
-		$order = wc_create_order( [
+		return self::create_order_copy( [
 			'status'      => $status,
 			'parent'      => $parent_order->get_id(),
 			'customer_id' => $parent_order->get_customer_id(),
-		] );
+		], $parent_order, $parent_order->get_items() );
+	}
+
+	/**
+	 * @param  array  $order_args  Order arguments.
+	 * @param  WC_Order  $main_order  Order arguments.
+	 * @param  array<WC_Order_Item>  $items
+	 *
+	 * @return WC_Order|WP_Error
+	 */
+	public static function create_order_copy( $order_args, $main_order, $items = [] ) {
+		$new_order = wc_create_order( $order_args );
+		$new_order->save();
+
+		$main_order = wc_get_order($main_order);
 
 		$fields_to_copy = [
 			'_order_shipping',
@@ -355,20 +369,18 @@ class WC_Reepay_Renewals {
 			'_reepay_token',
 		];
 
-		$order->save();
-
 		foreach ( $fields_to_copy as $field_name ) {
-			update_post_meta( $order->get_id(), $field_name, get_post_meta( $parent_order->get_id(), $field_name, true ) );
+			update_post_meta( $new_order->get_id(), $field_name, get_post_meta( $main_order->get_id(), $field_name, true ) );
 		}
 
-		foreach ( $parent_order->get_items() as $item ) {
-			$order->add_product( wc_get_product( $item['product_id'] ), $item['qty'] );
+		foreach ( $items as $item ) {
+			$new_order->add_product( wc_get_product( $item['product_id'] ), $item['qty'] );
 		}
 
-		$order->save();
-		$order->calculate_totals();
+		$new_order->save();
+		$new_order->calculate_totals();
 
-		return $order;
+		return $new_order;
 	}
 
 	/**
