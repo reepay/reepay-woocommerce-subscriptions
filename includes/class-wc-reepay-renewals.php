@@ -65,7 +65,7 @@ class WC_Reepay_Renewals {
 		}
 
 		$token = $token->get_token();
-
+		
 		$orders = [ $main_order ];
 		$order_items = $main_order->get_items();
 
