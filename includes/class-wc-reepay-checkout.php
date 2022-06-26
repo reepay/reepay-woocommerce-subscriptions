@@ -37,14 +37,10 @@ class WC_Reepay_Checkout {
 	}
 
 	public function woocommerce_add_to_cart_validation( $passed, $added_product_id ) {
-		if ( self::is_reepay_product_in_cart() ) {
-			$passed = false;
-			if(self::is_reepay_product($added_product_id)) {
-				wc_add_notice( __( 'You can only buy one subscription per purchase', reepay_s()->settings( 'domain' ) ), 'error' );
-			} else {
-				wc_add_notice( __( 'You cannot buy a subscription together with other products', reepay_s()->settings( 'domain' ) ), 'error' );
-			}
-		} elseif ( ! wc()->cart->is_empty() ) {
+		if ( $passed && (
+				( self::is_reepay_product_in_cart() && ! self::is_reepay_product( $added_product_id ) ) ||
+				( ! self::is_reepay_product_in_cart() && self::is_reepay_product( $added_product_id ) )
+			) ) {
 			$passed = false;
 			wc_add_notice( __( 'You cannot buy a subscription together with other products', reepay_s()->settings( 'domain' ) ), 'error' );
 		}
