@@ -39,7 +39,7 @@ class WC_Reepay_Checkout {
 	public function woocommerce_add_to_cart_validation( $passed, $added_product_id ) {
 		if ( $passed && (
 				( self::is_reepay_product_in_cart() && ! self::is_reepay_product( $added_product_id ) ) ||
-				( ! self::is_reepay_product_in_cart() && self::is_reepay_product( $added_product_id ) )
+				( !WC()->cart->is_empty() && ! self::is_reepay_product_in_cart() && self::is_reepay_product( $added_product_id ) )
 			) ) {
 			$passed = false;
 			wc_add_notice( __( 'You cannot buy a subscription together with other products', reepay_s()->settings( 'domain' ) ), 'error' );
