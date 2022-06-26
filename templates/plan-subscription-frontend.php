@@ -1,10 +1,17 @@
 <?php
+/**
+ * @var string $billing_plan
+ * @var string $trial
+ * @var string $contract_periods
+ */
 ?>
 
 <div class="reepay_subscription_info">
-    <p><?= $product->reepay_get_billing_plan() ?></p>
-    <p><?= $product->reepay_get_trial() ?></p>
-    <?php if(!empty($product->get_meta('_reepay_subscription_contract_periods'))):?>
-        <?php esc_html_e( 'Minimum Contract Period - ', $domain ); ?> <?=$product->get_meta('_reepay_subscription_contract_periods')?>
-    <?php endif; ?>
+    <p><?=$billing_plan?></p>
+    <p><?=$trial?></p>
+	<?php
+	if ( ! empty( $contract_periods ) ) {
+		 echo esc_html__( 'Minimum Contract Period - ', $domain ) . ' ' . $contract_periods;
+	}
+    ?>
 </div>

@@ -117,7 +117,9 @@ class WC_Reepay_Subscription_Plan_Simple {
         wc_get_template(
             'plan-subscription-frontend.php',
             array(
-                'product' => $product,
+                'billing_plan' => $product->reepay_get_billing_plan(),
+                'trial' => $product->reepay_get_trial(),
+                'contract_periods' => $product->get_meta( '_reepay_subscription_contract_periods' ),
                 'domain'  => reepay_s()->settings( 'domain' )
             ),
             '',
