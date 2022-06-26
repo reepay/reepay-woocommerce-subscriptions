@@ -10,8 +10,7 @@ class WC_Reepay_Renewals {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'reepay_webhook_invoice_authorized', [ $this, 'create_subscriptions' ] );
-		add_action( 'reepay_webhook_invoice_settled', [ $this, 'create_subscriptions' ] );
+		add_action( 'reepay_webhook', [ $this, 'create_subscriptions' ] );
 
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
@@ -30,11 +29,19 @@ class WC_Reepay_Renewals {
 	 *     'transaction' => string
 	 *     'event_type' => string
 	 *     'event_id' => string
-	 *     'order_id' => int
 	 * ] $data
 	 */
 	public function create_subscriptions( $data ) {
-		$main_order = wc_get_order( $data['order_id'] );
+		if( $data['event_type'] !== 'invoice_authorized' && $data['event_type'] !== 'invoice_settled' ) {
+			return;
+		}
+
+		$main_order = rp_get_order_by_handle( $data['invoice'] );
+		$data['order_id'] = $main_order->get_id();
+
+		if ( empty($main_order) ) {
+			return;
+		}
 
 		if ( ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
 			self::log( [
@@ -71,16 +78,16 @@ class WC_Reepay_Renewals {
 
 		foreach ( $order_items as $order_item_key => $order_item ) {
 			if ( count( $order_items ) <= 1 ) {
-				return;
+				break;
 			}
+
+			$main_order->remove_item( $order_item_key );
+			unset( $order_items[ $order_item_key ] );
 
 			$orders[] = self::create_order_copy( [
 				'status'      => $main_order->get_status( '' ),
 				'customer_id' => $main_order->get_customer_id(),
 			], $main_order, [ $order_item ] );
-
-			wc_delete_order_item( $order_item_key );
-			unset( $order_items[ $order_item_key ] );
 		}
 
 		$main_order->calculate_totals();
@@ -93,7 +100,7 @@ class WC_Reepay_Renewals {
 
 			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
 
-			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' )??[] );
+			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' )?:[] );
 
 			$new_subscription = null;
 			try {
@@ -142,7 +149,7 @@ class WC_Reepay_Renewals {
 					'notice' => "Subscription {$data['order_id']} - unable to create subscription"
 				] );
 
-				return;
+				continue;
 			}
 
 			try {
@@ -169,7 +176,7 @@ class WC_Reepay_Renewals {
 					'notice' => "Subscription {$data['order_id']} - unable to assign payment method to subscription"
 				] );
 
-				return;
+				continue;
 			}
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
