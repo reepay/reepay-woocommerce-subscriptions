@@ -51,14 +51,19 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
         return $ret;
     }
 
-    /**
-     * Get subscription's price HTML.
-     *
-     * @return string containing the formatted price
-     */
-    public function get_price_html( $price = '' ) {
-
-        return parent::get_price_html( $price );
+	/**
+	 * Returns the price in html format.
+	 *
+	 * @param string $deprecated Deprecated param.
+	 *
+	 * @return string
+	 */
+    public function get_price_html( $deprecated = '' ) {
+	    if ( is_product() ) {
+		    return parent::get_price_html() . '1';
+	    } else {
+		    return parent::get_price_html() . '2';
+	    }
     }
 
 }
