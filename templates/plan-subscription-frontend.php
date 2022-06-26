@@ -8,9 +8,15 @@
 ?>
 
 <ul class="reepay_subscription_info">
-    <li><?= $billing_plan ?></li>
-    <li><?= $trial ?></li>
+	<?php if ( ! empty( $billing_plan ) ) : ?>
+        <li><?= $billing_plan ?></li>
+	<?php endif; ?>
+
+	<?php if ( ! empty( $trial ) ) : ?>
+        <li><?= $trial ?></li>
+	<?php endif; ?>
+
 	<?php if ( ! empty( $contract_periods ) ) : ?>
-        <li><?= esc_html__( 'Minimum Contract Period - ', $domain ) . ' ' . $contract_periods ?> </li>
+        <li><?= esc_html__( 'Minimum Contract Period - ', $domain ) . ' ' . $contract_periods ?></li>
 	<?php endif; ?>
 </ul>
