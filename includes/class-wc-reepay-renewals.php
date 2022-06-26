@@ -34,9 +34,9 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function create_subscriptions( $data ) {
-		$order = wc_get_order( $data['order_id'] );
+		$main_order = wc_get_order( $data['order_id'] );
 
-		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
+		if ( ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
 			self::log( [
 				'log'    => [
 					'source' => 'WC_Reepay_Renewals::create_subscription',
@@ -49,7 +49,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		$token = self::get_payment_token_order( $order );
+		$token = self::get_payment_token_order( $main_order );
 
 		if ( empty( $token ) ) {
 			self::log( [
@@ -66,8 +66,8 @@ class WC_Reepay_Renewals {
 
 		$token = $token->get_token();
 
-		$orders = [];
-		$order_items = $order->get_items();
+		$orders = [ $main_order ];
+		$order_items = $main_order->get_items();
 
 		foreach ( $order_items as $order_item_key => $order_item ) {
 			if ( count( $order_items ) <= 1 ) {
@@ -75,13 +75,15 @@ class WC_Reepay_Renewals {
 			}
 
 			$orders[] = self::create_order_copy( [
-				'status'      => $order->get_status( '' ),
-				'customer_id' => $order->get_customer_id(),
-			], $order, [ $order_item ] );
+				'status'      => $main_order->get_status( '' ),
+				'customer_id' => $main_order->get_customer_id(),
+			], $main_order, [ $order_item ] );
 
 			wc_delete_order_item( $order_item_key );
 			unset( $order_items[ $order_item_key ] );
 		}
+
+		$main_order->calculate_totals();
 
 		foreach ( $orders as $order ) {
 			$order_items = $order->get_items();
@@ -172,10 +174,7 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
-
-			return;
 		}
-
 	}
 
 	/**
