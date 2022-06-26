@@ -10,8 +10,8 @@ class WC_Reepay_Renewals {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'reepay_webhook_invoice_authorized', [ $this, 'create_subscription' ] );
-		add_action( 'reepay_webhook_invoice_settled', [ $this, 'create_subscription' ] );
+		add_action( 'reepay_webhook_invoice_authorized', [ $this, 'create_subscriptions' ] );
+		add_action( 'reepay_webhook_invoice_settled', [ $this, 'create_subscriptions' ] );
 
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
@@ -33,7 +33,7 @@ class WC_Reepay_Renewals {
 	 *     'order_id' => int
 	 * ] $data
 	 */
-	public function create_subscription( $data ) {
+	public function create_subscriptions( $data ) {
 		$order = wc_get_order( $data['order_id'] );
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
@@ -66,12 +66,32 @@ class WC_Reepay_Renewals {
 
 		$token = $token->get_token();
 
-		foreach ( $order->get_items() as $item_id => $order_item ) {
+		$orders = [];
+		$order_items = $order->get_items();
+
+		foreach ( $order_items as $order_item_key => $order_item ) {
+			if ( count( $order_items ) <= 1 ) {
+				return;
+			}
+
+			$orders[] = self::create_order_copy( [
+				'status'      => $order->get_status( '' ),
+				'customer_id' => $order->get_customer_id(),
+			], $order, [ $order_item ] );
+
+			wc_delete_order_item( $order_item_key );
+			unset( $order_items[ $order_item_key ] );
+		}
+
+		foreach ( $orders as $order ) {
+			$order_items = $order->get_items();
+			$order_item  = reset( $order_items );
+
 			$product = $order_item->get_product();
 
 			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
 
-			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' ) ?? [] );
+			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' )??[] );
 
 			$new_subscription = null;
 			try {
@@ -103,7 +123,7 @@ class WC_Reepay_Renewals {
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				] );
-			} catch ( Exception $e ) {
+			}catch( Exception $e ) {
 				self::log( [
 					'notice' => $e->getMessage()
 				] );
@@ -131,7 +151,7 @@ class WC_Reepay_Renewals {
 					'handle' => $new_subscription['handle'],
 					'source' => $token,
 				] );
-			} catch ( Exception $e ) {
+			}catch( Exception $e ) {
 				self::log( [
 					'notice' => $e->getMessage()
 				] );
@@ -155,6 +175,7 @@ class WC_Reepay_Renewals {
 
 			return;
 		}
+
 	}
 
 	/**
