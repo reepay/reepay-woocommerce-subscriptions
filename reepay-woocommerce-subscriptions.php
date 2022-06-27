@@ -121,6 +121,68 @@ class WooCommerce_Reepay_Subscriptions{
                 'desc'     => '',
                 'id'       => 'reepay_section_title'
             ),
+            '_reepay_enable_downgrade' => array(
+                'name' => __('Enable Downgrade', reepay_s()->settings('domain')),
+                'type' => 'checkbox',
+                'desc' => __('Enable Downgrade', reepay_s()->settings('domain')),
+                'id' => '_reepay_enable_downgrade'
+            ),
+            '_reepay_downgrade_compensation_method' => array(
+                'name' => __('Compensation method for downgrade', reepay_s()->settings('domain')),
+                'type' => 'select',
+                'options' => [
+                    1,2,3
+                ],
+                'desc' => __('Compensation method for downgrade', reepay_s()->settings('domain')),
+                'id' => '_reepay_downgrade_compensation_method'
+            ),
+            '_reepay_enable_upgrade' => array(
+                'name' => __('Enable Upgrade', reepay_s()->settings('domain')),
+                'type' => 'checkbox',
+                'desc' => __('Enable Upgrade', reepay_s()->settings('domain')),
+                'id' => '_reepay_enable_upgrade'
+            ),
+            '_reepay_upgrade_compensation_method' => array(
+                'name' => __('Compensation method for upgrade', reepay_s()->settings('domain')),
+                'type' => 'select',
+                'options' => [
+                    1,2,3
+                ],
+                'desc' => __('Compensation method for upgrade', reepay_s()->settings('domain')),
+                'id' => '_reepay_upgrade_compensation_method'
+            ),
+            '_reepay_enable_on_hold' => array(
+                'name' => __('Enable On Hold', reepay_s()->settings('domain')),
+                'type' => 'checkbox',
+                'desc' => __('Enable On Hold', reepay_s()->settings('domain')),
+                'id' => '_reepay_enable_on_hold'
+            ),
+            '_reepay_on_hold_compensation_method' => array(
+                'name' => __('Compensation method for On Hold', reepay_s()->settings('domain')),
+                'type' => 'select',
+                'options' => [
+                    'none' => 'No Compensation',
+                    'prorated_credit' => 'Prorated Credit',
+                    'full_credit' => 'Full Credit',
+                ],
+                'desc' => __('Compensation method for on_hold', reepay_s()->settings('domain')),
+                'id' => '_reepay_on_hold_compensation_method'
+            ),
+            '_reepay_enable_cancel' => array(
+                'name' => __('Enable Cancel', reepay_s()->settings('domain')),
+                'type' => 'checkbox',
+                'desc' => __('Enable Cancel', reepay_s()->settings('domain')),
+                'id' => '_reepay_enable_cancel'
+            ),
+            '_reepay_cancel_compensation_method' => array(
+                'name' => __('Compensation method for Cancel', reepay_s()->settings('domain')),
+                'type' => 'select',
+                'options' => [
+                    1,2,3
+                ],
+                'desc' => __('Compensation method for cancel', reepay_s()->settings('domain')),
+                'id' => '_reepay_cancel_compensation_method'
+            ),
             'test_mode' => array(
                 'name' => __( 'Test mode', reepay_s()->settings('domain') ),
                 'type' => 'checkbox',
