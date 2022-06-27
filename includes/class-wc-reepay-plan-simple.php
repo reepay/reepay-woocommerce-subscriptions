@@ -70,6 +70,10 @@ class WC_Reepay_Subscription_Plan_Simple {
         add_filter( 'woocommerce_product_class', array( $this, 'load_subscription_product_class' ), 10, 2 );
         add_filter( 'product_type_selector', array( $this, 'add_subscription_product_type' ) );
 
+	    add_filter( 'woocommerce_cart_item_price', array( $this, 'format_price' ), 10, 2 );
+	    add_filter( 'woocommerce_cart_item_subtotal', array( $this, 'format_price' ), 10, 2 );
+	    add_filter( 'woocommerce_order_formatted_line_subtotal', array( $this, 'format_price' ), 10, 2 );
+
         $this->register_actions();
     }
 
@@ -96,6 +100,26 @@ class WC_Reepay_Subscription_Plan_Simple {
 
         return $types;
     }
+
+	/**
+	 * @param  string  $price
+	 * @param  array<string, mixed>  $product
+	 *
+	 * @return string
+	 */
+	public function format_price( $price, $product ) {
+		$product = wc_get_product( $product['variation_id'] ?: $product['product_id'] );
+		if ( empty( $product ) || ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
+			return $price;
+		}
+
+		if ( $product->is_type( 'variation' ) ) {
+			return WC_Product_Reepay_Simple_Subscription::format_price( $product->get_price_html(), $product );
+		}
+
+
+		return $product->get_price_html();
+	}
 
     public function add_to_cart() {
         $this->display_subscription_info();
