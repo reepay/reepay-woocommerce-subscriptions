@@ -46,7 +46,7 @@ class WC_Reepay_Discounts_And_Coupons
         ];
         $amount = $coupon->get_amount();
 
-        if ($amount > 0) {
+        if ($amount >= 1) {
             if ($coupon->get_discount_type() === 'reepay_percentage') {
                 $params['percentage'] = $amount;
             } else if ($coupon->get_discount_type() === 'reepay_fixed_product') {
@@ -80,7 +80,7 @@ class WC_Reepay_Discounts_And_Coupons
             $paramsCoupon["max_redemptions"] = $max_redemptions;
         }
         if (!empty($end)) {
-            $paramsCoupon["valid_until"] = $end->format(DATE_ISO8601);
+            $paramsCoupon["valid_until"] = $end->format('Y-m-d\TH:i:s');
         }
         return $paramsCoupon;
     }
