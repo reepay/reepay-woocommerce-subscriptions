@@ -37,24 +37,12 @@ class WC_Reepay_Renewals {
 		}
 
 		$main_order = rp_get_order_by_handle( $data['invoice'] );
+
+		if ( empty($main_order)  || ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
+			return;
+		}
+
 		$data['order_id'] = $main_order->get_id();
-
-		if ( empty($main_order) ) {
-			return;
-		}
-
-		if ( ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::create_subscription',
-					'error'  => 'Subscription already exists',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['order_id']} already exists, an attempt was made to re-create"
-			] );
-
-			return;
-		}
 
 		$token = self::get_payment_token_order( $main_order );
 
