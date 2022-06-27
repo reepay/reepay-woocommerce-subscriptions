@@ -69,6 +69,7 @@ class WC_Reepay_Subscription_Plan_Simple {
         add_action( 'init', array( $this, 'create_subscription_product_class' ) );
         add_filter( 'woocommerce_product_class', array( $this, 'load_subscription_product_class' ), 10, 2 );
         add_filter( 'product_type_selector', array( $this, 'add_subscription_product_type' ) );
+	    add_action( 'save_post', array( $this, 'set_sold_individual' ), PHP_INT_MAX );
 
 	    add_filter( 'woocommerce_cart_item_price', array( $this, 'format_price' ), 10, 2 );
 	    add_filter( 'woocommerce_cart_item_subtotal', array( $this, 'format_price' ), 10, 2 );
@@ -125,6 +126,14 @@ class WC_Reepay_Subscription_Plan_Simple {
         $this->display_subscription_info();
         do_action( 'woocommerce_simple_add_to_cart' );
     }
+
+	public function set_sold_individual( $post_id ) {
+		if ( ! $this->is_reepay_product_saving() ) {
+			return;
+		}
+
+		update_post_meta( $post_id, '_sold_individually', 'yes' );
+	}
 
     public function display_subscription_info() {
         global $product;
