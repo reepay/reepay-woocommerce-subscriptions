@@ -3,7 +3,7 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 
 
     public static $types_info = array(
-        WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY => 'For %s may(s)',
+        WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY => 'For %s day(s)',
         WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE => 'For %s month(s), on the first day of the month',
         WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY => 'For %s month(s)',
         WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY => 'For %s month(s), on the last day of the month',
@@ -51,14 +51,21 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
         return $ret;
     }
 
-    /**
-     * Get subscription's price HTML.
-     *
-     * @return string containing the formatted price
-     */
-    public function get_price_html( $price = '' ) {
+	/**
+	 * Returns the price in html format.
+	 *
+	 * @param string $deprecated Deprecated param.
+	 *
+	 * @return string
+	 */
+    public function get_price_html( $deprecated = '' ) {
+	    $schedule_type = $this->get_meta('_reepay_subscription_schedule_type');
+	    $schedule_type = WC_Reepay_Subscription_Plan_Simple::$schedule_types[$schedule_type] ?? '';
 
-        return parent::get_price_html( $price );
+	    if(empty($schedule_type)) {
+		    return parent::get_price_html();
+	    }
+
+	    return parent::get_price_html() . ' / ' . $schedule_type;
     }
-
 }

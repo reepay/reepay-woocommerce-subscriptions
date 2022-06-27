@@ -10,8 +10,7 @@ class WC_Reepay_Renewals {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'reepay_webhook_invoice_authorized', [ $this, 'create_subscription' ] );
-		add_action( 'reepay_webhook_invoice_settled', [ $this, 'create_subscription' ] );
+		add_action( 'reepay_webhook', [ $this, 'create_subscriptions' ] );
 
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
@@ -30,13 +29,21 @@ class WC_Reepay_Renewals {
 	 *     'transaction' => string
 	 *     'event_type' => string
 	 *     'event_id' => string
-	 *     'order_id' => int
 	 * ] $data
 	 */
-	public function create_subscription( $data ) {
-		$order = wc_get_order( $data['order_id'] );
+	public function create_subscriptions( $data ) {
+		if( $data['event_type'] !== 'invoice_authorized' && $data['event_type'] !== 'invoice_settled' ) {
+			return;
+		}
 
-		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
+		$main_order = rp_get_order_by_handle( $data['invoice'] );
+		$data['order_id'] = $main_order->get_id();
+
+		if ( empty($main_order) ) {
+			return;
+		}
+
+		if ( ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
 			self::log( [
 				'log'    => [
 					'source' => 'WC_Reepay_Renewals::create_subscription',
@@ -49,7 +56,7 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		$token = self::get_payment_token_order( $order );
+		$token = self::get_payment_token_order( $main_order );
 
 		if ( empty( $token ) ) {
 			self::log( [
@@ -65,13 +72,35 @@ class WC_Reepay_Renewals {
 		}
 
 		$token = $token->get_token();
+		
+		$orders = [ $main_order ];
+		$order_items = $main_order->get_items();
 
-		foreach ( $order->get_items() as $item_id => $order_item ) {
+		foreach ( $order_items as $order_item_key => $order_item ) {
+			if ( count( $order_items ) <= 1 ) {
+				break;
+			}
+
+			$main_order->remove_item( $order_item_key );
+			unset( $order_items[ $order_item_key ] );
+
+			$orders[] = self::create_order_copy( [
+				'status'      => $main_order->get_status( '' ),
+				'customer_id' => $main_order->get_customer_id(),
+			], $main_order, [ $order_item ] );
+		}
+
+		$main_order->calculate_totals();
+
+		foreach ( $orders as $order ) {
+			$order_items = $order->get_items();
+			$order_item  = reset( $order_items );
+
 			$product = $order_item->get_product();
 
 			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
 
-			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' ) ?? [] );
+			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' )?:[] );
 
 			$new_subscription = null;
 			try {
@@ -103,7 +132,7 @@ class WC_Reepay_Renewals {
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				] );
-			} catch ( Exception $e ) {
+			}catch( Exception $e ) {
 				self::log( [
 					'notice' => $e->getMessage()
 				] );
@@ -120,7 +149,7 @@ class WC_Reepay_Renewals {
 					'notice' => "Subscription {$data['order_id']} - unable to create subscription"
 				] );
 
-				return;
+				continue;
 			}
 
 			try {
@@ -131,7 +160,7 @@ class WC_Reepay_Renewals {
 					'handle' => $new_subscription['handle'],
 					'source' => $token,
 				] );
-			} catch ( Exception $e ) {
+			}catch( Exception $e ) {
 				self::log( [
 					'notice' => $e->getMessage()
 				] );
@@ -147,13 +176,11 @@ class WC_Reepay_Renewals {
 					'notice' => "Subscription {$data['order_id']} - unable to assign payment method to subscription"
 				] );
 
-				return;
+				continue;
 			}
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
-
-			return;
 		}
 	}
 
@@ -171,22 +198,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::renew_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
-
-			return;
-		}
-
-		self::create_child_order( $parent_order, 'wc-completed', $data  );
+		self::create_child_order( $data, 'wc-completed' );
 	}
 
 	/**
@@ -202,22 +214,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function hold_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::hold_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
-
-			return;
-		}
-
-		self::create_child_order( $parent_order, 'wc-on-hold', $data  );
+		self::create_child_order( $data, 'wc-on-hold' );
 	}
 
 	/**
@@ -232,24 +229,9 @@ class WC_Reepay_Renewals {
 	 *     'event_id' => string
 	 * ] $data
 	 */
-    public function cancel_subscription( $data ) {
-        $parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-        if ( empty( $parent_order ) ) {
-            self::log( [
-                'log'    => [
-                    'source' => 'WC_Reepay_Renewals::cancel_subscription',
-                    'error'  => 'undefined parent order',
-                    'data'   => $data
-                ],
-                'notice' => "Subscription {$data['subscription']} - undefined order"
-            ] );
-
-            return;
-        }
-
-        self::create_child_order( $parent_order, 'wc-cancelled', $data  );
-    }
+	public function cancel_subscription( $data ) {
+		self::create_child_order( $data, 'wc-cancelled' );
+	}
 
 	/**
 	 *
@@ -264,22 +246,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function uncancel_subscription( $data ) {
-		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
-
-		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::uncancel_subscription',
-					'error'  => 'undefined parent order',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['subscription']} - undefined order"
-			] );
-
-			return;
-		}
-
-		self::create_child_order( $parent_order, 'wc-completed', $data );
+		self::create_child_order( $data, 'wc-completed' );
 	}
 
 	/**
@@ -330,13 +297,18 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param  WC_Order  $parent_order
+	 * @param  array<string, string>  $data
 	 * @param  string  $status
-	 * @param  array<string, string>$data
 	 *
 	 * @return WC_Order|WP_Error
 	 */
-	public static function create_child_order( $parent_order, $status, $data ) {
+	public static function create_child_order( $data, $status ) {
+		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		if ( empty( $parent_order ) ) {
+			return new WP_Error( 'Undefined parent order' );
+		}
+
 		$query = new WP_Query( array(
 			'post_parent'    => $parent_order->get_id(),
 			'post_type'      => 'shop_order',
@@ -354,14 +326,29 @@ class WC_Reepay_Renewals {
 				],
 				'notice' => "Subscription {$data['subscription']} - duplication attempt"
 			] );
-			return new WP_Error('Duplicate order');
+
+			return new WP_Error( 'Duplicate order' );
 		}
 
-		$order = wc_create_order( [
+		return self::create_order_copy( [
 			'status'      => $status,
 			'parent'      => $parent_order->get_id(),
 			'customer_id' => $parent_order->get_customer_id(),
-		] );
+		], $parent_order, $parent_order->get_items() );
+	}
+
+	/**
+	 * @param  array  $order_args  Order arguments.
+	 * @param  WC_Order  $main_order  Order arguments.
+	 * @param  array<WC_Order_Item>  $items
+	 *
+	 * @return WC_Order|WP_Error
+	 */
+	public static function create_order_copy( $order_args, $main_order, $items = [] ) {
+		$new_order = wc_create_order( $order_args );
+		$new_order->save();
+
+		$main_order = wc_get_order($main_order);
 
 		$fields_to_copy = [
 			'_order_shipping',
@@ -409,20 +396,18 @@ class WC_Reepay_Renewals {
 			'_reepay_token',
 		];
 
-		$order->save();
-
 		foreach ( $fields_to_copy as $field_name ) {
-			update_post_meta( $order->get_id(), $field_name, get_post_meta( $parent_order->get_id(), $field_name, true ) );
+			update_post_meta( $new_order->get_id(), $field_name, get_post_meta( $main_order->get_id(), $field_name, true ) );
 		}
 
-		foreach ( $parent_order->get_items() as $item ) {
-			$order->add_product( wc_get_product( $item['product_id'] ), $item['qty'] );
+		foreach ( $items as $item ) {
+			$new_order->add_product( wc_get_product( $item['product_id'] ), $item['qty'] );
 		}
 
-		$order->save();
-		$order->calculate_totals();
+		$new_order->save();
+		$new_order->calculate_totals();
 
-		return $order;
+		return $new_order;
 	}
 
 	/**

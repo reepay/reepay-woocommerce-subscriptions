@@ -28,14 +28,16 @@ class WC_Product_Reepay_Variable_Subscription extends WC_Product_Variable {
         return $value;
     }
 
-    /**
-     * Get subscription's price HTML.
-     *
-     * @return string containing the formatted price
-     */
-    public function get_price_html( $price = '' ) {
+	/**
+	 * Returns the price in html format.
+	 *
+	 * @param string $price Price (default: '').
+	 *
+	 * @return string
+	 */
+	public function get_price_html( $price = '' ) {
 
-        return parent::get_price_html( $price );
+        return parent::get_price_html();
     }
 
 }

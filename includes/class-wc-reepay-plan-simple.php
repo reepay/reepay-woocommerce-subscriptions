@@ -69,7 +69,6 @@ class WC_Reepay_Subscription_Plan_Simple {
         add_action( 'init', array( $this, 'create_subscription_product_class' ) );
         add_filter( 'woocommerce_product_class', array( $this, 'load_subscription_product_class' ), 10, 2 );
         add_filter( 'product_type_selector', array( $this, 'add_subscription_product_type' ) );
-	    add_action( 'save_post', array( $this, 'set_sold_individual' ), PHP_INT_MAX );
 
         $this->register_actions();
     }
@@ -103,21 +102,15 @@ class WC_Reepay_Subscription_Plan_Simple {
         do_action( 'woocommerce_simple_add_to_cart' );
     }
 
-	public function set_sold_individual( $post_id ) {
-		if ( ! $this->is_reepay_product_saving() ) {
-			return;
-		}
-
-		update_post_meta( $post_id, '_sold_individually', 'yes' );
-	}
-
     public function display_subscription_info() {
         global $product;
 
         wc_get_template(
             'plan-subscription-frontend.php',
             array(
-                'product' => $product,
+                'billing_plan' => $product->reepay_get_billing_plan(),
+                'trial' => $product->reepay_get_trial(),
+                'contract_periods' => $product->get_meta( '_reepay_subscription_contract_periods' ),
                 'domain'  => reepay_s()->settings( 'domain' )
             ),
             '',
