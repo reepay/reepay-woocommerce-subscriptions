@@ -42,6 +42,8 @@ jQuery( function ( $ ) {
     } );
 
     let $coupon_type = $('#discount_type');
+    let $coupon_amount_label = $('[for="coupon_amount"]')
+    let default_coupon_amount_label = $coupon_amount_label.text()
 
     if ($coupon_type.length) {
         $coupon_type.on('change', function() {
@@ -69,17 +71,24 @@ jQuery( function ( $ ) {
 
 
         function coupon_type_settings(type) {
+            if (type === 'reepay_percentage') {
+                $coupon_amount_label.text(window.reepay.amountPercentageLabel)
+            } else {
+                $coupon_amount_label.text(default_coupon_amount_label)
+            }
+
             if (type === 'reepay_percentage' || type === 'reepay_fixed_product') {
                 $('.show_if_reepay').show();
-                let input = $('.show_if_reepay').find('.reepay-required')[0]
-                if (input) {
-                    input.required = true
+
+                let input = $('.show_if_reepay').find('.reepay-required')
+                if (input.length) {
+                    input.attr('required', true)
                 }
             } else {
                 $('.show_if_reepay').hide();
-                let input = $('.show_if_reepay').find('.reepay-required')[0]
-                if (input) {
-                    input.required = false
+                let input = $('.show_if_reepay').find('.reepay-required')
+                if (input.length) {
+                    input.attr('required', false)
                 }
             }
         }
