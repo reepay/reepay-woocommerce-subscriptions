@@ -55,13 +55,16 @@ jQuery( function ( $ ) {
         let $use_existing_coupon_input = $('input[name=use_existing_coupon]');
 
         $apply_to_inputs.on('change', function() {
-            apply_to_settings(this.value);
-        })
+            if (this.checked) {
+                apply_to_settings(this.value);
+            }
+        }).trigger('change')
 
         $apply_to_all_plans_input.on('change', function() {
-            apply_to_plans(this.value);
-        })
-        apply_to_plans($apply_to_all_plans_input.closest(':checked').val())
+            if (this.checked) {
+                apply_to_plans(this.value);
+            }
+        }).trigger('change')
 
         $use_existing_coupon_input.on('change', function() {
             show_existing_coupon_settings(this.value);
@@ -94,19 +97,22 @@ jQuery( function ( $ ) {
         }
 
         function apply_to_settings(value) {
-            console.log(value)
             if (value === 'custom') {
                 $('.active_if_apply_to_custom input').attr('disabled', false)
+                $('.active_if_apply_to_custom').show()
             } else {
                 $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
+                $('.active_if_apply_to_custom').hide()
             }
         }
 
         function apply_to_plans(value) {
             if (value === '0') {
-                $('#_reepay_discount_eligible_plans').attr('disabled', false)
+                $('.show_if_selected_plans').show()
+                $('.show_if_selected_plans select').attr('disabled', false)
             } else {
-                $('#_reepay_discount_eligible_plans').attr('disabled', true)
+                $('.show_if_selected_plans').hide()
+                $('.show_if_selected_plans select').attr('disabled', true)
             }
         }
 
