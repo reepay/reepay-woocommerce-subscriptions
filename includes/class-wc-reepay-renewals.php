@@ -314,7 +314,7 @@ class WC_Reepay_Renewals {
 		if ( ! empty( $query->posts ) && $query->posts[0]->post_status === $status ) {
 			self::log( [
 				'log'    => [
-					'source' => 'WC_Reepay_Renewals::cancel_subscription',
+					'source' => 'WC_Reepay_Renewals::create_child_order',
 					'error'  => 'duplicate status - ' . $status,
 				],
 				'notice' => "Subscription {$data['subscription']} - duplication attempt"
@@ -322,6 +322,13 @@ class WC_Reepay_Renewals {
 
 			return new WP_Error( 'Duplicate order' );
 		}
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::create_child_order',
+				'data'   => $data,
+			]
+		] );
 
 		return self::create_order_copy( [
 			'status'      => $status,
