@@ -122,7 +122,6 @@ class WC_Reepay_Account_Page {
 
         if (!empty($_GET['put_on_hold'])) {
             $handle = $_GET['put_on_hold'];
-            $plan_handle = $_GET['plan'];
             $handle = urlencode($handle);
             $handle = urlencode($handle);
 
@@ -133,21 +132,16 @@ class WC_Reepay_Account_Page {
 
 
             if ($order && $order->get_customer_id() === get_current_user_id()) {
-                $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($plan_handle);
-                if (!empty($plan)) {
-                    $compensation_method = get_post_meta($plan->ID, '_reepay_subscription_compensation', true);
+                $compensation_method = reepay_s()->settings('_reepay_on_hold_compensation_method');
 
-                    $params = [
-                        "compensation_method" => $compensation_method,
-                    ];
+                $params = [
+                    "compensation_method" => $compensation_method,
+                ];
 
-                    try {
-                        $result = reepay_s()->api()->request("subscription/{$handle}/on_hold", 'POST', $params);
-                    } catch (Exception $e) {
-                        wc_add_notice( $e->getMessage(), 'error' );
-                    }
-                } else {
-                    wc_add_notice('Plan not found', 'error');
+                try {
+                    $result = reepay_s()->api()->request("subscription/{$handle}/on_hold", 'POST', $params);
+                } catch (Exception $e) {
+                    wc_add_notice( $e->getMessage(), 'error' );
                 }
             } else {
                 wc_add_notice('Permission denied', 'error');

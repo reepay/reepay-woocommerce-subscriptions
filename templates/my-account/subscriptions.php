@@ -26,7 +26,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                     <?php if ($subscription['state'] === 'on_hold'): ?>
                         <a href="?reactivate=<?= $subscription['handle'] ?>" class="button">Reactivate</a>
                     <?php else: ?>
-                        <a href="?put_on_hold=<?= $subscription['handle'] ?>&plan=<?= $plan['handle'] ?>" class="button">Put on hold</a>
+                        <a href="?put_on_hold=<?= $subscription['handle'] ?>" class="button">Put on hold</a>
                     <?php endif; ?>
 
                     <?php if ($subscription['state'] !== 'on_hold'): ?>

@@ -59,7 +59,6 @@ class WC_Reepay_Subscription_Plan_Simple {
         '_reepay_subscription_billing_cycles_period',
         '_reepay_subscription_trial',
         '_reepay_subscription_fee',
-        '_reepay_subscription_compensation',
     );
 
     /**
