@@ -89,6 +89,9 @@
     margin-right: 0;
 }
 
+.reepay-subscriptions-page {
+    margin-top: 30px
+}
 .sub-order .status-on-hold{
     background: #000 !important;
     color: #fff !important;
