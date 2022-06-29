@@ -1,23 +1,29 @@
 jQuery( function ( $ ) {
+    let tab;
+
+    const $body = $( 'body' );
+    const $selectProductType = $( 'select#product-type' );
+
     $( '#woocommerce-product-data' ).on( 'woocommerce_variations_loaded', function () {
         init('#variable_product_options');
     } );
-    $( 'body' ).on( 'woocommerce-product-type-change', function () {
-        var tab;
 
-        if ( 'reepay_simple_subscriptions' === $( 'select#product-type' ).val()){
+    $body.on( 'woocommerce-product-type-change', function () {
+        let tab;
+
+        if ( 'reepay_simple_subscriptions' === $selectProductType.val()){
             tab = '#general_product_data';
-        }else if('reepay_variable_subscriptions' === $( 'select#product-type' ).val()){
+        }else if('reepay_variable_subscriptions' === $selectProductType.val()){
             tab = '#variable_product_options';
         }
 
         init(tab);
     } );
 
-    $( 'body' ).on( 'init_tooltips', function () {
+    $body.on( 'init_tooltips', function () {
         $( '.addon-shipping-new' ).closest('tr').addClass('hidden');
         $( '.addon-shipping-choose' ).on( 'change', function () {
-            if($(this).val() == 'new'){
+            if($(this).val() === 'new'){
                 $( '.addon-shipping-new' ).closest('tr').removeClass('hidden');
             }else{
                 $( '.addon-shipping-new' ).closest('tr').addClass('hidden');
@@ -27,7 +33,7 @@ jQuery( function ( $ ) {
 
 
 
-    $( 'body' ).on( 'woocommerce_variations_added', function () {
+    $body.on( 'woocommerce_variations_added', function () {
         init('#variable_product_options');
     } );
 
@@ -36,6 +42,8 @@ jQuery( function ( $ ) {
     } );
 
     let $coupon_type = $('#discount_type');
+    let $coupon_amount_label = $('[for="coupon_amount"]')
+    let default_coupon_amount_label = $coupon_amount_label.text()
 
     if ($coupon_type.length) {
         $coupon_type.on('change', function() {
@@ -47,13 +55,16 @@ jQuery( function ( $ ) {
         let $use_existing_coupon_input = $('input[name=use_existing_coupon]');
 
         $apply_to_inputs.on('change', function() {
-            apply_to_settings(this.value);
-        })
+            if (this.checked) {
+                apply_to_settings(this.value);
+            }
+        }).trigger('change')
 
         $apply_to_all_plans_input.on('change', function() {
-            apply_to_plans(this.value);
-        })
-        apply_to_plans($apply_to_all_plans_input.closest(':checked').val())
+            if (this.checked) {
+                apply_to_plans(this.value);
+            }
+        }).trigger('change')
 
         $use_existing_coupon_input.on('change', function() {
             show_existing_coupon_settings(this.value);
@@ -63,27 +74,45 @@ jQuery( function ( $ ) {
 
 
         function coupon_type_settings(type) {
+            if (type === 'reepay_percentage') {
+                $coupon_amount_label.text(window.reepay.amountPercentageLabel)
+            } else {
+                $coupon_amount_label.text(default_coupon_amount_label)
+            }
+
             if (type === 'reepay_percentage' || type === 'reepay_fixed_product') {
                 $('.show_if_reepay').show();
+
+                let input = $('.show_if_reepay').find('.reepay-required')
+                if (input.length) {
+                    input.attr('required', true)
+                }
             } else {
                 $('.show_if_reepay').hide();
+                let input = $('.show_if_reepay').find('.reepay-required')
+                if (input.length) {
+                    input.attr('required', false)
+                }
             }
         }
 
         function apply_to_settings(value) {
-            console.log(value)
             if (value === 'custom') {
                 $('.active_if_apply_to_custom input').attr('disabled', false)
+                $('.active_if_apply_to_custom').show()
             } else {
                 $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
+                $('.active_if_apply_to_custom').hide()
             }
         }
 
         function apply_to_plans(value) {
             if (value === '0') {
                 $('.show_if_selected_plans').show()
+                $('.show_if_selected_plans select').attr('disabled', false)
             } else {
                 $('.show_if_selected_plans').hide()
+                $('.show_if_selected_plans select').attr('disabled', true)
             }
         }
 
@@ -100,39 +129,68 @@ jQuery( function ( $ ) {
     }
 
     if (('.wp-list-table').length) {
-        setInterval(update_subscriptions_table, 6000)
+        init_table();
+        //setInterval(update_subscriptions_table, 3000)
     }
 
     function update_subscriptions_table() {
         return $.get(location.href)
             .then(html => {
                $('.wp-list-table').replaceWith($(html).find('.wp-list-table'))
+                init_table();
             })
     }
 
+    function init_table(){
+        $('tr.sub-order').hide();
+        $('a.show-sub-orders').on('click', function(e) {
+            e.preventDefault();
+
+            var $self = $(this),
+                el = $('tr.' + $self.data('class') );
+
+            if ( el.is(':hidden') ) {
+                el.show();
+                $self.text( $self.data('hide') );
+            } else {
+                el.hide();
+                $self.text( $self.data('show') );
+            }
+        });
+
+        $('button.toggle-sub-orders').on('click', function(e) {
+            e.preventDefault();
+
+            $('tr.sub-order').toggle();
+        });
+    }
+
     function show_settings(){
-        if ( 'reepay_simple_subscriptions' === $( 'select#product-type' ).val() || 'reepay_variable_subscriptions' === $( 'select#product-type' ).val() ) {
+        if ( 'reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val() ) {
             $( '.show_if_reepay_subscription' ).show();
         }else{
             $( '.show_if_reepay_subscription' ).hide();
         }
 
-        if ( 'reepay_variable_subscriptions' === $( 'select#product-type' ).val() ) {
-            $('#variable_product_options .variable_pricing').children( ':first' ).hide();
-            $('#variable_product_options .variable_pricing').children( ':nth-child(2)' ).hide();
+        const $variablePricing = $('#variable_product_options .variable_pricing');
+
+        if ('reepay_variable_subscriptions' === $selectProductType.val() ||
+            'variable' === $selectProductType.val()) {
+            $variablePricing.children( ':first' ).hide();
+            $variablePricing.children( ':nth-child(2)' ).hide();
             $('#variable_product_options .sale_price_dates_fields').hide();
             $( '.show_if_variable' ).show();
             $( '.general_tab' ).hide();
             $( '#general_product_data .show_if_reepay_subscription' ).hide();
         }else{
             $( '.show_if_variable' ).hide();
-            $('#variable_product_options .variable_pricing').children( ':first' ).show();
-            $('#variable_product_options .variable_pricing').children( ':nth-child(2)' ).show();
+            $variablePricing.children( ':first' ).show();
+            $variablePricing.children( ':nth-child(2)' ).show();
         }
     }
 
     function show_plan_settings(type){
-        var subs_block = $('.reepay_subscription_pricing');
+        const subs_block = $('.reepay_subscription_pricing');
         subs_block.find('.type-fields').hide();
         subs_block.find('.fields-' + type).show();
     }
@@ -147,8 +205,8 @@ jQuery( function ( $ ) {
 
 
     function choose_change_settings(val){
-        if ( 'reepay_simple_subscriptions' === $( 'select#product-type' ).val() || 'reepay_variable_subscriptions' === $( 'select#product-type' ).val() ) {
-            if(val == 'new'){
+        if ( 'reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val() ) {
+            if(val === 'new'){
                 $('.reepay_subscription_settings').show();
                 $('.reepay_subscription_choose_exist').hide();
             }else{
@@ -159,7 +217,7 @@ jQuery( function ( $ ) {
     }
 
     function show_trial_settings(type){
-        var subs_block = $('.reepay_subscription_trial');
+        const subs_block = $('.reepay_subscription_trial');
         subs_block.find('.trial-fields').hide();
         subs_block.find('.fields-' + type).show();
     }
@@ -181,7 +239,7 @@ jQuery( function ( $ ) {
     }
 
     function billing_cycles_settings(val){
-        if(val == 'true'){
+        if(val === 'true'){
             $('.fields-billing_cycles').show();
         }else{
             $('.fields-billing_cycles').hide();
@@ -232,11 +290,9 @@ jQuery( function ( $ ) {
         });
     }
 
-    var tab;
-
-    if ( 'reepay_simple_subscriptions' === $( 'select#product-type' ).val()){
+    if ( 'reepay_simple_subscriptions' === $selectProductType.val()){
         tab = '#general_product_data';
-    }else if('reepay_variable_subscriptions' === $( 'select#product-type' ).val()){
+    }else if('reepay_variable_subscriptions' === $selectProductType.val()){
         tab = '#variable_product_options';
     }
 

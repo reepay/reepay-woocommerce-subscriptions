@@ -46,7 +46,7 @@ class WC_Reepay_Discounts_And_Coupons
         ];
         $amount = $coupon->get_amount();
 
-        if ($amount > 0) {
+        if ($amount >= 1) {
             if ($coupon->get_discount_type() === 'reepay_percentage') {
                 $params['percentage'] = $amount;
             } else if ($coupon->get_discount_type() === 'reepay_fixed_product') {
@@ -80,7 +80,7 @@ class WC_Reepay_Discounts_And_Coupons
             $paramsCoupon["max_redemptions"] = $max_redemptions;
         }
         if (!empty($end)) {
-            $paramsCoupon["valid_until"] = $end->format(DATE_ISO8601);
+            $paramsCoupon["valid_until"] = $end->format('Y-m-d\TH:i:s');
         }
         return $paramsCoupon;
     }
@@ -283,12 +283,13 @@ class WC_Reepay_Discounts_And_Coupons
             return $valid;
         }
 
-        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true);
-        if (count($apply_to_plans) > 0) {
+        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
+        $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+        if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
             foreach ($discounts->get_items_to_validate() as $item) {
                 $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
                 if (!$valid) {
-                    throw new Exception(__('Invalid coupon', 'woocommerce'), 113);
+                    throw new Exception(__( 'Sorry, this coupon is not applicable to the products: %s.', 'woocommerce' ), 113);
                 }
             }
         }
@@ -301,8 +302,9 @@ class WC_Reepay_Discounts_And_Coupons
             return true;
         }
 
-        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true);
-        if (count($apply_to_plans) > 0) {
+        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
+        $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+        if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
             if (!$this->validate_applied_for_plans($product, $apply_to_plans)) {
                 return false;
             }
@@ -326,7 +328,7 @@ class WC_Reepay_Discounts_And_Coupons
         }
         $meta['_reepay_discount_eligible_plans'][0] = $apply_to_plans;
 
-        $plans = WC_Reepay_Subscription_Plans::get_plans_wc();
+        $plans = WC_Reepay_Subscription_Plan_Simple::get_plans_wc();
         $coupons = $this->get_coupons();
 
         $handle = get_post_meta(get_the_ID(), '_reepay_coupon_handle', true);

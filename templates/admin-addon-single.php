@@ -76,13 +76,13 @@ global $post;
                 <label for="addon_amount_<?php echo $loop; ?>">
                     <?php _e( 'Amount (per unit)', $domain );?>
                 </label>
-                <input style="width: 100%;" type="number" placeholder="<?php _e( 'kr 0.00', $domain );?>" id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
+                <input style="width: 100%;" type="number" min="0" placeholder="<?php _e( 'kr 0.00', $domain );?>" id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
             </td>
             <td class="addon_name"style="width: 32%">
                 <label for="addon_vat_<?php echo $loop; ?>">
                     <?php _e( 'VAT %', $domain );?>
                 </label>
-                <input style="width: 100%;" type="number" id="addon_vat_<?php echo $loop; ?>" name="product_addon_vat[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['vat'] ) ?>" />
+                <input style="width: 100%;" type="number" min="0" id="addon_vat_<?php echo $loop; ?>" name="product_addon_vat[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['vat'] ) ?>" />
             </td>
             <td class="addon_name" style="width: 32%">
                 <label for="addon_vat_type_<?php echo $loop; ?>">

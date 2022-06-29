@@ -191,19 +191,18 @@ class WooCommerce_Reepay_Subscriptions{
     public function admin_enqueue_scripts(){
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
-        /*wp_localize_script('admin-reepay-subscriptiony', 'reepay', [
-            'ajaxUrl' => admin_url('admin-ajax.php')
-        ]);*/
+        wp_localize_script('admin-reepay-subscription', 'reepay', [
+            'amountPercentageLabel' => __( 'Coupon percentage', reepay_s()->settings('domain') )
+        ]);
     }
 
     public function includes(){
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-api.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-log.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-admin-notice.php' );
-	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-helpers.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-checkout.php' );
-        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plans.php' );
-        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plans-variable.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-variable.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php' );
@@ -212,6 +211,7 @@ class WooCommerce_Reepay_Subscriptions{
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons-shipping.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-list.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-table.php' );
+        include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-admin-frontend.php' );
     }
 }
 
