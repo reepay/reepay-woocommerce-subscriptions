@@ -12,7 +12,8 @@ class WC_Reepay_Checkout {
 	 */
 	public function __construct() {
 		add_filter( 'woocommerce_payment_gateways', [ $this, 'woocommerce_payment_gateways' ], PHP_INT_MAX );
-		add_filter('woocommerce_add_to_cart_validation', [$this, 'woocommerce_add_to_cart_validation'], PHP_INT_MAX, 2 );
+		add_filter( 'woocommerce_add_to_cart_validation', [ $this, 'woocommerce_add_to_cart_validation' ], PHP_INT_MAX, 2 );
+		add_filter( 'wcs_cart_have_subscription', [ $this, 'is_reepay_product_in_cart' ] );
 	}
 
 	/**
