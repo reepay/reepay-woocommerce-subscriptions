@@ -35,7 +35,9 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 		$addons_list = $this->get_reepay_addons_list();
 		if ( ! empty( $addons_list["content"] ) ) {
 			foreach ( $addons_list["content"] as $addon ) {
-				$options[ $addon['handle'] ] = $addon['name'];
+                if($addon['all_plans']){
+                    $options[ $addon['handle'] ] = $addon['name'];
+                }
 			}
 		}
 
@@ -45,6 +47,8 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			'default' => '',
 			'class'   => 'wc-enhanced-select addon-shipping-choose',
 			'options' => $options,
+            'description' => __('Only addons not related to plans are available.', reepay_s()->settings('domain')),
+            'desc_tip' => true,
 		);
 
 		$settings['reepay_shipping_addon_name'] = array(

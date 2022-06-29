@@ -29,6 +29,7 @@
                     id="_reepay_discount_name"
                     name="_reepay_discount_name"
                     value="<?= $meta['_reepay_discount_name'][0] ?? ''?>"
+                    class="reepay-required"
                     required
             />
         </p>
