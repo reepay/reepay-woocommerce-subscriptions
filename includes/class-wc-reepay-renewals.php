@@ -10,7 +10,7 @@ class WC_Reepay_Renewals {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'reepay_webhook', [ $this, 'create_subscriptions' ] );
+		add_action( 'reepay_webhook', [ $this, 'create_subscriptions_handle' ] );
 
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
@@ -31,17 +31,40 @@ class WC_Reepay_Renewals {
 	 *     'event_id' => string
 	 * ] $data
 	 */
-	public function create_subscriptions( $data ) {
+	public function create_subscriptions_handle( $data ) {
 		if( $data['event_type'] !== 'invoice_authorized' && $data['event_type'] !== 'invoice_settled' ) {
 			return;
 		}
 
-		$main_order = rp_get_order_by_handle( $data['invoice'] );
+		$order = rp_get_order_by_handle( $data['invoice'] );
 
-		if ( empty($main_order)  || ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
+		if ( empty($order)  || ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) || self::is_locked( $order->get_id() ) ) {
 			return;
 		}
 
+		self::lock_order( $order->get_id() );
+
+		$this->create_subscriptions( $data, $order );
+
+		self::unlock_order( $order->get_id() );
+	}
+
+	/**
+	 *
+	 * @param  array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'invoice' => string
+	 *     'customer' => string
+	 *     'transaction' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 * ] $data
+	 *
+	 * @param WC_Order $main_order
+	 */
+	public function create_subscriptions( $data, $main_order ) {
 		$data['order_id'] = $main_order->get_id();
 
 		$token = self::get_payment_token_order( $main_order );
@@ -60,7 +83,7 @@ class WC_Reepay_Renewals {
 		}
 
 		$token = $token->get_token();
-		
+
 		$orders = [ $main_order ];
 		$order_items = $main_order->get_items();
 
@@ -78,6 +101,19 @@ class WC_Reepay_Renewals {
 			], $main_order, [ $order_item ] );
 		}
 
+		$ids = [];
+
+		foreach ($orders as $order) {
+			$ids[] = $order->get_id();
+		}
+
+		self::log( [
+			'log' => [
+				'source' => '!1!',
+				'count' => count($orders),
+				'ids' => $ids
+			]
+		]);
 		$main_order->calculate_totals();
 
 		foreach ( $orders as $order ) {
@@ -95,34 +131,34 @@ class WC_Reepay_Renewals {
 				/**
 				 * @see https://reference.reepay.com/api/#create-subscription
 				 */
-                $sub_data = [
-                    'customer'        => $data['customer'],
-                    'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
+				$sub_data = [
+					'customer'        => $data['customer'],
+					'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
 //					'amount' => null,
-                    'quantity'        => $order_item->get_quantity(),
-                    'test'            => WooCommerce_Reepay_Subscriptions::settings( 'test_mode' ),
-                    'handle'          => $handle,
+					'quantity'        => $order_item->get_quantity(),
+					'test'            => WooCommerce_Reepay_Subscriptions::settings( 'test_mode' ),
+					'handle'          => $handle,
 //					'metadata' => null,
-                    'source'          => $token,
+					'source'          => $token,
 //					'create_customer' => null,
 //					'plan_version'    => null,
-                    'amount_incl_vat' => wc_prices_include_tax(),
+					'amount_incl_vat' => wc_prices_include_tax(),
 //					'generate_handle' => null,
 //					'start_date' => null,
 //					'end_date' => null,
-                    'grace_duration'  => 172800,
+					'grace_duration'  => 172800,
 //					'no_trial' => null,
 //					'no_setup_fee' => null,
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
-                    'coupon_codes'    => self::get_reepay_coupons( $order ),
+					'coupon_codes'    => self::get_reepay_coupons( $order ),
 //					'additional_costs' => null,
-                    'signup_method'   => 'source',
-                ];
+					'signup_method'   => 'source',
+				];
 
-                if(!empty($addons)){
-                    $sub_data['add_ons'] = $addons;
-                }
+				if(!empty($addons)){
+					$sub_data['add_ons'] = $addons;
+				}
 
 				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
 			}catch( Exception $e ) {
@@ -313,15 +349,22 @@ class WC_Reepay_Renewals {
 
 		if ( ! empty( $query->posts ) && $query->posts[0]->post_status === $status ) {
 			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::cancel_subscription',
+				'log' => [
+					'source' => 'WC_Reepay_Renewals::create_child_order',
 					'error'  => 'duplicate status - ' . $status,
-				],
-				'notice' => "Subscription {$data['subscription']} - duplication attempt"
+					'data'   => $data
+				]
 			] );
 
 			return new WP_Error( 'Duplicate order' );
 		}
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::create_child_order',
+				'data'   => $data,
+			]
+		] );
 
 		return self::create_order_copy( [
 			'status'      => $status,
@@ -437,12 +480,7 @@ class WC_Reepay_Renewals {
 
 		$shm      = array_shift( $methods );
 		$shm_data = get_option( 'woocommerce_' . $shm->get_method_id() . '_' . $shm->get_instance_id() . '_settings' );
-        self::log( [
-            'log'    => [
-                'source' => 'WC_Reepay_Renewals::addons-shipping',
-                'data'  => $shm_data,
-            ],
-        ] );
+
 		if ( empty( $shm_data ) || empty($shm_data['reepay_shipping_addon_name']) ) {
 			return [];
 		}
@@ -461,6 +499,39 @@ class WC_Reepay_Renewals {
 				'add_on'        => $shm_data['reepay_shipping_addon'],
 			]
 		];
+	}
+
+	/**
+	 * Lock the order.
+	 *
+	 * @param mixed $order_id
+	 *
+	 * @return void
+	 */
+	private static function lock_order( $order_id ) {
+		update_post_meta( $order_id, '_reepay_subscriptions_locked', '1' );
+	}
+
+	/**
+	 * Unlock the order.
+	 *
+	 * @param mixed $order_id
+	 *
+	 * @return void
+	 */
+	private static function unlock_order( $order_id ) {
+		delete_post_meta( $order_id, '_reepay_subscriptions_locked' );
+	}
+
+	/**
+	 * Check is order order locked.
+	 *
+	 * @param $order_id
+	 *
+	 * @return bool
+	 */
+	private static function is_locked( $order_id ) {
+		return (bool) get_post_meta( $order_id, '_reepay_subscriptions_locked', true );;
 	}
 
 	/**

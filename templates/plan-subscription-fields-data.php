@@ -362,18 +362,6 @@
         </span>
         </p>
     </div>
-    <div class="options_group reepay_subscription_compensation show_if_reepay_subscription">
-        <p class="form-field">
-            <label for="_subscription_compensation"><?php esc_html_e( 'Compensation method', $domain ); ?></label>
-            <select id="_subscription_compensation" name="_reepay_subscription_compensation<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
-                <option value="none" <?php selected( 'none', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'None', $domain ); ?></option>
-                <option value="full_refund" <?php selected( 'full_refund', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Full refund', $domain ); ?></option>
-                <option value="prorated_refund" <?php selected( 'prorated_refund', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated refund', $domain ); ?></option>
-                <option value="full_credit" <?php selected( 'full_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Full credit', $domain ); ?></option>
-                <option value="prorated_credit" <?php selected( 'prorated_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated credit', $domain ); ?></option>
-            </select>
-        </p>
-    </div>
     <div class="options_group show_if_reepay_subscription">
         <?php
         woocommerce_wp_select(

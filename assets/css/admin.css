@@ -88,3 +88,24 @@
 .wc-metaboxes-wrapper .wc-metabox table td.minmax_column input:nth-of-type(2) {
     margin-right: 0;
 }
+
+.reepay-subscriptions-page {
+    margin-top: 30px
+}
+.sub-order .status-on-hold{
+    background: #000 !important;
+    color: #fff !important;
+    border-radius: 4px;
+}
+
+.sub-order .status-cancelled{
+    background: #747575 !important;
+    color: #fff !important;
+    border-radius: 4px;
+}
+
+.sub-order .status-completed{
+    background: #8EC165 !important;
+    color: #fff !important;
+    border-radius: 4px;
+}
