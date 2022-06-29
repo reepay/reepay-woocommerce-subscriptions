@@ -258,9 +258,9 @@ class WooCommerce_Reepay_Subscriptions{
     public function admin_enqueue_scripts(){
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
-        /*wp_localize_script('admin-reepay-subscriptiony', 'reepay', [
-            'ajaxUrl' => admin_url('admin-ajax.php')
-        ]);*/
+        wp_localize_script('admin-reepay-subscription', 'reepay', [
+            'amountPercentageLabel' => __( 'Coupon percentage', reepay_s()->settings('domain') )
+        ]);
     }
 
     public function includes(){
