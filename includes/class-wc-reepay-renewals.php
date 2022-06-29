@@ -37,24 +37,12 @@ class WC_Reepay_Renewals {
 		}
 
 		$main_order = rp_get_order_by_handle( $data['invoice'] );
+
+		if ( empty($main_order)  || ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
+			return;
+		}
+
 		$data['order_id'] = $main_order->get_id();
-
-		if ( empty($main_order) ) {
-			return;
-		}
-
-		if ( ! empty( $main_order->get_meta( '_reepay_subscription_handle' ) ) ) {
-			self::log( [
-				'log'    => [
-					'source' => 'WC_Reepay_Renewals::create_subscription',
-					'error'  => 'Subscription already exists',
-					'data'   => $data
-				],
-				'notice' => "Subscription {$data['order_id']} already exists, an attempt was made to re-create"
-			] );
-
-			return;
-		}
 
 		$token = self::get_payment_token_order( $main_order );
 
@@ -107,31 +95,36 @@ class WC_Reepay_Renewals {
 				/**
 				 * @see https://reference.reepay.com/api/#create-subscription
 				 */
-				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', [
-					'customer'        => $data['customer'],
-					'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
+                $sub_data = [
+                    'customer'        => $data['customer'],
+                    'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
 //					'amount' => null,
-					'quantity'        => $order_item->get_quantity(),
-					'test'            => WooCommerce_Reepay_Subscriptions::settings( 'test_mode' ),
-					'handle'          => $handle,
+                    'quantity'        => $order_item->get_quantity(),
+                    'test'            => WooCommerce_Reepay_Subscriptions::settings( 'test_mode' ),
+                    'handle'          => $handle,
 //					'metadata' => null,
-					'source'          => $token,
+                    'source'          => $token,
 //					'create_customer' => null,
 //					'plan_version'    => null,
-					'amount_incl_vat' => wc_prices_include_tax(),
+                    'amount_incl_vat' => wc_prices_include_tax(),
 //					'generate_handle' => null,
 //					'start_date' => null,
 //					'end_date' => null,
-					'grace_duration'  => 172800,
+                    'grace_duration'  => 172800,
 //					'no_trial' => null,
 //					'no_setup_fee' => null,
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
-					'coupon_codes'    => self::get_reepay_coupons( $order ),
-					'add_ons'         => $addons,
+                    'coupon_codes'    => self::get_reepay_coupons( $order ),
 //					'additional_costs' => null,
-					'signup_method'   => 'source',
-				] );
+                    'signup_method'   => 'source',
+                ];
+
+                if(!empty($addons)){
+                    $sub_data['add_ons'] = $addons;
+                }
+
+				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
 			}catch( Exception $e ) {
 				self::log( [
 					'notice' => $e->getMessage()
@@ -444,8 +437,13 @@ class WC_Reepay_Renewals {
 
 		$shm      = array_shift( $methods );
 		$shm_data = get_option( 'woocommerce_' . $shm->get_method_id() . '_' . $shm->get_instance_id() . '_settings' );
-
-		if ( empty( $shm_data ) ) {
+        self::log( [
+            'log'    => [
+                'source' => 'WC_Reepay_Renewals::addons-shipping',
+                'data'  => $shm_data,
+            ],
+        ] );
+		if ( empty( $shm_data ) || empty($shm_data['reepay_shipping_addon_name']) ) {
 			return [];
 		}
 
