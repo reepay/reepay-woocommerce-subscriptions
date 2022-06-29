@@ -82,11 +82,21 @@ class WC_Reepay_Subscription_Plan_Simple {
         add_action( "woocommerce_reepay_simple_subscriptions_add_to_cart", array( $this, 'add_to_cart' ) );
         add_action( 'woocommerce_product_options_general_product_data', array( $this, 'subscription_pricing_fields' ) );
         add_action( 'save_post', array( $this, 'save_subscription_meta' ), 11 );
-        add_filter( 'woocommerce_after_cart_item_name', array( $this, 'cart_subscription_info' ), 10, 2);
+        add_filter( 'woocommerce_cart_item_name', array( $this, 'checkout_subscription_info' ), 10, 3);
+        add_action( 'woocommerce_before_order_itemmeta', array( $this, 'admin_order_subscription_info' ), 10, 3);
     }
 
-    public function cart_subscription_info($cart_item, $cart_item_key){
-        echo $this->get_subscription_info_frontend($cart_item['data']);
+    public function checkout_subscription_info($name, $cart_item, $cart_item_key){
+        if(!empty($cart_item['data']) && WC_Reepay_Checkout::is_reepay_product( $cart_item['data'])) {
+            $name = $name . $this->get_subscription_info_frontend($cart_item['data']);
+        }
+        return $name;
+    }
+
+    public function admin_order_subscription_info($item_id, $item, $product){
+        if(!empty($product) && WC_Reepay_Checkout::is_reepay_product( $product)) {
+           echo $this->get_subscription_info_frontend($product);
+        }
     }
 
     public function create_subscription_product_class() {
@@ -149,16 +159,15 @@ class WC_Reepay_Subscription_Plan_Simple {
         ob_start();
         wc_get_template(
             'plan-subscription-frontend.php',
-            array(
+            [
                 'billing_plan' => $product->reepay_get_billing_plan(),
                 'trial' => $product->reepay_get_trial(),
-                'contract_periods' => $product->get_meta( '_reepay_subscription_contract_periods' ),
-                'domain'  => reepay_s()->settings( 'domain' )
-            ),
+                'contract_periods' => $product->get_meta('_reepay_subscription_contract_periods'),
+                'domain' => reepay_s()->settings('domain')
+            ],
             '',
-            reepay_s()->settings( 'plugin_path' ) . 'templates/'
+            reepay_s()->settings('plugin_path') . 'templates/'
         );
-
         return ob_get_clean();
     }
 
