@@ -44,6 +44,14 @@ class WooCommerce_Reepay_Subscriptions{
      */
     public static $version = '1.0.0';
 
+    public static $compensation_methods = [
+        'none' => 'None',
+        'full_refund' => 'Full refund',
+        'prorated_refund' => 'Prorated refund',
+        'full_credit' => 'Full credit',
+        'prorated_credit' => 'Prorated credit',
+    ];
+
     /**
      * Constructor
      */
@@ -137,13 +145,7 @@ class WooCommerce_Reepay_Subscriptions{
             '_reepay_downgrade_compensation_method' => array(
                 'name' => __('Compensation method for downgrade', reepay_s()->settings('domain')),
                 'type' => 'select',
-                'options' =>  [
-                    'none' => 'None',
-                    'full_refund' => 'Full refund',
-                    'prorated_refund' => 'Prorated refund',
-                    'full_credit' => 'Full credit',
-                    'prorated_credit' => 'Prorated credit',
-                ],
+                'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for downgrade', reepay_s()->settings('domain')),
                 'id' => '_reepay_downgrade_compensation_method'
             ),
@@ -156,13 +158,7 @@ class WooCommerce_Reepay_Subscriptions{
             '_reepay_upgrade_compensation_method' => array(
                 'name' => __('Compensation method for upgrade', reepay_s()->settings('domain')),
                 'type' => 'select',
-                'options' =>  [
-                    'none' => 'None',
-                    'full_refund' => 'Full refund',
-                    'prorated_refund' => 'Prorated refund',
-                    'full_credit' => 'Full credit',
-                    'prorated_credit' => 'Prorated credit',
-                ],
+                'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for upgrade', reepay_s()->settings('domain')),
                 'id' => '_reepay_upgrade_compensation_method'
             ),
@@ -175,13 +171,7 @@ class WooCommerce_Reepay_Subscriptions{
             '_reepay_on_hold_compensation_method' => array(
                 'name' => __('Compensation method for On Hold', reepay_s()->settings('domain')),
                 'type' => 'select',
-                'options' => [
-                    'none' => 'None',
-                    'full_refund' => 'Full refund',
-                    'prorated_refund' => 'Prorated refund',
-                    'full_credit' => 'Full credit',
-                    'prorated_credit' => 'Prorated credit',
-                ],
+                'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for on_hold', reepay_s()->settings('domain')),
                 'id' => '_reepay_on_hold_compensation_method'
             ),
@@ -194,13 +184,7 @@ class WooCommerce_Reepay_Subscriptions{
             '_reepay_cancel_compensation_method' => array(
                 'name' => __('Compensation method for Cancel', reepay_s()->settings('domain')),
                 'type' => 'select',
-                'options' =>  [
-                    'none' => 'None',
-                    'full_refund' => 'Full refund',
-                    'prorated_refund' => 'Prorated refund',
-                    'full_credit' => 'Full credit',
-                    'prorated_credit' => 'Prorated credit',
-                ],
+                'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for cancel', reepay_s()->settings('domain')),
                 'id' => '_reepay_cancel_compensation_method'
             ),
