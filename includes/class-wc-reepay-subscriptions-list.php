@@ -28,7 +28,7 @@ class WC_Reepay_Subscriptions_List {
     public function render_page() {
         ?>
 
-        <form action="" method="get">
+        <form action="" method="get" class="reepay-subscriptions-page">
             <input type="hidden" name="page" value="reepay-subscriptions" />
             <?php
             $drafts_table = new Subscriptions_Table();
