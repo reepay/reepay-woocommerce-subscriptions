@@ -268,13 +268,13 @@
         </p>
 
         <!--Advanced-->
-        <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
+        <p class="form-field advanced-fields <?= $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_renewal_reminder">
                 <?php esc_html_e( 'Renewal Reminder', $domain ); ?>
             </label>
             <input type="number" <?= $is_exist ? 'disabled' : '' ?> min="0" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_renewal_reminder) ? esc_attr($_reepay_subscription_renewal_reminder) : ''?>"/>
         </p>
-        <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
+        <p class="form-field advanced-fields <?= $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_default_quantity">
                 <?php esc_html_e( 'Default Quantity', $domain ); ?>
             </label>
