@@ -20,24 +20,30 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
     <table>
         <tbody>
         <?php if (!$is_expired): ?>
-            <tr>
-                <td>Actions:</td>
-                <td>
-                    <?php if ($subscription['state'] === 'on_hold'): ?>
-                        <a href="?reactivate=<?= $subscription['handle'] ?>" class="button">Reactivate</a>
-                    <?php else: ?>
-                        <a href="?put_on_hold=<?= $subscription['handle'] ?>" class="button">Put on hold</a>
-                    <?php endif; ?>
-
-                    <?php if ($subscription['state'] !== 'on_hold'): ?>
-                        <?php if ($subscription['is_cancelled'] === true): ?>
-                            <a href="?uncancel_subscription=<?= $subscription['handle'] ?>" class="button">Uncancel</a>
+            <?php if (reepay_s()->settings('_reepay_enable_on_hold') || reepay_s()->settings('_reepay_enable_cancel')): ?>
+                <tr>
+                    <td>Actions:</td>
+                    <td>
+                        <?php if ($subscription['state'] === 'on_hold'): ?>
+                            <a href="?reactivate=<?= $subscription['handle'] ?>" class="button">Reactivate</a>
                         <?php else: ?>
-                            <a href="?cancel_subscription=<?= $subscription['handle'] ?>" class="button">Cancel Subscription</a>
+                            <?php if (reepay_s()->settings('_reepay_enable_on_hold')): ?>
+                                <a href="?put_on_hold=<?= $subscription['handle'] ?>" class="button">Put on hold</a>
+                            <?php endif; ?>
                         <?php endif; ?>
-                    <?php endif; ?>
-                    <br>
-            </tr>
+
+                        <?php if ($subscription['state'] !== 'on_hold'): ?>
+                            <?php if ($subscription['is_cancelled'] === true): ?>
+                                <a href="?uncancel_subscription=<?= $subscription['handle'] ?>" class="button">Uncancel</a>
+                            <?php else: ?>
+                                <?php if (reepay_s()->settings('_reepay_enable_cancel')): ?>
+                                    <a href="?cancel_subscription=<?= $subscription['handle'] ?>" class="button">Cancel Subscription</a>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                        <br>
+                </tr>
+            <?php endif; ?>
 
             <tr>
                 <td>Payment methods:</td>
