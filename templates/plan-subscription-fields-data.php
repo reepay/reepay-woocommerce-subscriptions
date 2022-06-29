@@ -268,13 +268,13 @@
         </p>
 
         <!--Advanced-->
-        <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
+        <p class="form-field advanced-fields <?= $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_renewal_reminder">
                 <?php esc_html_e( 'Renewal Reminder', $domain ); ?>
             </label>
             <input type="number" <?= $is_exist ? 'disabled' : '' ?> min="0" id="_reepay_subscription_renewal_reminder" name="_reepay_subscription_renewal_reminder<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_price wc_input_subscription_price" placeholder="<?php esc_html_e( 'Renewal Reminder Schedule', $domain ); ?>" value="<?php echo !empty($_reepay_subscription_renewal_reminder) ? esc_attr($_reepay_subscription_renewal_reminder) : ''?>"/>
         </p>
-        <p class="form-field advanced-fields <?= $variable ? 'dimensions_field form-row' : '' ?>">
+        <p class="form-field advanced-fields <?= $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_default_quantity">
                 <?php esc_html_e( 'Default Quantity', $domain ); ?>
             </label>
@@ -360,18 +360,6 @@
                 <option value="separate_conditional" <?php !empty($fee['handling']) ?? selected( 'separate_conditional', $fee['handling'], true ) ?>><?php esc_html_e( 'Create a separate invoice for the setup fee, if the first invoice is not created in conjunction with the creation', $domain ); ?></option>
             </select>
         </span>
-        </p>
-    </div>
-    <div class="options_group reepay_subscription_compensation show_if_reepay_subscription">
-        <p class="form-field">
-            <label for="_subscription_compensation"><?php esc_html_e( 'Compensation method', $domain ); ?></label>
-            <select id="_subscription_compensation" name="_reepay_subscription_compensation<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
-                <option value="none" <?php selected( 'none', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'None', $domain ); ?></option>
-                <option value="full_refund" <?php selected( 'full_refund', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Full refund', $domain ); ?></option>
-                <option value="prorated_refund" <?php selected( 'prorated_refund', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated refund', $domain ); ?></option>
-                <option value="full_credit" <?php selected( 'full_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Full credit', $domain ); ?></option>
-                <option value="prorated_credit" <?php selected( 'prorated_credit', $_reepay_subscription_compensation, true ) ?>><?php esc_html_e( 'Prorated credit', $domain ); ?></option>
-            </select>
         </p>
     </div>
     <div class="options_group show_if_reepay_subscription">
