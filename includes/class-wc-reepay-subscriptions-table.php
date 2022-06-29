@@ -81,6 +81,7 @@ class Subscriptions_Table extends \WP_List_Table {
             'handle'   => __( 'Subscription Handle', reepay_s()->settings('domain') ),
             'date'   => __( 'Date created', reepay_s()->settings('domain') ),
             'next_period_start'   => __( 'Next renewal date', reepay_s()->settings('domain') ),
+            'customer_handle'   => __( 'Customer handle', reepay_s()->settings('domain') ),
         );
     }
 
@@ -139,6 +140,10 @@ class Subscriptions_Table extends \WP_List_Table {
         return $this->format_date($item['next_period_start']);
     }
 
+    public function column_customer_handle($item) {
+        return $item['customer_handle'];
+    }
+
     function format_status($subscription) {
         if ($subscription['is_cancelled'] === true) {
             return 'Cancelled';
@@ -185,7 +190,6 @@ class Subscriptions_Table extends \WP_List_Table {
         $subscriptions = $this->get_subscriptions();
 
         if ( !empty($subscriptions['content']) ) {
-
             foreach ($subscriptions['content'] as $subscription) {
                 $data[ $subscription['handle'] ] = array(
                     'id'     => $subscription['handle'],
@@ -193,6 +197,7 @@ class Subscriptions_Table extends \WP_List_Table {
                     'status'   => $this->format_status($subscription),
                     'date'   => $subscription['created'],
                     'next_period_start'   => $subscription['next_period_start'],
+                    'customer_handle'   => $subscription['customer'],
                     'plan' => $subscription['plan'],
                 );
             }
