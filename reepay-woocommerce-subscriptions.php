@@ -64,6 +64,13 @@ class WooCommerce_Reepay_Subscriptions{
 		    'test_mode' => get_option('_reepay_test_mode') === 'yes',
 		    'api_private_key' => get_option('_reepay_api_private_key'),
 		    'api_private_key_test' => get_option('_reepay_api_private_key_test'),
+            '_reepay_enable_downgrade' => get_option('_reepay_enable_downgrade') === 'yes',
+            '_reepay_downgrade_compensation_method' => get_option('_reepay_downgrade_compensation_method'),
+            '_reepay_enable_upgrade' => get_option('_reepay_enable_upgrade') === 'yes',
+            '_reepay_upgrade_compensation_method' => get_option('_reepay_upgrade_compensation_method'),
+            '_reepay_enable_on_hold' => get_option('_reepay_enable_on_hold') === 'yes',
+            '_reepay_on_hold_compensation_method' => get_option('_reepay_on_hold_compensation_method'),
+            '_reepay_enable_cancel' => get_option('_reepay_enable_cancel') === 'yes',
 	    ];
 
 

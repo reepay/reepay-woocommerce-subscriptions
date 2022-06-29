@@ -73,6 +73,9 @@ class WC_Reepay_Account_Page {
     public function check_action() {
 
         if (!empty($_GET['cancel_subscription'])) {
+            if (!reepay_s()->settings('_reepay_enable_cancel_subscription')) {
+                return;
+            }
 
             $handle = $_GET['cancel_subscription'];
             $handle = urlencode($handle);
@@ -121,6 +124,9 @@ class WC_Reepay_Account_Page {
         }
 
         if (!empty($_GET['put_on_hold'])) {
+            if (!reepay_s()->settings('_reepay_enable_on_hold')) {
+                return;
+            }
             $handle = $_GET['put_on_hold'];
             $handle = urlencode($handle);
             $handle = urlencode($handle);
