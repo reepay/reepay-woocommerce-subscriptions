@@ -76,8 +76,8 @@ class Subscriptions_Table extends \WP_List_Table {
      */
     public function get_columns() {
         return array(
-            'status' => __( 'Status', reepay_s()->settings('domain') ),
             'plan'   => __( 'Plan', reepay_s()->settings('domain') ),
+            'status' => __( 'Status', reepay_s()->settings('domain') ),
             'handle'   => __( 'Subscription Handle', reepay_s()->settings('domain') ),
             'date'   => __( 'Date created', reepay_s()->settings('domain') ),
             'next_period_start'   => __( 'Next renewal date', reepay_s()->settings('domain') ),
@@ -146,18 +146,18 @@ class Subscriptions_Table extends \WP_List_Table {
 
     function format_status($subscription) {
         if ($subscription['is_cancelled'] === true) {
-            return 'Cancelled';
+            return '<mark class="canceled"><span>Cancelled</span></mark>';
         }
         if ($subscription['state'] === 'expired') {
-            return 'Expired';
+            return '<mark class="expired"><span>Expired</span></mark>';
         }
 
         if ($subscription['state'] === 'on_hold') {
-            return 'On Hold';
+            return '<mark class="on-hold"><span>On Hold</span></mark>';
         }
 
         if ($subscription['state'] === 'is_cancelled') {
-            return 'Is cancelled';
+            return '<mark class="is-canceled"><span>Is cancelled</span></mark>';
         }
 
         if ($subscription['state'] === 'active') {
@@ -165,10 +165,10 @@ class Subscriptions_Table extends \WP_List_Table {
                 $now = new DateTime();
                 $trial_end = new DateTime($subscription['trial_end']);
                 if ($trial_end > $now) {
-                    return 'Trial';
+                    return '<mark class="trial"><span>Trial</span></mark>';
                 }
             }
-            return 'Active';
+            return '<mark class="active"><span>Active</span></mark>';
         }
 
         return $subscription['state'];

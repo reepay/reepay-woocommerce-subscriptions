@@ -92,20 +92,52 @@
 .reepay-subscriptions-page {
     margin-top: 30px
 }
-.sub-order .status-on-hold{
-    background: #000 !important;
-    color: #fff !important;
+
+.table-view-list.subscriptions .column-status mark{
+    display: inline-flex;
+    line-height: 2.5em;
+    color: #777;
+    background: #e5e5e5;
     border-radius: 4px;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    margin: -0.25em 0;
+    cursor: inherit!important;
+    white-space: nowrap;
+    max-width: 100%;
 }
 
-.sub-order .status-cancelled{
-    background: #747575 !important;
-    color: #fff !important;
-    border-radius: 4px;
+.table-view-list.subscriptions .column-status span {
+    margin: 0 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.sub-order .status-completed{
-    background: #8EC165 !important;
-    color: #fff !important;
-    border-radius: 4px;
+.table-view-list.subscriptions .column-status .active{
+    background: #c6e1c6;
+    color: #5b841b;
+}
+
+.table-view-list.subscriptions .column-status .canceled{
+    color: #777;
+    background: #e5e5e5;
+}
+
+.table-view-list.subscriptions .column-status .expired{
+    background: #eba3a3;
+    color: #761919;
+}
+
+.table-view-list.subscriptions .column-status .on-hold{
+    background: #f8dda7;
+    color: #94660c;
+}
+
+.table-view-list.subscriptions .column-status .is-canceled{
+    color: #777;
+    background: #e5e5e5;
+}
+
+.table-view-list.subscriptions .column-status .trial{
+    background: #c6e1c6;
+    color: #5b841b;
 }
