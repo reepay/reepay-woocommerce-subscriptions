@@ -150,7 +150,7 @@ class WC_Reepay_Admin_Frontend {
 	}
 
     function modify_search_results_order( $orderby, $query ) {
-        if ($query->is_main_query() && $query->get('post_type') === 'shop_order') {
+        if (is_admin() && $query->is_main_query() && $query->get('post_type') === 'shop_order') {
             global $wpdb;
             $orderby = "CASE WHEN $wpdb->posts.post_parent != 0 THEN $wpdb->posts.post_parent WHEN $wpdb->posts.post_parent = 0 THEN $wpdb->posts.id END desc";
         }
@@ -160,7 +160,7 @@ class WC_Reepay_Admin_Frontend {
 
     function modify_search_results_fields( $orderby, $query ) {
 
-        if ($query->is_main_query() && $query->get('post_type') === 'shop_order') {
+        if (is_admin() && $query->is_main_query() && $query->get('post_type') === 'shop_order') {
             global $wpdb;
             $orderby = "$wpdb->posts.*, $wpdb->posts.post_title";
         }
