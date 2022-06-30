@@ -260,6 +260,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 
     public function subscription_pricing_fields() {
         global $post;
+	    global $pagenow;
+
         $post_id = $post->ID;
 
         $data = $this->get_subscription_template_data( $post_id );
@@ -271,6 +273,8 @@ class WC_Reepay_Subscription_Plan_Simple {
         $data['is_exist'] = false;
 
         $data['product_object'] = wc_get_product( $post_id );
+
+	    $data['is_creating_new_product'] = $pagenow === 'post-new.php';
 
         ob_start();
         wc_get_template(
