@@ -290,3 +290,19 @@ function reepay_s() {
 }
 
 reepay_s();
+
+add_filter( 'posts_orderby', 'modify_search_results_order', 10, 2 );
+function modify_search_results_order( $orderby, $query ) {
+    global $wpdb;
+    $orderby = "CASE WHEN wp_posts.post_parent != 0 THEN wp_posts.post_parent WHEN wp_posts.post_parent = 0 THEN wp_posts.id END desc";
+
+    return $orderby;
+}
+
+add_filter( 'posts_fields', 'modify_search_results_fields', 10, 2 );
+function modify_search_results_fields( $orderby, $query ) {
+    global $wpdb;
+    $orderby = "wp_posts.*, wp_posts.post_title";
+
+    return $orderby;
+}
