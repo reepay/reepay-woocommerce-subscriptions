@@ -293,16 +293,21 @@ reepay_s();
 
 add_filter( 'posts_orderby', 'modify_search_results_order', 10, 2 );
 function modify_search_results_order( $orderby, $query ) {
-    global $wpdb;
-    $orderby = "CASE WHEN wp_posts.post_parent != 0 THEN wp_posts.post_parent WHEN wp_posts.post_parent = 0 THEN wp_posts.id END desc";
+    if ($query->is_main_query() && $query->get('post_type') === 'shop_order') {
+        global $wpdb;
+        $orderby = "CASE WHEN $wpdb->posts.post_parent != 0 THEN $wpdb->posts.post_parent WHEN $wpdb->posts.post_parent = 0 THEN $wpdb->posts.id END desc";
+    }
 
     return $orderby;
 }
 
 add_filter( 'posts_fields', 'modify_search_results_fields', 10, 2 );
 function modify_search_results_fields( $orderby, $query ) {
-    global $wpdb;
-    $orderby = "wp_posts.*, wp_posts.post_title";
+
+    if ($query->is_main_query() && $query->get('post_type') === 'shop_order') {
+        global $wpdb;
+        $orderby = "$wpdb->posts.*, $wpdb->posts.post_title";
+    }
 
     return $orderby;
 }
