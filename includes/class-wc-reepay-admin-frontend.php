@@ -14,6 +14,9 @@ class WC_Reepay_Admin_Frontend {
 		add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11 );
 		add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
+
+        add_filter( 'posts_orderby', [$this, 'modify_search_results_order'], 10, 2 );
+        add_filter( 'posts_fields', [$this, 'modify_search_results_fields'], 10, 2 );
 	}
 
 	/**
@@ -145,6 +148,25 @@ class WC_Reepay_Admin_Frontend {
 
 		return $existing_columns;
 	}
+
+    function modify_search_results_order( $orderby, $query ) {
+        if (is_admin() && $query->is_main_query() && $query->get('post_type') === 'shop_order') {
+            global $wpdb;
+            $orderby = "CASE WHEN $wpdb->posts.post_parent != 0 THEN $wpdb->posts.post_parent WHEN $wpdb->posts.post_parent = 0 THEN $wpdb->posts.id END desc";
+        }
+
+        return $orderby;
+    }
+
+    function modify_search_results_fields( $orderby, $query ) {
+
+        if (is_admin() && $query->is_main_query() && $query->get('post_type') === 'shop_order') {
+            global $wpdb;
+            $orderby = "$wpdb->posts.*, $wpdb->posts.post_title";
+        }
+
+        return $orderby;
+    }
 }
 
 new WC_Reepay_Admin_Frontend();
