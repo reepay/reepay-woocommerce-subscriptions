@@ -393,3 +393,9 @@
         do_action( 'woocommerce_product_options_tax' );
         ?>
     </div>
+
+    <div id="reepay_subscription_publish_btn" class="options_group reepay_subscription_publish_btn show_if_reepay_subscription">
+        <p class="form-field">
+            <input type="submit" name="save" id="reepay-publish" class="button button-primary button-large" value="<?= $is_creating_new_product ? 'Create plan' : 'Update plan'?>">
+        </p>
+    </div>
