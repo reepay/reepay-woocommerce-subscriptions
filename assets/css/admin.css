@@ -11,6 +11,9 @@
     vertical-align: baseline;
 }
 
+#reepay_subscription_publish_btn.reepay_subscription_publish_btn p.form-field {
+    padding-left: 4px !important;
+}
 
 #global-addons-table td {
     padding: 7px 9px;
