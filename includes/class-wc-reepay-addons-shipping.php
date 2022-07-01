@@ -65,25 +65,6 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			'class'   => 'addon-shipping-new',
 		);
 
-		$settings['reepay_shipping_addon_vat'] = array(
-			'title'       => esc_html__( 'Add-on VAT %', reepay_s()->settings( 'domain' ) ),
-			'type'        => 'price',
-			'default'     => '',
-			'placeholder' => '%',
-			'class'       => 'addon-shipping-new',
-		);
-
-		$settings['reepay_shipping_addon_vat_type'] = array(
-			'title'   => esc_html__( 'Add-on VAT type', reepay_s()->settings( 'domain' ) ),
-			'type'    => 'select',
-			'default' => '',
-			'class'   => 'addon-shipping-new',
-			'options' => array(
-				'include' => 'Include VAT',
-				'exclude' => 'Exclude VAT'
-			),
-		);
-
 		return $settings;
 	}
 
@@ -103,8 +84,6 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			unset( $instance_settings['reepay_shipping_addon'] );
 			unset( $instance_settings['reepay_shipping_addon_name'] );
 			unset( $instance_settings['reepay_shipping_addon_description'] );
-			unset( $instance_settings['reepay_shipping_addon_vat'] );
-			unset( $instance_settings['reepay_shipping_addon_vat_type'] );
 		} else {
 			if ( $instance_settings['reepay_shipping_addon'] == 'new' ) {
 				//add new method
@@ -112,9 +91,9 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 					'name'        => $instance_settings['reepay_shipping_addon_name'],
 					'description' => $instance_settings['reepay_shipping_addon_description'],
 					'amount'      => $instance_settings['cost'],
-					'vat'         => $instance_settings['reepay_shipping_addon_vat'],
+					'vat'         => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
 					'type'        => 'on_off',
-					'vat_type'    => $instance_settings['reepay_shipping_addon_vat_type'],
+					'vat_type'    => wc_prices_include_tax(),
 				], $shipping_method->get_instance_option_key() );
 
 				$instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
@@ -124,8 +103,6 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 
 				$instance_settings['reepay_shipping_addon_name']        = $addon_data['name'];
 				$instance_settings['reepay_shipping_addon_description'] = $addon_data['description'];
-				$instance_settings['reepay_shipping_addon_vat']         = $addon_data['vat'] / 100;
-				$instance_settings['reepay_shipping_addon_vat_type']    = $addon_data['type'];
 			}
 		}
 
