@@ -21,7 +21,7 @@ class WC_Reepay_Account_Page {
         add_filter('woocommerce_reepay_payment_accept_url', [$this, 'add_subscription_arg']);
         add_filter('woocommerce_reepay_payment_cancel_url', [$this, 'add_subscription_arg']);
         add_action('woocommerce_reepay_payment_method_added', [$this, 'payment_method_added']);
-        return add_filter( 'woocommerce_endpoint_subscriptions_title', [$this, 'get_title'] );
+        add_filter( 'woocommerce_endpoint_subscriptions_title', [$this, 'get_title'] );
     }
 
     public function add_subscription_arg($url) {
