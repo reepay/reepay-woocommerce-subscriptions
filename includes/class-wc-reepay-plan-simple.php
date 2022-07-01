@@ -35,16 +35,51 @@ class WC_Reepay_Subscription_Plan_Simple {
     );
 
 	public static $types_info = array(
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY => 'For %s day(s)',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE => 'For %s month(s), on the first day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY => 'For %s month(s)',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY => 'For %s month(s), on the last day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO => 'For %s month(s), on the first day of the month, fixed months Jan, Apr, Jul, Oct',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO => 'For %s month(s), on the last day of the month, fixed months Jan, Apr, Jul, Oct',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY => 'For %s month(s), on the first day of the month, fixed months Jan, Jul',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 => 'For %s month(s), on the first day of the month, fixed months Jan',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY => 'For %s Week',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => 'Manual',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY                          => 'For %s day',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple'            => 'For %s days',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month on the first day of the month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'For %s months on the first day of the month',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY                => 'For %s month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple'  => 'For %s months',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY                 => 'Billed every month on the last day of the month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple'   => 'For %s months on the last day of the month',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'            => 'For %s months, on the first day of the month. The billing is fixed to these months: January, April, July, October',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'           => 'For %s months, on the last day of the month. The billing is fixed to these months: January, April, July, October',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'      => 'For %s months, on the first day of the month. The billing is fixed to these months: January, July',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple'    => 'For %s months, on the first day of the month. The billing is fixed to these months: January',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => 'For %s Week',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => 'For %s Weeks',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL                         => 'Manual',
+	);
+
+	public static $types_info_short = array(
+		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY                          => 'For %s day',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple'            => 'For %s days',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'For %s months',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY                => 'For %s month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple'  => 'For %s months',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY                 => 'Billed every month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple'   => 'For %s months',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'            => 'For %s months',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'           => 'For %s months',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'      => 'For %s months',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple'    => 'For %s months',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => 'For %s Week',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => 'For %s Weeks',
+
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL                         => 'Manual',
 	);
 
     public static $meta_fields = array(
@@ -724,16 +759,19 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
 	/**
-	 * @param WC_Product $product
+	 * @param  WC_Product  $product
+	 * @param  bool  $is_short
 	 *
 	 * @return string
 	 */
-	public static function get_billing_plan( $product ) {
+	public static function get_billing_plan( $product, $is_short = false ) {
 		$type = $product->get_meta('_reepay_subscription_schedule_type');
 		$type_data = $product->get_meta('_reepay_subscription_'.$type);
 		$interval = self::get_interval($product->get_id(), $type, $type_data);
 
-		$type_str = self::$types_info[$type] ?? '';
+		$types_info = $is_short ? self::$types_info_short : self::$types_info;
+
+		$type_str = $types_info[ $interval > 1 ? $type . '_multiple' : $type ] ?? $types_info[ $type ] ?? '';
 		$ret = '';
 		if(!empty($type_str)){
 			$ret = sprintf(
