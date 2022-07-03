@@ -141,3 +141,15 @@
     background: #c6e1c6;
     color: #5b841b;
 }
+
+.form-row.dimensions_field input {
+    width: 30.75% !important;
+    margin-right: 3.8% !important;
+}
+.form-row.dimensions_field input:last-child {
+    margin-right: 0 !important;
+}
+
+[for="_subscription_billing_cycles"] {
+    width: 100%;
+}
