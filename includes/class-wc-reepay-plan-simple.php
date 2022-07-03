@@ -271,7 +271,7 @@ class WC_Reepay_Subscription_Plan_Simple {
             ]
         ] );
 
-        return $query->post??null;
+        return $query->post ?? null;
     }
 
     /**
@@ -712,11 +712,14 @@ class WC_Reepay_Subscription_Plan_Simple {
             $params['minimum_prorated_amount'] = floatval( $type_data['proration_minimum'] );
         }
 
+        $params['vat'] = self::get_vat($post_id);
 
+        return $params;
+    }
+
+    public static function get_vat($post_id){
         $product = wc_get_product( $post_id );
-
-        $params['vat'] = 0;
-
+        $vat = 0;
         if ( 'taxable' == $product->get_tax_status() && wc_tax_enabled() ) {
             $calculate_tax_for = array(
                 'country'   => '*',
@@ -730,12 +733,41 @@ class WC_Reepay_Subscription_Plan_Simple {
                 reset($tax_rates);
                 $first_key = key($tax_rates);
                 if(!empty($tax_rates[$first_key]['rate'])){
-                    $params['vat'] = floatval($tax_rates[$first_key]['rate']) / 100;
+                    $vat = floatval($tax_rates[$first_key]['rate']) / 100;
                 }
             }
         }
 
-        return $params;
+        return $vat;
+    }
+
+    public static function get_vat_shipping(){
+
+        $vat = 0;
+        $shipping_tax_class = get_option( 'woocommerce_shipping_tax_class' );
+
+        $tax_class = $shipping_tax_class;
+
+        if ( ! is_null( $tax_class ) ) {
+            $matched_tax_rates = WC_Tax::find_shipping_rates(
+                [
+                    'country' => '*',
+                    'state' => '*',
+                    'city' => '*',
+                    'postcode' => '*',
+                    'tax_class' => $tax_class,
+                ]
+            );
+            if(!empty($matched_tax_rates)){
+                reset($matched_tax_rates);
+                $first_key = key($matched_tax_rates);
+                if(!empty($matched_tax_rates[$first_key]['rate'])){
+                    $vat = floatval($matched_tax_rates[$first_key]['rate']) / 100;
+                }
+            }
+        }
+
+        return $vat;
     }
 
     public static function get_interval( $post_id, $type, $type_data ) {

@@ -36,9 +36,9 @@ global $post;
             <td class="addon_name" width="100%">
                 <?php if(!empty($addons_list)):?>
                     <select id="_subscription_choose_exist"  name="addon_choose_exist[<?php echo $loop; ?>]" class="wc_input_subscription_period_interval">
-                        <option value=""><?php esc_html_e( 'Select plan', $domain ); ?></option>
+                        <option value=""><?php esc_html_e( 'Select add-on', $domain ); ?></option>
                         <?php foreach ($addons_list as $addon_rem):?>
-                            <option value="<?=$addon_rem['handle']?>" <?php !empty($addon['exist']) ?? selected( $addon_rem['handle'], $addon['exist'], true ) ?>><?=$addon_rem['name']?></option>
+                            <option value="<?=$addon_rem['handle']?>" <?php !empty($addon['exist']) ? selected( $addon_rem['handle'], $addon['exist'], true ) : '' ?>><?=$addon_rem['name']?></option>
                         <?php endforeach; ?>
                     </select>
                 <?php else: ?>
@@ -84,21 +84,6 @@ global $post;
                     <?php _e( 'Amount (per unit)', $domain );?>
                 </label>
                 <input style="width: 100%;" type="number" min="0" placeholder="<?php _e( 'kr 0.00', $domain );?>" id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
-            </td>
-            <td class="addon_name"style="width: 34%">
-                <label for="addon_vat_<?php echo $loop; ?>">
-                    <?php _e( 'VAT %', $domain );?>
-                </label>
-                <input style="width: 100%;" type="number" min="0" id="addon_vat_<?php echo $loop; ?>" name="product_addon_vat[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['vat'] ) ?>" />
-            </td>
-            <td class="addon_name" style="width: 33%">
-                <label for="addon_vat_type_<?php echo $loop; ?>">
-                    <?php _e( 'VAT type', $domain );?>
-                </label>
-                <select style="width: 100%; min-height: 38px" id="addon_vat_type_<?php echo $loop; ?>" name="product_addon_vat_type[<?php echo $loop; ?>]">
-                    <option <?php selected('include', $addon['vat_type']); ?> value="include"><?php _e('Include VAT', $domain); ?></option>
-                    <option <?php selected('exclude', $addon['vat_type']); ?> value="exclude"><?php _e('Exclude VAT', $domain); ?></option>
-                </select>
             </td>
         </tr>
         </tbody>

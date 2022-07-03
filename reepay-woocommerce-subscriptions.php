@@ -136,6 +136,30 @@ class WooCommerce_Reepay_Subscriptions{
                 'desc'     => '',
                 'id'       => 'reepay_section_title'
             ),
+            'test_mode' => array(
+                'name' => __( 'Test mode', reepay_s()->settings('domain') ),
+                'type' => 'checkbox',
+                'desc' => __( 'Enable test API mode', reepay_s()->settings('domain') ),
+                'id'   => '_reepay_test_mode'
+            ),
+            'debug' => array(
+                'name' => __( 'Enable logging', reepay_s()->settings('domain') ),
+                'type' => 'checkbox',
+                'desc' => __( 'Enable API logging. Logs can be seen in WooCommerce > Status > Logs', reepay_s()->settings('domain') ),
+                'id'   => '_reepay_debug'
+            ),
+            'api_private_key' => array(
+                'name' => __( 'Private Key Live', reepay_s()->settings('domain') ),
+                'type' => 'text',
+                'desc' => __( 'Private Key Live for API', reepay_s()->settings('domain') ),
+                'id'   => '_reepay_api_private_key'
+            ),
+            'api_private_key_test' => array(
+                'name' => __( 'Private Key Test', reepay_s()->settings('domain') ),
+                'type' => 'text',
+                'desc' => __( 'Private Key Test for test API', reepay_s()->settings('domain') ),
+                'id'   => '_reepay_api_private_key_test'
+            ),
             '_reepay_enable_downgrade' => array(
                 'name' => __('Enable Downgrade', reepay_s()->settings('domain')),
                 'type' => 'checkbox',
@@ -187,30 +211,6 @@ class WooCommerce_Reepay_Subscriptions{
                 'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for cancel', reepay_s()->settings('domain')),
                 'id' => '_reepay_cancel_compensation_method'
-            ),
-            'test_mode' => array(
-                'name' => __( 'Test mode', reepay_s()->settings('domain') ),
-                'type' => 'checkbox',
-                'desc' => __( 'Enable test api mode', reepay_s()->settings('domain') ),
-                'id'   => '_reepay_test_mode'
-            ),
-            'debug' => array(
-                'name' => __( 'Enable logging', reepay_s()->settings('domain') ),
-                'type' => 'checkbox',
-                'desc' => __( 'Enable api logging. Logs can be seen in WooCommerce > Status > Logs', reepay_s()->settings('domain') ),
-                'id'   => '_reepay_debug'
-            ),
-            'api_private_key' => array(
-                'name' => __( 'Private key', reepay_s()->settings('domain') ),
-                'type' => 'text',
-                'desc' => __( 'Private key for api', reepay_s()->settings('domain') ),
-                'id'   => '_reepay_api_private_key'
-            ),
-            'api_private_key_test' => array(
-                'name' => __( 'Private key (Test)', reepay_s()->settings('domain') ),
-                'type' => 'text',
-                'desc' => __( 'Private key for test api', reepay_s()->settings('domain') ),
-                'id'   => '_reepay_api_private_key_test'
             ),
             'section_end' => array(
                 'type' => 'sectionend',

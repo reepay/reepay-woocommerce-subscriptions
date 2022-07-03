@@ -124,7 +124,7 @@ class WC_Reepay_Renewals {
 
 			$handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
 
-			$addons = array_merge( self::get_shipping_addons( $order ), $order_item->get_meta( 'addons' )?:[] );
+			$addons = array_merge( self::get_shipping_addons( $order ), self::get_plan_addons( $order_item )?:[] );
 
 			$new_subscription = null;
 			try {
@@ -467,6 +467,23 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
+	 * @param  WC_Order_Item  $order_item
+	 *
+	 * @return array
+	 */
+	public static function get_plan_addons( $order_item ) {
+        $plan_addons = $order_item->get_meta( 'addons' );
+        if(!empty($plan_addons)){
+            foreach ($plan_addons as &$addon){
+                $addon['amount'] = floatval($addon['amount']) * 100;
+            }
+            return $plan_addons;
+        }
+
+        return [];
+    }
+
+	/**
 	 * @param  WC_Order  $order
 	 *
 	 * @return array
@@ -492,8 +509,8 @@ class WC_Reepay_Renewals {
 				'type'          => 'on_off',
 				'fixed_amount ' => true,
 				'amount'        => $shm_data['reepay_shipping_addon_amount'],
-				'vat'           => $shm_data['reepay_shipping_addon_vat'],
-				'vat_type'      => $shm_data['reepay_shipping_addon_vat_type'],
+				'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
+				'vat_type'      => wc_prices_include_tax(),
 				'handle'        => $shm_data['reepay_shipping_addon'],
 				'exist'         => $shm_data['reepay_shipping_addon'],
 				'add_on'        => $shm_data['reepay_shipping_addon'],
