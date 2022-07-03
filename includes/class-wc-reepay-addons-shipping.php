@@ -91,7 +91,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 					'name'        => $instance_settings['reepay_shipping_addon_name'],
 					'description' => $instance_settings['reepay_shipping_addon_description'],
 					'amount'      => $instance_settings['cost'],
-					'vat'         => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
+					'vat'         => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping() * 100,
 					'type'        => 'on_off',
 					'vat_type'    => wc_prices_include_tax(),
 				], $shipping_method->get_instance_option_key() );
