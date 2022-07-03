@@ -74,11 +74,13 @@ class WC_Product_Reepay_Variable_Subscription extends WC_Product_Variable {
 			if ( is_null( $result['min'] ) || (float)$variation->get_price() < $result['min'] ) {
 				$result['min'] = (float) $variation->get_price();
 				$result['min_schedule_type'] = $variation->get_meta( '_reepay_subscription_schedule_type' );
+				$result['min_schedule_type'] = WC_Reepay_Subscription_Plan_Simple::$schedule_types[ $result['min_schedule_type'] ]??'';
 			}
 
 			if ( is_null( $result['max'] ) || (float)$variation->get_price() > $result['max'] ) {
 				$result['max'] = (float) $variation->get_price();
 				$result['max_schedule_type'] = $variation->get_meta( '_reepay_subscription_schedule_type' );
+				$result['max_schedule_type'] = WC_Reepay_Subscription_Plan_Simple::$schedule_types[ $result['max_schedule_type'] ]??'';
 			}
 		}
 

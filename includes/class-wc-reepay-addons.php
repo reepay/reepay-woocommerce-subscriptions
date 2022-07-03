@@ -244,7 +244,6 @@ class WC_Reepay_Subscription_Addons{
         $product = wc_get_product($post);
         $product_addons = array_filter((array)$product->get_meta('_product_addons'));
         $addons_list = $this->get_reepay_addons_list();
-
         wc_get_template(
             'admin-addons-panel.php',
             array(
@@ -333,7 +332,7 @@ class WC_Reepay_Subscription_Addons{
             'name' => !empty($product_addon['name']) ? $product_addon['name'] : '',
             'description' => !empty($product_addon['description']) ? $product_addon['description'] : '',
             'amount' => !empty($product_addon['amount']) ? floatval($product_addon['amount']) * 100 : 0,
-            'vat' => !empty($product_addon['vat']) ? floatval($product_addon['vat']) / 100 : 0,
+            'vat' => !empty($product_addon['vat']) ? floatval($product_addon['vat']) : 0,
             'type' => $product_addon['type'],
             'amount_incl_vat' => $product_addon['vat_type'] == 'include',
             'all_plans' => false,
@@ -396,8 +395,6 @@ class WC_Reepay_Subscription_Addons{
             $addon_type = $_POST['product_addon_type'];
             $addon_position = $_POST['product_addon_position'];
             $addon_amount = $_POST['product_addon_amount'];
-            $addon_vat = $_POST['product_addon_vat'];
-            $addon_vat_type = $_POST['product_addon_vat_type'];
             $addon_handle = $_POST['product_addon_handle'];
             $addon_choose = $_POST['_reepay_addon_choose'];
             $addon_exist = $_POST['addon_choose_exist'];
@@ -420,8 +417,8 @@ class WC_Reepay_Subscription_Addons{
                     $data['type'] = sanitize_text_field(stripslashes($addon_type[$i]));
                     $data['position'] = absint($addon_position[$i]);
                     $data['amount'] = wc_format_decimal(sanitize_text_field(stripslashes($addon_amount[$i])));
-                    $data['vat'] = wc_format_decimal(sanitize_text_field(stripslashes($addon_vat[$i])));
-                    $data['vat_type'] = sanitize_text_field(stripslashes($addon_vat_type[$i]));
+                    $data['vat'] = WC_Reepay_Subscription_Plan_Simple::get_vat($post_id);
+                    $data['vat_type'] = wc_prices_include_tax();
                     $data['handle'] = $addon_handle[$i];
                     $data['choose'] = $addon_choose[$i];
                     $data['exist'] = $addon_exist[$i];

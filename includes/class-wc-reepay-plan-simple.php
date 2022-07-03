@@ -34,6 +34,19 @@ class WC_Reepay_Subscription_Plan_Simple {
         'customize' => 'Customize',
     );
 
+	public static $types_info = array(
+		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY => 'For %s day(s)',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE => 'For %s month(s), on the first day of the month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY => 'For %s month(s)',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY => 'For %s month(s), on the last day of the month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO => 'For %s month(s), on the first day of the month, fixed months Jan, Apr, Jul, Oct',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO => 'For %s month(s), on the last day of the month, fixed months Jan, Apr, Jul, Oct',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY => 'For %s month(s), on the first day of the month, fixed months Jan, Jul',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 => 'For %s month(s), on the first day of the month, fixed months Jan',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY => 'For %s Week',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => 'Manual',
+	);
+
     public static $meta_fields = array(
         '_reepay_subscription_handle',
         '_reepay_subscription_choose',
@@ -155,12 +168,20 @@ class WC_Reepay_Subscription_Plan_Simple {
     }
 
     public function get_subscription_info_frontend($product){
+	    if ( !WC_Reepay_Checkout::is_reepay_product( $product ) ) {
+			return '';
+		}
+
+	    if ( $product->is_type( 'variation' ) ) {
+		    $product = wc_get_product( $product->get_parent_id() );
+	    }
+
         ob_start();
         wc_get_template(
             'plan-subscription-frontend.php',
             [
-                'billing_plan' => $product->reepay_get_billing_plan(),
-                'trial' => $product->reepay_get_trial(),
+	            'billing_plan' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product ),
+                'trial' => WC_Reepay_Subscription_Plan_Simple::get_trial( $product ),
                 'contract_periods' => $product->get_meta('_reepay_subscription_contract_periods'),
                 'domain' => reepay_s()->settings('domain')
             ],
@@ -215,7 +236,7 @@ class WC_Reepay_Subscription_Plan_Simple {
             ]
         ] );
 
-        return $query->post??null;
+        return $query->post ?? null;
     }
 
     /**
@@ -260,6 +281,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 
     public function subscription_pricing_fields() {
         global $post;
+	    global $pagenow;
+
         $post_id = $post->ID;
 
         $data = $this->get_subscription_template_data( $post_id );
@@ -271,6 +294,8 @@ class WC_Reepay_Subscription_Plan_Simple {
         $data['is_exist'] = false;
 
         $data['product_object'] = wc_get_product( $post_id );
+
+	    $data['is_creating_new_product'] = $pagenow === 'post-new.php';
 
         ob_start();
         wc_get_template(
@@ -652,11 +677,14 @@ class WC_Reepay_Subscription_Plan_Simple {
             $params['minimum_prorated_amount'] = floatval( $type_data['proration_minimum'] );
         }
 
+        $params['vat'] = self::get_vat($post_id);
 
+        return $params;
+    }
+
+    public static function get_vat($post_id){
         $product = wc_get_product( $post_id );
-
-        $params['vat'] = 0;
-
+        $vat = 0;
         if ( 'taxable' == $product->get_tax_status() && wc_tax_enabled() ) {
             $calculate_tax_for = array(
                 'country'   => '*',
@@ -670,12 +698,41 @@ class WC_Reepay_Subscription_Plan_Simple {
                 reset($tax_rates);
                 $first_key = key($tax_rates);
                 if(!empty($tax_rates[$first_key]['rate'])){
-                    $params['vat'] = floatval($tax_rates[$first_key]['rate']) / 100;
+                    $vat = floatval($tax_rates[$first_key]['rate']) / 100;
                 }
             }
         }
 
-        return $params;
+        return $vat;
+    }
+
+    public static function get_vat_shipping(){
+
+        $vat = 0;
+        $shipping_tax_class = get_option( 'woocommerce_shipping_tax_class' );
+
+        $tax_class = $shipping_tax_class;
+
+        if ( ! is_null( $tax_class ) ) {
+            $matched_tax_rates = WC_Tax::find_shipping_rates(
+                [
+                    'country' => '*',
+                    'state' => '*',
+                    'city' => '*',
+                    'postcode' => '*',
+                    'tax_class' => $tax_class,
+                ]
+            );
+            if(!empty($matched_tax_rates)){
+                reset($matched_tax_rates);
+                $first_key = key($matched_tax_rates);
+                if(!empty($matched_tax_rates[$first_key]['rate'])){
+                    $vat = floatval($matched_tax_rates[$first_key]['rate']) / 100;
+                }
+            }
+        }
+
+        return $vat;
     }
 
     public static function get_interval( $post_id, $type, $type_data ) {
@@ -697,6 +754,48 @@ class WC_Reepay_Subscription_Plan_Simple {
             return false;
         }
     }
+
+	/**
+	 * @param WC_Product $product
+	 *
+	 * @return string
+	 */
+	public static function get_billing_plan( $product ) {
+		$type = $product->get_meta('_reepay_subscription_schedule_type');
+		$type_data = $product->get_meta('_reepay_subscription_'.$type);
+		$interval = self::get_interval($product->get_id(), $type, $type_data);
+
+		$type_str = self::$types_info[$type] ?? '';
+		$ret = '';
+		if(!empty($type_str)){
+			$ret = sprintf(
+				__($type_str, reepay_s()->settings('domain')),
+				$interval
+			);
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * @param WC_Product $product
+	 *
+	 * @return string
+	 */
+	public static function get_trial( $product ) {
+		$trial = $product->get_meta('_reepay_subscription_trial');
+		$ret = '';
+
+		if(!empty($trial['type'])){
+			if($trial['type'] != 'customize'){
+				$ret = 'Trial period - '.WC_Reepay_Subscription_Plan_Simple::$trial[$trial['type']];
+			}else{
+				$ret = 'Trial period - '.$trial['length'].' '.$trial['unit'];
+			}
+		}
+
+		return $ret;
+	}
 
     protected function plan_error( $message ) {
         if ( is_ajax() ) {
