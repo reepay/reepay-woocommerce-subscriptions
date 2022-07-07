@@ -39,10 +39,10 @@ class WooCommerce_Reepay_Subscriptions{
 	 */
 	private static $settings;
 
-    /**
-     * @var string
-     */
-    public static $version = '1.0.0';
+	/**
+	 * @var string
+	 */
+	public static $version = '1.0.0';
 
 	/**
 	 * @var string
@@ -276,6 +276,7 @@ class WooCommerce_Reepay_Subscriptions{
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-checkout.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-variable.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-rest.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php' );
