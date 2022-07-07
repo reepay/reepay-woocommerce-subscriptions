@@ -44,17 +44,17 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		try {
-			wp_send_json_success(
-				reepay_s()->api()->request("plan/{$request['handle']}")
+			return new WP_REST_Response(
+				reepay_s()->api()->request( "plan/{$request['handle']}" )[0]
 			);
-		} catch(Exception $e) {
+		}catch( Exception $e ) {
 			reepay_s()->log()->log( [
-				'source' => 'WC_Reepay_Subscription_Plan_Simple_Rest::get_item',
+				'source'  => 'WC_Reepay_Subscription_Plan_Simple_Rest::get_item',
 				'message' => 'Getting plan error',
-				'handle' => $request['handle']
+				'handle'  => $request['handle']
 			], 'error' );
 
-			wp_send_json_error();
+			return new WP_Error( 400, $e->getMessage() );
 		}
 	}
 
