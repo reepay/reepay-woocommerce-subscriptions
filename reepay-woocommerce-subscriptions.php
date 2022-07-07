@@ -44,6 +44,11 @@ class WooCommerce_Reepay_Subscriptions{
      */
     public static $version = '1.0.0';
 
+	/**
+	 * @var string
+	 */
+	public static $rest_api_namespace = 'reepay_subscription';
+
     public static $compensation_methods = [
         'none' => 'None',
         'full_refund' => 'Full refund',
@@ -68,6 +73,7 @@ class WooCommerce_Reepay_Subscriptions{
     		'plugin_url' => plugin_dir_url(__FILE__),
     		'plugin_path' => plugin_dir_path(__FILE__),
     		'version' => static::$version,
+		    'rest_api_namespace' => static::$rest_api_namespace,
 		    'debug' => get_option('_reepay_debug') === 'yes',
 		    'test_mode' => get_option('_reepay_test_mode') === 'yes',
 		    'api_private_key' => get_option('_reepay_api_private_key'),
