@@ -68,6 +68,14 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 *
 	 */
 	public function get_item_permissions_check( $request ) {
+		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+			return true;
+		}
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return new WP_Error(401, 'Not authorized or no access');
+		}
+
 		return true;
 	}
 }
