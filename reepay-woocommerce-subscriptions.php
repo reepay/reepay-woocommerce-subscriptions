@@ -35,6 +35,11 @@ class WooCommerce_Reepay_Subscriptions{
 	private $log;
 
 	/**
+	 * @var WC_Reepay_Subscription_Plan_Simple
+	 */
+	private $plan_simple;
+
+	/**
 	 * @var array<string, mixed>
 	 */
 	private static $settings;
@@ -99,6 +104,7 @@ class WooCommerce_Reepay_Subscriptions{
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
+        $this->plan_simple = WC_Reepay_Subscription_Plan_Simple::get_instance();
     }
 
     /**
@@ -249,6 +255,13 @@ class WooCommerce_Reepay_Subscriptions{
 	 */
 	public function log() {
 		return $this->log;
+	}
+
+	/**
+	 * @return WC_Reepay_Subscription_Plan_Simple
+	 */
+	public function plan() {
+		return $this->plan_simple;
 	}
 
 	/**

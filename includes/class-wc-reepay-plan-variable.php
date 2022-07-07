@@ -106,4 +106,4 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
     }
 }
 
-new WC_Reepay_Subscription_Plan_Variable();
+WC_Reepay_Subscription_Plan_Variable::get_instance();

@@ -21,6 +21,13 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 			"callback"            => array( $this, "get_item" ),
 			"permission_callback" => array( $this, "get_item_permissions_check" ),
 			"args"                => array(
+				"product_id" => array(
+					"type"              => "integer",
+					"required"          => true,
+					"validate_callback" => function( $param, $request, $key ) {
+						return ! empty( $param ) && get_post_type( $param ) === 'product';
+					},
+				),
 				"handle" => array(
 					"type"              => "string",
 					"required"          => true,
@@ -44,8 +51,19 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		try {
+			$plan_meta_data = reepay_s()->plan()->get_remote_plan_meta( $request['handle'] );
+			$plan_meta_data['disabled'] = true;
+			$plan_meta_data['plans_list'] = reepay_s()->plan()->get_reepay_plans_list() ?: array();
+			$plan_meta_data['domain'] = reepay_s()->settings( 'domain' );
+
+			ob_start();
+
+			reepay_s()->plan()->subscription_pricing_fields( $request['product_id'], $plan_meta_data );
+
+			var_dump(ob_get_clean());
+
 			return new WP_REST_Response(
-				reepay_s()->api()->request( "plan/{$request['handle']}" )[0]
+
 			);
 		}catch( Exception $e ) {
 			reepay_s()->log()->log( [
