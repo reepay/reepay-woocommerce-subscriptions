@@ -21,8 +21,7 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 	 * @return string
 	 */
 	public static function format_price($price_html, $product) {
-		$schedule_type = $product->get_meta( '_reepay_subscription_schedule_type' );
-		$schedule_type = WC_Reepay_Subscription_Plan_Simple::$schedule_types[ $schedule_type ]??'';
+		$schedule_type = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true );
 
 		if ( empty( $schedule_type ) || empty( $price_html ) ) {
 			return $price_html;

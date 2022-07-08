@@ -17,6 +17,6 @@
 	<?php endif; ?>
 
 	<?php if ( ! empty( $contract_periods ) ) : ?>
-        <li><?= esc_html__( 'Minimum Contract Period - ', $domain ) . ' ' . $contract_periods ?></li>
+        <li><?= esc_html__( 'Contract Period', $domain ) . ': ' . $contract_periods ?></li>
 	<?php endif; ?>
 </ul>

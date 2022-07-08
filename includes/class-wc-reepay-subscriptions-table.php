@@ -76,12 +76,12 @@ class Subscriptions_Table extends \WP_List_Table {
      */
     public function get_columns() {
         return array(
-            'plan'   => __( 'Plan', reepay_s()->settings('domain') ),
             'status' => __( 'Status', reepay_s()->settings('domain') ),
-            'handle'   => __( 'Subscription Handle', reepay_s()->settings('domain') ),
-            'date'   => __( 'Date created', reepay_s()->settings('domain') ),
-            'next_period_start'   => __( 'Next renewal date', reepay_s()->settings('domain') ),
+            'handle'   => __( 'Subscription handle', reepay_s()->settings('domain') ),
             'customer_handle'   => __( 'Customer handle', reepay_s()->settings('domain') ),
+            'plan'   => __( 'Plan', reepay_s()->settings('domain') ),
+            'date'   => __( 'Created date', reepay_s()->settings('domain') ),
+            'next_period_start'   => __( 'Next renewal date', reepay_s()->settings('domain') ),
         );
     }
 

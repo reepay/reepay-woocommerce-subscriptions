@@ -84,7 +84,8 @@ class WooCommerce_Reepay_Subscriptions{
 
 
         $this->includes();
-        add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
+        add_action( 'admin_enqueue_scripts', [$this, 'admin_enqueue_scripts'] );
+        add_action( 'admin_enqueue_scripts', [$this, 'admin_customer_report'] );
         add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links'] );
         add_filter( 'woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50 );
         add_action( 'woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab'] );
@@ -93,6 +94,36 @@ class WooCommerce_Reepay_Subscriptions{
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
+    }
+
+    public function admin_customer_report(){
+        if(isset($_GET['path']) && $_GET['path'] == '/customers'){
+            $script_path =  'assets/js/analytics/build/index.js';
+            $script_asset_path = $this->settings('plugin_url') . 'assets/js/analytics/build/index.asset.php';
+            $script_asset = file_exists($script_asset_path)
+                ? require($script_asset_path)
+                : ['dependencies' => [], 'version' => filemtime($this->settings('plugin_path') . $script_path)];
+            $script_url = $this->settings('plugin_url') . $script_path;
+
+            wp_register_script(
+                'reepay-customer-extends',
+                $script_url,
+                $script_asset['dependencies'],
+                $script_asset['version'],
+                true
+            );
+
+            wp_register_style(
+                'reepay-customer-extends',
+                $this->settings('plugin_url') . 'assets/js/analytics/build/index.css',
+                // Add any dependencies styles may have, such as wp-components.
+                array(),
+                filemtime( $this->settings('plugin_path') . 'assets/js/analytics/build/index.css')
+            );
+
+            wp_enqueue_script( 'reepay-customer-extends' );
+            wp_enqueue_style( 'reepay-customer-extends' );
+        }
     }
 
     /**

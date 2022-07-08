@@ -139,35 +139,21 @@ class WC_Reepay_Subscription_Addons{
 	/**
 	 * Add cart item data.
 	 *
-	 * @param  array  $cart_item_meta  Cart item meta data.
+	 * @param  array  $cart_item_data  Cart item meta data.
 	 * @param  int  $product_id  Product ID.
-	 * @param  array  $post_data
-	 * @param  bool  $test  If this is a test i.e. just getting data but not adding to cart. Used to prevent uploads.
+	 * @param  int  $variation_id
+	 * @param  int  $quantity
 	 *
 	 * @return array
 	 */
-    public function add_cart_item_data( $cart_item_meta, $product_id, $post_data = null, $test = false ) {
-
-        if ( !$post_data && isset( $_POST ) ) {
-            $post_data = $_POST;
-        }
-
-        if ( empty( $post_data ) ) {
-            $post_data = $cart_item_meta;
-        }
-
-
-        if ( ! empty( $post_data['add-to-cart'] )) {
-            $product_id = $post_data['add-to-cart'];
-        }
+    public function add_cart_item_data( $cart_item_data, $product_id, $variation_id, $quantity ) {
+	    $post_data = $_POST;
 
         $product_addons = $this->get_product_addons( $product_id );
 
-        if ( empty( $cart_item_meta['addons'] ) ) {
-            $cart_item_meta['addons'] = array();
+        if ( empty( $cart_item_data['addons'] ) ) {
+            $cart_item_data['addons'] = array();
         }
-
-
 
         if ( is_array( $product_addons ) && ! empty( $product_addons ) ) {;
 
@@ -196,12 +182,12 @@ class WC_Reepay_Subscription_Addons{
                         $data[$i]['quantity'] = intval($value);
                     }
 
-                    $cart_item_meta['addons'] = array_merge( $cart_item_meta['addons'], apply_filters( 'woocommerce_product_addon_cart_item_data', $data, $addon, $product_id, $post_data ) );
+                    $cart_item_data['addons'] = array_merge( $cart_item_data['addons'], apply_filters( 'woocommerce_product_addon_cart_item_data', $data, $addon, $product_id, $post_data ) );
                 }
             }
         }
 
-        return $cart_item_meta;
+        return $cart_item_data;
     }
 
     public function addons_display(){

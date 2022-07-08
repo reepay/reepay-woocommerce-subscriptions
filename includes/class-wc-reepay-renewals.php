@@ -107,13 +107,6 @@ class WC_Reepay_Renewals {
 			$ids[] = $order->get_id();
 		}
 
-		self::log( [
-			'log' => [
-				'source' => '!1!',
-				'count' => count($orders),
-				'ids' => $ids
-			]
-		]);
 		$main_order->calculate_totals();
 
 		foreach ( $orders as $order ) {
