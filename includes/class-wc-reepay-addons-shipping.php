@@ -58,6 +58,13 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			'class'   => 'addon-shipping-new',
 		);
 
+		$settings['reepay_shipping_addon_handle'] = array(
+			'title'   => esc_html__( 'Add-on handle', reepay_s()->settings( 'domain' ) ),
+			'type'    => 'text',
+			'default' => '',
+			'class'   => 'addon-shipping-new',
+		);
+
 		$settings['reepay_shipping_addon_description'] = array(
 			'title'   => esc_html__( 'Add-on description', reepay_s()->settings( 'domain' ) ),
 			'type'    => 'textarea',
@@ -86,23 +93,23 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			unset( $instance_settings['reepay_shipping_addon_description'] );
 		} else {
 			if ( $instance_settings['reepay_shipping_addon'] == 'new' ) {
-				//add new method
-				$created_addon = $this->save_to_reepay( [
-					'name'        => $instance_settings['reepay_shipping_addon_name'],
-					'description' => $instance_settings['reepay_shipping_addon_description'],
-					'amount'      => $instance_settings['cost'],
-					'vat'         => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping() * 100,
-					'type'        => 'on_off',
-					'vat_type'    => wc_prices_include_tax(),
-				], $shipping_method->get_instance_option_key() );
+                $created_addon = $this->save_to_reepay([
+                    'name' => $instance_settings['reepay_shipping_addon_name'],
+                    'handle' => $instance_settings['reepay_shipping_addon_handle'],
+                    'description' => $instance_settings['reepay_shipping_addon_description'],
+                    'amount' => $instance_settings['cost'],
+                    'vat' => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping() * 100,
+                    'type' => 'on_off',
+                    'vat_type' => wc_prices_include_tax(),
+                ], $shipping_method->get_instance_option_key());
 
-				$instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
-			} else {
-				//get existing method
-				$addon_data = $this->get_reepay_addon_data( $instance_settings['reepay_shipping_addon'] );
-
-				$instance_settings['reepay_shipping_addon_name']        = $addon_data['name'];
-				$instance_settings['reepay_shipping_addon_description'] = $addon_data['description'];
+                $instance_settings['reepay_shipping_addon_handle'] = $created_addon['handle'];
+            } else {
+                //get existing method
+                $addon_data = $this->get_reepay_addon_data($instance_settings['reepay_shipping_addon']);
+                $instance_settings['reepay_shipping_addon_handle'] = $instance_settings['reepay_shipping_addon'];
+                $instance_settings['reepay_shipping_addon_name'] = $addon_data['name'];
+                $instance_settings['reepay_shipping_addon_description'] = $addon_data['description'];
 			}
 		}
 

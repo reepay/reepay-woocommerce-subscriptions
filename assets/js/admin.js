@@ -23,12 +23,18 @@ jQuery( function ( $ ) {
     $body.on( 'init_tooltips', function () {
         $( '.addon-shipping-new' ).closest('tr').addClass('hidden');
         $( '.addon-shipping-choose' ).on( 'change', function () {
-            if($(this).val() === 'new'){
+            init_shipping($(this));
+        } );
+
+        init_shipping($( '.addon-shipping-choose' ))
+
+        function init_shipping(addon_field){
+            if(addon_field.val() === 'new'){
                 $( '.addon-shipping-new' ).closest('tr').removeClass('hidden');
             }else{
                 $( '.addon-shipping-new' ).closest('tr').addClass('hidden');
             }
-        } );
+        }
     } );
 
 

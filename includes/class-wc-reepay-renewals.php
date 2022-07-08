@@ -504,9 +504,9 @@ class WC_Reepay_Renewals {
 				'amount'        => $shm_data['reepay_shipping_addon_amount'],
 				'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
 				'vat_type'      => wc_prices_include_tax(),
-				'handle'        => $shm_data['reepay_shipping_addon'],
+				'handle'        => $shm_data['reepay_shipping_addon_handle'],
 				'exist'         => $shm_data['reepay_shipping_addon'],
-				'add_on'        => $shm_data['reepay_shipping_addon'],
+				'add_on'        => $shm_data['reepay_shipping_addon_handle'],
 			]
 		];
 	}
