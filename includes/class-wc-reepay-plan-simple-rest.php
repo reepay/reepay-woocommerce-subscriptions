@@ -6,7 +6,7 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
-	public function get_path() {
+	public function get_url() {
 		return get_rest_url( 0, $this->namespace . $this->rest_base );
 	}
 
@@ -55,16 +55,27 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 			$plan_meta_data['disabled'] = true;
 			$plan_meta_data['plans_list'] = reepay_s()->plan()->get_reepay_plans_list() ?: array();
 			$plan_meta_data['domain'] = reepay_s()->settings( 'domain' );
+			$plan_meta_data['is_exist'] = true;
+			$plan_meta_data['is_creating_new_product'] = false;
+
+			foreach ( WC_Reepay_Subscription_Plan_Simple::$meta_fields as $key) {
+				if ( ! isset( $plan_meta_data[ $key ] ) ) {
+					$plan_meta_data[ $key ] = '';
+				}
+			}
 
 			ob_start();
-
-			reepay_s()->plan()->subscription_pricing_fields( $request['product_id'], $plan_meta_data );
-
-			var_dump(ob_get_clean());
-
-			return new WP_REST_Response(
-
+			wc_get_template(
+				'plan-subscription-fields-data.php',
+				$plan_meta_data,
+				'',
+				reepay_s()->settings( 'plugin_path' ) . 'templates/'
 			);
+
+			return new WP_REST_Response( [
+				'success' => true,
+				'html' => ob_get_clean()
+			] );
 		}catch( Exception $e ) {
 			reepay_s()->log()->log( [
 				'source'  => 'WC_Reepay_Subscription_Plan_Simple_Rest::get_item',
@@ -98,4 +109,4 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	}
 }
 
-new WC_Reepay_Subscription_Plan_Simple_Rest();
+new WC_Reepay_Subscription_Plan_Simple_Rest;

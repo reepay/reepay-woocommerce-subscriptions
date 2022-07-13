@@ -104,7 +104,8 @@ class WooCommerce_Reepay_Subscriptions{
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
-        $this->plan_simple = WC_Reepay_Subscription_Plan_Simple::get_instance();
+        $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
+	    new WC_Reepay_Subscription_Plan_Variable();
     }
 
     /**
@@ -278,7 +279,10 @@ class WooCommerce_Reepay_Subscriptions{
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         wp_localize_script('admin-reepay-subscription', 'reepay', [
-            'amountPercentageLabel' => __( 'Coupon percentage', reepay_s()->settings('domain') )
+            'amountPercentageLabel' => __( 'Coupon percentage', reepay_s()->settings('domain') ),
+            'rest_urls' => [
+            	'get_plan' => get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/plan_simple/" ) . '?product_id=' . ($_GET['post'] ?? 0)
+            ]
         ]);
     }
 

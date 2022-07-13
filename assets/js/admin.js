@@ -204,14 +204,25 @@ jQuery( function ( $ ) {
     }
 
 
-    function choose_change_settings(val){
+    function choose_change_settings($select){
+        const val = $select.val();
+        const $container = $select.parents('.reepay_subscription_choose').parent();
+
+        const $reepay_subscription_settings = $container.find('.reepay_subscription_settings');
+        const $reepay_subscription_choose_exist = $container.find('.reepay_subscription_choose_exist');
+
         if ( 'reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val() ) {
             if(val === 'new'){
-                $('.reepay_subscription_settings').show();
-                $('.reepay_subscription_choose_exist').hide();
+                $reepay_subscription_settings.show();
+                $reepay_subscription_choose_exist.hide();
             }else{
-                $('.reepay_subscription_settings').hide();
-                $('.reepay_subscription_choose_exist').show();
+                $reepay_subscription_settings.hide();
+                $reepay_subscription_choose_exist.show();
+
+                load_plan(
+                    $reepay_subscription_choose_exist.find('#_subscription_choose_exist').val(),
+                    $reepay_subscription_choose_exist.find('.reepay_subscription_settings_exist')
+                );
             }
         }
     }
@@ -246,6 +257,33 @@ jQuery( function ( $ ) {
         }
     }
 
+    function load_plan (handle, $container) {
+        if(!handle) {
+            return;
+        }
+
+        $.ajax({
+            url: window.reepay.rest_urls.get_plan + `&handle=${handle}`,
+            method: 'GET',
+            beforeSend: function (xhr) {
+
+            },
+            success: function (response_data) {
+                if(!response_data.success) {
+                    return;
+                }
+
+                $container.html('').append($(`<div style="width: 100%">${response_data.html}</div>`))
+            },
+            error: function (request, status, error) {
+
+            },
+            complete: function () {
+
+            },
+        })
+    }
+
     function init(tab){
         let tab_ = $(tab);
         show_settings();
@@ -259,7 +297,7 @@ jQuery( function ( $ ) {
         show_notice_settings( tab_.find('#_subscription_notice_period').val());
         show_contract_settings( tab_.find('#_subscription_contract_periods').val());
         billing_cycles_settings( tab_.find('input[type=radio][name=_reepay_subscription_billing_cycles]:checked').val());
-        choose_change_settings(tab_.find('#_reepay_subscription_choose:checked').val());
+        choose_change_settings(tab_.find('#_reepay_subscription_choose'));
 
         $( tab + ' #_subscription_schedule_type' ).on( 'change', function () {
             show_plan_settings($(this).val());
@@ -282,7 +320,7 @@ jQuery( function ( $ ) {
         });
 
         $(tab + ' #_reepay_subscription_choose').change(function() {
-            choose_change_settings(this.value);
+            choose_change_settings($(this));
         });
 
         $(tab + ' input[type=radio][name=_reepay_subscription_billing_cycles]').change(function() {

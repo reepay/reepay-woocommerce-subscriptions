@@ -7,4 +7,4 @@ class WC_Reepay_Subscription_Plan_Variable_Rest extends WC_Reepay_Subscription_P
 	}
 }
 
-new WC_Reepay_Subscription_Plan_Variable_Rest();
+new WC_Reepay_Subscription_Plan_Variable_Rest;

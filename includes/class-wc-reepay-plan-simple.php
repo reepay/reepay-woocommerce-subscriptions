@@ -109,26 +109,10 @@ class WC_Reepay_Subscription_Plan_Simple {
         '_reepay_subscription_fee',
     );
 
-	/**
-	 * @var WC_Reepay_Subscription_Plan_Simple
-	 */
-	private static $instance;
-
-	/**
-	 * @return WC_Reepay_Subscription_Plan_Simple
-	 */
-	public static function get_instance() {
-		if ( is_null( self::$instance ) ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
-
     /**
      * Constructor
      */
-    protected function __construct() {
+    public function __construct() {
         add_action( 'init', array( $this, 'create_subscription_product_class' ) );
         add_filter( 'woocommerce_product_class', array( $this, 'load_subscription_product_class' ), 10, 2 );
         add_filter( 'product_type_selector', array( $this, 'add_subscription_product_type' ) );
@@ -337,7 +321,7 @@ class WC_Reepay_Subscription_Plan_Simple {
         global $post;
 	    global $pagenow;
 
-        $post_id = $post_id ?? $post->ID;
+        $post_id = $post_id ?: $post->ID;
 
 	    $data = !empty( $data ) ? $data : $this->get_subscription_template_data( $post_id );
 
@@ -345,11 +329,15 @@ class WC_Reepay_Subscription_Plan_Simple {
             $data['_reepay_subscription_choose'] = 'new';
         }
 
-        $data['is_exist'] = false;
-
+	    $data['is_exist'] = $data['_reepay_subscription_choose'] != 'new';
         $data['product_object'] = wc_get_product( $post_id );
-
 	    $data['is_creating_new_product'] = $pagenow === 'post-new.php';
+
+	    foreach ( self::$meta_fields as $key) {
+		    if ( ! isset( $data[ $key ] ) ) {
+			    $data[ $key ] = '';
+		    }
+	    }
 
         ob_start();
         wc_get_template(
@@ -360,8 +348,8 @@ class WC_Reepay_Subscription_Plan_Simple {
         );
         $data['settings'] =  ob_get_clean();
 
-        $data['is_exist'] = $data['_reepay_subscription_choose'] != 'new';
-        if($data['_reepay_subscription_choose'] != 'new'){
+
+        if($data['is_exist']){
             ob_start();
             wc_get_template(
                 'plan-subscription-fields-data.php',
@@ -444,7 +432,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		    $plan_meta['_reepay_subscription_trial'] = $trial;
 	    }
 
-	    if ( $plan_data["fixed_count"] ) {
+	    if ( ! empty( $plan_data["fixed_count"] ) ) {
 		    $plan_meta['_reepay_subscription_billing_cycles'] = 'true';
 		    $plan_meta['_reepay_subscription_billing_cycles_period'] = $plan_data["fixed_count"];
 	    } else {

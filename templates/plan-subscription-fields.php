@@ -16,7 +16,7 @@ $variable = $variable ?? false;
 </div>
 
 <div class="reepay_subscription_choose_exist">
-    <div class="options_group reepay_subscription_choose_exist show_if_reepay_subscription">
+    <div class="options_group show_if_reepay_subscription">
         <p class="form-field exist-fields <?= $variable ? 'dimensions_field form-row' : '' ?> ">
             <?php if(!empty($plans_list)):?>
             <select id="_subscription_choose_exist"  name="_reepay_choose_exist<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
@@ -39,6 +39,12 @@ $variable = $variable ?? false;
 
 <div class="reepay_subscription_settings">
     <?= $settings ?>
+</div>
+
+<div id="reepay_subscription_publish_btn" class="options_group reepay_subscription_publish_btn show_if_reepay_subscription">
+    <p class="form-field">
+        <input type="submit" name="save" id="reepay-publish" class="button button-primary button-large" value="<?= $is_creating_new_product ? 'Create plan' : 'Update plan'?>">
+    </p>
 </div>
 
 <div class="options_group show_if_reepay_simple_subscriptions clear"></div>
