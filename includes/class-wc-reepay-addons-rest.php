@@ -18,9 +18,26 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	 */
 	public function get_item( $request ) {
 		try {
-			return new WP_REST_Response(
-				reepay_s()->api()->request( "add_on/{$request['handle']}" )
+			$addon_data = reepay_s()->api()->request( "add_on/{$request['handle']}" );
+			$addon_data['choose'] = 'exist';
+			$addon_data['disabled'] = true;
+
+			ob_start();
+			wc_get_template(
+				'admin-addon-single-data.php',
+				array(
+					'addon' => $addon_data,
+					'loop' => -1,
+					'domain' => reepay_s()->settings( 'domain' )
+				),
+				'',
+				reepay_s()->settings('plugin_path').'templates/'
 			);
+
+			return new WP_REST_Response( [
+				'success' => true,
+				'html' => ob_get_clean(),
+			] );
 		}catch( Exception $e ) {
 			reepay_s()->log()->log( [
 				'source'  => 'WC_Reepay_Subscription_Addons_Rest::get_item',

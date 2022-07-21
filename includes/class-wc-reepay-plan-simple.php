@@ -368,13 +368,21 @@ class WC_Reepay_Subscription_Plan_Simple {
         );
     }
 
-    public function save_remote_plan( $post_id, $handle ) {
+	public function save_remote_plan( $post_id, $handle ) {
 		$data = $this->get_remote_plan_meta( $handle );
 
-		foreach ( $data as $key => $val) {
-			update_post_meta( $post_id, $key, $val );
+		if ( empty( $data ) ) {
+			return;
 		}
-    }
+
+		foreach ( self::$meta_fields as $key ) {
+			delete_post_meta( $post_id, $key );
+
+			if ( isset( $data[ $key ] ) ) {
+				update_post_meta( $post_id, $key, $data[ $key ] );
+			}
+		}
+	}
 
 	/**
 	 * @param string $handle reepay plan handle
