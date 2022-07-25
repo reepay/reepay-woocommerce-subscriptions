@@ -124,10 +124,12 @@ class WC_Reepay_Subscription_API{
                     return  $result;
                 }
 
-                $error = json_decode($body)->error;
-                $message = json_decode($body)->message;
-                if(!empty($message)){
-                    $error .= ' - '.$message;
+                $body = json_decode($body);
+
+                $error = $body->error;
+
+                if(!empty($body->message)){
+                    $error .= ' - '.$body->message;
                 }
                 throw new Exception(sprintf(__('API Error (request): %s. HTTP Code: %s', reepay_s()->settings('domain') ), $error, $http_code));
             default:

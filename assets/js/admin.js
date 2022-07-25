@@ -136,15 +136,6 @@ jQuery( function ( $ ) {
 
     if (('.wp-list-table').length) {
         init_table();
-        //setInterval(update_subscriptions_table, 3000)
-    }
-
-    function update_subscriptions_table() {
-        return $.get(location.href)
-            .then(html => {
-               $('.wp-list-table').replaceWith($(html).find('.wp-list-table'))
-                init_table();
-            })
     }
 
     function init_table(){
@@ -195,104 +186,165 @@ jQuery( function ( $ ) {
         }
     }
 
-    function show_plan_settings(type){
-        const subs_block = $('.reepay_subscription_pricing');
+    function show_plan_settings($container){
+        const type = $container.find('#_subscription_schedule_type').val()
+        const subs_block = $container.find('.reepay_subscription_pricing');
+
         subs_block.find('.type-fields').hide();
         subs_block.find('.fields-' + type).show();
     }
 
-    function show_fee_settings(val){
-        if(val.checked) {
-            $('.fee-fields').show();
+    function show_fee_settings($container){
+        const val = $container.find('#_subscription_schedule_type').val()
+
+        if(val) {
+            $container.find('.fee-fields').show();
         }else{
-            $('.fee-fields').hide();
+            $container.find('.fee-fields').hide();
         }
     }
 
 
-    function choose_change_settings(val){
+    function choose_change_settings($select){
+        const val = $select.val();
+        const $container = $select.parents('.reepay_subscription_choose').parent();
+
+        const $reepay_subscription_settings = $container.find('.reepay_subscription_settings');
+        const $reepay_subscription_choose_exist = $container.find('.reepay_subscription_choose_exist');
+
         if ( 'reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val() ) {
             if(val === 'new'){
-                $('.reepay_subscription_settings').show();
-                $('.reepay_subscription_choose_exist').hide();
+                $reepay_subscription_settings.show();
+                $reepay_subscription_choose_exist.hide();
             }else{
-                $('.reepay_subscription_settings').hide();
-                $('.reepay_subscription_choose_exist').show();
+                $reepay_subscription_settings.hide();
+                $reepay_subscription_choose_exist.show();
             }
         }
     }
 
-    function show_trial_settings(type){
-        const subs_block = $('.reepay_subscription_trial');
+    function show_trial_settings($container){
+        const type = $container.find('#_subscription_trial').val()
+        const subs_block = $container.find('.reepay_subscription_trial');
+
         subs_block.find('.trial-fields').hide();
         subs_block.find('.fields-' + type).show();
     }
 
-    function show_notice_settings(val){
+    function show_notice_settings($container){
+        const val = $container.find('#_subscription_notice_period').val()
+
         if(parseInt(val) > 0){
-            $('.fields-notice_period').show();
+            $container.find('.fields-notice_period').show();
         }else{
-            $('.fields-notice_period').hide();
+            $container.find('.fields-notice_period').hide();
         }
     }
 
-    function show_contract_settings(val){
+    function show_contract_settings($container){
+        const val = $container.find('#_subscription_notice_period').val()
+
         if(parseInt(val) > 0){
-            $('.fields-contract_periods').show();
+            $container.find('.fields-contract_periods').show();
         }else{
-            $('.fields-contract_periods').hide();
+            $container.find('.fields-contract_periods').hide();
         }
     }
 
-    function billing_cycles_settings(val){
+    function billing_cycles_settings($container){
+        const val = $container.find('#_subscription_notice_period').val()
+
         if(val === 'true'){
-            $('.fields-billing_cycles').show();
+            $container.find('.fields-billing_cycles').show();
         }else{
-            $('.fields-billing_cycles').hide();
+            $container.find('.fields-billing_cycles').hide();
         }
+    }
+
+    function load_plan (handle, $container) {
+        if(!handle) {
+            return;
+        }
+
+        $container.html('')
+
+        $.ajax({
+            url: window.reepay.rest_urls.get_plan + `&handle=${handle}`,
+            method: 'GET',
+            beforeSend: function (xhr) {
+
+            },
+            success: function (response_data) {
+                if(!response_data.success) {
+                    return;
+                }
+
+                $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
+
+                show_plan_settings($container);
+                show_trial_settings($container);
+                show_notice_settings($container);
+                show_contract_settings($container);
+                show_fee_settings($container);
+            },
+            error: function (request, status, error) {
+
+            },
+            complete: function () {
+
+            },
+        })
     }
 
     function init(tab){
-        let tab_ = $(tab);
+        const $tab = $(tab);
+
         show_settings();
-        if(tab_.find('#_subscription_fee').is(':checked')) {
+
+        if($tab.find('#_subscription_fee').is(':checked')) {
             $('.fee-fields').show();
         }else{
             $('.fee-fields').hide();
         }
-        show_trial_settings(tab_.find('#_subscription_trial').val());
-        show_plan_settings(tab_.find('#_subscription_schedule_type').val());
-        show_notice_settings( tab_.find('#_subscription_notice_period').val());
-        show_contract_settings( tab_.find('#_subscription_contract_periods').val());
-        billing_cycles_settings( tab_.find('input[type=radio][name=_reepay_subscription_billing_cycles]:checked').val());
-        choose_change_settings(tab_.find('#_reepay_subscription_choose:checked').val());
 
         $( tab + ' #_subscription_schedule_type' ).on( 'change', function () {
-            show_plan_settings($(this).val());
-        } );
+            show_plan_settings($tab);
+        } ).trigger('change');
 
         $( tab + ' #_subscription_trial' ).on( 'change', function () {
-            show_trial_settings($(this).val());
-        } );
+            show_trial_settings($tab);
+        } ).trigger('change');
 
         $( tab + ' #_subscription_notice_period' ).on( 'change', function () {
-            show_notice_settings($(this).val());
-        } );
+            show_notice_settings($tab);
+        } ).trigger('change');
 
         $( tab + ' #_subscription_contract_periods' ).on( 'change', function () {
-            show_contract_settings($(this).val());
-        } );
+            show_contract_settings($tab);
+        } ).trigger('change');
 
         $( tab + ' #_subscription_fee').on( 'change', function () {
-            show_fee_settings(this);
-        });
+            show_fee_settings($tab);
+        }).trigger('change');
 
+        choose_change_settings($tab.find('[name="_reepay_subscription_choose"]:checked'));
         $(tab + ' #_reepay_subscription_choose').change(function() {
-            choose_change_settings(this.value);
+            choose_change_settings($(this));
         });
 
+        $( tab + ' #_subscription_choose_exist' ).change(function () {
+            const $this = $(this);
+            const $container = $this.parents('.reepay_subscription_choose_exist');
+
+            load_plan(
+                $this.val(),
+                $container.find('.reepay_subscription_settings_exist')
+            );
+        })
+
+        billing_cycles_settings( $tab.find('input[type=radio][name=_reepay_subscription_billing_cycles]:checked') );
         $(tab + ' input[type=radio][name=_reepay_subscription_billing_cycles]').change(function() {
-            billing_cycles_settings(this.value);
+            billing_cycles_settings($(this));
         });
     }
 

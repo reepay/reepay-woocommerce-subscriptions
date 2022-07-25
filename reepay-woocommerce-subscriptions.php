@@ -35,14 +35,24 @@ class WooCommerce_Reepay_Subscriptions{
 	private $log;
 
 	/**
+	 * @var WC_Reepay_Subscription_Plan_Simple
+	 */
+	private $plan_simple;
+
+	/**
 	 * @var array<string, mixed>
 	 */
 	private static $settings;
 
-    /**
-     * @var string
-     */
-    public static $version = '1.0.0';
+	/**
+	 * @var string
+	 */
+	public static $version = '1.0.0';
+
+	/**
+	 * @var string
+	 */
+	public static $rest_api_namespace = 'reepay_subscription';
 
     public static $compensation_methods = [
         'none' => 'None',
@@ -68,6 +78,7 @@ class WooCommerce_Reepay_Subscriptions{
     		'plugin_url' => plugin_dir_url(__FILE__),
     		'plugin_path' => plugin_dir_path(__FILE__),
     		'version' => static::$version,
+		    'rest_api_namespace' => static::$rest_api_namespace,
 		    'debug' => get_option('_reepay_debug') === 'yes',
 		    'test_mode' => get_option('_reepay_test_mode') === 'yes',
 		    'api_private_key' => get_option('_reepay_api_private_key'),
@@ -94,6 +105,8 @@ class WooCommerce_Reepay_Subscriptions{
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
+        $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
+	    new WC_Reepay_Subscription_Plan_Variable();
     }
 
     public function admin_customer_report(){
@@ -277,6 +290,13 @@ class WooCommerce_Reepay_Subscriptions{
 	}
 
 	/**
+	 * @return WC_Reepay_Subscription_Plan_Simple
+	 */
+	public function plan() {
+		return $this->plan_simple;
+	}
+
+	/**
 	 * Return plugin settings
 	 * @param  string  $property_name
 	 *
@@ -290,7 +310,10 @@ class WooCommerce_Reepay_Subscriptions{
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         wp_localize_script('admin-reepay-subscription', 'reepay', [
-            'amountPercentageLabel' => __( 'Coupon percentage', reepay_s()->settings('domain') )
+            'amountPercentageLabel' => __( 'Coupon percentage', reepay_s()->settings('domain') ),
+            'rest_urls' => [
+            	'get_plan' => get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/plan_simple/" ) . '?product_id=' . ($_GET['post'] ?? 0)
+            ]
         ]);
     }
 
@@ -302,6 +325,8 @@ class WooCommerce_Reepay_Subscriptions{
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-variable.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-rest.php' );
+	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-addons-rest.php' );
 	    include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php' );
         include_once( $this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php' );

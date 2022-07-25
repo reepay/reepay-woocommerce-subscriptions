@@ -10,6 +10,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         if ( $product_type == 'reepay_variable_subscriptions' ) {
             $php_classname = 'WC_Product_Reepay_Variable_Subscription';
         }
+
         return $php_classname;
     }
 
@@ -105,5 +106,3 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         do_action( 'woocommerce_variable_add_to_cart' );
     }
 }
-
-new WC_Reepay_Subscription_Plan_Variable();

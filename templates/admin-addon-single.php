@@ -11,7 +11,7 @@ if(empty($addon['choose'])){
 
 global $post;
 ?>
-<div class="woocommerce_product_addon wc-metabox closed">
+<div class="woocommerce_product_addon wc-metabox postbox closed">
     <h3>
         <button type="button" class="remove_addon button"><?php _e( 'Remove', $domain ); ?></button>
 
@@ -31,60 +31,37 @@ global $post;
 
 
     <table cellpadding="0" cellspacing="0" class="wc-metabox-content">
+        <tbody class="new-addon <?= $addon['choose'] == 'exist' ? 'hidden' : ''?>">
+        <?php
+        wc_get_template(
+	        'admin-addon-single-data.php',
+	        array(
+		        'addon' => $addon,
+		        'loop' => $loop,
+		        'domain' => $domain,
+	        ),
+	        '',
+	        reepay_s()->settings('plugin_path').'templates/'
+        );
+        ?>
+        </tbody>
         <tbody class="exist <?= $addon['choose'] == 'new' ? 'hidden' : ''?>">
         <tr>
             <td class="addon_name" width="100%">
-                <?php if(!empty($addons_list)):?>
-                    <select id="_subscription_choose_exist"  name="addon_choose_exist[<?php echo $loop; ?>]" class="wc_input_subscription_period_interval">
+			    <?php if(!empty($addons_list)):?>
+                    <select id="_subscription_choose_exist"  name="addon_choose_exist[<?php echo $loop; ?>]" class="wc_input_subscription_period_interval js-subscription_choose_exist">
                         <option value=""><?php esc_html_e( 'Select add-on', $domain ); ?></option>
-                        <?php foreach ($addons_list as $addon_rem):?>
-                            <option value="<?=$addon_rem['handle']?>" <?php !empty($addon['exist']) ? selected( $addon_rem['handle'], $addon['exist'], true ) : '' ?>><?=$addon_rem['name']?></option>
-                        <?php endforeach; ?>
+					    <?php foreach ($addons_list as $addon_rem):?>
+                            <option value="<?=$addon_rem['handle']?>" <?php !empty($addon['exist']) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'], true ) : '' ?>><?=$addon_rem['name']?></option>
+					    <?php endforeach; ?>
                     </select>
-                <?php else: ?>
-                    <?php esc_html_e( 'Add-ons list is empty', $domain ); ?>
-                <?php endif; ?>
+			    <?php else: ?>
+				    <?php esc_html_e( 'Add-ons list is empty', $domain ); ?>
+			    <?php endif; ?>
             </td>
         </tr>
-        </tbody>
-        <tbody class="new-addon <?= $addon['choose'] == 'exist' ? 'hidden' : ''?>">
-        <tr style="display: flex">
-            <td class="addon_name" style="width: 50%;">
-                <label for="addon_name_<?php echo $loop; ?>">
-			        <?php _e( 'Name', $domain );?>
-                </label>
-                <input style="width: 100%;" type="text" id="addon_name_<?php echo $loop; ?>" name="product_addon_name[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['name'] ) ?>" />
-            </td>
-            <td class="addon_name" style="width: 50%;">
-                <label for="addon_name_<?php echo $loop; ?>">
-			        <?php _e( 'Type', $domain );?>
-                </label>
-                <select name="product_addon_type[<?php echo $loop; ?>]" class="product_addon_type"  <?= $addon['choose'] == 'exist' ? 'disabled' : ''?> style="min-height: 38px">
-                    <option <?php selected('on_off', $addon['type']); ?> value="on_off"><?php _e('On/Off', $domain); ?></option>
-                    <option <?php selected('quantity', $addon['type']); ?> value="quantity"><?php _e('Quantity', $domain); ?></option>
-                </select>
-            </td>
-        </tr>
-
         <tr>
-            <td class="addon_description" style="width: 100%">
-                <label for="addon_description_<?php echo $loop; ?>">
-                    <?php
-                    _e( 'Description', $domain );
-                    echo wc_help_tip( __( 'Will display on the frontend', $domain ) );
-                    ?>
-                </label>
-                <textarea cols="20" id="addon_description_<?php echo $loop; ?>" rows="3" name="product_addon_description[<?php echo $loop; ?>]"><?php echo esc_textarea( $addon['description'] ) ?></textarea>
-            </td>
-        </tr>
-
-        <tr style="display: flex">
-            <td class="addon_name" style="width: 33%">
-                <label for="addon_amount_<?php echo $loop; ?>">
-                    <?php _e( 'Amount (per unit)', $domain );?>
-                </label>
-                <input style="width: 100%;" type="number" min="0" placeholder="<?php _e( 'kr 0.00', $domain );?>" id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
-            </td>
+            <td class="js-exist-addon-data"></td>
         </tr>
         </tbody>
     </table>
