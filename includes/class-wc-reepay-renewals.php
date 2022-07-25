@@ -78,7 +78,7 @@ class WC_Reepay_Renewals {
 				],
 				'notice' => "Subscription {$data['order_id']} has no payment token"
 			] );
-
+            $main_order->add_order_note("Unable to create subscription. Empty token");
 			return;
 		}
 
@@ -158,6 +158,7 @@ class WC_Reepay_Renewals {
 				self::log( [
 					'notice' => $e->getMessage()
 				] );
+                $order->add_order_note('Unable to create subscription. Error from acquire: ' . $e->getMessage());
 			}
 
 			if ( empty( $new_subscription ) ) {
