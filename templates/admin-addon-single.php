@@ -20,10 +20,6 @@ global $post;
         <span> <?php _e( 'Type', $domain ); ?>: <?php $addon['type'] === 'on_off' ? _e('On/Off', $domain) : _e('Quantity', $domain) ?></span>;
         <span> <?php _e( 'Amount', $domain ); ?>: <?php echo esc_attr( $addon['amount'] ) ?></span>
 
-        &nbsp&nbsp<?php esc_html_e( 'Create new', $domain ); ?> &nbsp
-        <input type="radio" id="_reepay_subscription_choose" name="_reepay_addon_choose[<?php echo $loop; ?>]" value="new" <?php checked( 'new', $addon['choose'], true ); ?>>
-        &nbsp&nbsp<?php esc_html_e( 'Choose existing', $domain ); ?> &nbsp
-        <input type="radio" id="_reepay_subscription_choose" name="_reepay_addon_choose[<?php echo $loop; ?>]" value="exist" <?php checked( 'exist', $addon['choose'], true ); ?>>
 
         <input type="hidden" name="product_addon_position[<?php echo $loop; ?>]" class="product_addon_position" value="<?php echo $loop; ?>" />
         <input type="hidden" name="product_addon_handle[<?php echo $loop; ?>]" class="product_addon_position" value="<?= !empty($addon['handle']) ? $addon['handle'] : '' ?>" />
@@ -31,6 +27,17 @@ global $post;
 
 
     <table cellpadding="0" cellspacing="0" class="wc-metabox-content">
+        <tr>
+            <td class="addon_name">
+                <p class="form-row choose-radio">
+                    <label><?php esc_html_e( 'Creation type', $domain ); ?></label>
+                    &nbsp&nbsp<?php esc_html_e( 'Create new', $domain ); ?> &nbsp
+                    <input type="radio" id="_reepay_subscription_choose" name="_reepay_addon_choose[<?php echo $loop; ?>]" value="new" <?php checked( 'new', $addon['choose'], true ); ?>>
+                    &nbsp&nbsp<?php esc_html_e( 'Choose existing', $domain ); ?> &nbsp
+                    <input type="radio" id="_reepay_subscription_choose" name="_reepay_addon_choose[<?php echo $loop; ?>]" value="exist" <?php checked( 'exist', $addon['choose'], true ); ?>>
+                </p>
+            </td>
+        </tr>
         <tbody class="new-addon <?= $addon['choose'] == 'exist' ? 'hidden' : ''?>">
         <?php
         wc_get_template(

@@ -161,6 +161,22 @@
     width: 8%;
 }
 
+.choose-radio{
+    display: flex;
+    align-items: center;
+    padding-left: 0 !important;
+}
+
+.choose-radio input{
+    width: auto !important;
+    float: inherit !important;
+    min-width: 16px !important;
+}
+
+.choose-radio label{
+    margin-right: 20px !important;
+}
+
 @media screen and (max-width: 960px) {
     .reepay-subscriptions-page .column-status{
         width: 9%;
