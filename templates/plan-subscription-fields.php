@@ -22,6 +22,9 @@ $variable = $variable ?? false;
 <div class="reepay_subscription_choose_exist">
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field exist-fields <?= $variable ? 'dimensions_field form-row' : '' ?> ">
+            <label for="_subscription_price">
+                <?php esc_html_e( 'Choose plan', $domain ); ?>
+            </label>
             <?php if(!empty($plans_list)):?>
             <select id="_subscription_choose_exist"  name="_reepay_choose_exist<?= $variable ? '['.$loop.']' : '' ?>" class="wc_input_subscription_period_interval">
                 <option value=""><?php esc_html_e( 'Select plan', $domain ); ?></option>
