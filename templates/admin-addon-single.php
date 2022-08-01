@@ -18,7 +18,7 @@ global $post;
         <div class="handlediv" title="<?php _e( 'Click to toggle', $domain ); ?>"></div>
         <strong><?php _e( 'Add-on', $domain ); ?>: <span class="group_name"><?php if ( $addon['name'] ) echo '"' . esc_attr( $addon['name'] ) . '"'; ?></span></strong>;
         <span> <?php _e( 'Type', $domain ); ?>: <?php $addon['type'] === 'on_off' ? _e('On/Off', $domain) : _e('Quantity', $domain) ?></span>;
-        <span> <?php _e( 'Amount', $domain ); ?>: <?php echo esc_attr( $addon['amount'] ) ?></span>
+        <span> <?php _e( 'Amount', $domain ); ?>: <?php echo floatval($addon['amount']) * 100 ?></span>
 
 
         <input type="hidden" name="product_addon_position[<?php echo $loop; ?>]" class="product_addon_position" value="<?php echo $loop; ?>" />

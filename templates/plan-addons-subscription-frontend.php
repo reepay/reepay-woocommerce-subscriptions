@@ -10,7 +10,7 @@
             <?php elseif ($addon['type'] == 'quantity'): ?>
                 <input type="number" min="0" name="addon-<?=$addon['handle']?>" value="0">
             <?php endif; ?>
-            <?= $addon['name'] ?> +<?= wc_price($addon['amount']) ?> <?= !empty($addon['description']) ? '('.$addon['description'].')' : '' ?>
+            <?= $addon['name'] ?> +<?= wc_price($addon['amount']) ?> / <?= $billing_plan ?> <?= !empty($addon['description']) ? '('.$addon['description'].')' : '' ?>
         </p>
     <?php endforeach; ?>
 </div>

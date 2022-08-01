@@ -198,6 +198,7 @@ class WC_Reepay_Subscription_Addons{
             wc_get_template(
                 'plan-addons-subscription-frontend.php',
                 array(
+                    'billing_plan' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true ),
                     'product' => $product,
                     'addons' => $product_addons,
                     'domain' => reepay_s()->settings('domain')
