@@ -230,7 +230,7 @@ class WC_Reepay_Subscription_Addons{
 
         $product = wc_get_product($post);
         $product_addons = array_filter((array)$product->get_meta('_product_addons'));
-        $addons_list = $this->get_reepay_addons_list();
+        $addons_list = $this->get_reepay_addons_list(true);
         wc_get_template(
             'admin-addons-panel.php',
             array(

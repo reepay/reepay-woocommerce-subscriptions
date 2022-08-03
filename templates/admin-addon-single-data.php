@@ -39,7 +39,7 @@ global $post;
 			echo wc_help_tip( __( 'Will display on the frontend', $domain ) );
 			?>
         </label>
-        <textarea cols="20" id="addon_description_<?php echo $loop; ?>" rows="3" <?= $addon['disabled'] ? 'disabled' : ''?> name="product_addon_description[<?php echo $loop; ?>]"><?php echo esc_textarea( $addon['description'] ) ?></textarea>
+        <textarea cols="20" id="addon_description_<?php echo $loop; ?>" rows="3" <?= $addon['disabled'] ? 'disabled' : ''?> name="product_addon_description[<?php echo $loop; ?>]"><?php echo !empty($addon['description']) ?  esc_textarea( $addon['description'] ) : '' ?></textarea>
     </td>
 </tr>
 
