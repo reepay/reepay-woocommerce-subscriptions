@@ -21,7 +21,7 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 			$addon_data = reepay_s()->api()->request( "add_on/{$request['handle']}" );
 			$addon_data['choose'] = 'exist';
 			$addon_data['disabled'] = true;
-
+            $addon_data['amount'] = $addon_data['amount'] / 100;
 			ob_start();
 			wc_get_template(
 				'admin-addon-single-data.php',

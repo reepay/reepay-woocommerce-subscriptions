@@ -48,6 +48,6 @@ global $post;
         <label for="addon_amount_<?php echo $loop; ?>">
 			<?php _e( 'Amount (per unit)', $domain );?>
         </label>
-        <input style="width: 100%;" type="number" min="0" placeholder="<?php _e( 'kr 0.00', $domain );?>" <?= $addon['disabled'] ? 'disabled' : ''?> id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
+        <input style="width: 100%;" type="number" placeholder="<?php _e( 'kr 0.00', $domain );?>" <?= $addon['disabled'] ? 'disabled' : ''?> id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
     </td>
 </tr>
