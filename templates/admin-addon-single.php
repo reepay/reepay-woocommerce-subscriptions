@@ -11,7 +11,7 @@ if(empty($addon['choose'])){
 
 global $post;
 ?>
-<div class="woocommerce_product_addon wc-metabox postbox closed">
+<div class="woocommerce_product_addon wc-metabox closed">
     <h3>
         <button type="button" class="remove_addon button"><?php _e( 'Remove', $domain ); ?></button>
 
