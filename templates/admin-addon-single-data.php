@@ -51,3 +51,15 @@ global $post;
         <input style="width: 100%;" type="number" placeholder="<?php _e( 'kr 0.00', $domain );?>" <?= $addon['disabled'] ? 'disabled' : ''?> id="addon_amount_<?php echo $loop; ?>" name="product_addon_amount[<?php echo $loop; ?>]" value="<?php echo esc_attr( $addon['amount'] ) ?>" />
     </td>
 </tr>
+
+<tr>
+    <td class="addon_name">
+        <p class="form-row choose-radio">
+            <label><?php esc_html_e( 'Add-on availability', $domain ); ?></label>
+            &nbsp&nbsp<?php esc_html_e( 'Current plan', $domain ); ?> &nbsp
+            <input type="radio" id="_reepay_subscription_avai" name="_reepay_addon_avai[<?php echo $loop; ?>]" <?= $addon['disabled'] ? 'disabled' : ''?> value="current" <?= empty($addon['avai']) || $addon['avai'] == 'current' ? 'checked' : ''  ?>>
+            &nbsp&nbsp<?php esc_html_e( 'All plans', $domain ); ?> &nbsp
+            <input type="radio" id="_reepay_subscription_avai" name="_reepay_addon_avai[<?php echo $loop; ?>]" <?= $addon['disabled'] ? 'disabled' : ''?> value="all" <?php checked( 'all', $addon['avai'], true ); ?>>
+        </p>
+    </td>
+</tr>

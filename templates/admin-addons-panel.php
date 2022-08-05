@@ -76,6 +76,7 @@
                     $addon['description'] = '';
                     $addon['type'] = 'on-off';
                     $addon['amount'] = '';
+                    $addon['avai'] = '';
                     $addon['vat'] = 25;
                     $addon['vat_type'] = 'include';
 

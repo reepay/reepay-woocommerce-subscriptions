@@ -230,7 +230,10 @@ class WC_Reepay_Subscription_Addons{
 
         $product = wc_get_product($post);
         $product_addons = array_filter((array)$product->get_meta('_product_addons'));
-        $addons_list = $this->get_reepay_addons_list(true);
+
+        $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
+
+        $addons_list = $this->get_reepay_addons_list($plan_handle, true);
         wc_get_template(
             'admin-addons-panel.php',
             array(
@@ -248,7 +251,7 @@ class WC_Reepay_Subscription_Addons{
 	 *
 	 * @return mixed
 	 */
-	public function get_reepay_addons_list( $drop_cache = false ){
+	public function get_reepay_addons_list($plan_handle = false, $drop_cache = false ){
 		$addons_list = $drop_cache ? null : get_option('reepay_s_addons_list');
 
 	    if ( ! empty( $addons_list ) ) {
@@ -260,6 +263,9 @@ class WC_Reepay_Subscription_Addons{
 
             if(!empty($addons_list['content'])){
                 foreach ($addons_list['content'] as $i => $addon){
+                    if(!$addon['all_plans'] && !in_array($plan_handle, $addon['eligible_plans'])){
+                        unset($addons_list['content'][$i]);
+                    }
                     if($addon['state'] != 'active'){
                         unset($addons_list['content'][$i]);
                     }
@@ -322,8 +328,8 @@ class WC_Reepay_Subscription_Addons{
             'vat' => !empty($product_addon['vat']) ? floatval($product_addon['vat']) : 0,
             'type' => $product_addon['type'],
             'amount_incl_vat' => $product_addon['vat_type'] == 'include',
-            'all_plans' => false,
-            'eligible_plans' => [$plan_handle],
+            'all_plans' => $product_addon['avai'] == 'all',
+            'eligible_plans' => $product_addon['avai']  == 'all' ? [] : [$plan_handle],
         ];
 
         if(!empty($product_addon['handle'])){ //Update
@@ -334,7 +340,7 @@ class WC_Reepay_Subscription_Addons{
                 WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
             }
         }else{ //Create
-            $addon_handle = 'Woocommerce_'.$post_id.'_'.$i;
+            $addon_handle = 'Woocommerce_'.$post_id.'_'.time();
             $params['handle'] = $addon_handle;
             try{
                 $result = reepay_s()->api()->request('add_on', 'POST', $params);
@@ -394,6 +400,7 @@ class WC_Reepay_Subscription_Addons{
         if (isset($_POST['product_addon_name'])) {
             $addon_name = $_POST['product_addon_name'];
             $addon_description = $_POST['product_addon_description'];
+            $addon_avai = $_POST['_reepay_addon_avai'];
             $addon_type = !empty($_POST['product_addon_type']) ? $_POST['product_addon_type'] : '';
             $addon_position = $_POST['product_addon_position'];
             $addon_amount = $_POST['product_addon_amount'];
@@ -409,6 +416,7 @@ class WC_Reepay_Subscription_Addons{
                     $this->add_plan_to_addon($post_id, $addon_exist[$i]);
                     $data['choose'] = $addon_choose[$i];
                     $data['position'] = $addon_position[$i];
+                    $data['avai'] = $addon_avai[$i];
                 }else{
                     if (!isset($addon_name[$i]) || ('' == $addon_name[$i])) {
                         continue;
@@ -418,6 +426,7 @@ class WC_Reepay_Subscription_Addons{
                     $data['description'] = wp_kses_post(stripslashes($addon_description[$i]));
                     $data['type'] = sanitize_text_field(stripslashes($addon_type[$i]));
                     $data['position'] = absint($addon_position[$i]);
+                    $data['avai'] = sanitize_text_field($addon_avai[$i]);
                     $data['amount'] = wc_format_decimal(sanitize_text_field(stripslashes($addon_amount[$i])));
                     $data['vat'] = WC_Reepay_Subscription_Plan_Simple::get_vat($post_id);
                     $data['vat_type'] = wc_prices_include_tax();
