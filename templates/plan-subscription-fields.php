@@ -11,11 +11,11 @@ $variable = $variable ?? false;
         <?php esc_html_e('Create new plan', $domain); ?> &nbsp
         <input type="radio" id="_reepay_subscription_choose"
                name="_reepay_subscription_choose<?= $variable ? '[' . $loop . ']' : '' ?>"
-               value="new" <?php checked('new', $_reepay_subscription_choose, true); ?>>
+               value="new" <?php checked('new', esc_attr($_reepay_subscription_choose), true); ?>>
         &nbsp&nbsp<?php esc_html_e('Choose existing plan', $domain); ?> &nbsp
         <input type="radio" id="_reepay_subscription_choose"
                name="_reepay_subscription_choose<?= $variable ? '[' . $loop . ']' : '' ?>"
-               value="exist" <?php checked('exist', $_reepay_subscription_choose, true); ?>>
+               value="exist" <?php checked('exist', esc_attr($_reepay_subscription_choose), true); ?>>
     </p>
 </div>
 
@@ -35,7 +35,7 @@ $variable = $variable ?? false;
                         class="wc_input_subscription_period_interval">
                     <option value=""><?php esc_html_e('Select plan', $domain); ?></option>
                     <?php foreach ($plans_list as $plan): ?>
-                        <option value="<?= $plan['handle'] ?>" <?= $_reepay_subscription_choose == 'exist' ? selected($plan['handle'], $_reepay_choose_exist) : '' ?>><?= $plan['name'] ?></option>
+                        <option value="<?= esc_attr($plan['handle']) ?>" <?= $_reepay_subscription_choose == 'exist' ? selected($plan['handle'], $_reepay_choose_exist) : '' ?>><?= esc_attr($plan['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
             <?php else: ?>
@@ -52,7 +52,7 @@ $variable = $variable ?? false;
      class="options_group reepay_subscription_publish_btn show_if_reepay_subscription">
     <p class="form-field">
         <input type="submit" name="save" id="reepay-publish" class="button button-primary button-large"
-               value="<?= !$is_exist ? 'Create plan' : 'Update plan' ?>">
+               value="<?= !$is_exist ? esc_html_e('Create plan', $domain) : esc_html_e('Update plan', $domain) ?>">
     </p>
 </div>
 

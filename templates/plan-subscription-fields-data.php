@@ -593,14 +593,14 @@ $variable = !empty($variable);
             [
                 'id' => '_tax_status',
                 'value' => $product_object->get_tax_status('edit'),
-                'label' => __('Tax status', 'woocommerce'),
+                'label' => __('Tax status', $domain),
                 'options' => [
-                    'taxable' => __('Taxable', 'woocommerce'),
-                    'shipping' => __('Shipping only', 'woocommerce'),
-                    'none' => _x('None', 'Tax status', 'woocommerce'),
+                    'taxable' => __('Taxable', $domain),
+                    'shipping' => __('Shipping only', $domain),
+                    'none' => _x('None', 'Tax status', $domain),
                 ],
                 'desc_tip' => 'true',
-                'description' => __('Define whether or not the entire product is taxable, or just the cost of shipping it.', 'woocommerce'),
+                'description' => __('Define whether or not the entire product is taxable, or just the cost of shipping it.', $domain),
                 'custom_attributes' => empty($disabled) ? [] : ['disabled' => 'disabled']
             ]
         );
@@ -609,10 +609,10 @@ $variable = !empty($variable);
             [
                 'id' => '_tax_class',
                 'value' => $product_object->get_tax_class('edit'),
-                'label' => __('Tax class', 'woocommerce'),
+                'label' => __('Tax class', $domain),
                 'options' => wc_get_product_tax_class_options(),
                 'desc_tip' => 'true',
-                'description' => __('Choose a tax class for this product. Tax classes are used to apply different tax rates specific to certain types of product.', 'woocommerce'),
+                'description' => __('Choose a tax class for this product. Tax classes are used to apply different tax rates specific to certain types of product.', $domain),
                 'custom_attributes' => empty($disabled) ? [] : ['disabled' => 'disabled']
             ]
         );
