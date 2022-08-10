@@ -76,7 +76,7 @@ class WooCommerce_Reepay_Subscriptions
         }
 
         self::$settings = [
-            'domain' => reepay_s()->settings('domain'),
+            'domain' => 'reepay-woocommerce-subscriptions',
             'plugin_url' => plugin_dir_url(__FILE__),
             'plugin_path' => plugin_dir_path(__FILE__),
             'version' => static::$version,

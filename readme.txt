@@ -13,4 +13,4 @@ WC tested up to: 3.2
 Integration woocommerce with Reepay Subscriptions via API.
 
 == Changelog ==
-v 1.0.0
+v 1.0.0 - initial
