@@ -110,7 +110,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
         <tr>
             <td><?php _e('Total Amount (Incl. VAT)', $domain); ?>:</td>
             <td>
-                Kr <?= number_format($plan['amount'] / 100, 2) ?> DKK / Every Day
+                <?= number_format($plan['amount'] / 100, 2) ?> <?= $plan['currency'] ?> / <?= $subscription['formatted_schedule'] ?>
             </td>
         </tr>
         <tr>

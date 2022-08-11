@@ -277,6 +277,7 @@ class WC_Reepay_Account_Page
                 'expired_date' => $subscription['expired_date'] ?? null,
                 'formatted_expired_date' => $this->format_date($subscription['expired_date'] ?? null),
                 'formatted_status' => $this->get_status($subscription),
+                'formatted_schedule' => $this->get_formatted_schedule_type($plans[$subscription['plan']]),
                 'payment_methods' => $payment_methods,
                 'plan' => $subscription['plan']
             ];
@@ -316,18 +317,18 @@ class WC_Reepay_Account_Page
     function get_status($subscription)
     {
         if ($subscription['is_cancelled'] === true) {
-            return 'cancelled';
+            return 'Cancelled';
         }
         if ($subscription['state'] === 'expired') {
-            return 'expired';
+            return 'Expired';
         }
 
         if ($subscription['state'] === 'on_hold') {
-            return 'on_hold';
+            return 'On hold';
         }
 
         if ($subscription['state'] === 'is_cancelled') {
-            return 'is_cancelled';
+            return 'Cancelled';
         }
 
         if ($subscription['state'] === 'active') {
@@ -335,13 +336,35 @@ class WC_Reepay_Account_Page
                 $now = new DateTime();
                 $trial_end = new DateTime($subscription['trial_end']);
                 if ($trial_end > $now) {
-                    return 'trial';
+                    return 'Trial';
                 }
             }
-            return 'active';
+            return 'Active';
         }
 
         return $subscription['state'];
+    }
+
+    public function get_formatted_schedule_type($plan) {
+        if ($plan['schedule_type'] === 'manual') {
+            return 'Manual';
+        }
+        if ($plan['schedule_type'] === 'daily') {
+            return 'Every day';
+        }
+        if ($plan['schedule_type'] === 'weekly_fixedday') {
+            return 'Weekly fixedday';
+        }
+        if ($plan['schedule_type'] === 'month_startdate') {
+            return 'Month startdate';
+        }
+        if ($plan['schedule_type'] === 'month_fixedday') {
+            return 'Month fixedday';
+        }
+        if ($plan['schedule_type'] === 'month_lastday') {
+            return 'Month lastdate';
+        }
+        return $plan['schedule_type'];
     }
 
     function format_date($dateStr)
