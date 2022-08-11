@@ -435,7 +435,7 @@ class WC_Reepay_Subscription_Plan_Simple
             $fee = [
                 'enabled' => 'yes',
                 'amount' => intval($plan_data['setup_fee']) / 100,
-                'text' => $plan_data['setup_fee_text'],
+                'text' => !empty($plan_data['setup_fee_text']) ? $plan_data['setup_fee_text'] : '',
                 'handling' => $plan_data['setup_fee_handling'],
             ];
 
@@ -456,8 +456,12 @@ class WC_Reepay_Subscription_Plan_Simple
                 'type' => $type,
                 'length' => $plan_data['trial_interval_length'],
                 'unit' => $plan_data['trial_interval_unit'],
-                'reminder' => $plan_data['trial_reminder_email_days'],
+                'reminder' => !empty($plan_data['trial_reminder_email_days']),
             ];
+
+            if (!empty($plan_data['trial_reminder_email_days'])) {
+                $trial['reminder'] = $plan_data['trial_reminder_email_days'];
+            }
 
             $plan_meta['_reepay_subscription_trial'] = $trial;
         }
