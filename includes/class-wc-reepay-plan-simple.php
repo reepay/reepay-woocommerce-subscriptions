@@ -207,7 +207,7 @@ class WC_Reepay_Subscription_Plan_Simple
             return;
         }
 
-        update_post_meta($post_id, '_sold_individually', 'yes');
+        update_post_meta($post_id, '_sold_individually', 'no');
     }
 
     public function display_subscription_info()
