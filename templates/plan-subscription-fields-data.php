@@ -3,6 +3,12 @@ $disabled = '';
 $variable = !empty($variable);
 ?>
 <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
+    <p class="form-field fields-name <?= $variable ? 'form-row' : '' ?>">
+        <label for="_reepay_subscription_name"><?php esc_html_e('Name', $domain); ?></label>
+        <input type="text" id="_reepay_subscription_name" <?= $disabled ?>
+               name="_reepay_subscription_name<?= $variable ? '[' . $loop . ']' : '' ?>"
+               value="<?= !empty($_reepay_subscription_name) ? $_reepay_subscription_name : '' ?>">
+    </p>
     <p class="form-field pricing-fields <?= $variable ? 'dimensions_field form-row' : '' ?> ">
         <label for="_subscription_price">
             <?php esc_html_e('Subscription pricing (kr)', $domain); ?>

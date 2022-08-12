@@ -88,6 +88,7 @@ class WC_Reepay_Subscription_Plan_Simple
         '_reepay_subscription_choose',
         '_reepay_choose_exist',
         '_reepay_subscription_price',
+        '_reepay_subscription_name',
         '_reepay_subscription_schedule_type',
         '_reepay_subscription_daily',
         '_reepay_subscription_month_startdate',
@@ -427,6 +428,10 @@ class WC_Reepay_Subscription_Plan_Simple
             $plan_meta['_reepay_subscription_price'] = intval($plan_data['amount']) / 100;
         }
 
+        if (!empty($plan_data['name'])) {
+            $plan_meta['_reepay_subscription_name'] = $plan_data['name'];
+        }
+
         if (!empty($plan_data['vat'])) {
             $plan_meta['_reepay_subscription_vat'] = $plan_data['vat'];
         }
@@ -586,7 +591,6 @@ class WC_Reepay_Subscription_Plan_Simple
                 $this->plan_error(__('Please choose the plan', reepay_s()->settings('domain')));
             }
         } else {
-
             if (!empty($request_data['_reepay_subscription_price'])) {
                 update_post_meta($post_id, '_regular_price', $request_data['_reepay_subscription_price']);
                 update_post_meta($post_id, '_price', $request_data['_reepay_subscription_price']);
@@ -751,7 +755,7 @@ class WC_Reepay_Subscription_Plan_Simple
         $type_data = get_post_meta($post_id, '_reepay_subscription_' . $type, true);
 
         $params = [
-            'name' => get_the_title($post_id),
+            'name' => $request_data['_reepay_subscription_name'],
             'description' => get_post_field('post_content', $post_id),
             //'fixed_trial_days' => '', //@todo Уточнить что за поле в админке
         ];
