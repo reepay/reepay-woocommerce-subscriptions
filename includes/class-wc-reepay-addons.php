@@ -415,15 +415,15 @@ class WC_Reepay_Subscription_Addons
     {
         $product_addons = [];
         if (isset($_POST['product_addon_name'])) {
-            $addon_name = sanitize_text_field($_POST['product_addon_name']);
-            $addon_description = sanitize_text_field($_POST['product_addon_description']);
-            $addon_avai = sanitize_text_field($_POST['_reepay_addon_avai']);
-            $addon_type = !empty($_POST['product_addon_type']) ? sanitize_text_field($_POST['product_addon_type']) : '';
-            $addon_position = intval($_POST['product_addon_position']);
-            $addon_amount = intval($_POST['product_addon_amount']);
-            $addon_handle = sanitize_text_field($_POST['product_addon_handle']);
-            $addon_choose = sanitize_text_field($_POST['_reepay_addon_choose']);
-            $addon_exist = sanitize_text_field($_POST['addon_choose_exist']);
+            $addon_name = $_POST['product_addon_name'];
+            $addon_description = $_POST['product_addon_description'];
+            $addon_avai = $_POST['_reepay_addon_avai'];
+            $addon_type = !empty($_POST['product_addon_type']) ? $_POST['product_addon_type'] : '';
+            $addon_position = $_POST['product_addon_position'];
+            $addon_amount = $_POST['product_addon_amount'];
+            $addon_handle = $_POST['product_addon_handle'];
+            $addon_choose = $_POST['_reepay_addon_choose'];
+            $addon_exist = $_POST['addon_choose_exist'];
 
             for ($i = 0; $i < sizeof($addon_name); $i++) {
                 $data = [];
