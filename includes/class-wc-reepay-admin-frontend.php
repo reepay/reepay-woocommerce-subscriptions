@@ -97,7 +97,7 @@ class WC_Reepay_Admin_Frontend
             case 'reepay_sub':
                 $handle = $the_order->get_meta('_reepay_subscription_handle', true);
                 if (!empty($handle)) {
-                    $admin_page = 'https://admin.reepay.com/#/misha-rudrastyh-team/misha-rudrastyh-team/';
+                    $admin_page = 'https://app.reepay.com/#/rp/';
 
                     $link = $admin_page . 'subscriptions/' . $handle;
 
