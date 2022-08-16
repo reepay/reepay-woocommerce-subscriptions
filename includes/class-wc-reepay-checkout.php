@@ -75,12 +75,16 @@ class WC_Reepay_Checkout
         /**
          * @var $cart_item array Item data
          */
-        foreach (WC()->cart->get_cart() as $cart_item) {
-            if (self::is_reepay_product($cart_item['data'])) {
-                $is_reepay_product_in_cart = true;
-                break;
+
+        if (!is_null(WC()->cart->get_cart())) {
+            foreach (WC()->cart->get_cart() as $cart_item) {
+                if (self::is_reepay_product($cart_item['data'])) {
+                    $is_reepay_product_in_cart = true;
+                    break;
+                }
             }
         }
+        
 
         return $is_reepay_product_in_cart;
     }
