@@ -99,7 +99,7 @@ class WC_Reepay_Admin_Frontend
                 if (!empty($handle)) {
                     $admin_page = 'https://app.reepay.com/#/rp/';
 
-                    $link = $admin_page . 'subscriptions/' . $handle;
+                    $link = $admin_page . 'subscriptions/subscription/' . $handle;
 
                     $output = sprintf('<a target="_blank" href="%s">%s</a>', $link, $handle);
                 }
