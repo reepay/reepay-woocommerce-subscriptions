@@ -1,8 +1,8 @@
 <?php
 
 
-
-class WC_Reepay_Subscriptions_List {
+class WC_Reepay_Subscriptions_List
+{
 
     public function __construct()
     {
@@ -17,19 +17,20 @@ class WC_Reepay_Subscriptions_List {
 
         add_submenu_page(
             'woocommerce',
-            'Reepay Subscriptions',
-            'Reepay Subscriptions',
+            'Subscriptions',
+            'Subscriptions',
             'edit_pages',
             'reepay-subscriptions',
             [$this, 'render_page']
         );
     }
 
-    public function render_page() {
+    public function render_page()
+    {
         ?>
 
         <form action="" method="get" class="reepay-subscriptions-page">
-            <input type="hidden" name="page" value="reepay-subscriptions" />
+            <input type="hidden" name="page" value="reepay-subscriptions"/>
             <?php
             $drafts_table = new Subscriptions_Table();
             $drafts_table->prepare_items();
