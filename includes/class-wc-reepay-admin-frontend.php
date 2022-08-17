@@ -19,6 +19,15 @@ class WC_Reepay_Admin_Frontend
 
         add_filter('posts_orderby', [$this, 'modify_search_results_order'], 10, 2);
         add_filter('posts_fields', [$this, 'modify_search_results_fields'], 10, 2);
+
+        add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'reepay_show_extra_order_fields'));
+    }
+
+    public function reepay_show_extra_order_fields($order)
+    {
+
+        $output = '<a href="https://app.reepay.com/#/rp/customers/customers/customer/customer-' . $order->get_customer_id() . '" target="_blank">customer-' . $order->get_customer_id() . '</a>';
+        echo '<p><strong>' . __('Customer Handle') . ':</strong> ' . $output . '</p>';
     }
 
     /**
