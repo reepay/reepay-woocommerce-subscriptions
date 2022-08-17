@@ -630,7 +630,7 @@ $variable = !empty($variable);
         ?>
     </div>
 
-<?php if ($is_exist): ?>
+<?php if (isset($is_exist) && $is_exist): ?>
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field <?= $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_supersedes"><?php esc_html_e('Supersede mode', $domain); ?></label>
