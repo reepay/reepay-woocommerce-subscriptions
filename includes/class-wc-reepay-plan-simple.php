@@ -106,6 +106,7 @@ class WC_Reepay_Subscription_Plan_Simple
         '_reepay_subscription_notice_period',
         '_reepay_subscription_notice_period_start',
         '_reepay_subscription_billing_cycles',
+        '_reepay_subscription_supersedes',
         '_reepay_subscription_billing_cycles_period',
         '_reepay_subscription_trial',
         '_reepay_subscription_fee',
@@ -637,7 +638,7 @@ class WC_Reepay_Subscription_Plan_Simple
     public function update_plan($handle, $params)
     {
         try {
-            $params['supersede_mode'] = 'scheduled_sub_update'; //@todo сделать параметр для обновляемых планов выбор обновлять ли уже оформленные подписки
+            $params['supersede_mode'] = !empty($params['supersede_mode']) ? $params['supersede_mode'] : 'scheduled_sub_update';
 
             $result = reepay_s()->api()->request("plan/$handle", 'POST', $params);
             return true;
@@ -672,6 +673,7 @@ class WC_Reepay_Subscription_Plan_Simple
 
         $params['amount'] = floatval(get_post_meta($post_id, '_reepay_subscription_price', true)) * 100;
         $params['handle'] = $handle;
+        $params['supersede_mode'] = get_post_meta($post_id, '_reepay_subscription_supersedes', true);
         $params['quantity'] = intval(get_post_meta($post_id, '_reepay_subscription_default_quantity', true));
         $params['schedule_type'] = $this->get_type($type);
         //$params['fixed_life_time_unit'] = ''; //@todo Уточнить что за поле в админке
