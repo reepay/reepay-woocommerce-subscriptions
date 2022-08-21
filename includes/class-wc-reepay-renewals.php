@@ -119,7 +119,7 @@ class WC_Reepay_Renewals
 
             $product = $order_item->get_product();
 
-            $handle = 'subscription_handle_' . $order->get_id() . '_' . $product->get_id();
+            $handle = $order->get_id() . '_' . $product->get_id();
 
             $addons = array_merge(self::get_shipping_addons($order), self::get_plan_addons($order_item) ?: []);
 
