@@ -41,7 +41,7 @@ class WC_Reepay_Renewals
 
         $order = rp_get_order_by_handle($data['invoice']);
 
-        if (empty($order) || !empty($order->get_meta('_reepay_subscription_handle')) || self::is_locked($order->get_id())) {
+        if (empty($order) || !empty($order->get_meta('_reepay_subscription_handle')) || self::is_locked($order->get_id()) || !$this->is_order_contain_subscription($order)) {
             return;
         }
 
@@ -50,6 +50,18 @@ class WC_Reepay_Renewals
         $this->create_subscriptions($data, $order);
 
         self::unlock_order($order->get_id());
+    }
+
+    public function is_order_contain_subscription($order)
+    {
+        foreach ($order->get_items() as $item_key => $item_values) {
+            $product = $item_values->get_product();
+            if ($product->is_type('reepay_variable_subscriptions') || $product->is_type('reepay_simple_subscriptions')) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

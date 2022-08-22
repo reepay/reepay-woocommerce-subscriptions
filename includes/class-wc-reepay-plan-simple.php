@@ -422,7 +422,7 @@ class WC_Reepay_Subscription_Plan_Simple
             return [];
         }
 
-        $plan_meta['_regular_price'] = $plan_data['amount'] / 100;//@todo уточнить нужно ли добавлять fee в цену или выводить отдельно
+        $plan_meta['_regular_price'] = $plan_data['amount'] / 100;
         $plan_meta['_price'] = $plan_data['amount'] / 100;
 
         if (!empty($plan_data['amount'])) {
