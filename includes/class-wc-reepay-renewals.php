@@ -35,11 +35,14 @@ class WC_Reepay_Renewals
      */
     public function create_subscriptions_handle($data)
     {
-        if ($data['event_type'] !== 'invoice_authorized' && $data['event_type'] !== 'invoice_settled') {
+        if ($data['event_type'] == 'invoice_authorized' || $data['event_type'] == 'invoice_settled') {
+            $order = rp_get_order_by_handle($data['invoice']);
+        } elseif ($data['event_type'] == 'customer_payment_method_added') {
+            $order = rp_get_order_by_session($data['payment_method_reference']);
+        } else {
             return;
         }
 
-        $order = rp_get_order_by_handle($data['invoice']);
 
         if (empty($order) || !empty($order->get_meta('_reepay_subscription_handle')) || self::is_locked($order->get_id()) || !$this->is_order_contain_subscription($order)) {
             return;
@@ -83,7 +86,13 @@ class WC_Reepay_Renewals
     {
         $data['order_id'] = $main_order->get_id();
 
-        $token = self::get_payment_token_order($main_order);
+        if (!empty($data['payment_method'])) {
+            $token = $data['payment_method'];
+        } else {
+            $token = self::get_payment_token_order($main_order);
+            $token = $token->get_token();
+        }
+
 
         if (empty($token)) {
             self::log([
@@ -98,7 +107,6 @@ class WC_Reepay_Renewals
             return;
         }
 
-        $token = $token->get_token();
 
         $orders = [$main_order];
         $order_items = $main_order->get_items();
@@ -117,11 +125,6 @@ class WC_Reepay_Renewals
             ], $main_order, [$order_item]);
         }
 
-        $ids = [];
-
-        foreach ($orders as $order) {
-            $ids[] = $order->get_id();
-        }
 
         $main_order->calculate_totals();
 
@@ -177,6 +180,7 @@ class WC_Reepay_Renewals
                 $order->add_order_note('Unable to create subscription. Error from acquire: ' . $e->getMessage());
             }
 
+
             if (empty($new_subscription)) {
                 self::log([
                     'log' => [
@@ -190,6 +194,15 @@ class WC_Reepay_Renewals
 
                 continue;
             }
+
+            self::log([
+                'log' => [
+                    'source' => 'WC_Reepay_Renewals::create_subscription',
+                    'error' => 'See sub',
+                    'data' => $new_subscription
+                ],
+                'notice' => "Subscription {$data['order_id']} has no payment token"
+            ]);
 
             try {
                 /**
