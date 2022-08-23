@@ -13,6 +13,7 @@ class WC_Reepay_Renewals
     public function __construct()
     {
         add_action('reepay_webhook', [$this, 'create_subscriptions_handle']);
+        add_action('reepay_create_subscription', [$this, 'create_subscriptions'], 10, 2);
 
         add_action('reepay_webhook_raw_event_subscription_renewal', [$this, 'renew_subscription']);
         add_action('reepay_webhook_raw_event_subscription_on_hold', [$this, 'hold_subscription']);
@@ -101,7 +102,7 @@ class WC_Reepay_Renewals
                     'error' => 'Empty token',
                     'data' => $data
                 ],
-                'notice' => "Subscription {$data['order_id']} has no payment token"
+                'notice' => "Subscription {$main_order->get_id()} has no payment token"
             ]);
             $main_order->add_order_note("Unable to create subscription. Empty token");
             return;
