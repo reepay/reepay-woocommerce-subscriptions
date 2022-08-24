@@ -196,14 +196,6 @@ class WC_Reepay_Renewals
                 continue;
             }
 
-            self::log([
-                'log' => [
-                    'source' => 'WC_Reepay_Renewals::create_subscription',
-                    'error' => 'See sub',
-                    'data' => $new_subscription
-                ],
-                'notice' => "Subscription {$data['order_id']} has no payment token"
-            ]);
 
             try {
                 /**
@@ -362,7 +354,7 @@ class WC_Reepay_Renewals
         // $handle - "subscription_handle_<order_id>_<product_id>"
         $parts = explode('_', $handle);
 
-        return wc_get_order((int)$parts[2]);
+        return wc_get_order((int)$parts[0]);
     }
 
     /**
@@ -373,6 +365,7 @@ class WC_Reepay_Renewals
      */
     public static function create_child_order($data, $status)
     {
+
         $parent_order = self::get_order_by_subscription_handle($data['subscription']);
 
         if (empty($parent_order)) {
@@ -406,6 +399,8 @@ class WC_Reepay_Renewals
                 'data' => $data,
             ]
         ]);
+
+        update_post_meta($parent_order->get_id(), '_reepay_order', $data['invoice']);
 
         return self::create_order_copy([
             'status' => $status,
