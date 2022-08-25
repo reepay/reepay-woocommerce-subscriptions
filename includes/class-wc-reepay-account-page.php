@@ -82,7 +82,7 @@ class WC_Reepay_Account_Page
     {
 
         if (!empty($_GET['cancel_subscription'])) {
-            if (!reepay_s()->settings('_reepay_enable_cancel_subscription')) {
+            if (!reepay_s()->settings('_reepay_enable_cancel')) {
                 return;
             }
 
