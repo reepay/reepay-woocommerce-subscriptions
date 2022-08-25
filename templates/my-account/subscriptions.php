@@ -45,7 +45,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                                 <?php endif; ?>
                             <?php endif; ?>
                         <?php endif; ?>
-                        <br>
+                    </td>
                 </tr>
             <?php endif; ?>
 
@@ -66,8 +66,6 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                     </td>
                 </tr>
 
-
-                <br>
             <?php endforeach; ?>
             <tr>
                 <td></td>
