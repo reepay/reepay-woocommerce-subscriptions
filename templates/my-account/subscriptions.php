@@ -19,6 +19,55 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
     <h1><?= $plan['name'] ?></h1>
     <table>
         <tbody>
+        <tr>
+            <td><?php _e('Status', $domain); ?>:</td>
+            <td>
+                <span style="text-transform: capitalize">
+                    <?php if ($subscription['state'] === 'expired'): ?>
+                        <?php _e('Expired', $domain); ?> <?= $subscription['formatted_expired_date'] ?>
+                    <?php else: ?>
+                        <?= $subscription['formatted_status'] ?>
+                        <?php if ($subscription['renewing'] === false): ?>
+                            <?php _e('Non-renewing', $domain); ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td><?php _e('First period start', $domain); ?>:</td>
+            <td>
+                <?php if (!empty($subscription['first_period_start'])): ?>
+                    <?= $subscription['formatted_first_period_start'] ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <tr>
+            <td><?php _e('Current period', $domain); ?>:</td>
+            <td>
+                <?php if (!empty($subscription['current_period_start'])): ?>
+                    <?= $subscription['formatted_current_period_start'] . '-' . $subscription['formatted_next_period_start'] ?>
+                <?php else: ?>
+                    <?php _e('No Active period', $domain); ?>
+                <?php endif; ?>
+            </td>
+        </tr>
+        <tr>
+            <td><?php _e('Total Amount (Incl. VAT)', $domain); ?>:</td>
+            <td>
+                <?= number_format($plan['amount'] / 100, 2) ?> <?= $plan['currency'] ?> / <?= $subscription['formatted_schedule'] ?>
+            </td>
+        </tr>
+        <tr>
+            <td><?php _e('Billing Cycle', $domain); ?>:</td>
+            <td>
+                <?php if (!empty($plan['fixed_count'])): ?>
+                    <?php _e('1 out of', $domain); ?> <?= $plan['fixed_count'] ?>
+                <?php else: ?>
+                    <?php _e('Forever Until Canceled', $domain); ?>
+                <?php endif; ?>
+            </td>
+        </tr>
         <?php if (!$is_expired): ?>
             <?php if (reepay_s()->settings('_reepay_enable_on_hold') || reepay_s()->settings('_reepay_enable_cancel')): ?>
                 <tr>
@@ -74,53 +123,6 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                        class="button"><?php _e('Add payment method', $domain); ?></a></td>
             </tr>
         <?php endif; ?>
-        <tr>
-            <td><?php _e('Status', $domain); ?>:</td>
-            <td>
-                <?php if ($subscription['state'] === 'expired'): ?>
-                    <?php _e('Expired', $domain); ?> <?= $subscription['formatted_expired_date'] ?>
-                <?php else: ?>
-                    <?= $subscription['formatted_status'] ?>
-                    <?php if ($subscription['renewing'] === false): ?>
-                        <?php _e('Non-renewing', $domain); ?>
-                    <?php endif; ?>
-                <?php endif; ?>
-            </td>
-        </tr>
-        <tr>
-            <td><?php _e('First period start', $domain); ?>:</td>
-            <td>
-                <?php if (!empty($subscription['first_period_start'])): ?>
-                    <?= $subscription['formatted_first_period_start'] ?>
-                <?php endif; ?>
-            </td>
-        </tr>
-        <tr>
-            <td><?php _e('Current period', $domain); ?>:</td>
-            <td>
-                <?php if (!empty($subscription['current_period_start'])): ?>
-                    <?= $subscription['formatted_current_period_start'] . '-' . $subscription['formatted_next_period_start'] ?>
-                <?php else: ?>
-                    <?php _e('No Active period', $domain); ?>
-                <?php endif; ?>
-            </td>
-        </tr>
-        <tr>
-            <td><?php _e('Total Amount (Incl. VAT)', $domain); ?>:</td>
-            <td>
-                <?= number_format($plan['amount'] / 100, 2) ?> <?= $plan['currency'] ?> / <?= $subscription['formatted_schedule'] ?>
-            </td>
-        </tr>
-        <tr>
-            <td><?php _e('Billing Cycle', $domain); ?>:</td>
-            <td>
-                <?php if (!empty($plan['fixed_count'])): ?>
-                    <?php _e('1 out of', $domain); ?> <?= $plan['fixed_count'] ?>
-                <?php else: ?>
-                    <?php _e('Forever Until Canceled', $domain); ?>
-                <?php endif; ?>
-            </td>
-        </tr>
         </tbody>
     </table>
 <?php endforeach; ?>
