@@ -37,7 +37,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                         <?php if ($subscription['state'] !== 'on_hold'): ?>
                             <?php if ($subscription['is_cancelled'] === true): ?>
                                 <a href="?uncancel_subscription=<?= $subscription['handle'] ?>"
-                                   class="button">Uncancel</a>
+                                   class="button"><?php _e('Uncancel', $domain); ?></a>
                             <?php else: ?>
                                 <?php if (reepay_s()->settings('_reepay_enable_cancel')): ?>
                                     <a href="?cancel_subscription=<?= $subscription['handle'] ?>"
