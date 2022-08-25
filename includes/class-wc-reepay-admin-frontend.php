@@ -19,8 +19,20 @@ class WC_Reepay_Admin_Frontend
 
         add_filter('posts_orderby', [$this, 'modify_search_results_order'], 10, 2);
         add_filter('posts_fields', [$this, 'modify_search_results_fields'], 10, 2);
+        add_filter('woocommerce_order_number', [$this, 'modify_order_id'], 10, 2);
 
         add_action('woocommerce_admin_order_data_after_billing_address', array($this, 'reepay_show_extra_order_fields'));
+    }
+
+    public function modify_order_id($id, $order)
+    {
+        global $post;
+
+        $reepay_order = get_post_meta($order->get_id(), '_reepay_order', true);
+        if (!empty($reepay_order) && strpos($reepay_order, 'inv') !== false && $post->post_parent !== 0) {
+            return $reepay_order;
+        }
+        return $id;
     }
 
     public function reepay_show_extra_order_fields($order)
