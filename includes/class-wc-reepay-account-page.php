@@ -42,7 +42,7 @@ class WC_Reepay_Account_Page
                     'source' => $token->get_token(),
                 ]);
                 set_transient($handle . '_payment_methods', $payment_methods);
-                wc_add_notice(__('Payment method successfully added.', 'reepay-checkout-gateway'));
+                wc_add_notice(__('Payment method successfully added.', reepay_s()->settings('domain')));
             } catch (Exception $exception) {
                 wc_add_notice($exception->getMessage());
             }

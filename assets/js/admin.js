@@ -212,10 +212,14 @@ jQuery(function ($) {
 
         if ('reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val()) {
             if (val === 'new') {
+                $reepay_subscription_choose_exist.find("input").prop("disabled", true);
+                $reepay_subscription_choose_exist.find("select").prop("disabled", true);
                 $('input#reepay-publish').val('Create plan');
                 $reepay_subscription_settings.show();
                 $reepay_subscription_choose_exist.hide();
             } else {
+                $reepay_subscription_choose_exist.find("input").prop("disabled", false);
+                $reepay_subscription_choose_exist.find("select").prop("disabled", false);
                 $('input#reepay-publish').val('Update plan');
                 $reepay_subscription_settings.hide();
                 $reepay_subscription_choose_exist.show();

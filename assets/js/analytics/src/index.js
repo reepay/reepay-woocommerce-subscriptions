@@ -2,19 +2,18 @@
 import './index.scss';
 
 
-
 /**
  * External dependencies
  */
 
-import { addFilter } from '@wordpress/hooks';
+import {addFilter} from '@wordpress/hooks';
 
 
 addFilter(
     'woocommerce_admin_report_table',
     'woocommerce',
-    ( reportTableData ) => {
-        if ( reportTableData.endpoint !== 'customers' ) {
+    (reportTableData) => {
+        if (reportTableData.endpoint !== 'customers') {
             return reportTableData;
         }
 
@@ -27,28 +26,32 @@ addFilter(
         ];
 
         if (
-            ! reportTableData.items ||
-            ! reportTableData.items.data ||
-            ! reportTableData.items.data.length
+            !reportTableData.items ||
+            !reportTableData.items.data ||
+            !reportTableData.items.data.length
         ) {
             return reportTableData;
         }
 
-        const newRows = reportTableData.rows.map( ( row, index ) => {
-            const customer = reportTableData.items.data[ index ];
-            //console.log(customer);
+        const newRows = reportTableData.rows.map((row, index) => {
+            const customer = reportTableData.items.data[index];
             //console.log(Object.keys(roles_list));
 
-
+            const link = React.createElement("a", {
+                    href: "https://app.reepay.com/#/rp/customers/customers/customer/customer-" + customer.user_id,
+                    target: "_blank"
+                },
+                'customer-' + customer.user_id
+            );
             const newRow = [
                 ...row,
                 {
-                    display: 'customer-' + customer.user_id,
+                    display: link,
                     value: 'customer-' + customer.user_id,
                 },
             ];
             return newRow;
-        } );
+        });
 
         reportTableData.rows = newRows;
 
