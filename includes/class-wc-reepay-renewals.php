@@ -125,7 +125,7 @@ class WC_Reepay_Renewals
         } else {
             $token = self::get_payment_token_order($main_order);
         }
-        
+
 
         if (empty($token)) {
             self::log([
@@ -162,6 +162,10 @@ class WC_Reepay_Renewals
         $main_order->calculate_totals();
 
         foreach ($orders as $order) {
+            if (!$this->is_order_contain_subscription($order)) {
+                continue;
+            }
+            
             $order_items = $order->get_items();
             $order_item = reset($order_items);
 
