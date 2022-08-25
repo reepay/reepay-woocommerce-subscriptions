@@ -31,7 +31,7 @@
                     type="text"
                     id="_reepay_discount_name"
                     name="_reepay_discount_name"
-                    value="<?= esc_attr($meta['_reepay_discount_name'][0]) ?? '' ?>"
+                    value="<?= esc_attr(!empty($meta['_reepay_discount_name'][0]) ?? '') ?>"
                     class="reepay-required"
                     required
             />
@@ -44,7 +44,7 @@
                     id="_reepay_discount_apply_to"
                     name="_reepay_discount_apply_to"
                 <?= $is_update ? 'disabled="disabled"' : '' ?>
-                    value="all" <?php checked('all', esc_attr($meta['_reepay_discount_apply_to'][0]) ?? 'all'); ?> />
+                    value="all" <?php checked('all', esc_attr(!empty($meta['_reepay_discount_apply_to'][0]) ?? 'all')); ?> />
             &nbsp<?php esc_html_e('All', reepay_s()->settings('domain')); ?>
         </p>
         <p class="form-field">
@@ -53,7 +53,7 @@
                     id="_reepay_discount_apply_to"
                     name="_reepay_discount_apply_to"
                 <?= $is_update ? 'disabled="disabled"' : '' ?>
-                    value="custom" <?php checked('custom', $meta['_reepay_discount_apply_to'][0] ?? 'all'); ?> />
+                    value="custom" <?php checked('custom', !empty($meta['_reepay_discount_apply_to'][0]) ?? 'all'); ?> />
             &nbsp<?php esc_html_e('Custom', reepay_s()->settings('domain')); ?>
         </p>
         <p class="form-field active_if_apply_to_custom" style="margin-left: 20px">
@@ -70,12 +70,12 @@
         <p class="form-field">
             <label for="_reepay_discount_all_plans"><?php esc_html_e('Availability', reepay_s()->settings('domain')); ?></label>
             <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
-                   value="1" <?php checked('1', esc_attr($meta['_reepay_discount_all_plans'][0]) ?? '1'); ?>/>
+                   value="1" <?php checked('1', esc_attr(!empty($meta['_reepay_discount_all_plans'][0]) ?? '1')); ?>/>
             &nbsp<?php esc_html_e('All plans', reepay_s()->settings('domain')); ?>
         </p>
         <p class="form-field">
             <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
-                   value="0" <?php checked('0', esc_attr($meta['_reepay_discount_all_plans'][0]) ?? '1'); ?>/>
+                   value="0" <?php checked('0', esc_attr(!empty($meta['_reepay_discount_all_plans'][0]) ?? '1')); ?>/>
             &nbsp<?php esc_html_e('Selected plans', reepay_s()->settings('domain')); ?>
         </p>
         <p class="form-field show_if_selected_plans">
@@ -85,7 +85,7 @@
                 <select name="_reepay_discount_eligible_plans[]" id="_reepay_discount_eligible_plans"
                         multiple="multiple" class="wc-enhanced-select short">
                     <?php foreach ($plans as $value => $label): ?>
-                        <option value="<?= esc_attr($value) ?>" <?= selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])) ?>><?= esc_attr($label) ?></option>
+                        <option value="<?= esc_attr($value) ?>" <?= selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0]) ?? []) ?>><?= esc_attr($label) ?></option>
                     <?php endforeach; ?>
                 </select>
             <?php endif; ?>
