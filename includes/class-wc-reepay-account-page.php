@@ -263,6 +263,7 @@ class WC_Reepay_Account_Page
                 $payment_methods = reepay_s()->api()->request("subscription/" . $subscription['handle'] . "/pm");
                 set_transient($subscription['handle'] . '_payment_methods', $payment_methods);
             }
+            $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($subscription['plan']);
             $subscriptionsArr[] = [
                 'state' => $subscription['state'],
                 'handle' => $subscription['handle'],
@@ -277,7 +278,7 @@ class WC_Reepay_Account_Page
                 'expired_date' => $subscription['expired_date'] ?? null,
                 'formatted_expired_date' => $this->format_date($subscription['expired_date'] ?? null),
                 'formatted_status' => $this->get_status($subscription),
-                'formatted_schedule' => $this->get_formatted_schedule_type($plans[$subscription['plan']]),
+                'formatted_schedule' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan($plan),
                 'payment_methods' => $payment_methods,
                 'plan' => $subscription['plan']
             ];
