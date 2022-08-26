@@ -215,6 +215,8 @@ class WC_Reepay_Renewals
                     'notice' => $e->getMessage()
                 ]);
                 $order->add_order_note('Unable to create subscription. Error from acquire: ' . $e->getMessage());
+
+                WC_Reepay_Subscription_Admin_Notice::add_frontend_notice('Unable to create subscription. Error from acquire: ' . $e->getMessage(), $order->get_id());
             }
 
 
