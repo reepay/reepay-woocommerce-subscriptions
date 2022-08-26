@@ -82,7 +82,7 @@ class WC_Reepay_Account_Page
     {
 
         if (!empty($_GET['cancel_subscription'])) {
-            if (!reepay_s()->settings('_reepay_enable_cancel_subscription')) {
+            if (!reepay_s()->settings('_reepay_enable_cancel')) {
                 return;
             }
 
@@ -263,6 +263,7 @@ class WC_Reepay_Account_Page
                 $payment_methods = reepay_s()->api()->request("subscription/" . $subscription['handle'] . "/pm");
                 set_transient($subscription['handle'] . '_payment_methods', $payment_methods);
             }
+            $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($subscription['plan']);
             $subscriptionsArr[] = [
                 'state' => $subscription['state'],
                 'handle' => $subscription['handle'],
@@ -277,6 +278,7 @@ class WC_Reepay_Account_Page
                 'expired_date' => $subscription['expired_date'] ?? null,
                 'formatted_expired_date' => $this->format_date($subscription['expired_date'] ?? null),
                 'formatted_status' => $this->get_status($subscription),
+                'formatted_schedule' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan($plan),
                 'payment_methods' => $payment_methods,
                 'plan' => $subscription['plan']
             ];
@@ -316,18 +318,18 @@ class WC_Reepay_Account_Page
     function get_status($subscription)
     {
         if ($subscription['is_cancelled'] === true) {
-            return 'cancelled';
+            return 'Cancelled';
         }
         if ($subscription['state'] === 'expired') {
-            return 'expired';
+            return 'Expired';
         }
 
         if ($subscription['state'] === 'on_hold') {
-            return 'on_hold';
+            return 'On hold';
         }
 
         if ($subscription['state'] === 'is_cancelled') {
-            return 'is_cancelled';
+            return 'Cancelled';
         }
 
         if ($subscription['state'] === 'active') {
@@ -335,13 +337,35 @@ class WC_Reepay_Account_Page
                 $now = new DateTime();
                 $trial_end = new DateTime($subscription['trial_end']);
                 if ($trial_end > $now) {
-                    return 'trial';
+                    return 'Trial';
                 }
             }
-            return 'active';
+            return 'Active';
         }
 
         return $subscription['state'];
+    }
+
+    public function get_formatted_schedule_type($plan) {
+        if ($plan['schedule_type'] === 'manual') {
+            return 'Manual';
+        }
+        if ($plan['schedule_type'] === 'daily') {
+            return 'Every day';
+        }
+        if ($plan['schedule_type'] === 'weekly_fixedday') {
+            return 'Weekly fixedday';
+        }
+        if ($plan['schedule_type'] === 'month_startdate') {
+            return 'Month startdate';
+        }
+        if ($plan['schedule_type'] === 'month_fixedday') {
+            return 'Month fixedday';
+        }
+        if ($plan['schedule_type'] === 'month_lastday') {
+            return 'Month lastdate';
+        }
+        return $plan['schedule_type'];
     }
 
     function format_date($dateStr)

@@ -19,74 +19,19 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
     <h1><?= $plan['name'] ?></h1>
     <table>
         <tbody>
-        <?php if (!$is_expired): ?>
-            <?php if (reepay_s()->settings('_reepay_enable_on_hold') || reepay_s()->settings('_reepay_enable_cancel')): ?>
-                <tr>
-                    <td><?php _e('Actions:', $domain); ?></td>
-                    <td>
-                        <?php if ($subscription['state'] === 'on_hold'): ?>
-                            <a href="?reactivate=<?= $subscription['handle'] ?>"
-                               class="button"><?php _e('Reactivate', $domain); ?></a>
-                        <?php else: ?>
-                            <?php if (reepay_s()->settings('_reepay_enable_on_hold')): ?>
-                                <a href="?put_on_hold=<?= $subscription['handle'] ?>"
-                                   class="button"><?php _e('Put on hold', $domain); ?></a>
-                            <?php endif; ?>
-                        <?php endif; ?>
-
-                        <?php if ($subscription['state'] !== 'on_hold'): ?>
-                            <?php if ($subscription['is_cancelled'] === true): ?>
-                                <a href="?uncancel_subscription=<?= $subscription['handle'] ?>"
-                                   class="button">Uncancel</a>
-                            <?php else: ?>
-                                <?php if (reepay_s()->settings('_reepay_enable_cancel')): ?>
-                                    <a href="?cancel_subscription=<?= $subscription['handle'] ?>"
-                                       class="button"><?php _e('Cancel Subscription', $domain); ?></a>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        <?php endif; ?>
-                        <br>
-                </tr>
-            <?php endif; ?>
-
-            <tr>
-                <td><?php _e('Payment methods:', $domain); ?></td>
-                <td></td>
-            </tr>
-            <?php foreach ($user_payment_methods2 ?? [] as $payment_method): ?>
-                <tr>
-                    <td><?= $payment_method->get_masked_card() ?> <?= $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></td>
-                    <td>
-                        <?php if ($payment_method->get_token() === $subscription_payment_method['id']): ?>
-                            <?php _e('Current', $domain); ?>
-                        <?php else: ?>
-                            <a href="?change_payment_method=<?= $subscription['handle'] ?>&token_id=<?= $payment_method->get_id() ?>"
-                               class="button"><?php _e('Change', $domain); ?></a>
-                        <?php endif; ?>
-                    </td>
-                </tr>
-
-
-                <br>
-            <?php endforeach; ?>
-            <tr>
-                <td></td>
-                <td>
-                    <a href="<?= wc_get_endpoint_url('add-payment-method') . '?reepay_subscription=' . $subscription['handle'] ?>"
-                       class="button"><?php _e('Add payment method', $domain); ?></a></td>
-            </tr>
-        <?php endif; ?>
         <tr>
             <td><?php _e('Status', $domain); ?>:</td>
             <td>
-                <?php if ($subscription['state'] === 'expired'): ?>
-                    <?php _e('Expired', $domain); ?> <?= $subscription['formatted_expired_date'] ?>
-                <?php else: ?>
-                    <?= $subscription['formatted_status'] ?>
-                    <?php if ($subscription['renewing'] === false): ?>
-                        <?php _e('Non-renewing', $domain); ?>
+                <span style="text-transform: capitalize">
+                    <?php if ($subscription['state'] === 'expired'): ?>
+                        <?php _e('Expired', $domain); ?> <?= $subscription['formatted_expired_date'] ?>
+                    <?php else: ?>
+                        <?= $subscription['formatted_status'] ?>
+                        <?php if ($subscription['renewing'] === false): ?>
+                            <?php _e('Non-renewing', $domain); ?>
+                        <?php endif; ?>
                     <?php endif; ?>
-                <?php endif; ?>
+                </span>
             </td>
         </tr>
         <tr>
@@ -110,7 +55,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
         <tr>
             <td><?php _e('Total Amount (Incl. VAT)', $domain); ?>:</td>
             <td>
-                Kr <?= number_format($plan['amount'] / 100, 2) ?> DKK / Every Day
+                <?= number_format($plan['amount'] / 100, 2) ?> <?= $plan['currency'] ?> / <?= $subscription['formatted_schedule'] ?>
             </td>
         </tr>
         <tr>
@@ -123,6 +68,61 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                 <?php endif; ?>
             </td>
         </tr>
+        <?php if (!$is_expired): ?>
+            <?php if (reepay_s()->settings('_reepay_enable_on_hold') || reepay_s()->settings('_reepay_enable_cancel')): ?>
+                <tr>
+                    <td><?php _e('Actions:', $domain); ?></td>
+                    <td>
+                        <?php if ($subscription['state'] === 'on_hold'): ?>
+                            <a href="?reactivate=<?= $subscription['handle'] ?>"
+                               class="button"><?php _e('Reactivate', $domain); ?></a>
+                        <?php else: ?>
+                            <?php if (reepay_s()->settings('_reepay_enable_on_hold')): ?>
+                                <a href="?put_on_hold=<?= $subscription['handle'] ?>"
+                                   class="button"><?php _e('Put on hold', $domain); ?></a>
+                            <?php endif; ?>
+                        <?php endif; ?>
+
+                        <?php if ($subscription['state'] !== 'on_hold'): ?>
+                            <?php if ($subscription['is_cancelled'] === true): ?>
+                                <a href="?uncancel_subscription=<?= $subscription['handle'] ?>"
+                                   class="button"><?php _e('Uncancel', $domain); ?></a>
+                            <?php else: ?>
+                                <?php if (reepay_s()->settings('_reepay_enable_cancel')): ?>
+                                    <a href="?cancel_subscription=<?= $subscription['handle'] ?>"
+                                       class="button"><?php _e('Cancel Subscription', $domain); ?></a>
+                                <?php endif; ?>
+                            <?php endif; ?>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endif; ?>
+
+            <tr>
+                <td><?php _e('Payment methods:', $domain); ?></td>
+                <td></td>
+            </tr>
+            <?php foreach ($user_payment_methods2 ?? [] as $payment_method): ?>
+                <tr>
+                    <td><?= $payment_method->get_masked_card() ?> <?= $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></td>
+                    <td>
+                        <?php if ($payment_method->get_token() === $subscription_payment_method['id']): ?>
+                            <?php _e('Current', $domain); ?>
+                        <?php else: ?>
+                            <a href="?change_payment_method=<?= $subscription['handle'] ?>&token_id=<?= $payment_method->get_id() ?>"
+                               class="button"><?php _e('Change', $domain); ?></a>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+
+            <?php endforeach; ?>
+            <tr>
+                <td></td>
+                <td>
+                    <a href="<?= wc_get_endpoint_url('add-payment-method') . '?reepay_subscription=' . $subscription['handle'] ?>"
+                       class="button"><?php _e('Add payment method', $domain); ?></a></td>
+            </tr>
+        <?php endif; ?>
         </tbody>
     </table>
 <?php endforeach; ?>

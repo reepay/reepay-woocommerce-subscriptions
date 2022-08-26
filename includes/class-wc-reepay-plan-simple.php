@@ -290,7 +290,7 @@ class WC_Reepay_Subscription_Plan_Simple
             ]
         ]);
 
-        return $query->post ?? null;
+        return wc_get_product($query->post ?? null);
     }
 
     /**
