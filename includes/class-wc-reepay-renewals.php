@@ -165,7 +165,7 @@ class WC_Reepay_Renewals
             if (!$this->is_order_contain_subscription($order)) {
                 continue;
             }
-            
+
             $order_items = $order->get_items();
             $order_item = reset($order_items);
 
@@ -438,11 +438,33 @@ class WC_Reepay_Renewals
 
         update_post_meta($parent_order->get_id(), '_reepay_order', $data['invoice']);
 
+        $items = $parent_order->get_items();
+
+        if (!empty($parent_order->get_items('fee'))) {
+            foreach ($parent_order->get_items('fee') as $fee) {
+                $items[] = $fee;
+            }
+        }
+
+        if (!empty($parent_order->get_items('shipping'))) {
+            foreach ($parent_order->get_items('shipping') as $shipping) {
+                $items[] = $shipping;
+            }
+        }
+
+
+        self::log([
+            'log' => [
+                'source' => 'WC_Reepay_Renewals::create_child_order_items',
+                'data' => $items,
+            ]
+        ]);
+
         return self::create_order_copy([
             'status' => $status,
             'parent' => $parent_order->get_id(),
             'customer_id' => $parent_order->get_customer_id(),
-        ], $parent_order, $parent_order->get_items());
+        ], $parent_order, $items);
     }
 
     /**
@@ -510,7 +532,7 @@ class WC_Reepay_Renewals
         }
 
         foreach ($items as $item) {
-            $new_order->add_product(wc_get_product($item['product_id']), $item['qty']);
+            $new_order->add_item($item);
         }
 
         $new_order->save();
