@@ -51,13 +51,22 @@ jQuery(function ($) {
     let default_coupon_amount_label = $coupon_amount_label.text()
 
     if ($coupon_type.length) {
+        let $apply_to_inputs = $('input[type=radio][name=_reepay_discount_apply_to]');
+        let $apply_to_all_plans_input = $('input[name=_reepay_discount_all_plans]');
+        let $use_existing_coupon_input = $('input[name=use_existing_coupon]');
+        let $reepay_discount_type = $('input[name=_reepay_discount_type]');
+
         $coupon_type.on('change', function () {
             coupon_type_settings(this.value)
         })
         coupon_type_settings($coupon_type.val())
-        let $apply_to_inputs = $('input[type=radio][name=_reepay_discount_apply_to]');
-        let $apply_to_all_plans_input = $('input[name=_reepay_discount_all_plans]');
-        let $use_existing_coupon_input = $('input[name=use_existing_coupon]');
+
+        $reepay_discount_type.on('change', function() {
+            debugger
+            if (this.checked) {
+                coupon_type_percentage(this.value)
+            }
+        }).trigger('change')
 
         $apply_to_inputs.on('change', function () {
             if (this.checked) {
@@ -78,13 +87,7 @@ jQuery(function ($) {
 
 
         function coupon_type_settings(type) {
-            if (type === 'reepay_percentage') {
-                $coupon_amount_label.text(window.reepay.amountPercentageLabel)
-            } else {
-                $coupon_amount_label.text(default_coupon_amount_label)
-            }
-
-            if (type === 'reepay_percentage' || type === 'reepay_fixed_product') {
+            if (type === 'reepay_type') {
                 $('.show_if_reepay').show();
 
                 let input = $('.show_if_reepay').find('.reepay-required')
@@ -97,6 +100,14 @@ jQuery(function ($) {
                 if (input.length) {
                     input.attr('required', false)
                 }
+            }
+        }
+
+        function coupon_type_percentage(value) {
+            if (value === 'reepay_percentage') {
+                $coupon_amount_label.text(window.reepay.amountPercentageLabel)
+            } else {
+                $coupon_amount_label.text(default_coupon_amount_label)
             }
         }
 

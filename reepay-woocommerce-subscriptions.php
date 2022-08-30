@@ -48,7 +48,7 @@ class WooCommerce_Reepay_Subscriptions
     /**
      * @var string
      */
-    public static $version = '1.0.0';
+    public static $version = '1.0.1';
 
     /**
      * @var string
