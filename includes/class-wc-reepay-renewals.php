@@ -67,7 +67,7 @@ class WC_Reepay_Renewals
             return;
         }
 
-        if (!$this->is_order_contain_subscription($order)) {
+        if (!self::is_order_contain_subscription($order)) {
             self::log([
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_subscription',
@@ -89,7 +89,7 @@ class WC_Reepay_Renewals
         self::unlock_order($order->get_id());
     }
 
-    public function is_order_contain_subscription($order)
+    public static function is_order_contain_subscription($order)
     {
         foreach ($order->get_items() as $item_key => $item_values) {
             $product = $item_values->get_product();
@@ -143,7 +143,7 @@ class WC_Reepay_Renewals
 
         $orders = [$main_order];
         $order_items = $main_order->get_items();
-
+        $created_orders = [$main_order->get_id()];
         foreach ($order_items as $order_item_key => $order_item) {
             if (count($order_items) <= 1) {
                 break;
@@ -152,17 +152,22 @@ class WC_Reepay_Renewals
             $main_order->remove_item($order_item_key);
             unset($order_items[$order_item_key]);
 
-            $orders[] = self::create_order_copy([
+            $created_order = self::create_order_copy([
                 'status' => $main_order->get_status(''),
                 'customer_id' => $main_order->get_customer_id(),
             ], $main_order, [$order_item]);
+
+            $orders[] = $created_order;
+
+            $created_orders[] = $created_order->get_id();
         }
 
+        update_post_meta($main_order->get_id(), '_reepay_another_orders', $created_orders);
 
         $main_order->calculate_totals();
 
         foreach ($orders as $order) {
-            if (!$this->is_order_contain_subscription($order)) {
+            if (!self::is_order_contain_subscription($order)) {
                 continue;
             }
 
@@ -266,6 +271,7 @@ class WC_Reepay_Renewals
             $order->save();
         }
     }
+
 
     /**
      *

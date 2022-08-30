@@ -79,13 +79,25 @@ class WC_Reepay_Subscription_Admin_Notice
     public function show_thankyou_message($ret, $order_id)
     {
         $notice = get_post_meta($order_id, '_reepay_frontend_notices', true);
-
         if (!empty($notice)) {
             $ret = array(
                 'state' => 'failed',
                 'message' => $notice
             );
+        } else {
+            $reloaded = get_post_meta($order_id, '_reepay_thankyou_reloaded', true);
+
+            if (empty($reloaded)) {
+                $order = wc_get_order($order_id);
+                if (WC_Reepay_Renewals::is_order_contain_subscription($order)) {
+                    $ret = array(
+                        'state' => 'reload',
+                    );
+                    update_post_meta($order_id, '_reepay_thankyou_reloaded', true);
+                }
+            }
         }
+
 
         return $ret;
     }

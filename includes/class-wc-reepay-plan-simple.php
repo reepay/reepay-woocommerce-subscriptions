@@ -121,12 +121,30 @@ class WC_Reepay_Subscription_Plan_Simple
         add_filter('woocommerce_product_class', [$this, 'load_subscription_product_class'], 10, 2);
         add_filter('product_type_selector', [$this, 'add_subscription_product_type']);
         add_action('save_post', [$this, 'set_sold_individual'], PHP_INT_MAX);
+        add_filter('woocommerce_get_order_item_totals', [$this, 'rework_total'], 10, 3);
 
         add_filter('woocommerce_cart_item_price', [$this, 'format_price'], 10, 2);
         add_filter('woocommerce_cart_item_subtotal', [$this, 'format_price'], 10, 2);
-        add_filter('woocommerce_order_formatted_line_subtotal', [$this, 'format_price'], 10, 2);
+        add_filter('woocommerce_order_formatted_line_subtotal', [$this, 'format_price'], 10, 3);
 
         $this->register_actions();
+    }
+
+    public function rework_total($total_rows, $order, $tax_display)
+    {
+        $another_orders = get_post_meta($order->get_id(), '_reepay_another_orders', true);
+        if (!empty($another_orders)) {
+            $total = 0;
+            foreach ($another_orders as $order_id) {
+                $order_another = wc_get_order($order_id);
+                $total += floatval($order_another->get_total());
+            }
+
+            $total_rows['cart_subtotal']['value'] = wc_price($total);
+            $total_rows['order_total']['value'] = wc_price($total);
+        }
+
+        return $total_rows;
     }
 
     protected function register_actions()
