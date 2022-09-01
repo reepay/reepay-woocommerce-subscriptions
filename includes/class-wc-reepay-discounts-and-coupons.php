@@ -262,11 +262,27 @@ class WC_Reepay_Discounts_And_Coupons
         $coupon->save();
     }
 
+    function is_coupon_applied_for_plans($coupon, WC_Product $product) {
+        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
+        $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+        if ($apply_to_all_plans === '1' ) {
+            return true;
+        }
+        if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
+            $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
+            return in_array($plan_handle, $apply_to_plans);
+        }
+        return false;
+    }
+
     function apply_discount($discount, $discounting_amount, $cart_item, $single, WC_Coupon $coupon) {
         $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
 
         if ($type === 'reepay_percentage'){
-            $discount = (float) $coupon->get_amount() * ( $discounting_amount / 100 );
+            $product = $cart_item['data'];
+            if ($this->is_coupon_applied_for_plans($coupon, $product)) {
+                $discount = (float) $coupon->get_amount() * ( $discounting_amount / 100 );
+            }
         }
 
         if (!$this->applied_fixed_coupon && $type === 'reepay_fixed_product'){
@@ -292,13 +308,18 @@ class WC_Reepay_Discounts_And_Coupons
 
         $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
         $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+        $apply = false;
         if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
             foreach ($discounts->get_items_to_validate() as $item) {
                 $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
-                if (!$valid) {
-                    throw new Exception(__( 'Sorry, this coupon is not applicable to the products: %s.', 'woocommerce' ), 113);
+                if ($valid) {
+                    $apply = true;
                 }
             }
+            if (!$apply) {
+                throw new Exception(__( 'Sorry, this coupon is not applicable to the products: %s.', 'woocommerce' ), 113);
+            }
+
         }
 
         return $valid;
