@@ -242,6 +242,10 @@ class WC_Reepay_Discounts_And_Coupons
             $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
         }
 
+        if (!empty($_REQUEST['_reepay_discount_amount'])) {
+            $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
+        }
+
         if (empty($discountHandle)) {
             $discount = $this->create_discount($coupon);
             $discountHandle = $discount['handle'];
