@@ -136,19 +136,20 @@ class WC_Reepay_Discounts_And_Coupons
 
         $post_id = $coupon->get_id();
         $apply_items = $_REQUEST['_reepay_discount_apply_to_items'] ?? ['all'];
+        $duration_type = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
 
         $discountHandle = 'discount'.$post_id;
         $params["handle"] = $discountHandle;
         $params["apply_to"] = $apply_items;
 
-        if ($end = $coupon->get_date_expires()) {
-            $end = $end->diff(new DateTime());
-            $params["fixed_period_unit"] = "days";
-            $params["fixed_period"] = $end->days;
+
+        if ($duration_type === 'fixed_number') {
+            $params["fixed_count"] = $_REQUEST['_reepay_discount_fixed_count'];
         }
 
-        if ($coupon->get_usage_limit() > 0) {
-            $params["fixed_count"] = $coupon->get_usage_limit();
+        if ($duration_type === 'limited_time') {
+            $params["fixed_period_unit"] = $_REQUEST['_reepay_discount_fixed_period_unit'];
+            $params["fixed_period"] = $_REQUEST['_reepay_discount_fixed_period'];
         }
 
 
