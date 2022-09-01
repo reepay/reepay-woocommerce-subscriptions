@@ -47,63 +47,112 @@ jQuery(function ($) {
     });
 
     let $coupon_type = $('#discount_type');
-    let $coupon_amount_label = $('[for="coupon_amount"]')
+    let $coupon_amount_label = $('[for="_reepay_discount_amount"]')
     let default_coupon_amount_label = $coupon_amount_label.text()
 
     if ($coupon_type.length) {
         let $apply_to_inputs = $('input[type=radio][name=_reepay_discount_apply_to]');
         let $apply_to_all_plans_input = $('input[name=_reepay_discount_all_plans]');
         let $use_existing_coupon_input = $('input[name=use_existing_coupon]');
+        let $use_existing_coupon_select = $('[name=_reepay_discount_use_existing_coupon_id]');
         let $reepay_discount_type = $('input[name=_reepay_discount_type]');
+        let $reepay_discount_duration = $('input[name=_reepay_discount_duration]');
+        let $container = $('.reepay_coupon_new');
+
+        $use_existing_coupon_select.on('change', function() {
+            show_existing_select($(document))
+        })
 
         $coupon_type.on('change', function () {
-            coupon_type_settings(this.value)
+            coupon_type_settings($(document))
         })
-        coupon_type_settings($coupon_type.val())
+
+        $reepay_discount_duration.on('change', function() {
+            if (this.checked) {
+                duration_settings($container)
+            }
+        })
 
         $reepay_discount_type.on('change', function() {
-            debugger
             if (this.checked) {
-                coupon_type_percentage(this.value)
+                coupon_type_percentage($container)
             }
-        }).trigger('change')
+        })
 
         $apply_to_inputs.on('change', function () {
             if (this.checked) {
-                apply_to_settings(this.value);
+                apply_to_settings($container);
             }
-        }).trigger('change')
+        })
 
         $apply_to_all_plans_input.on('change', function () {
             if (this.checked) {
-                apply_to_plans(this.value);
+                apply_to_plans($container);
             }
-        }).trigger('change')
+        })
 
         $use_existing_coupon_input.on('change', function () {
-            show_existing_coupon_settings(this.value);
+            show_existing_coupon_settings($(document));
         })
-        show_existing_coupon_settings($use_existing_coupon_input.closest(':checked').val())
 
+        coupon_type_settings($(document))
+        show_existing_coupon_settings($(document))
 
-        function coupon_type_settings(type) {
-            if (type === 'reepay_type') {
-                $('.show_if_reepay').show();
+        coupon_type_percentage($container)
+        apply_to_settings($container)
+        apply_to_plans($container)
+        duration_settings($container)
 
-                let input = $('.show_if_reepay').find('.reepay-required')
-                if (input.length) {
-                    input.attr('required', true)
-                }
+        function show_existing_select($container) {
+            let handle = $container.find('[name=_reepay_discount_use_existing_coupon_id]').val()
+            load_coupon(handle, $('.reepay_coupon_settings_exist'))
+        }
+
+        function show_existing_coupon_settings($container) {
+            let value = $container.find('input[name=use_existing_coupon]:checked').val();
+            if (value === 'true') {
+                $('.show_if_use_existing_coupon').show()
+                $('.hide_if_use_existing_coupon').hide()
             } else {
-                $('.show_if_reepay').hide();
-                let input = $('.show_if_reepay').find('.reepay-required')
-                if (input.length) {
-                    input.attr('required', false)
-                }
+                $('.show_if_use_existing_coupon').hide()
+                $('.hide_if_use_existing_coupon').show()
             }
         }
 
-        function coupon_type_percentage(value) {
+        function duration_settings($container) {
+            let value = $container.find('input[name=_reepay_discount_duration]:checked').val()
+            if (value === 'fixed_number') {
+                $('.show_if_fixed_number').show()
+                $('.show_if_limited_time').hide()
+            } else if (value === 'limited_time') {
+                $('.show_if_fixed_number').hide()
+                $('.show_if_limited_time').show()
+            } else {
+                $('.show_if_fixed_number').hide()
+                $('.show_if_limited_time').hide()
+            }
+        }
+
+        function coupon_type_settings($container) {
+            let type = $container.find('#discount_type').val();
+            if (type === 'reepay_type') {
+                $('.show_if_reepay').show();
+                $('.coupon_amount_field').hide();
+                check_required()
+            } else {
+                $('.show_if_reepay').hide();
+                $('.coupon_amount_field').show();
+                check_required()
+            }
+        }
+
+        function check_required() {
+            $('.reepay-required').attr('required', false)
+            $('.reepay-required:visible').attr('required', true)
+        }
+
+        function coupon_type_percentage($container) {
+            let value = $container.find('input[name=_reepay_discount_type]:checked').val();
             if (value === 'reepay_percentage') {
                 $coupon_amount_label.text(window.reepay.amountPercentageLabel)
             } else {
@@ -111,9 +160,14 @@ jQuery(function ($) {
             }
         }
 
-        function apply_to_settings(value) {
-            if (value === 'custom') {
+        function apply_to_settings($container) {
+            let input = $container.find('input[type=radio][name=_reepay_discount_apply_to]:checked');
+            let value = input.val();
+            if (value === 'custom' && !input.attr('disabled')) {
                 $('.active_if_apply_to_custom input').attr('disabled', false)
+                $('.active_if_apply_to_custom').show()
+            } else if (value === 'custom' && input.attr('disabled')) {
+                $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
                 $('.active_if_apply_to_custom').show()
             } else {
                 $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
@@ -121,23 +175,14 @@ jQuery(function ($) {
             }
         }
 
-        function apply_to_plans(value) {
+        function apply_to_plans($container) {
+            let value = $container.find('input[name=_reepay_discount_all_plans]:checked').val();
             if (value === '0') {
                 $('.show_if_selected_plans').show()
                 $('.show_if_selected_plans select').attr('disabled', false)
             } else {
                 $('.show_if_selected_plans').hide()
                 $('.show_if_selected_plans select').attr('disabled', true)
-            }
-        }
-
-        function show_existing_coupon_settings(value) {
-            if (value === 'true') {
-                $('.show_if_use_existing_coupon').show()
-                $('.hide_if_use_existing_coupon').hide()
-            } else {
-                $('.show_if_use_existing_coupon').hide()
-                $('.hide_if_use_existing_coupon').show()
             }
         }
 
@@ -301,6 +346,40 @@ jQuery(function ($) {
                 show_notice_settings($container);
                 show_contract_settings($container);
                 show_fee_settings($container);
+            },
+            error: function (request, status, error) {
+
+            },
+            complete: function () {
+
+            },
+        })
+    }
+
+    function load_coupon(handle, $container) {
+        if (!handle) {
+            return;
+        }
+
+        $container.html('')
+
+        $.ajax({
+            url: window.reepay.rest_urls.get_coupon + `?handle=${handle}`,
+            method: 'GET',
+            beforeSend: function (xhr) {
+
+            },
+            success: function (response_data) {
+                if (!response_data.success) {
+                    return;
+                }
+
+                $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
+
+                coupon_type_percentage($container)
+                apply_to_settings($container)
+                apply_to_plans($container)
+                duration_settings($container)
             },
             error: function (request, status, error) {
 

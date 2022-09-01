@@ -326,7 +326,8 @@ class WooCommerce_Reepay_Subscriptions
         wp_localize_script('admin-reepay-subscription', 'reepay', [
             'amountPercentageLabel' => __('Coupon percentage', reepay_s()->settings('domain')),
             'rest_urls' => [
-                'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . ($_GET['post'] ?? 0)
+                'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . ($_GET['post'] ?? 0),
+                'get_coupon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/coupon/"),
             ]
         ]);
     }
@@ -342,6 +343,7 @@ class WooCommerce_Reepay_Subscriptions
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-addons.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-rest.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-addons-rest.php');
+        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-coupons-rest.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php');
