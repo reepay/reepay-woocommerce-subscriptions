@@ -110,10 +110,15 @@ jQuery(function ($) {
 
         function show_existing_coupon_settings($container) {
             let value = $container.find('input[name=use_existing_coupon]:checked').val();
+            let $existing_container = $('.show_if_use_existing_coupon')
             if (value === 'true') {
+                $existing_container.find("input").prop("disabled", false);
+                $existing_container.find("select").prop("disabled", false);
                 $('.show_if_use_existing_coupon').show()
                 $('.hide_if_use_existing_coupon').hide()
             } else {
+                $existing_container.find("input").prop("disabled", true);
+                $existing_container.find("select").prop("disabled", true);
                 $('.show_if_use_existing_coupon').hide()
                 $('.hide_if_use_existing_coupon').show()
             }

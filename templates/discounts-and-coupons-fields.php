@@ -42,7 +42,7 @@
         );
         ?>
     </div>
-    <div class="reepay_coupon_settings_exist">
+    <div class="show_if_use_existing_coupon reepay_coupon_settings_exist">
 
     </div>
 </div>
