@@ -12,8 +12,8 @@ class WC_Reepay_Discounts_And_Coupons
     ];
 
     public static $coupon_types = [
-        'reepay_percentage' => 'Reepay Percentage Discount',
-        'reepay_fixed_product' => 'Reepay Fixed product Discount',
+            'reepay_percentage' => 'Reepay Percentage Discount',
+            'reepay_fixed_product' => 'Reepay Fixed product Discount',
     ];
 
     /**
@@ -27,20 +27,20 @@ class WC_Reepay_Discounts_And_Coupons
     public function __construct()
     {
         add_filter('woocommerce_coupon_discount_types', [$this, 'add_coupon_types'], 10, 1);
-        add_action('woocommerce_coupon_options', [$this, 'add_coupon_text_field'], 10);
-        add_action('woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2);
+        add_action( 'woocommerce_coupon_options', [$this, 'add_coupon_text_field'], 10 );
+        add_action( 'woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2 );
         add_filter('woocommerce_coupon_is_valid', [$this, 'validate_coupon'], 10, 4);
         add_filter('woocommerce_coupon_is_valid_for_product', [$this, 'validate_coupon_for_product'], 10, 4);
         add_filter('woocommerce_coupon_get_discount_amount', [$this, 'apply_discount'], 10, 5);
 
-        add_filter("woocommerce_coupon_error", [$this, "plugin_coupon_error_message"], 10, 3);
+        add_filter("woocommerce_coupon_error",[$this, "plugin_coupon_error_message"],10,3);
 
     }
 
-    function get_discount_default_params(WC_Coupon $coupon)
-    {
+    function get_discount_default_params(WC_Coupon $coupon) {
 
         $name = get_post_meta($coupon->get_id(), '_reepay_discount_name', true);
+        $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
 
         $params = [
             "name" => $name,
@@ -48,9 +48,9 @@ class WC_Reepay_Discounts_And_Coupons
         $amount = $coupon->get_amount();
 
         if ($amount >= 1) {
-            if ($coupon->get_discount_type() === 'reepay_percentage') {
+            if ($type === 'reepay_percentage') {
                 $params['percentage'] = $amount;
-            } else if ($coupon->get_discount_type() === 'reepay_fixed_product') {
+            } else if ($type === 'reepay_fixed_product') {
                 $params['amount'] = $amount;
             }
         }
@@ -60,12 +60,12 @@ class WC_Reepay_Discounts_And_Coupons
         }
 
 
+
         return $params;
     }
 
 
-    function get_coupon_default_params(WC_Coupon $coupon)
-    {
+    function get_coupon_default_params(WC_Coupon $coupon) {
         $apply_plans = $_REQUEST['_reepay_discount_eligible_plans'];
         $end = $coupon->get_date_expires();
 
@@ -86,9 +86,8 @@ class WC_Reepay_Discounts_And_Coupons
         return $paramsCoupon;
     }
 
-    function use_existing_coupon(WC_Coupon $wc_coupon, $handle)
-    {
-        try {
+    function use_existing_coupon(WC_Coupon $wc_coupon, $handle) {
+        try{
             $couponObj = reepay_s()->api()->request('coupon/' . $handle);
             $discountObj = reepay_s()->api()->request('discount/' . $couponObj['discount']);
 
@@ -118,126 +117,120 @@ class WC_Reepay_Discounts_And_Coupons
             update_post_meta($post_id, '_reepay_coupon_handle', $couponObj['handle']);
 
             return $wc_coupon;
-        } catch (Exception $e) {
-            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+        }catch (Exception $e){
+            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
     }
 
-    function plugin_coupon_error_message($err, $err_code, WC_Coupon $coupon)
-    {
-        if ($coupon->is_type(array_keys(static::$coupon_types)) && intval($err_code) === 117) {
+    function plugin_coupon_error_message($err,$err_code, WC_Coupon $coupon) {
+        if( $coupon->is_type( 'reepay_type' ) && intval($err_code) === 117 ) {
             return __('Coupon is not applied for this plans', reepay_s()->settings('domain'));
         }
         return $err;
     }
 
-    function create_discount(WC_Coupon $coupon)
-    {
+    function create_discount(WC_Coupon $coupon) {
 
         $params = $this->get_discount_default_params($coupon);
 
 
         $post_id = $coupon->get_id();
         $apply_items = $_REQUEST['_reepay_discount_apply_to_items'] ?? ['all'];
+        $duration_type = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
 
-        $discountHandle = 'discount' . $post_id;
+        $discountHandle = 'discount'.$post_id;
         $params["handle"] = $discountHandle;
         $params["apply_to"] = $apply_items;
 
-        if ($end = $coupon->get_date_expires()) {
-            $end = $end->diff(new DateTime());
-            $params["fixed_period_unit"] = "days";
-            $params["fixed_period"] = $end->days;
+
+        if ($duration_type === 'fixed_number') {
+            $params["fixed_count"] = $_REQUEST['_reepay_discount_fixed_count'];
         }
 
-        if ($coupon->get_usage_limit() > 0) {
-            $params["fixed_count"] = $coupon->get_usage_limit();
+        if ($duration_type === 'limited_time') {
+            $params["fixed_period_unit"] = $_REQUEST['_reepay_discount_fixed_period_unit'];
+            $params["fixed_period"] = $_REQUEST['_reepay_discount_fixed_period'];
         }
 
 
-        try {
+        try{
             $discountObj = reepay_s()->api()->request('discount', 'POST', $params);
             update_post_meta($post_id, '_reepay_discount_handle', $params['handle']);
             return $discountObj;
-        } catch (Exception $e) {
-            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+        }catch (Exception $e){
+            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
         return false;
     }
 
-    function update_discount(WC_Coupon $coupon)
-    {
+    function update_discount(WC_Coupon $coupon) {
         $params = $this->get_discount_default_params($coupon);
         $handle = get_post_meta($coupon->get_id(), '_reepay_discount_handle', true);
 
-        try {
+        try{
             $discountObj = reepay_s()->api()->request('discount/' . $handle, 'PUT', $params);
             return $discountObj;
-        } catch (Exception $e) {
-            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+        }catch (Exception $e){
+            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
 
         return false;
     }
 
 
-    function get_coupons()
-    {
+    function get_coupons() {
         return reepay_s()->api()->request('coupon')['content'] ?? [];
     }
 
-    function create_coupon(WC_Coupon $coupon, $discount_handle)
-    {
+    function create_coupon(WC_Coupon $coupon, $discount_handle) {
 
         $paramsCoupon = $this->get_coupon_default_params($coupon);
 
         $post_id = $coupon->get_id();
-        $couponHandle = 'coupon' . $post_id;
+        $couponHandle = 'coupon'.$post_id;
 
         $paramsCoupon["handle"] = $couponHandle;
         $paramsCoupon["code"] = $coupon->get_code();
         $paramsCoupon["discount"] = $discount_handle;
 
 
-        try {
+        try{
             $result2 = reepay_s()->api()->request('coupon', 'POST', $paramsCoupon);
             update_post_meta($post_id, '_reepay_coupon_handle', $paramsCoupon['handle']);
             return $result2;
-        } catch (Exception $e) {
-            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+        }catch (Exception $e){
+            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
 
         return false;
     }
 
-    function update_coupon(WC_Coupon $coupon)
-    {
+    function update_coupon(WC_Coupon $coupon) {
         $paramsCoupon = $this->get_coupon_default_params($coupon);
         $handle = get_post_meta($coupon->get_id(), '_reepay_coupon_handle', true);
 
-        try {
+        try{
             $result = reepay_s()->api()->request('coupon/' . $handle, 'PUT', $paramsCoupon);
             return $result;
-        } catch (Exception $e) {
-            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+        }catch (Exception $e){
+            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
 
         return false;
     }
 
 
-    function save_coupon_text_field($post_id, WC_Coupon $coupon)
-    {
+    function save_coupon_text_field( $post_id, WC_Coupon $coupon ) {
         $type = $coupon->get_discount_type();
 
-        if ($type !== 'reepay_percentage' && $type !== 'reepay_fixed_product') {
+        if($type !== 'reepay_type'){
             return;
         }
 
-        if (!empty($_REQUEST)) {
-            foreach ($_REQUEST as $i => $value) {
-                if (strpos($i, 'reepay_discount')) {
-                    update_post_meta($post_id, $i, $value);
+        if(!empty($_REQUEST)){
+            foreach ($_REQUEST as $i => $value){
+                if(strpos($i, 'reepay_discount')){
+                    update_post_meta( $post_id, $i, $value );
                 }
             }
         }
@@ -247,6 +240,10 @@ class WC_Reepay_Discounts_And_Coupons
 
         if ($_REQUEST['use_existing_coupon'] === 'true') {
             $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
+        }
+
+        if (!empty($_REQUEST['_reepay_discount_amount'])) {
+            $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
         }
 
         if (empty($discountHandle)) {
@@ -265,14 +262,30 @@ class WC_Reepay_Discounts_And_Coupons
         $coupon->save();
     }
 
-    function apply_discount($discount, $discounting_amount, $cart_item, $single, WC_Coupon $coupon)
-    {
+    function is_coupon_applied_for_plans($coupon, WC_Product $product) {
+        $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
+        $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+        if ($apply_to_all_plans === '1' ) {
+            return true;
+        }
+        if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
+            $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
+            return in_array($plan_handle, $apply_to_plans);
+        }
+        return false;
+    }
 
-        if ($coupon->is_type('reepay_percentage')) {
-            $discount = (float)$coupon->get_amount() * ($discounting_amount / 100);
+    function apply_discount($discount, $discounting_amount, $cart_item, $single, WC_Coupon $coupon) {
+        $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
+
+        if ($type === 'reepay_percentage'){
+            $product = $cart_item['data'];
+            if ($this->is_coupon_applied_for_plans($coupon, $product)) {
+                $discount = (float) $coupon->get_amount() * ( $discounting_amount / 100 );
+            }
         }
 
-        if (!$this->applied_fixed_coupon && $coupon->is_type('reepay_fixed_product')) {
+        if (!$this->applied_fixed_coupon && $type === 'reepay_fixed_product'){
             $discount = $coupon->get_amount();
             $this->applied_fixed_coupon = true;
         }
@@ -280,8 +293,7 @@ class WC_Reepay_Discounts_And_Coupons
         return $discount;
     }
 
-    function validate_applied_for_plans(WC_Product $product, $apply_to_plans = [])
-    {
+    function validate_applied_for_plans(WC_Product $product, $apply_to_plans = []) {
         if (count($apply_to_plans) > 0) {
             $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
             return in_array($plan_handle, $apply_to_plans);
@@ -289,29 +301,32 @@ class WC_Reepay_Discounts_And_Coupons
         return true;
     }
 
-    function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts)
-    {
-        if (!$coupon->is_type(array_keys(static::$coupon_types))) {
+    function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts){
+        if ( ! $coupon->is_type( 'reepay_type' ) ) {
             return $valid;
         }
 
         $apply_to_plans = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
         $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+        $apply = false;
         if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
             foreach ($discounts->get_items_to_validate() as $item) {
                 $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
-                if (!$valid) {
-                    throw new Exception(__(sprintf('Sorry, this coupon is not applicable to the products: %s.', $item->product->get_name()), 'woocommerce'), 113);
+                if ($valid) {
+                    $apply = true;
                 }
             }
+            if (!$apply) {
+                throw new Exception(__( 'Sorry, this coupon is not applicable to the products: %s.', 'woocommerce' ), 113);
+            }
+
         }
 
         return $valid;
     }
 
-    function validate_coupon_for_product($valid, WC_Product $product, WC_Coupon $coupon, $values)
-    {
-        if ($coupon->is_type(array_keys(static::$coupon_types))) {
+    function validate_coupon_for_product($valid, WC_Product $product, WC_Coupon $coupon, $values){
+        if ( $coupon->is_type( 'reepay_type' ) ) {
             return true;
         }
 
@@ -326,8 +341,7 @@ class WC_Reepay_Discounts_And_Coupons
         return $valid;
     }
 
-    function add_coupon_text_field()
-    {
+    function add_coupon_text_field() {
         $meta = get_post_meta(get_the_ID());
 
         $apply_to_items = [];
@@ -348,7 +362,7 @@ class WC_Reepay_Discounts_And_Coupons
         $handle = get_post_meta(get_the_ID(), '_reepay_coupon_handle', true);
 
         $is_update = false;
-        if (!empty($handle)) {
+        if(!empty($handle)){
             $is_update = true;
         }
 
@@ -361,13 +375,14 @@ class WC_Reepay_Discounts_And_Coupons
                 'is_update' => $is_update,
             ),
             '',
-            reepay_s()->settings('plugin_path') . 'templates/'
+            reepay_s()->settings('plugin_path').'templates/'
         );
     }
-
     public function add_coupon_types($discount_types)
     {
-        return array_merge($discount_types, static::$coupon_types);
+        return array_merge($discount_types, [
+            'reepay_type' => 'Reepay discount',
+        ]);
     }
 }
 
