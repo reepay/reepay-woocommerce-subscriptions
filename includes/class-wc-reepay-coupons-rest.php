@@ -26,13 +26,15 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 
             $coupon_data = [];
 
+            $amount = !empty($discountObj['amount']) ? $discountObj['amount'] / 100 : $discountObj['percentage'];
+
             $coupon_data['_reepay_discount_name'] = [$couponObj['name']];
             $coupon_data['_reepay_discount_apply_to'] = empty($discountObj['apply_to']) ? ['all'] : ['custom'];
             $coupon_data['_reepay_discount_apply_to_items'] = [$discountObj['apply_to']];
             $coupon_data['_reepay_discount_all_plans'] = [$couponObj['all_plans']];
             $coupon_data['_reepay_discount_eligible_plans'] = [$couponObj['eligible_plans']];
             $coupon_data['_reepay_discount_duration'] = ['forever'];
-            $coupon_data['_reepay_discount_amount'] = [!empty($discountObj['amount']) ? $discountObj['amount'] / 100 : 0];
+            $coupon_data['_reepay_discount_amount'] = [!empty($amount) ? $amount : 0];
 
             if (!empty($discountObj['fixed_count'])) {
                 $coupon_data['_reepay_discount_duration'] = ['fixed_number'];
