@@ -127,7 +127,23 @@ class WC_Reepay_Subscription_Plan_Simple
         add_filter('woocommerce_cart_item_subtotal', [$this, 'format_price'], 10, 2);
         add_filter('woocommerce_order_formatted_line_subtotal', [$this, 'format_price'], 10, 3);
 
+        add_action('woocommerce_cart_calculate_fees', [$this, 'add_setup_fee']);
+
         $this->register_actions();
+    }
+
+    public function add_setup_fee()
+    {
+        foreach (WC()->cart->get_cart() as $cart_item) {
+            if (WC_Reepay_Checkout::is_reepay_product($cart_item['data'])) {
+                $product = $cart_item['data'];
+                $fee = $product->get_meta('_reepay_subscription_fee');
+                if (!empty($fee) && !empty($fee['enabled']) && $fee['enabled'] == 'yes') {
+                    $amount = floatval($fee["amount"]) * $cart_item['quantity'];
+                    WC()->cart->add_fee(__($product->get_name() . ' - ' . $fee["text"], reepay_s()->settings('domain')), $amount, false);
+                }
+            }
+        }
     }
 
     public function rework_total($total_rows, $order, $tax_display)
@@ -249,8 +265,9 @@ class WC_Reepay_Subscription_Plan_Simple
         wc_get_template(
             'plan-subscription-frontend.php',
             [
-                'billing_plan' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan($product),
-                'trial' => WC_Reepay_Subscription_Plan_Simple::get_trial($product),
+                'billing_plan' => self::get_billing_plan($product),
+                'trial' => self::get_trial($product),
+                'setup_fee' => self::get_setup_fee($product),
                 'contract_periods' => $product->get_meta('_reepay_subscription_contract_periods'),
                 'domain' => reepay_s()->settings('domain')
             ],
@@ -934,6 +951,22 @@ class WC_Reepay_Subscription_Plan_Simple
             } else {
                 $ret = 'Trial period: ' . $trial['length'] . ' ' . $trial['unit'];
             }
+        }
+
+        return $ret;
+    }
+
+    /**
+     * @param WC_Product $product
+     *
+     * @return string
+     */
+    public static function get_setup_fee($product)
+    {
+        $fee = $product->get_meta('_reepay_subscription_fee');
+        $ret = '';
+        if (!empty($fee) && !empty($fee['enabled']) && $fee['enabled'] == 'yes') {
+            $ret = 'Setup fee (' . $fee["text"] . '): +' . wc_price($fee["amount"]);
         }
 
         return $ret;

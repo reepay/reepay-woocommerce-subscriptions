@@ -84,7 +84,7 @@ class WC_Reepay_Renewals
 
         self::lock_order($order->get_id());
 
-        $this->create_subscriptions($data, $order);
+        //$this->create_subscriptions($data, $order);
 
         self::unlock_order($order->get_id());
     }
@@ -149,13 +149,26 @@ class WC_Reepay_Renewals
                 break;
             }
 
+            //Get the WC_Product object
+            $product = $order_item->get_product();
+            $items_to_create = [$order_item];
+            $fee = $product->get_meta('_reepay_subscription_fee');
+            if (!empty($fee) && !empty($fee['enabled']) && $fee['enabled'] == 'yes') {
+                foreach ($main_order->get_items('fee') as $item_id => $item) {
+                    if ($product->get_name() . ' - ' . $fee["text"] === $item['name']) {
+                        $items_to_create[] = $item;
+                        $main_order->remove_item($item_id);
+                    }
+                }
+            }
+
             $main_order->remove_item($order_item_key);
             unset($order_items[$order_item_key]);
 
             $created_order = self::create_order_copy([
                 'status' => $main_order->get_status(''),
                 'customer_id' => $main_order->get_customer_id(),
-            ], $main_order, [$order_item]);
+            ], $main_order, $items_to_create);
 
             $orders[] = $created_order;
 
@@ -540,7 +553,36 @@ class WC_Reepay_Renewals
         }
 
         foreach ($items as $item) {
-            $new_order->add_item($item);
+            if ($item->is_type('line_item')) {
+                $product_item = new WC_Order_Item_Product();
+                $product_item->set_name($item->get_name());
+                $product_item->set_quantity($item->get_quantity());
+                $product_item->set_product_id($item->get_product_id());
+                $product_item->set_subtotal($item->get_subtotal());
+                $product_item->set_total($item->get_total());
+                $new_order->add_item($product_item);
+            }
+
+            //fees
+            if ($item->is_type('fee')) {
+                $fees_item = new WC_Order_Item_Fee();
+                $fees_item->set_name($item->get_name());
+                $fees_item->set_amount($item->get_amount());
+                $fees_item->set_total($item->get_total());
+                $new_order->add_item($fees_item);
+            }
+
+            //shipping
+            if ($item->is_type('shipping')) {
+                $shipping_item = new WC_Order_Item_Shipping();
+                $shipping_item->set_method_title($item->get_method_title());
+                $shipping_item->set_method_id($item->get_method_id());
+                $shipping_item->set_total($item->get_total());
+                $new_order->add_item($shipping_item);
+            }
+
+
+            $new_order->calculate_totals();
         }
 
         $new_order->save();
