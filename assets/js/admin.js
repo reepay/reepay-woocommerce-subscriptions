@@ -110,10 +110,15 @@ jQuery(function ($) {
 
         function show_existing_coupon_settings($container) {
             let value = $container.find('input[name=use_existing_coupon]:checked').val();
+            let $existing_container = $('.show_if_use_existing_coupon')
             if (value === 'true') {
+                $existing_container.find("input").prop("disabled", false);
+                $existing_container.find("select").prop("disabled", false);
                 $('.show_if_use_existing_coupon').show()
                 $('.hide_if_use_existing_coupon').hide()
             } else {
+                $existing_container.find("input").prop("disabled", true);
+                $existing_container.find("select").prop("disabled", true);
                 $('.show_if_use_existing_coupon').hide()
                 $('.hide_if_use_existing_coupon').show()
             }
@@ -138,10 +143,11 @@ jQuery(function ($) {
             if (type === 'reepay_type') {
                 $('.show_if_reepay').show();
                 $('.coupon_amount_field').hide();
+                $('.expiry_date_field').hide();
                 check_required()
             } else {
                 $('.show_if_reepay').hide();
-                $('.coupon_amount_field').show();
+                $('.expiry_date_field').show();
                 check_required()
             }
         }

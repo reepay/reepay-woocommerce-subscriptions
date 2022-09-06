@@ -237,9 +237,25 @@ class WC_Reepay_Discounts_And_Coupons
 
         $discountHandle = get_post_meta($post_id, '_reepay_discount_handle', true);
         $couponHandle = get_post_meta($post_id, '_reepay_coupon_handle', true);
+        $duration = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
 
-        if ($_REQUEST['use_existing_coupon'] === 'true') {
-            $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
+
+        if ($duration === 'fixed_number') {
+            $coupon->set_usage_limit($_REQUEST['_reepay_discount_fixed_count']);
+        }
+
+        if ($duration === 'limited_time') {
+            $length = $_REQUEST['_reepay_discount_fixed_period'];
+            $units = $_REQUEST['_reepay_discount_fixed_period_unit'];
+            $date = new DateTime();
+            if ($units === 'months') {
+                $date->modify("+$length months");
+            }
+
+            if ($units === 'days') {
+                $date->modify("+$length days");
+            }
+            $coupon->set_date_expires($date->getTimestamp());
         }
 
         if (!empty($_REQUEST['_reepay_discount_amount'])) {
@@ -260,6 +276,7 @@ class WC_Reepay_Discounts_And_Coupons
         }
 
         $coupon->save();
+
     }
 
     function is_coupon_applied_for_plans($coupon, WC_Product $product) {
