@@ -143,10 +143,11 @@ jQuery(function ($) {
             if (type === 'reepay_type') {
                 $('.show_if_reepay').show();
                 $('.coupon_amount_field').hide();
+                $('.expiry_date_field').hide();
                 check_required()
             } else {
                 $('.show_if_reepay').hide();
-                $('.coupon_amount_field').show();
+                $('.expiry_date_field').show();
                 check_required()
             }
         }
