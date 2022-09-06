@@ -27,7 +27,7 @@
             </p>
         </div>
     <?php endif; ?>
-    <div class="hide_if_use_existing_coupon">
+    <div class="hide_if_use_existing_coupon reepay_coupon_new">
         <?php
         wc_get_template(
             'discounts-and-coupons-fields-data.php',

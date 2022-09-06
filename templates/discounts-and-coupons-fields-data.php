@@ -16,7 +16,7 @@
 <p class="form-field">
     <label for="_reepay_discount_amount"><?php esc_html_e('Amount', reepay_s()->settings('domain')); ?></label>
     <input
-            type="text"
+            type="number"
             id="_reepay_discount_amount"
             name="_reepay_discount_amount"
             value="<?= esc_attr($meta['_reepay_discount_amount'][0] ?? '0') ?>"
@@ -33,6 +33,8 @@
             type="radio"
             id="_reepay_discount_type"
             name="_reepay_discount_type"
+            class="reepay-required"
+            required
         <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="reepay_fixed_product" <?php checked('reepay_fixed_product', esc_attr($meta['_reepay_discount_type'][0] ?? 'reepay_fixed_product')); ?> />
     &nbsp<?php esc_html_e('Fixed amount', reepay_s()->settings('domain')); ?>
@@ -43,7 +45,7 @@
             id="_reepay_discount_type"
             name="_reepay_discount_type"
         <?= $is_update ? 'disabled="disabled"' : '' ?>
-            value="reepay_percentage" <?php checked('reepay_percentage', $meta['_reepay_discount_type '][0] ?? 'all'); ?> />
+            value="reepay_percentage" <?php checked('reepay_percentage', $meta['_reepay_discount_type'][0] ?? ''); ?> />
     &nbsp<?php esc_html_e('Percentage', reepay_s()->settings('domain')); ?>
 </p>
 <!--End Discount type-->
@@ -134,13 +136,12 @@
 <p class="form-field show_if_fixed_number">
     <label for="_reepay_discount_fixed_count"><?php esc_html_e('Times', reepay_s()->settings('domain')); ?></label>
     <input
-            type="text"
+            type="number"
+            min="1"
             id="_reepay_discount_fixed_count"
             name="_reepay_discount_fixed_count"
-            value="<?= esc_attr($meta['_reepay_discount_fixed_count'][0] ?? '') ?>"
-            class="reepay-required"
+            value="<?= esc_attr($meta['_reepay_discount_fixed_count'][0] ?? '1') ?>"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
-            required
     />
 </p>
 <p class="form-field">
@@ -155,10 +156,11 @@
 <p class="form-field show_if_limited_time">
     <label for="_reepay_discount_fixed_period"><?php esc_html_e('Period Length', reepay_s()->settings('domain')); ?></label>
     <input
-            type="text"
+            type="number"
+            min="1"
             id="_reepay_discount_fixed_period"
             name="_reepay_discount_fixed_period"
-            value="<?= esc_attr($meta['_reepay_discount_fixed_period'][0] ?? '') ?>"
+            value="<?= esc_attr($meta['_reepay_discount_fixed_period'][0] ?? '1') ?>"
     />
 </p>
 <p class="form-field show_if_limited_time">
