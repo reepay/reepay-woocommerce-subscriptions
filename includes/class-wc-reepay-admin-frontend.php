@@ -29,7 +29,7 @@ class WC_Reepay_Admin_Frontend
         global $post;
 
         $reepay_order = get_post_meta($order->get_id(), '_reepay_order', true);
-        if (!empty($reepay_order) && strpos($reepay_order, 'inv') !== false && $post->post_parent !== 0) {
+        if (!empty($reepay_order) && strpos($reepay_order, 'inv') !== false && !empty($post->post_parent) && $post->post_parent !== 0) {
             return $reepay_order;
         }
         return $id;
