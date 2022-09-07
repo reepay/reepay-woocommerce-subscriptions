@@ -3,6 +3,10 @@ jQuery(function ($) {
 
     const $body = $('body');
     const $selectProductType = $('select#product-type');
+    
+    if ($('.woocommerce_product_addon').length > 0) {
+        $('.save-addons-button').show();
+    }
 
     $('#woocommerce-product-data').on('woocommerce_variations_loaded', function () {
         init('#variable_product_options');
@@ -59,7 +63,7 @@ jQuery(function ($) {
         let $reepay_discount_duration = $('input[name=_reepay_discount_duration]');
         let $container = $('.reepay_coupon_new');
 
-        $use_existing_coupon_select.on('change', function() {
+        $use_existing_coupon_select.on('change', function () {
             show_existing_select($(document))
         })
 
@@ -67,13 +71,13 @@ jQuery(function ($) {
             coupon_type_settings($(document))
         })
 
-        $reepay_discount_duration.on('change', function() {
+        $reepay_discount_duration.on('change', function () {
             if (this.checked) {
                 duration_settings($container)
             }
         })
 
-        $reepay_discount_type.on('change', function() {
+        $reepay_discount_type.on('change', function () {
             if (this.checked) {
                 coupon_type_percentage($container)
             }

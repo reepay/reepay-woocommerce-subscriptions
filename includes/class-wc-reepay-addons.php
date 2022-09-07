@@ -277,7 +277,7 @@ class WC_Reepay_Subscription_Addons
 
             if (!empty($addons_list['content'])) {
                 foreach ($addons_list['content'] as $i => $addon) {
-                    if (!$addon['all_plans'] && !in_array($plan_handle, $addon['eligible_plans'])) {
+                    if (!$addon['all_plans'] && (!empty($plan_handle) && !in_array($plan_handle, $addon['eligible_plans']))) {
                         unset($addons_list['content'][$i]);
                     }
                     if ($addon['state'] != 'active') {

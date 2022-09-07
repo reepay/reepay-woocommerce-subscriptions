@@ -33,9 +33,9 @@
     </div>
 
     <div class="woocommerce-product-add-ons-toolbar woocommerce-product-add-ons-toolbar--add-import-export toolbar">
-        <button type="submit" class="button button-primary"><?php _e('Save changes', $domain); ?></button>
+        <button type="submit"
+                class="button button-primary save-addons-button hidden"><?php _e('Save changes', $domain); ?></button>
         <button type="button" class="button add_new_addon"><?php _e('New add-on', $domain); ?></button>
-
     </div>
 
 </div>
@@ -103,7 +103,7 @@
                 html = html.replace(/{loop}/g, loop);
 
                 $('.woocommerce_product_addons').append(html);
-
+                $('.save-addons-button').show();
                 $('select.product_addon_type').change();
 
                 return false;
