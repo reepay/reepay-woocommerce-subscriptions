@@ -140,6 +140,7 @@
             min="1"
             id="_reepay_discount_fixed_count"
             name="_reepay_discount_fixed_count"
+            <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="<?= esc_attr($meta['_reepay_discount_fixed_count'][0] ?? '1') ?>"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
     />
@@ -160,12 +161,15 @@
             min="1"
             id="_reepay_discount_fixed_period"
             name="_reepay_discount_fixed_period"
+            <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="<?= esc_attr($meta['_reepay_discount_fixed_period'][0] ?? '1') ?>"
     />
 </p>
 <p class="form-field show_if_limited_time">
     <label for="_reepay_discount_fixed_period_unit"><?php esc_html_e('Unit', reepay_s()->settings('domain')); ?></label>
-    <select name="_reepay_discount_fixed_period_unit" id="coupon_id" class="short">
+    <select name="_reepay_discount_fixed_period_unit" id="coupon_id"
+            class="short"
+            <?= $is_update ? 'disabled="disabled"' : '' ?>>
         <option value="days">Days</option>
         <option value="months">Months</option>
     </select>

@@ -34,7 +34,7 @@
             array(
                 'meta' => $meta,
                 'plans' => $plans,
-                'is_update' => false,
+                'is_update' => $is_update,
                 'domain' => reepay_s()->settings( 'domain' )
             ),
             '',

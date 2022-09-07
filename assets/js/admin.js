@@ -3,7 +3,7 @@ jQuery(function ($) {
 
     const $body = $('body');
     const $selectProductType = $('select#product-type');
-    
+
     if ($('.woocommerce_product_addon').length > 0) {
         $('.save-addons-button').show();
     }
@@ -72,27 +72,19 @@ jQuery(function ($) {
         })
 
         $reepay_discount_duration.on('change', function () {
-            if (this.checked) {
-                duration_settings($container)
-            }
+            duration_settings($container)
         })
 
         $reepay_discount_type.on('change', function () {
-            if (this.checked) {
-                coupon_type_percentage($container)
-            }
+            coupon_type_percentage($container)
         })
 
         $apply_to_inputs.on('change', function () {
-            if (this.checked) {
-                apply_to_settings($container);
-            }
+            apply_to_settings($container);
         })
 
         $apply_to_all_plans_input.on('change', function () {
-            if (this.checked) {
-                apply_to_plans($container);
-            }
+            apply_to_plans($container);
         })
 
         $use_existing_coupon_input.on('change', function () {
@@ -129,7 +121,17 @@ jQuery(function ($) {
         }
 
         function duration_settings($container) {
-            let value = $container.find('input[name=_reepay_discount_duration]:checked').val()
+            let input = $container.find('input[name=_reepay_discount_duration]:checked')
+            let value = input.val()
+
+            if (input.attr('disabled')) {
+                $('.show_if_fixed_number').find('input, select').attr('disabled', 'disabled')
+                $('.show_if_limited_time').find('input, select').attr('disabled', 'disabled')
+            } else {
+                $('.show_if_fixed_number').find('input, select').attr('disabled', false)
+                $('.show_if_limited_time').find('input, select').attr('disabled', false)
+            }
+
             if (value === 'fixed_number') {
                 $('.show_if_fixed_number').show()
                 $('.show_if_limited_time').hide()
@@ -140,6 +142,8 @@ jQuery(function ($) {
                 $('.show_if_fixed_number').hide()
                 $('.show_if_limited_time').hide()
             }
+
+
         }
 
         function coupon_type_settings($container) {
@@ -173,14 +177,16 @@ jQuery(function ($) {
         function apply_to_settings($container) {
             let input = $container.find('input[type=radio][name=_reepay_discount_apply_to]:checked');
             let value = input.val();
-            if (value === 'custom' && !input.attr('disabled')) {
-                $('.active_if_apply_to_custom input').attr('disabled', false)
-                $('.active_if_apply_to_custom').show()
-            } else if (value === 'custom' && input.attr('disabled')) {
+
+            if (input.attr('disabled')) {
                 $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
+            } else {
+                $('.active_if_apply_to_custom input').attr('disabled', false)
+            }
+
+            if (value === 'custom') {
                 $('.active_if_apply_to_custom').show()
             } else {
-                $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
                 $('.active_if_apply_to_custom').hide()
             }
         }
