@@ -325,6 +325,13 @@ class WC_Reepay_Discounts_And_Coupons
         return true;
     }
 
+    /**
+     * @param $valid
+     * @param WC_Coupon $coupon
+     * @param WC_Discounts $discounts
+     * @return bool
+     * @throws Exception
+     */
     function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts){
         if ( ! $coupon->is_type( 'reepay_type' ) ) {
             return $valid;
@@ -338,14 +345,14 @@ class WC_Reepay_Discounts_And_Coupons
                 $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
                 if ($valid) {
                     $apply = true;
+                    break;
                 }
             }
-            if (!$apply) {
-                throw new Exception(__( 'Sorry, this coupon is not applicable to the products: %s.', 'woocommerce' ), 113);
-            }
-
         }
 
+        if (!$apply) {
+            throw new Exception(__( 'Sorry, this coupon is not applicable to the products', 'woocommerce' ), 113);
+        }
         return $valid;
     }
 
