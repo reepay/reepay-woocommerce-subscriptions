@@ -239,27 +239,34 @@ class WC_Reepay_Discounts_And_Coupons
         $couponHandle = get_post_meta($post_id, '_reepay_coupon_handle', true);
         $duration = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
 
+        $is_update = false;
 
-        if ($duration === 'fixed_number') {
-            $coupon->set_usage_limit($_REQUEST['_reepay_discount_fixed_count']);
+        if (!empty($couponHandle)) {
+            $is_update = true;
         }
 
-        if ($duration === 'limited_time') {
-            $length = $_REQUEST['_reepay_discount_fixed_period'];
-            $units = $_REQUEST['_reepay_discount_fixed_period_unit'];
-            $date = new DateTime();
-            if ($units === 'months') {
-                $date->modify("+$length months");
+        if (!$is_update) {
+            if ($duration === 'fixed_number') {
+                $coupon->set_usage_limit($_REQUEST['_reepay_discount_fixed_count']);
             }
 
-            if ($units === 'days') {
-                $date->modify("+$length days");
-            }
-            $coupon->set_date_expires($date->getTimestamp());
-        }
+            if ($duration === 'limited_time') {
+                $length = $_REQUEST['_reepay_discount_fixed_period'];
+                $units = $_REQUEST['_reepay_discount_fixed_period_unit'];
+                $date = new DateTime();
+                if ($units === 'months') {
+                    $date->modify("+$length months");
+                }
 
-        if (!empty($_REQUEST['_reepay_discount_amount'])) {
-            $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
+                if ($units === 'days') {
+                    $date->modify("+$length days");
+                }
+                $coupon->set_date_expires($date->getTimestamp());
+            }
+
+            if (!empty($_REQUEST['_reepay_discount_amount'])) {
+                $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
+            }
         }
 
         if (empty($discountHandle)) {
