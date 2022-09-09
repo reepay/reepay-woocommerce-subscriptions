@@ -125,11 +125,12 @@ jQuery(function ($) {
                 $('.hide_if_use_existing_coupon').show()
             }
             check_required()
+            requiredApplyItems($container)
         }
 
         function requiredApplyItems($container) {
             let $items = $container.find('[name="_reepay_discount_apply_to_items[]"]')
-            if ($items.is(':checked')) {
+            if ($items.is(':checked') || !$items.is(':visible')) {
                 $items.removeAttr('required')
             } else {
                 $items.attr('required', 'required')
