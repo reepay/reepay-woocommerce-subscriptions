@@ -180,6 +180,7 @@ jQuery(function ($) {
         function check_required() {
             $('.reepay-required').attr('required', false)
             $('.reepay-required:visible').attr('required', true)
+            $('.select2-container:visible').prev('.reepay-required').attr('required', true)
         }
 
         function coupon_type_percentage($container) {
