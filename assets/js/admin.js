@@ -62,6 +62,11 @@ jQuery(function ($) {
         let $reepay_discount_type = $('input[name=_reepay_discount_type]');
         let $reepay_discount_duration = $('input[name=_reepay_discount_duration]');
         let $container = $('.reepay_coupon_new');
+        let $requiredFix = $('[name="_reepay_discount_apply_to_items[]"]')
+
+        $requiredFix.on('change', function() {
+            requiredApplyItems($container)
+        })
 
         $use_existing_coupon_select.on('change', function () {
             show_existing_select($(document))
@@ -94,6 +99,7 @@ jQuery(function ($) {
         coupon_type_settings($(document))
         show_existing_coupon_settings($(document))
 
+        requiredApplyItems($container)
         coupon_type_percentage($container)
         apply_to_settings($container)
         apply_to_plans($container)
@@ -117,6 +123,16 @@ jQuery(function ($) {
                 $existing_container.find("select").prop("disabled", true);
                 $('.show_if_use_existing_coupon').hide()
                 $('.hide_if_use_existing_coupon').show()
+            }
+            check_required()
+        }
+
+        function requiredApplyItems($container) {
+            let $items = $container.find('[name="_reepay_discount_apply_to_items[]"]')
+            if ($items.is(':checked')) {
+                $items.removeAttr('required')
+            } else {
+                $items.attr('required', 'required')
             }
         }
 
@@ -176,18 +192,21 @@ jQuery(function ($) {
 
         function apply_to_settings($container) {
             let input = $container.find('input[type=radio][name=_reepay_discount_apply_to]:checked');
+            let applyItems = $container.find('.active_if_apply_to_custom input');
             let value = input.val();
 
             if (input.attr('disabled')) {
-                $('.active_if_apply_to_custom input').attr('disabled', 'disabled')
+                applyItems.attr('disabled', 'disabled')
             } else {
-                $('.active_if_apply_to_custom input').attr('disabled', false)
+                applyItems.attr('disabled', false)
             }
 
             if (value === 'custom') {
                 $('.active_if_apply_to_custom').show()
+                applyItems.attr('required', 'required')
             } else {
                 $('.active_if_apply_to_custom').hide()
+                applyItems.removeAttr('required')
             }
         }
 

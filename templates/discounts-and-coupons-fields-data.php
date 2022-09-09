@@ -76,6 +76,7 @@
         <?php foreach ($chunk as $value => $label): ?>
             <input disabled type="checkbox" id="<?= esc_attr($value) ?>"
                    name="_reepay_discount_apply_to_items[]"
+                   required
                    <?= $is_update ? 'disabled="disabled"' : '' ?>
                    value="<?= esc_attr($value) ?>" <?php checked(in_array($value, $meta['_reepay_discount_apply_to_items'][0] ?? []), true); ?>/> &nbsp<?php esc_html_e($label, reepay_s()->settings('domain')); ?>
             &nbsp
@@ -107,7 +108,8 @@
         <?php esc_html_e('Select one or more plans', reepay_s()->settings('domain')); ?>
         <br>
         <select name="_reepay_discount_eligible_plans[]" id="_reepay_discount_eligible_plans"
-                multiple="multiple" class="wc-enhanced-select short">
+                multiple="multiple" class="wc-enhanced-select short reepay-required"
+                required>
             <?php foreach ($plans as $value => $label): ?>
                 <option value="<?= esc_attr($value) ?>" <?= selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])) ?>><?= esc_attr($label) ?></option>
             <?php endforeach; ?>
@@ -126,6 +128,7 @@
             type="radio"
             id="_reepay_discount_duration"
             name="_reepay_discount_duration"
+            class="required-atleast-one"
         <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="forever" <?php checked('forever', esc_attr($meta['_reepay_discount_duration'][0] ?? 'forever')); ?> />
     &nbsp<?php esc_html_e('Forever', reepay_s()->settings('domain')); ?>
