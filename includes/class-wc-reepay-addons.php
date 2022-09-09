@@ -385,7 +385,7 @@ class WC_Reepay_Subscription_Addons
                     if (!empty($variations)) {
                         $plan_handle = [];
                         foreach ($variations as $loop => $variation) {
-                            $plan_handle = 'wc_subscription_' . $loop . '_' . $variation['variation_id'];
+                            $plan_handle = 'plan_' . $loop . '_' . $variation['variation_id'];
                             array_push($result['eligible_plans'], $plan_handle);
                         }
                     }

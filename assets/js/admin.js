@@ -32,12 +32,38 @@ jQuery(function ($) {
 
         init_shipping($('.addon-shipping-choose'))
 
+        function fill_addon_price(addon_field) {
+            var amount_field = $(".wc-modal-shipping-method-settings input[name*='_cost']")
+            $('.addon-notice').remove();
+            if (addon_field.val() !== 'new' && addon_field.val() !== '') {
+                amount_field.prop("disabled", true);
+                $.ajax({
+                    url: window.reepay.rest_urls.get_addon + `?amount=true&handle=${addon_field.val()}`,
+                    method: 'GET',
+                    success: function (response_data) {
+                        if (!response_data && !response_data.success) {
+                            console.log(response_data);
+                            return;
+                        }
+                        amount_field.val(response_data.amount);
+                        if ($('.addon-notice').length <= 0) {
+                            amount_field.after('<p class="addon-notice">Add-on amount can be changed <a target="_blank" href="https://app.reepay.com/#/rp/config/addons/' + addon_field.val() + '">here</a></p>');
+                        }
+                    },
+                })
+            } else {
+                amount_field.prop("disabled", false);
+            }
+        }
+
         function init_shipping(addon_field) {
             if (addon_field.val() === 'new') {
                 $('.addon-shipping-new').closest('tr').removeClass('hidden');
             } else {
                 $('.addon-shipping-new').closest('tr').addClass('hidden');
             }
+
+            fill_addon_price(addon_field);
         }
     });
 

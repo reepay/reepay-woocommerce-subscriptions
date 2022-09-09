@@ -84,7 +84,7 @@ class WC_Reepay_Renewals
 
         self::lock_order($order->get_id());
 
-        //$this->create_subscriptions($data, $order);
+        $this->create_subscriptions($data, $order);
 
         self::unlock_order($order->get_id());
     }

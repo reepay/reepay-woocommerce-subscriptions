@@ -696,7 +696,7 @@ class WC_Reepay_Subscription_Plan_Simple
 
     public function generate_subscription_handle($post_id)
     {
-        return 'wc_subscription_' . $post_id . '-' . time();
+        return 'plan_' . $post_id . '-' . time();
     }
 
     public function get_params($post_id)

@@ -90,21 +90,28 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
             unset($instance_settings['reepay_shipping_addon_name']);
             unset($instance_settings['reepay_shipping_addon_description']);
         } else {
-            if ($instance_settings['reepay_shipping_addon'] == 'new') {
-                $created_addon = $this->save_to_reepay([
-                    'name' => $instance_settings['reepay_shipping_addon_name'],
-                    'description' => $instance_settings['reepay_shipping_addon_description'],
-                    'amount' => $instance_settings['cost'],
-                    'choose' => $instance_settings['reepay_shipping_addon'],
-                    'vat' => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping() * 100,
-                    'type' => 'on_off',
-                    'vat_type' => wc_prices_include_tax(),
-                ], $shipping_method->get_instance_option_key());
+            $params = [
+                'name' => $instance_settings['reepay_shipping_addon_name'],
+                'description' => $instance_settings['reepay_shipping_addon_description'],
+                'amount' => $instance_settings['cost'],
+                'choose' => $instance_settings['reepay_shipping_addon'],
+                'vat' => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping() * 100,
+                'type' => 'on_off',
+                'vat_type' => wc_prices_include_tax(),
+            ];
 
+
+            if ($instance_settings['reepay_shipping_addon'] == 'new') {
+                $created_addon = $this->save_to_reepay($params, $shipping_method->get_instance_option_key());
                 $instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
             } else {
                 //get existing method
                 $addon_data = $this->get_reepay_addon_data($instance_settings['reepay_shipping_addon']);
+
+                if ($instance_settings['cost'] != $addon_data['amount']) {
+                    $instance_settings['cost'] = $addon_data['amount'];
+                }
+
                 $instance_settings['reepay_shipping_addon_name'] = $addon_data['name'];
                 $instance_settings['reepay_shipping_addon_description'] = $addon_data['description'];
             }
@@ -135,7 +142,8 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
                 WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
             }
         } else { //Update
-            $handle = $product_addon['handle'];
+            $handle = $product_addon['choose'];
+
             try {
                 reepay_s()->api()->request("add_on/$handle", 'PUT', $params);
             } catch (Exception $e) {
