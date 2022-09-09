@@ -328,6 +328,7 @@ class WooCommerce_Reepay_Subscriptions
             'rest_urls' => [
                 'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . ($_GET['post'] ?? 0),
                 'get_coupon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/coupon/"),
+                'get_addon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/addon/"),
             ]
         ]);
     }

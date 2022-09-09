@@ -100,13 +100,18 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
                 'vat_type' => wc_prices_include_tax(),
             ];
 
-            $created_addon = $this->save_to_reepay($params, $shipping_method->get_instance_option_key());
 
             if ($instance_settings['reepay_shipping_addon'] == 'new') {
+                $created_addon = $this->save_to_reepay($params, $shipping_method->get_instance_option_key());
                 $instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
             } else {
                 //get existing method
                 $addon_data = $this->get_reepay_addon_data($instance_settings['reepay_shipping_addon']);
+
+                if ($instance_settings['cost'] != $addon_data['amount']) {
+                    $instance_settings['cost'] = $addon_data['amount'];
+                }
+
                 $instance_settings['reepay_shipping_addon_name'] = $addon_data['name'];
                 $instance_settings['reepay_shipping_addon_description'] = $addon_data['description'];
             }
