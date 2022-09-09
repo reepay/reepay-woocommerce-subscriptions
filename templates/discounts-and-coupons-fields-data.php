@@ -45,6 +45,7 @@
             type="radio"
             id="_reepay_discount_type"
             name="_reepay_discount_type"
+            class="reepay-required"
         <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="reepay_percentage" <?php checked('reepay_percentage', $meta['_reepay_discount_type'][0] ?? ''); ?> />
     &nbsp<?php esc_html_e('Percentage', reepay_s()->settings('domain')); ?>
@@ -59,6 +60,7 @@
             id="_reepay_discount_apply_to"
             name="_reepay_discount_apply_to"
         <?= $is_update ? 'disabled="disabled"' : '' ?>
+            class="reepay-required"
             value="all" <?php checked('all', esc_attr($meta['_reepay_discount_apply_to'][0] ?? 'all')); ?> />
     &nbsp<?php esc_html_e('All', reepay_s()->settings('domain')); ?>
 </p>
@@ -67,6 +69,7 @@
             type="radio"
             id="_reepay_discount_apply_to"
             name="_reepay_discount_apply_to"
+            class="reepay-required"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="custom" <?php checked('custom', $meta['_reepay_discount_apply_to'][0] ?? 'all'); ?> />
     &nbsp<?php esc_html_e('Custom', reepay_s()->settings('domain')); ?>
@@ -87,10 +90,11 @@
 <!--End Apply to-->
 
 
-<!--Availability to-->
+<!--Availability-->
 <p class="form-field">
     <label for="_reepay_discount_all_plans"><?php esc_html_e('Availability', reepay_s()->settings('domain')); ?></label>
     <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
+           class="reepay-required"
            value="1" <?php checked('1', esc_attr($meta['_reepay_discount_all_plans'][0] ?? '1')); ?>
                    <?= $is_update ? 'disabled="disabled"' : '' ?>
     />
@@ -98,6 +102,7 @@
 </p>
 <p class="form-field">
     <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
+           class="reepay-required"
            value="0" <?php checked('0', esc_attr($meta['_reepay_discount_all_plans'][0] ?? '1')); ?>
                    <?= $is_update ? 'disabled="disabled"' : '' ?>
     />
@@ -128,7 +133,7 @@
             type="radio"
             id="_reepay_discount_duration"
             name="_reepay_discount_duration"
-            class="required-atleast-one"
+            class="reepay-required"
         <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="forever" <?php checked('forever', esc_attr($meta['_reepay_discount_duration'][0] ?? 'forever')); ?> />
     &nbsp<?php esc_html_e('Forever', reepay_s()->settings('domain')); ?>
@@ -138,6 +143,7 @@
             type="radio"
             id="_reepay_discount_duration"
             name="_reepay_discount_duration"
+            class="reepay-required"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="fixed_number" <?php checked('fixed_number', $meta['_reepay_discount_duration'][0] ?? ''); ?> />
     &nbsp<?php esc_html_e('Fixed Number', reepay_s()->settings('domain')); ?>
@@ -149,9 +155,9 @@
             min="1"
             id="_reepay_discount_fixed_count"
             name="_reepay_discount_fixed_count"
+            class="reepay-required"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
             value="<?= esc_attr($meta['_reepay_discount_fixed_count'][0] ?? '1') ?>"
-            <?= $is_update ? 'disabled="disabled"' : '' ?>
     />
 </p>
 <p class="form-field">
@@ -159,7 +165,8 @@
             type="radio"
             id="_reepay_discount_duration"
             name="_reepay_discount_duration"
-        <?= $is_update ? 'disabled="disabled"' : '' ?>
+            <?= $is_update ? 'disabled="disabled"' : '' ?>
+            class="reepay-required"
             value="limited_time" <?php checked('limited_time', $meta['_reepay_discount_duration'][0] ?? ''); ?> />
     &nbsp<?php esc_html_e('Limited Time', reepay_s()->settings('domain')); ?>
 </p>
@@ -171,6 +178,7 @@
             id="_reepay_discount_fixed_period"
             name="_reepay_discount_fixed_period"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
+            class="reepay-required"
             value="<?= esc_attr($meta['_reepay_discount_fixed_period'][0] ?? '1') ?>"
     />
 </p>
