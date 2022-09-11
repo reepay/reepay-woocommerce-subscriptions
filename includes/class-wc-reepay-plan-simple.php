@@ -295,6 +295,7 @@ class WC_Reepay_Subscription_Plan_Simple
         $plansQuery = new WP_Query([
             'post_type' => 'product',
             'post_status' => 'publish',
+            'posts_per_page' => -1,
             'meta_query' => [
                 [
                     'key' => '_reepay_subscription_handle',

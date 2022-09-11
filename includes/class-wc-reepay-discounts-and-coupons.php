@@ -239,27 +239,34 @@ class WC_Reepay_Discounts_And_Coupons
         $couponHandle = get_post_meta($post_id, '_reepay_coupon_handle', true);
         $duration = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
 
+        $is_update = false;
 
-        if ($duration === 'fixed_number') {
-            $coupon->set_usage_limit($_REQUEST['_reepay_discount_fixed_count']);
+        if (!empty($couponHandle)) {
+            $is_update = true;
         }
 
-        if ($duration === 'limited_time') {
-            $length = $_REQUEST['_reepay_discount_fixed_period'];
-            $units = $_REQUEST['_reepay_discount_fixed_period_unit'];
-            $date = new DateTime();
-            if ($units === 'months') {
-                $date->modify("+$length months");
+        if (!$is_update) {
+            if ($duration === 'fixed_number') {
+                $coupon->set_usage_limit($_REQUEST['_reepay_discount_fixed_count']);
             }
 
-            if ($units === 'days') {
-                $date->modify("+$length days");
-            }
-            $coupon->set_date_expires($date->getTimestamp());
-        }
+            if ($duration === 'limited_time') {
+                $length = $_REQUEST['_reepay_discount_fixed_period'];
+                $units = $_REQUEST['_reepay_discount_fixed_period_unit'];
+                $date = new DateTime();
+                if ($units === 'months') {
+                    $date->modify("+$length months");
+                }
 
-        if (!empty($_REQUEST['_reepay_discount_amount'])) {
-            $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
+                if ($units === 'days') {
+                    $date->modify("+$length days");
+                }
+                $coupon->set_date_expires($date->getTimestamp());
+            }
+
+            if (!empty($_REQUEST['_reepay_discount_amount'])) {
+                $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
+            }
         }
 
         if (empty($discountHandle)) {
@@ -318,6 +325,13 @@ class WC_Reepay_Discounts_And_Coupons
         return true;
     }
 
+    /**
+     * @param $valid
+     * @param WC_Coupon $coupon
+     * @param WC_Discounts $discounts
+     * @return bool
+     * @throws Exception
+     */
     function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts){
         if ( ! $coupon->is_type( 'reepay_type' ) ) {
             return $valid;
@@ -331,14 +345,14 @@ class WC_Reepay_Discounts_And_Coupons
                 $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
                 if ($valid) {
                     $apply = true;
+                    break;
                 }
             }
-            if (!$apply) {
-                throw new Exception(__( 'Sorry, this coupon is not applicable to the products: %s.', 'woocommerce' ), 113);
-            }
-
         }
 
+        if (!$apply) {
+            throw new Exception(__( 'Sorry, this coupon is not applicable to the products', 'woocommerce' ), 113);
+        }
         return $valid;
     }
 
