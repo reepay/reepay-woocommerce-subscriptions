@@ -1,7 +1,7 @@
 <?php
 
 /*
- * Plugin Name: WooCommerce Reepay Subscriptions
+ * Plugin Name: Reepay Subscriptions for WooCommerce
  * Description: Provides a subscriptions through Reepay for WooCommerce.
  * Author: OnePix
  * Author URI: https://onepix.net

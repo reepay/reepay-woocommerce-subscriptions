@@ -1,4 +1,4 @@
-=== Reepay WooCommerce Subscriptions ===
+=== Reepay Subscriptions for WooCommerce ===
 Contributors: reepay
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress ecommerce, reepay
 Requires at least: 4.0
