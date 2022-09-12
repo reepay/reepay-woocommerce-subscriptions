@@ -2,9 +2,9 @@
 
 /*
  * Plugin Name: Reepay Subscriptions for WooCommerce
- * Description: Provides a subscriptions through Reepay for WooCommerce.
- * Author: OnePix
- * Author URI: https://onepix.net
+ * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
+ * Author: reepay
+ * Author URI: https://reepay.com/
  * Version: 1.0.0
  * Text Domain: reepay-woocommerce-subscriptions
  * Domain Path: /languages
