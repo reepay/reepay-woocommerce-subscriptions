@@ -349,7 +349,7 @@ class WooCommerce_Reepay_Subscriptions
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         wp_localize_script('admin-reepay-subscription', 'reepay', [
-            'amountPercentageLabel' => __('Coupon percentage', reepay_s()->settings('domain')),
+            'amountPercentageLabel' => __('Percentage', reepay_s()->settings('domain')),
             'rest_urls' => [
                 'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . ($_GET['post'] ?? 0),
                 'get_coupon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/coupon/"),
