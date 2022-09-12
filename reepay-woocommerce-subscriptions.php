@@ -102,12 +102,37 @@ class WooCommerce_Reepay_Subscriptions
         add_filter('woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50);
         add_action('woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab']);
         add_action('woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings']);
+        add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
         register_activation_hook(REEPAY_PLUGIN_FILE, 'flush_rewrite_rules');
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
         $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
         new WC_Reepay_Subscription_Plan_Variable();
+    }
+
+    /**
+     * Show row meta on the plugin screen.
+     *
+     * @param mixed $links Plugin Row Meta.
+     * @param mixed $file Plugin Base file.
+     *
+     * @return array
+     */
+    public function plugin_row_meta($links, $file)
+    {
+
+        if (plugin_basename(__FILE__) !== $file) {
+            return $links;
+        }
+
+        $row_meta = array(
+            'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . esc_html__('Get free test account', reepay_s()->settings('domain')) . '</a>',
+            'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . esc_html__('Pricing', reepay_s()->settings('domain')) . '</a>',
+        );
+
+
+        return array_merge($links, $row_meta);
     }
 
     public function admin_customer_report()
