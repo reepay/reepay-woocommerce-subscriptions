@@ -211,7 +211,7 @@ class WooCommerce_Reepay_Subscriptions
                 'desc' => __('Private Key Test for test API', reepay_s()->settings('domain')),
                 'id' => '_reepay_api_private_key_test'
             ],
-            '_reepay_enable_downgrade' => [
+            /*'_reepay_enable_downgrade' => [
                 'name' => __('Enable Downgrade', reepay_s()->settings('domain')),
                 'type' => 'checkbox',
                 'desc' => __('Enable Downgrade', reepay_s()->settings('domain')),
@@ -236,7 +236,7 @@ class WooCommerce_Reepay_Subscriptions
                 'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for upgrade', reepay_s()->settings('domain')),
                 'id' => '_reepay_upgrade_compensation_method'
-            ],
+            ],*/
             '_reepay_enable_on_hold' => [
                 'name' => __('Enable On Hold', reepay_s()->settings('domain')),
                 'type' => 'checkbox',
