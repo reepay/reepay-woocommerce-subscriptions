@@ -244,7 +244,9 @@ jQuery(function ($) {
         }
 
         function apply_to_plans($container) {
-            let value = $container.find('input[name=_reepay_discount_all_plans]:checked').val();
+            let input = $container.find('input[name=_reepay_discount_all_plans]:checked');
+            let value = input.val()
+
             if (value === '0') {
                 $('.show_if_selected_plans').show()
                 $('.show_if_selected_plans select').attr('disabled', false)
@@ -252,6 +254,11 @@ jQuery(function ($) {
                 $('.show_if_selected_plans').hide()
                 $('.show_if_selected_plans select').attr('disabled', true)
             }
+
+            if (input.attr('disabled')) {
+                $('.show_if_selected_plans select').attr('disabled', true)
+            }
+
             check_required()
         }
 
