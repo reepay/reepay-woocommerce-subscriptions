@@ -90,7 +90,7 @@ jQuery(function ($) {
         let $container = $('.reepay_coupon_new');
         let $requiredFix = $('[name="_reepay_discount_apply_to_items[]"]')
 
-        $requiredFix.on('change', function() {
+        $requiredFix.on('change', function () {
             requiredApplyItems($container)
         })
 
@@ -324,13 +324,19 @@ jQuery(function ($) {
         subs_block.find('.fields-' + type).show();
     }
 
-    function show_fee_settings($container) {
-        const val = $container.find('#_subscription_schedule_type').val()
-
-        if (val) {
-            $container.find('.fee-fields').show();
+    function show_fee_settings($container, elem = false) {
+        var val;
+        if (elem) {
+            val = elem;
         } else {
-            $container.find('.fee-fields').hide();
+            val = $container.find('#_subscription_fee');
+        }
+        
+        var block = val.closest('.reepay_subscription_fee').find('.fee-fields')
+        if (val.is(':checked')) {
+            block.show();
+        } else {
+            block.hide();
         }
     }
 
@@ -495,7 +501,7 @@ jQuery(function ($) {
         }).trigger('change');
 
         $(tab + ' #_subscription_fee').on('change', function () {
-            show_fee_settings($tab);
+            show_fee_settings($tab, $(this));
         }).trigger('change');
 
         choose_change_settings($tab.find('[name="_reepay_subscription_choose"]:checked'));
