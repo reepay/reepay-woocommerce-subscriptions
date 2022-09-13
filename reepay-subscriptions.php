@@ -104,11 +104,19 @@ class WooCommerce_Reepay_Subscriptions
         add_action('woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings']);
         add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
         register_activation_hook(REEPAY_PLUGIN_FILE, 'flush_rewrite_rules');
+        add_action('admin_init', [$this, 'reepay_check_gateway']);
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
         $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
         new WC_Reepay_Subscription_Plan_Variable();
+    }
+
+    public function reepay_check_gateway()
+    {
+        if (!class_exists('WC_ReepayCheckout', false)) {
+            WC_Reepay_Subscription_Admin_Notice::add_activation_notice('The plugin Reepay Checkout for WooCommerce is required for Reepay Subscriptions for WooCommerce. <a target="_blank" href="https://wordpress.org/plugins/reepay-checkout-gateway/">Please install and activate the plugin.</a>');
+        }
     }
 
     /**
