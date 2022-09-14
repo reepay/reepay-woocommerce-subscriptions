@@ -22,9 +22,9 @@ global $post;
 
 
         <input type="hidden" name="product_addon_position[<?php echo $loop; ?>]" class="product_addon_position"
-               value="<?php echo esc_attr($loop); ?>"/>
+               value="<?php esc_attr_e($loop); ?>"/>
         <input type="hidden" name="product_addon_handle[<?php echo $loop; ?>]" class="product_addon_position"
-               value="<?= !empty($addon['handle']) ? esc_attr($addon['handle']) : '' ?>"/>
+               value="<?php echo !empty($addon['handle']) ? esc_attr($addon['handle']) : '' ?>"/>
     </h3>
 
 
@@ -44,7 +44,7 @@ global $post;
                 </p>
             </td>
         </tr>
-        <tbody class="new-addon <?= $addon['choose'] == 'exist' ? 'hidden' : '' ?>">
+        <tbody class="new-addon <?php echo $addon['choose'] == 'exist' ? 'hidden' : '' ?>">
         <?php
         wc_get_template(
             'admin-addon-single-data.php',
@@ -58,7 +58,7 @@ global $post;
         );
         ?>
         </tbody>
-        <tbody class="exist <?= $addon['choose'] == 'new' ? 'hidden' : '' ?>">
+        <tbody class="exist <?php echo $addon['choose'] == 'new' ? 'hidden' : '' ?>">
         <tr>
             <td class="addon_name" width="100%">
                 <?php if (!empty($addons_list)): ?>
@@ -66,7 +66,7 @@ global $post;
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">
                         <option value=""><?php esc_html_e('Select add-on', $domain); ?></option>
                         <?php foreach ($addons_list as $addon_rem): ?>
-                            <option value="<?= esc_attr($addon_rem['handle']) ?>" <?php !empty($addon['exist']) && $addon['choose'] == 'exist' ? selected($addon_rem['handle'], $addon['exist'], true) : '' ?>><?= esc_attr($addon_rem['name']) ?></option>
+                            <option value="<?php esc_attr_e($addon_rem['handle']) ?>" <?php !empty($addon['exist']) && $addon['choose'] == 'exist' ? selected($addon_rem['handle'], $addon['exist'], true) : '' ?>><?php esc_attr_e($addon_rem['name']) ?></option>
                         <?php endforeach; ?>
                     </select>
                 <?php else: ?>

@@ -18,7 +18,7 @@
                 <select name="_reepay_discount_use_existing_coupon_id" id="coupon_id" class="short">
                     <option value="">Select coupon</option>
                     <?php foreach ($coupons as $coupon): ?>
-                        <option value="<?= esc_attr($coupon['handle']) ?>"><?= esc_attr($coupon['code']) ?></option>
+                        <option value="<?php esc_attr_e($coupon['handle']) ?>"><?php esc_attr_e($coupon['code']) ?></option>
                     <?php endforeach; ?>
                 </select>
                 <?php if (empty($coupons)):
@@ -35,10 +35,10 @@
                 'meta' => $meta,
                 'plans' => $plans,
                 'is_update' => $is_update,
-                'domain' => reepay_s()->settings( 'domain' )
+                'domain' => reepay_s()->settings('domain')
             ),
             '',
-            reepay_s()->settings('plugin_path').'templates/'
+            reepay_s()->settings('plugin_path') . 'templates/'
         );
         ?>
     </div>
