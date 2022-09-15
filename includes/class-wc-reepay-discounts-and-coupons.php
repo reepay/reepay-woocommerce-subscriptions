@@ -95,7 +95,7 @@ class WC_Reepay_Discounts_And_Coupons
             update_post_meta($post_id, '_reepay_discount_eligible_plans', $couponObj['eligible_plans']);
             update_post_meta($post_id, '_reepay_coupon_handle', $couponObj['handle']);
 
-            return $wc_coupon;
+            return $couponObj['handle'];
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
@@ -121,7 +121,7 @@ class WC_Reepay_Discounts_And_Coupons
             update_post_meta($post_id, '_reepay_discount_apply_to_items', $discountObj['apply_to']);
             update_post_meta($post_id, '_reepay_discount_handle', $discountObj['handle']);
 
-            return $wc_coupon;
+            return $discountObj['handle'];
         }catch (Exception $e){
             WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
         }
