@@ -14,18 +14,25 @@ $variable = !empty($variable);
                 <?php esc_html_e('Subscription pricing (kr)', $domain); ?>
             </label>
             <span class="wrap">
-            <input type="number"
-                   id="_subscription_price" <?php echo $disabled ?> name="_reepay_subscription_price<?php echo $variable ? '[' . $loop . ']' : '' ?>"
-                   class="wc_input_price wc_input_subscription_price"
-                   placeholder="<?php esc_attr_e('e.g. 5.90', $domain); ?>" step="any" min="0"
-                   value="<?php echo !empty($_reepay_subscription_price) ?? esc_attr(wc_format_localized_price($_reepay_subscription_price)); ?>"/>
-            <select id="_subscription_schedule_type" <?php echo $disabled ?> name="_reepay_subscription_schedule_type<?php echo $variable ? '[' . $loop . ']' : '' ?>"
+                <input type="number"
+                       id="_subscription_price" <?php echo $disabled ?> name="_reepay_subscription_price<?php echo $variable ? '[' . $loop . ']' : '' ?>"
+                       class="wc_input_price wc_input_subscription_price"
+                       placeholder="<?php esc_attr_e('e.g. 5.90', $domain); ?>" step="any" min="0"
+                       value="<?php echo !empty($_reepay_subscription_price) ?? esc_attr(wc_format_localized_price($_reepay_subscription_price)); ?>"/>
+
+            </span>
+        </p>
+
+        <!--Type-->
+        <p class="form-field pricing-fields <?php echo $variable ? 'form-row' : '' ?> hidden">
+            <label for="_reepay_subscription_daily"><?php esc_html_e('Schedule Type', $domain); ?></label>
+            <select id="_subscription_schedule_type" <?php echo $disabled ?>
+                    name="_reepay_subscription_schedule_type<?php echo $variable ? '[' . $loop . ']' : '' ?>"
                     class="wc_input_subscription_period_interval">
                 <?php foreach (WC_Reepay_Subscription_Plan_Simple::$schedule_types as $value => $label) { ?>
                     <option value="<?php esc_attr_e($value); ?>" <?php !empty($_reepay_subscription_schedule_type) ?? selected($value, $_reepay_subscription_schedule_type, true) ?>><?php esc_html_e($label); ?></option>
                 <?php } ?>
             </select>
-        </span>
         </p>
 
         <!--Daily-->
@@ -442,6 +449,18 @@ $variable = !empty($variable);
                    value="<?php echo !empty($weekly_fixedday['proration_minimum']) ? $weekly_fixedday['proration_minimum'] : 0 ?>"/>
         </p>
 
+        <p class="form-field advanced-fields <?php echo $variable ? 'form-row' : '' ?>">
+            <label for="_reepay_subscription_default_quantity">
+                <?php esc_html_e('Default Quantity', $domain); ?>
+            </label>
+            <?php echo wc_help_tip(__('Default quantity to use when creating a new subscription. Also used as the quantity on hosted pages.', $domain)); ?>
+            <input type="number" min="0" id="_reepay_subscription_default_quantity" <?php echo $disabled ?>
+                   name="_reepay_subscription_default_quantity<?php echo $variable ? '[' . $loop . ']' : '' ?>"
+                   class="wc_input_price wc_input_subscription_price"
+                   placeholder="<?php esc_html_e('Default Quantity', $domain); ?>"
+                   value="<?php echo !empty($_reepay_subscription_default_quantity) ? esc_attr($_reepay_subscription_default_quantity) : '1' ?>"/>
+        </p>
+
         <!--Advanced-->
         <p class="form-field advanced-fields <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_renewal_reminder">
@@ -453,21 +472,12 @@ $variable = !empty($variable);
                    placeholder="<?php esc_html_e('Renewal Reminder Schedule', $domain); ?>"
                    value="<?php echo !empty($_reepay_subscription_renewal_reminder) ? esc_attr($_reepay_subscription_renewal_reminder) : '' ?>"/>
         </p>
-        <p class="form-field advanced-fields <?php echo $variable ? 'form-row' : '' ?>">
-            <label for="_reepay_subscription_default_quantity">
-                <?php esc_html_e('Default Quantity', $domain); ?>
-            </label>
-            <input type="number" min="0" id="_reepay_subscription_default_quantity" <?php echo $disabled ?>
-                   name="_reepay_subscription_default_quantity<?php echo $variable ? '[' . $loop . ']' : '' ?>"
-                   class="wc_input_price wc_input_subscription_price"
-                   placeholder="<?php esc_html_e('Default Quantity', $domain); ?>"
-                   value="<?php echo !empty($_reepay_subscription_default_quantity) ? esc_attr($_reepay_subscription_default_quantity) : '1' ?>"/>
-        </p>
     </div>
 
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_subscription_contract_periods"><?php esc_html_e('Minimum Contract Period', $domain); ?></label>
+            <?php echo wc_help_tip(__('Periods are relative to the billing frequency. If you have chosen to bill every month, a period is one month.', $domain)); ?>
             <input type="number" min="0" id="_subscription_contract_periods" <?php echo $disabled ?>
                    name="_reepay_subscription_contract_periods<?php echo $variable ? '[' . $loop . ']' : '' ?>"
                    placeholder="<?php esc_html_e('Periods', $domain); ?>"
@@ -490,6 +500,7 @@ $variable = !empty($variable);
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field">
             <label for="_subscription_notice_period"><?php esc_html_e('Notice period', $domain); ?></label>
+            <?php echo wc_help_tip(__('Periods are relative to the billing frequency. If you have chosen to bill every month, a period is one month.', $domain)); ?>
             <input type="number" min="0" id="_subscription_notice_period" <?php echo $disabled ?>
                    name="_reepay_subscription_notice_period<?php echo $variable ? '[' . $loop . ']' : '' ?>"
                    placeholder="<?php esc_html_e('Periods', $domain); ?>"
@@ -508,7 +519,7 @@ $variable = !empty($variable);
         </p>
     </div>
 
-    <div class="options_group show_if_reepay_subscription">
+    <div class="options_group show_if_reepay_subscription billing_cycles_block">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_subscription_billing_cycles"><?php esc_html_e('Billing Cycles', $domain); ?></label>
             <?php esc_html_e('Auto Renew until cancelled', $domain); ?> &nbsp<input type="radio"

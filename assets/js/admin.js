@@ -374,7 +374,7 @@ jQuery(function ($) {
         } else {
             val = $container.find('#_subscription_fee');
         }
-        
+
         var block = val.closest('.reepay_subscription_fee').find('.fee-fields')
         if (val.is(':checked')) {
             block.show();
@@ -436,13 +436,14 @@ jQuery(function ($) {
         }
     }
 
-    function billing_cycles_settings($container) {
-        const val = $container.find('#_subscription_notice_period').val()
+    function billing_cycles_settings(elem) {
+        const val = elem.val()
+        var block = elem.closest('.billing_cycles_block').find('.fields-billing_cycles')
 
         if (val === 'true') {
-            $container.find('.fields-billing_cycles').show();
+            block.show();
         } else {
-            $container.find('.fields-billing_cycles').hide();
+            block.hide();
         }
     }
 
