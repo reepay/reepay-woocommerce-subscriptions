@@ -1,3 +1,16 @@
+<!-- Name -->
+<p class="form-field">
+    <label for="_reepay_discount_name"><?php esc_html_e('Name', reepay_s()->settings('domain')); ?></label>
+    <input
+            type="text"
+            id="_reepay_discount_name"
+            name="_reepay_discount_name"
+            value="<?= esc_attr($meta['_reepay_discount_name'][0] ?? '') ?>"
+            class="reepay-required"
+            required
+    />
+</p>
+<!--End Name -->
 <!--Availability-->
 <p class="form-field">
     <label for="_reepay_discount_all_plans"><?php esc_html_e('Availability', reepay_s()->settings('domain')); ?></label>

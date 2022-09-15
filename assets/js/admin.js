@@ -557,7 +557,7 @@ jQuery(function ($) {
     function discount_set_data(discount, $container, disable = true) {
         //use .val(['value']) for radio buttons
         discount['_reepay_discount_amount'] && $container.find('[name="_reepay_discount_amount"]').val(discount['_reepay_discount_amount']).attr('disabled', disable)
-        discount['_reepay_discount_name'] && $container.find('[name="_reepay_discount_name"]').val(discount['_reepay_discount_name'])
+        // discount['_reepay_discount_name'] && $container.find('[name="_reepay_discount_name"]').val(discount['_reepay_discount_name'])
         discount['_reepay_discount_type'] && $container.find('[name="_reepay_discount_type"]').val([discount['_reepay_discount_type']]).attr('disabled', disable)
         discount['_reepay_discount_apply_to'] && $container.find('[name="_reepay_discount_apply_to"]').val([discount['_reepay_discount_apply_to']]).attr('disabled', disable)
         discount['_reepay_discount_apply_to_items'] && $container.find('[name="_reepay_discount_apply_to_items[]"]').val(discount['_reepay_discount_apply_to_items']).attr('disabled', disable)

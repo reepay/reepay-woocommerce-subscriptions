@@ -29,6 +29,19 @@
         </div>
     <?php endif; ?>
     <div class="hide_if_use_existing_coupon reepay_coupon_new">
+        <?php
+        wc_get_template(
+            'discounts-and-coupons-fields-data-coupon.php',
+            array(
+                'meta' => $meta,
+                'plans' => $plans,
+                'is_update' => $is_update,
+                'domain' => reepay_s()->settings('domain')
+            ),
+            '',
+            reepay_s()->settings('plugin_path') . 'templates/'
+        );
+        ?>
         <?php if (!$is_update): ?>
             <p class="form-field">
                 <label for="_reepay_discount_all_plans"><?php esc_html_e('Discount creation type', reepay_s()->settings('domain')); ?></label>
@@ -71,19 +84,6 @@
             ),
             '',
             reepay_s()->settings('plugin_path').'templates/'
-        );
-        ?>
-        <?php
-        wc_get_template(
-            'discounts-and-coupons-fields-data-coupon.php',
-            array(
-                'meta' => $meta,
-                'plans' => $plans,
-                'is_update' => $is_update,
-                'domain' => reepay_s()->settings('domain')
-            ),
-            '',
-            reepay_s()->settings('plugin_path') . 'templates/'
         );
         ?>
     </div>
