@@ -289,11 +289,11 @@ class WC_Reepay_Discounts_And_Coupons
             }
 
             if ($_REQUEST['use_existing_coupon'] === 'true') {
-                $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
+                $couponHandle = $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
             }
 
             if ($_REQUEST['use_existing_discount'] === 'true') {
-                $this->use_existing_discount($coupon, $_REQUEST['_reepay_discount_use_existing_discount_id']);
+                $discountHandle = $this->use_existing_discount($coupon, $_REQUEST['_reepay_discount_use_existing_discount_id']);
             }
         }
 
