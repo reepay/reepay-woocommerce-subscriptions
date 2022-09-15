@@ -45,15 +45,6 @@ class WC_Reepay_Discounts_And_Coupons
         $params = [
             "name" => $name,
         ];
-        $amount = $coupon->get_amount();
-
-        if ($amount >= 1) {
-            if ($type === 'reepay_percentage') {
-                $params['percentage'] = $amount;
-            } else if ($type === 'reepay_fixed_product') {
-                $params['amount'] = $amount;
-            }
-        }
 
         if ($description = $coupon->get_description()) {
             $params["description"] = $description;
@@ -147,6 +138,17 @@ class WC_Reepay_Discounts_And_Coupons
 
         $params = $this->get_discount_default_params($coupon);
 
+        $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
+
+        $amount = $coupon->get_amount();
+
+        if ($amount >= 1) {
+            if ($type === 'reepay_percentage') {
+                $params['percentage'] = $amount;
+            } else if ($type === 'reepay_fixed_product') {
+                $params['amount'] = $amount;
+            }
+        }
 
         $post_id = $coupon->get_id();
         $apply_items = $_REQUEST['_reepay_discount_apply_to_items'] ?? ['all'];
@@ -285,15 +287,16 @@ class WC_Reepay_Discounts_And_Coupons
             if (!empty($_REQUEST['_reepay_discount_amount'])) {
                 $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
             }
+
+            if ($_REQUEST['use_existing_coupon'] === 'true') {
+                $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
+            }
+
+            if ($_REQUEST['use_existing_discount'] === 'true') {
+                $this->use_existing_discount($coupon, $_REQUEST['_reepay_discount_use_existing_discount_id']);
+            }
         }
 
-        if ($_REQUEST['use_existing_coupon'] === 'true') {
-            $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
-        }
-
-        if ($_REQUEST['use_existing_discount'] === 'true') {
-            $this->use_existing_discount($coupon, $_REQUEST['_reepay_discount_use_existing_discount_id']);
-        }
 
         if (empty($discountHandle)) {
             $discount = $this->create_discount($coupon);
