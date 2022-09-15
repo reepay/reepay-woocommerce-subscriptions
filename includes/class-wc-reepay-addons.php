@@ -415,15 +415,15 @@ class WC_Reepay_Subscription_Addons
     {
         $product_addons = [];
         if (isset($_POST['product_addon_name'])) {
-            $addon_name = $_POST['product_addon_name'];
-            $addon_description = $_POST['product_addon_description'];
-            $addon_avai = $_POST['_reepay_addon_avai'];
-            $addon_type = !empty($_POST['product_addon_type']) ? $_POST['product_addon_type'] : '';
-            $addon_position = $_POST['product_addon_position'];
-            $addon_amount = $_POST['product_addon_amount'];
-            $addon_handle = $_POST['product_addon_handle'];
-            $addon_choose = $_POST['_reepay_addon_choose'];
-            $addon_exist = $_POST['addon_choose_exist'];
+            $addon_name = sanitize_text_field($_POST['product_addon_name']);
+            $addon_description = wp_kses_post($_POST['product_addon_description']);
+            $addon_avai = sanitize_text_field($_POST['_reepay_addon_avai']);
+            $addon_type = !empty($_POST['product_addon_type']) ? sanitize_text_field($_POST['product_addon_type']) : '';
+            $addon_position = absint($_POST['product_addon_position']);
+            $addon_amount = sanitize_text_field($_POST['product_addon_amount']);
+            $addon_handle = sanitize_text_field($_POST['product_addon_handle']);
+            $addon_choose = sanitize_text_field($_POST['_reepay_addon_choose']);
+            $addon_exist = sanitize_text_field($_POST['addon_choose_exist']);
 
             for ($i = 0; $i < sizeof($addon_name); $i++) {
                 $data = [];
@@ -439,12 +439,12 @@ class WC_Reepay_Subscription_Addons
                         continue;
                     }
 
-                    $data['name'] = sanitize_text_field(stripslashes($addon_name[$i]));
-                    $data['description'] = wp_kses_post(stripslashes($addon_description[$i]));
-                    $data['type'] = sanitize_text_field(stripslashes($addon_type[$i]));
-                    $data['position'] = absint($addon_position[$i]);
-                    $data['avai'] = sanitize_text_field($addon_avai[$i]);
-                    $data['amount'] = wc_format_decimal(sanitize_text_field(stripslashes($addon_amount[$i])));
+                    $data['name'] = stripslashes($addon_name[$i]);
+                    $data['description'] = stripslashes($addon_description[$i]);
+                    $data['type'] = stripslashes($addon_type[$i]);
+                    $data['position'] = $addon_position[$i];
+                    $data['avai'] = $addon_avai[$i];
+                    $data['amount'] = wc_format_decimal(stripslashes($addon_amount[$i]));
                     $data['vat'] = WC_Reepay_Subscription_Plan_Simple::get_vat($post_id);
                     $data['vat_type'] = wc_prices_include_tax();
                     $data['handle'] = $addon_handle[$i];

@@ -10,6 +10,8 @@ class WC_Reepay_Subscription_Admin_Notice
      */
     private static $notices = array();
 
+    private static $activation_notices = array();
+
 
     /**
      * Constructor
@@ -17,9 +19,26 @@ class WC_Reepay_Subscription_Admin_Notice
     public function __construct()
     {
         self::$notices = get_option('reepay_admin_notices', array());
+        self::$activation_notices = get_option('reepay_admin_activation_notices', array());
         add_action('post_updated_messages', array($this, 'show_editor_message'));
+        add_action('admin_notices', array($this, 'show_activation_message'));
         add_filter('woocommerce_reepay_check_payment', array($this, 'show_thankyou_message'), 10, 2);
+
     }
+
+    /**
+     * Show a notice.
+     *
+     * @param string $name Notice name.
+     * @param bool $force_save Force saving inside this method instead of at the 'shutdown'.
+     */
+    public static function add_activation_notice($notice)
+    {
+        self::$activation_notices = array_unique(array_merge(self::$activation_notices, array($notice)));
+
+        update_option('reepay_admin_activation_notices', self::$activation_notices);
+    }
+
 
     /**
      * Show a notice.
@@ -74,6 +93,17 @@ class WC_Reepay_Subscription_Admin_Notice
         }
 
         return $messages;
+    }
+
+    public function show_activation_message()
+    {
+        $notices = self::$activation_notices;
+        if (!empty($notices)) {
+            foreach ($notices as $notice) {
+                echo "<div class='error'><p>$notice</p></div>";
+            }
+            update_option('reepay_admin_activation_notices', array());
+        }
     }
 
     public function show_thankyou_message($ret, $order_id)

@@ -28,14 +28,14 @@ class WC_Reepay_Account_Page
     public function add_subscription_arg($url)
     {
         if ($_GET['reepay_subscription']) {
-            return add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url);
+            return add_query_arg('reepay_subscription', sanitize_text_field($_GET['reepay_subscription']), $url);
         }
         return $url;
     }
 
     public function payment_method_added(WC_Payment_Token $token)
     {
-        $handle = $_GET['reepay_subscription'] ?? '';
+        $handle = sanitize_text_field($_GET['reepay_subscription']) ?? '';
         if (!empty($handle)) {
             try {
                 $payment_methods = reepay_s()->api()->request('subscription/' . $handle . '/pm', 'POST', [
@@ -86,7 +86,7 @@ class WC_Reepay_Account_Page
                 return;
             }
 
-            $handle = $_GET['cancel_subscription'];
+            $handle = sanitize_text_field($_GET['cancel_subscription']);
             $handle = urlencode($handle);
 
             $order = wc_get_orders([
@@ -111,7 +111,7 @@ class WC_Reepay_Account_Page
 
         if (!empty($_GET['uncancel_subscription'])) {
 
-            $handle = $_GET['uncancel_subscription'];
+            $handle = sanitize_text_field($_GET['uncancel_subscription']);
             $handle = urlencode($handle);
 
             $order = wc_get_orders([
@@ -138,7 +138,7 @@ class WC_Reepay_Account_Page
             if (!reepay_s()->settings('_reepay_enable_on_hold')) {
                 return;
             }
-            $handle = $_GET['put_on_hold'];
+            $handle = sanitize_text_field($_GET['put_on_hold']);
             $handle = urlencode($handle);
 
             $order = wc_get_orders([
@@ -346,7 +346,8 @@ class WC_Reepay_Account_Page
         return $subscription['state'];
     }
 
-    public function get_formatted_schedule_type($plan) {
+    public function get_formatted_schedule_type($plan)
+    {
         if ($plan['schedule_type'] === 'manual') {
             return 'Manual';
         }

@@ -38,8 +38,12 @@ class WC_Reepay_Admin_Frontend
     public function reepay_show_extra_order_fields($order)
     {
 
-        $output = '<a href="https://app.reepay.com/#/rp/customers/customers/customer/customer-' . $order->get_customer_id() . '" target="_blank">customer-' . $order->get_customer_id() . '</a>';
-        echo '<p><strong>' . __('Customer Handle') . ':</strong> ' . $output . '</p>';
+        echo '<p>
+            <strong>' . __('Customer Handle') . ':</strong>
+            <a href="https://app.reepay.com/#/rp/customers/customers/customer/customer-' . $order->get_customer_id() . '" target="_blank">
+            customer-' . $order->get_customer_id() . '
+            </a>
+        </p>';
     }
 
     /**
@@ -129,7 +133,7 @@ class WC_Reepay_Admin_Frontend
         }
 
         if (!empty($output)) {
-            echo $output;
+            echo wp_kses_post($output);
         }
     }
 

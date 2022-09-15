@@ -1,4 +1,4 @@
-# Reepay Woocommerce Subscriptions Plugin
+# Reepay Subscriptions for WooCommerce plugin
 
 The Official Reepay Woocommerce plugin has been made for you to use on your wordpress site. Click below to download and
 install.

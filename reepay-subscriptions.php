@@ -1,10 +1,10 @@
 <?php
 
 /*
- * Plugin Name: WooCommerce Reepay Subscriptions
- * Description: Provides a subscriptions through Reepay for WooCommerce.
- * Author: OnePix
- * Author URI: https://onepix.net
+ * Plugin Name: Reepay Subscriptions for WooCommerce
+ * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
+ * Author: reepay
+ * Author URI: https://reepay.com/
  * Version: 1.0.0
  * Text Domain: reepay-woocommerce-subscriptions
  * Domain Path: /languages
@@ -102,12 +102,64 @@ class WooCommerce_Reepay_Subscriptions
         add_filter('woocommerce_settings_tabs_array', [$this, 'add_settings_tab'], 50);
         add_action('woocommerce_settings_tabs_reepay_subscriptions', [$this, 'settings_tab']);
         add_action('woocommerce_update_options_reepay_subscriptions', [$this, 'update_settings']);
+        add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
         register_activation_hook(REEPAY_PLUGIN_FILE, 'flush_rewrite_rules');
+        add_action('admin_init', [$this, 'reepay_admin_notices']);
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
         $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
         new WC_Reepay_Subscription_Plan_Variable();
+    }
+
+    public function reepay_admin_notices()
+    {
+        if (!class_exists('WC_ReepayCheckout', false)) {
+            WC_Reepay_Subscription_Admin_Notice::add_activation_notice('The plugin Reepay Checkout for WooCommerce is required for Reepay Subscriptions for WooCommerce. <a target="_blank" href="https://wordpress.org/plugins/reepay-checkout-gateway/">Please install and activate the plugin.</a>');
+        }
+
+        $settings = get_option('woocommerce_reepay_checkout_settings');
+        $test_subscriptions = get_option('_reepay_api_private_key_test');
+        $test_gateway = $settings["private_key_test"];
+
+        if (!empty($test_subscriptions) && !empty($test_gateway)) {
+            if ($test_subscriptions != $test_gateway) {
+                WC_Reepay_Subscription_Admin_Notice::add_activation_notice('Reepay checkout test key must match with Reepay subscriptions test key, please <a href="' . get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions">check settings</a>');
+            }
+        }
+
+        $live_subscriptions = get_option('_reepay_api_private_key');
+        $live_gateway = $settings["private_key"];
+
+        if (!empty($live_subscriptions) && !empty($live_gateway)) {
+            if ($live_subscriptions != $live_gateway) {
+                WC_Reepay_Subscription_Admin_Notice::add_activation_notice('Reepay checkout live key must match with Reepay subscriptions live key, please <a href="' . get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions">check settings</a>');
+            }
+        }
+    }
+
+    /**
+     * Show row meta on the plugin screen.
+     *
+     * @param mixed $links Plugin Row Meta.
+     * @param mixed $file Plugin Base file.
+     *
+     * @return array
+     */
+    public function plugin_row_meta($links, $file)
+    {
+
+        if (plugin_basename(__FILE__) !== $file) {
+            return $links;
+        }
+
+        $row_meta = array(
+            'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . esc_html__('Get free test account', reepay_s()->settings('domain')) . '</a>',
+            'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . esc_html__('Pricing', reepay_s()->settings('domain')) . '</a>',
+        );
+
+
+        return array_merge($links, $row_meta);
     }
 
     public function admin_customer_report()
@@ -211,7 +263,7 @@ class WooCommerce_Reepay_Subscriptions
                 'desc' => __('Private Key Test for test API', reepay_s()->settings('domain')),
                 'id' => '_reepay_api_private_key_test'
             ],
-            '_reepay_enable_downgrade' => [
+            /*'_reepay_enable_downgrade' => [
                 'name' => __('Enable Downgrade', reepay_s()->settings('domain')),
                 'type' => 'checkbox',
                 'desc' => __('Enable Downgrade', reepay_s()->settings('domain')),
@@ -236,7 +288,7 @@ class WooCommerce_Reepay_Subscriptions
                 'options' => static::$compensation_methods,
                 'desc' => __('Compensation method for upgrade', reepay_s()->settings('domain')),
                 'id' => '_reepay_upgrade_compensation_method'
-            ],
+            ],*/
             '_reepay_enable_on_hold' => [
                 'name' => __('Enable On Hold', reepay_s()->settings('domain')),
                 'type' => 'checkbox',
@@ -324,7 +376,7 @@ class WooCommerce_Reepay_Subscriptions
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         wp_localize_script('admin-reepay-subscription', 'reepay', [
-            'amountPercentageLabel' => __('Coupon percentage', reepay_s()->settings('domain')),
+            'amountPercentageLabel' => __('Percentage', reepay_s()->settings('domain')),
             'rest_urls' => [
                 'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . ($_GET['post'] ?? 0),
                 'get_coupon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/coupon/"),

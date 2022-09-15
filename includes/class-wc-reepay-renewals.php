@@ -280,6 +280,10 @@ class WC_Reepay_Renewals
                 continue;
             }
 
+            if ($order->get_status() != 'processing') {
+                $order->update_status('processing');
+            }
+
             $order->add_meta_data('_reepay_subscription_handle', $handle);
             $order->save();
         }
