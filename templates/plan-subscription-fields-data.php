@@ -508,7 +508,7 @@ $variable = !empty($variable);
         </p>
     </div>
 
-    <div class="options_group show_if_reepay_subscription">
+    <div class="options_group show_if_reepay_subscription billing_cycles_block">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_subscription_billing_cycles"><?php esc_html_e('Billing Cycles', $domain); ?></label>
             <?php esc_html_e('Auto Renew until cancelled', $domain); ?> &nbsp<input type="radio"
