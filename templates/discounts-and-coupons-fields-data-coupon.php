@@ -31,8 +31,10 @@
 </p>
 <p class="form-field show_if_selected_plans">
     <?php if (!empty($plans)): ?>
-        <?php esc_html_e('Select one or more plans', reepay_s()->settings('domain')); ?>
-        <br>
+        <?php if (!$is_update): ?>
+            <?php esc_html_e('Select one or more plans', reepay_s()->settings('domain')); ?>
+            <br>
+        <?php endif; ?>
         <select name="_reepay_discount_eligible_plans[]" id="_reepay_discount_eligible_plans"
                 multiple="multiple" class="wc-enhanced-select short reepay-required"
                 required>
