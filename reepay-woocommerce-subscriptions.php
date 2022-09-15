@@ -328,6 +328,7 @@ class WooCommerce_Reepay_Subscriptions
             'rest_urls' => [
                 'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . ($_GET['post'] ?? 0),
                 'get_coupon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/coupon/"),
+                'get_discount' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/discount/"),
                 'get_addon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/addon/"),
             ]
         ]);
@@ -345,6 +346,7 @@ class WooCommerce_Reepay_Subscriptions
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-rest.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-addons-rest.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-coupons-rest.php');
+        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-rest.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php');
         include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php');

@@ -31,7 +31,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
             $coupon_data['_reepay_discount_name'] = [$couponObj['name']];
             $coupon_data['_reepay_discount_apply_to'] = empty($discountObj['apply_to']) ? ['all'] : ['custom'];
             $coupon_data['_reepay_discount_apply_to_items'] = [$discountObj['apply_to']];
-            $coupon_data['_reepay_discount_all_plans'] = [$couponObj['all_plans']];
+            $coupon_data['_reepay_discount_all_plans'] = [$couponObj['all_plans'] ? '1' : '0'];
             $coupon_data['_reepay_discount_eligible_plans'] = [$couponObj['eligible_plans']];
             $coupon_data['_reepay_discount_duration'] = ['forever'];
             $coupon_data['_reepay_discount_amount'] = [!empty($amount) ? $amount : 0];
@@ -49,7 +49,19 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 
             ob_start();
             wc_get_template(
-                'discounts-and-coupons-fields-data.php',
+                'discounts-and-coupons-fields-data-discount.php',
+                array(
+                    'meta' => $coupon_data,
+                    'plans' => $plans,
+                    'is_update' => true,
+                    'loop' => -1,
+                    'domain' => reepay_s()->settings('domain')
+                ),
+                '',
+                reepay_s()->settings('plugin_path') . 'templates/'
+            );
+            wc_get_template(
+                'discounts-and-coupons-fields-data-coupon.php',
                 array(
                     'meta' => $coupon_data,
                     'plans' => $plans,

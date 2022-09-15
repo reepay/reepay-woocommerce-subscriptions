@@ -79,10 +79,15 @@ jQuery(function ($) {
     let $coupon_type = $('#discount_type');
     let $coupon_amount_label = $('[for="_reepay_discount_amount"]')
     let default_coupon_amount_label = $coupon_amount_label.text()
+    let new_discount_values = {};
+    let exist_discount_values = {};
+
 
     if ($coupon_type.length) {
         let $use_existing_coupon_select = $('[name=_reepay_discount_use_existing_coupon_id]');
         let $use_existing_coupon_input = $('input[name=use_existing_coupon]');
+        let $use_existing_discount_input = $('input[name=use_existing_discount]');
+        let $use_existing_discount_select = $('[name=_reepay_discount_use_existing_discount_id]');
         let $apply_to_inputs = $('input[type=radio][name=_reepay_discount_apply_to]');
         let $apply_to_all_plans_input = $('input[name=_reepay_discount_all_plans]');
         let $reepay_discount_type = $('input[name=_reepay_discount_type]');
@@ -96,6 +101,14 @@ jQuery(function ($) {
 
         $use_existing_coupon_select.on('change', function () {
             show_existing_select($(document))
+        })
+
+        $use_existing_discount_input.on('change', function () {
+            show_existing_discount_settings($container)
+        })
+
+        $use_existing_discount_select.on('change', function () {
+            show_existing_discount($container)
         })
 
         $coupon_type.on('change', function () {
@@ -124,6 +137,7 @@ jQuery(function ($) {
 
         coupon_type_settings($(document))
         show_existing_coupon_settings($(document))
+        show_existing_discount_settings($(document))
 
         requiredApplyItems($container)
         coupon_type_percentage($container)
@@ -131,9 +145,22 @@ jQuery(function ($) {
         apply_to_plans($container)
         duration_settings($container)
 
+        function updateCouponContainer($container) {
+            coupon_type_percentage($container)
+            apply_to_settings($container)
+            apply_to_plans($container)
+            duration_settings($container)
+            check_required()
+        }
+
         function show_existing_select($container) {
             let handle = $container.find('[name=_reepay_discount_use_existing_coupon_id]').val()
             load_coupon(handle, $('.reepay_coupon_settings_exist'))
+        }
+
+        function show_existing_discount($container) {
+            let handle = $container.find('[name=_reepay_discount_use_existing_discount_id]').val()
+            load_discount(handle, $container)
         }
 
         function show_existing_coupon_settings($container) {
@@ -155,6 +182,22 @@ jQuery(function ($) {
 
             check_required()
             requiredApplyItems($container)
+        }
+
+        function show_existing_discount_settings($container) {
+            let value = $container.find('input[name=use_existing_discount]:checked').val();
+            if (value === 'true') {
+                new_discount_values = discount_get_data($container)
+                discount_set_data(exist_discount_values, $container, 'disabled')
+                $('.show_if_use_existing_discount').show()
+                $('.hide_if_use_existing_discount').hide()
+            } else {
+                exist_discount_values = discount_get_data($container)
+                discount_set_data(new_discount_values, $container, false)
+                $('.show_if_use_existing_discount').hide()
+                $('.hide_if_use_existing_discount').show()
+            }
+            updateCouponContainer($container)
         }
 
         function requiredApplyItems($container) {
@@ -452,11 +495,7 @@ jQuery(function ($) {
 
                 $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
 
-                coupon_type_percentage($container)
-                apply_to_settings($container)
-                apply_to_plans($container)
-                duration_settings($container)
-                check_required()
+                updateCouponContainer($container)
             },
             error: function (request, status, error) {
 
@@ -465,6 +504,61 @@ jQuery(function ($) {
 
             },
         })
+    }
+
+    function load_discount(handle, $container) {
+        if (!handle) {
+            return;
+        }
+
+        $.get(window.reepay.rest_urls.get_discount + `?handle=${handle}`)
+            .then(function (response_data) {
+                if (!response_data.success) {
+                    return;
+                }
+
+                let discount = response_data.discount
+
+                console.log(discount)
+
+                discount_set_data(discount, $container)
+
+                updateCouponContainer($container)
+            })
+    }
+
+    function discount_get_data($container) {
+        let discount = {};
+        discount['_reepay_discount_amount'] = $container.find('[name="_reepay_discount_amount"]').val()
+        discount['_reepay_discount_name'] = $container.find('[name="_reepay_discount_name"]').val()
+        discount['_reepay_discount_type'] = $container.find('[name="_reepay_discount_type"]:checked').val() || 'reepay_fixed_product'
+        discount['_reepay_discount_apply_to'] = $container.find('[name="_reepay_discount_apply_to"]:checked').val() || 'all'
+        let apply_to_items = [];
+        $container.find('[name="_reepay_discount_apply_to_items[]"]:checked').each(function(i){
+            apply_to_items[i] = $(this).val();
+        });
+
+        discount['_reepay_discount_apply_to_items'] = apply_to_items
+
+        discount['_reepay_discount_duration'] = $container.find('[name="_reepay_discount_duration"]:checked').val() || 'forever'
+
+        discount['_reepay_discount_fixed_count'] = $container.find('[name="_reepay_discount_fixed_count"]').val()
+        discount['_reepay_discount_fixed_period'] = $container.find('[name="_reepay_discount_fixed_period"]').val()
+        discount['_reepay_discount_fixed_period_unit'] = $container.find('[name="_reepay_discount_fixed_period_unit"]').val()
+        return discount;
+    }
+
+    function discount_set_data(discount, $container, disable = true) {
+        //use .val(['value']) for radio buttons
+        discount['_reepay_discount_amount'] && $container.find('[name="_reepay_discount_amount"]').val(discount['_reepay_discount_amount']).attr('disabled', disable)
+        discount['_reepay_discount_name'] && $container.find('[name="_reepay_discount_name"]').val(discount['_reepay_discount_name'])
+        discount['_reepay_discount_type'] && $container.find('[name="_reepay_discount_type"]').val([discount['_reepay_discount_type']]).attr('disabled', disable)
+        discount['_reepay_discount_apply_to'] && $container.find('[name="_reepay_discount_apply_to"]').val([discount['_reepay_discount_apply_to']]).attr('disabled', disable)
+        discount['_reepay_discount_apply_to_items'] && $container.find('[name="_reepay_discount_apply_to_items[]"]').val(discount['_reepay_discount_apply_to_items']).attr('disabled', disable)
+        discount['_reepay_discount_duration'] && $container.find('[name="_reepay_discount_duration"]').val([discount['_reepay_discount_duration']]).attr('disabled', disable)
+        discount['_reepay_discount_fixed_count'] && $container.find('[name="_reepay_discount_fixed_count"]').val(discount['_reepay_discount_fixed_count']).attr('disabled', disable)
+        discount['_reepay_discount_fixed_period'] && $container.find('[name="_reepay_discount_fixed_period"]').val(discount['_reepay_discount_fixed_period']).attr('disabled', disable)
+        discount['_reepay_discount_fixed_period_unit'] && $container.find('[name="_reepay_discount_fixed_period_unit"]').val(discount['_reepay_discount_fixed_period_unit']).attr('disabled', disable)
     }
 
     function init(tab) {
