@@ -49,7 +49,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 
             ob_start();
             wc_get_template(
-                'discounts-and-coupons-fields-data-discount.php',
+                'discounts-and-coupons-fields-data-coupon.php',
                 array(
                     'meta' => $coupon_data,
                     'plans' => $plans,
@@ -61,7 +61,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
                 reepay_s()->settings('plugin_path') . 'templates/'
             );
             wc_get_template(
-                'discounts-and-coupons-fields-data-coupon.php',
+                'discounts-and-coupons-fields-data-discount.php',
                 array(
                     'meta' => $coupon_data,
                     'plans' => $plans,

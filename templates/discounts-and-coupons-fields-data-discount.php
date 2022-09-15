@@ -118,7 +118,10 @@
             name="_reepay_discount_duration"
             <?= $is_update ? 'disabled="disabled"' : '' ?>
             class="reepay-required"
-            value="limited_time" <?php checked('limited_time', $meta['_reepay_discount_duration'][0] ?? ''); ?> />
+            value="limited_time"
+            <?php checked('limited_time', $meta['_reepay_discount_duration'][0] ?? ''); ?>
+            <?php checked('limited_duration', $meta['_reepay_discount_duration'][0] ?? ''); ?>
+    />
     &nbsp<?php esc_html_e('Limited Time', reepay_s()->settings('domain')); ?>
 </p>
 <p class="form-field show_if_limited_time">
