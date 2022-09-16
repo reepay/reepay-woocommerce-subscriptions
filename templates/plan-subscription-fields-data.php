@@ -24,7 +24,7 @@ $variable = !empty($variable);
         </p>
 
         <!--Type-->
-        <p class="form-field pricing-fields <?php echo $variable ? 'form-row' : '' ?> hidden">
+        <p class="form-field pricing-fields <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_daily"><?php esc_html_e('Schedule Type', $domain); ?></label>
             <select id="_subscription_schedule_type" <?php echo $disabled ?>
                     name="_reepay_subscription_schedule_type<?php echo $variable ? '[' . $loop . ']' : '' ?>"

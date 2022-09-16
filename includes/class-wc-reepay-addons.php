@@ -164,7 +164,6 @@ class WC_Reepay_Subscription_Addons
         }
 
         if (is_array($product_addons) && !empty($product_addons)) {
-            ;
 
             foreach ($product_addons as $i => $addon) {
 
@@ -191,7 +190,7 @@ class WC_Reepay_Subscription_Addons
                         $data[$i]['quantity'] = intval($value);
                     }
 
-                    $cart_item_data['addons'] = array_merge($cart_item_data['addons'], apply_filters('woocommerce_product_addon_cart_item_data', $data, $addon, $product_id, $post_data));
+                    $cart_item_data['addons'] = array_merge($cart_item_data['addons'], $data);
                 }
             }
         }
