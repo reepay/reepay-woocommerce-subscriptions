@@ -169,7 +169,7 @@ class WC_Reepay_Account_Page
         }
 
         if (!empty($_GET['reactivate'])) {
-            $handle = $_GET['reactivate'];
+            $handle = sanitize_text_field($_GET['reactivate']);
             $handle = urlencode($handle);
 
             $order = wc_get_orders([
@@ -191,8 +191,8 @@ class WC_Reepay_Account_Page
         }
 
         if (!empty($_GET['change_payment_method'])) {
-            $handle = $_GET['change_payment_method'];
-            $token_id = $_GET['token_id'];
+            $handle = sanitize_text_field($_GET['change_payment_method']);
+            $token_id = intval($_GET['token_id']);
             $token = WC_Payment_Tokens::get($token_id);
             $handle = urlencode($handle);
 

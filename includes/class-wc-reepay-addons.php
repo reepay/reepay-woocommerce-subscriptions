@@ -155,8 +155,6 @@ class WC_Reepay_Subscription_Addons
      */
     public function add_cart_item_data($cart_item_data, $product_id, $variation_id, $quantity)
     {
-        $post_data = $_POST;
-
         $product_addons = $this->get_product_addons($product_id);
 
         if (empty($cart_item_data['addons'])) {
@@ -167,9 +165,9 @@ class WC_Reepay_Subscription_Addons
 
             foreach ($product_addons as $i => $addon) {
 
-                if (isset($post_data['addon-' . $addon['handle']])) {
+                if (isset($_POST['addon-' . $addon['handle']])) {
                     $data = [];
-                    $value = sanitize_text_field($post_data['addon-' . $addon['handle']]);
+                    $value = sanitize_text_field($_POST['addon-' . $addon['handle']]);
 
                     if ($value != 'yes' && !intval($value)) {
                         continue;
