@@ -655,7 +655,7 @@ class WC_Reepay_Subscription_Plan_Simple
 
         foreach (self::$meta_fields as $key) {
             if (isset($_REQUEST[$key])) {
-                $data[$key] = $_REQUEST[$key];
+                $data[$key] = sanitize_text_field($_REQUEST[$key]);
             }
         }
 
@@ -666,7 +666,7 @@ class WC_Reepay_Subscription_Plan_Simple
     {
         foreach (self::$meta_fields as $key) {
             if (isset($_REQUEST[$key])) {
-                update_post_meta($post_id, $key, $_REQUEST[$key]);
+                update_post_meta($post_id, $key, sanitize_text_field($_REQUEST[$key]));
             }
         }
     }

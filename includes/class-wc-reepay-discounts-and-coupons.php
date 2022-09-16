@@ -24,6 +24,13 @@ class WC_Reepay_Discounts_And_Coupons
         '_reepay_discount_apply_to',
         '_reepay_discount_apply_to_items',
         '_reepay_discount_all_plans',
+        '_reepay_discount_eligible_plans',
+        '_reepay_discount_duration',
+        '_reepay_discount_fixed_count',
+        '_reepay_discount_fixed_period',
+        '_reepay_discount_fixed_period_unit',
+        '_reepay_discount_use_existing_coupon_id',
+        '_reepay_discount_use_existing_discount_id',
     ];
 
     /**
@@ -68,7 +75,7 @@ class WC_Reepay_Discounts_And_Coupons
 
     function get_coupon_default_params(WC_Coupon $coupon)
     {
-        $apply_plans = $_REQUEST['_reepay_discount_eligible_plans'];
+        $apply_plans = array_map('sanitize_text_field', $_REQUEST['_reepay_discount_eligible_plans']);
         $end = $coupon->get_date_expires();
 
         $name = get_post_meta($coupon->get_id(), '_reepay_discount_name', true);
@@ -107,13 +114,14 @@ class WC_Reepay_Discounts_And_Coupons
             update_post_meta($post_id, '_reepay_coupon_handle', $couponObj['handle']);
 
             return $couponObj['handle'];
-        }catch (Exception $e){
-            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
+        } catch (Exception $e) {
+            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
         }
     }
 
-    function use_existing_discount(WC_Coupon $wc_coupon, $handle) {
-        try{
+    function use_existing_discount(WC_Coupon $wc_coupon, $handle)
+    {
+        try {
             $discountObj = reepay_s()->api()->request('discount/' . $handle);
 
             $wc_coupon->set_description($discountObj['description']);
@@ -133,8 +141,8 @@ class WC_Reepay_Discounts_And_Coupons
             update_post_meta($post_id, '_reepay_discount_handle', $discountObj['handle']);
 
             return $discountObj['handle'];
-        }catch (Exception $e){
-            WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
+        } catch (Exception $e) {
+            WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
         }
     }
 
@@ -164,8 +172,8 @@ class WC_Reepay_Discounts_And_Coupons
         }
 
         $post_id = $coupon->get_id();
-        $apply_items = $_REQUEST['_reepay_discount_apply_to_items'] ?? ['all'];
-        $duration_type = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
+        $apply_items = array_map('sanitize_text_field', $_REQUEST['_reepay_discount_apply_to_items']) ?? ['all'];
+        $duration_type = sanitize_text_field($_REQUEST['_reepay_discount_duration']) ?? 'forever';
 
         $discountHandle = 'discount' . $post_id;
         $params["handle"] = $discountHandle;
@@ -173,12 +181,12 @@ class WC_Reepay_Discounts_And_Coupons
 
 
         if ($duration_type === 'fixed_number') {
-            $params["fixed_count"] = $_REQUEST['_reepay_discount_fixed_count'];
+            $params["fixed_count"] = intval($_REQUEST['_reepay_discount_fixed_count']);
         }
 
         if ($duration_type === 'limited_time') {
-            $params["fixed_period_unit"] = $_REQUEST['_reepay_discount_fixed_period_unit'];
-            $params["fixed_period"] = $_REQUEST['_reepay_discount_fixed_period'];
+            $params["fixed_period_unit"] = sanitize_text_field($_REQUEST['_reepay_discount_fixed_period_unit']);
+            $params["fixed_period"] = intval($_REQUEST['_reepay_discount_fixed_period']);
         }
 
 
@@ -213,11 +221,13 @@ class WC_Reepay_Discounts_And_Coupons
         return reepay_s()->api()->request('coupon')['content'] ?? [];
     }
 
-    function get_discounts() {
+    function get_discounts()
+    {
         return reepay_s()->api()->request('discount')['content'] ?? [];
     }
 
-    function create_coupon(WC_Coupon $coupon, $discount_handle) {
+    function create_coupon(WC_Coupon $coupon, $discount_handle)
+    {
 
         $paramsCoupon = $this->get_coupon_default_params($coupon);
 
@@ -267,19 +277,14 @@ class WC_Reepay_Discounts_And_Coupons
         if (!empty($_REQUEST)) {
             foreach (self::$meta_fields as $key) {
                 if (isset($_REQUEST[$key])) {
-                    update_post_meta($post_id, $key, $_REQUEST[$key] ?? '');
+                    update_post_meta($post_id, $key, sanitize_text_field($_REQUEST[$key]) ?? '');
                 }
             }
-            /*foreach ($_REQUEST as $i => $value) {
-                if (strpos($i, 'reepay_discount')) {
-                    update_post_meta($post_id, $i, $value);
-                }
-            }*/
         }
 
         $discountHandle = get_post_meta($post_id, '_reepay_discount_handle', true);
         $couponHandle = get_post_meta($post_id, '_reepay_coupon_handle', true);
-        $duration = $_REQUEST['_reepay_discount_duration'] ?? 'forever';
+        $duration = sanitize_text_field($_REQUEST['_reepay_discount_duration']) ?? 'forever';
 
         $is_update = false;
 
@@ -289,12 +294,12 @@ class WC_Reepay_Discounts_And_Coupons
 
         if (!$is_update) {
             if ($duration === 'fixed_number') {
-                $coupon->set_usage_limit($_REQUEST['_reepay_discount_fixed_count']);
+                $coupon->set_usage_limit(intval($_REQUEST['_reepay_discount_fixed_count']));
             }
 
             if ($duration === 'limited_time') {
-                $length = $_REQUEST['_reepay_discount_fixed_period'];
-                $units = $_REQUEST['_reepay_discount_fixed_period_unit'];
+                $length = intval($_REQUEST['_reepay_discount_fixed_period']);
+                $units = sanitize_text_field($_REQUEST['_reepay_discount_fixed_period_unit']);
                 $date = new DateTime();
                 if ($units === 'months') {
                     $date->modify("+$length months");
@@ -307,15 +312,15 @@ class WC_Reepay_Discounts_And_Coupons
             }
 
             if (!empty($_REQUEST['_reepay_discount_amount'])) {
-                $coupon->set_amount($_REQUEST['_reepay_discount_amount']);
+                $coupon->set_amount(floatval($_REQUEST['_reepay_discount_amount']));
             }
 
             if ($_REQUEST['use_existing_coupon'] === 'true') {
-                $couponHandle = $this->use_existing_coupon($coupon, $_REQUEST['_reepay_discount_use_existing_coupon_id']);
+                $couponHandle = $this->use_existing_coupon($coupon, sanitize_text_field($_REQUEST['_reepay_discount_use_existing_coupon_id']));
             }
 
             if ($_REQUEST['use_existing_discount'] === 'true') {
-                $discountHandle = $this->use_existing_discount($coupon, $_REQUEST['_reepay_discount_use_existing_discount_id']);
+                $discountHandle = $this->use_existing_discount($coupon, sanitize_text_field($_REQUEST['_reepay_discount_use_existing_discount_id']));
             }
         }
 
