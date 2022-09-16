@@ -63,7 +63,7 @@
                         <select name="_reepay_discount_use_existing_discount_id" id="discount_id" class="short">
                             <option value="">Select discount</option>
                             <?php foreach ($discounts as $discount): ?>
-                                <option value="<?= esc_attr($discount['handle']) ?>"><?= esc_attr($discount['name']) ?></option>
+                                <option value="<?php echo esc_attr($discount['handle']) ?>"><?php echo esc_attr($discount['name']) ?></option>
                             <?php endforeach; ?>
                         </select>
                     <?php endif; ?>
@@ -80,10 +80,10 @@
                 'meta' => $meta,
                 'plans' => $plans,
                 'is_update' => $is_update,
-                'domain' => reepay_s()->settings( 'domain' )
+                'domain' => reepay_s()->settings('domain')
             ),
             '',
-            reepay_s()->settings('plugin_path').'templates/'
+            reepay_s()->settings('plugin_path') . 'templates/'
         );
         ?>
     </div>

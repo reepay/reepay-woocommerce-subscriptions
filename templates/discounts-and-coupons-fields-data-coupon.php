@@ -5,7 +5,7 @@
             type="text"
             id="_reepay_discount_name"
             name="_reepay_discount_name"
-            value="<?= esc_attr($meta['_reepay_discount_name'][0] ?? '') ?>"
+            value="<?php echo esc_attr($meta['_reepay_discount_name'][0] ?? '') ?>"
             class="reepay-required"
             required
     />
@@ -17,7 +17,7 @@
     <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
            class="reepay-required"
            value="1" <?php checked('1', esc_attr($meta['_reepay_discount_all_plans'][0] ?? '1')); ?>
-                   <?= $is_update ? 'disabled="disabled"' : '' ?>
+        <?php echo $is_update ? 'disabled="disabled"' : '' ?>
     />
     &nbsp<?php esc_html_e('All plans', reepay_s()->settings('domain')); ?>
 </p>
@@ -25,7 +25,7 @@
     <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
            class="reepay-required"
            value="0" <?php checked('0', esc_attr($meta['_reepay_discount_all_plans'][0] ?? '')); ?>
-                   <?= $is_update ? 'disabled="disabled"' : '' ?>
+        <?php echo $is_update ? 'disabled="disabled"' : '' ?>
     />
     &nbsp<?php esc_html_e('Selected plans', reepay_s()->settings('domain')); ?>
 </p>
@@ -40,9 +40,9 @@
                 required>
             <?php foreach ($plans as $value => $label): ?>
                 <?php if ($is_update && in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])): ?>
-                    <option value="<?= esc_attr($value) ?>" <?= selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])) ?>><?= esc_attr($label) ?></option>
-                <?php elseif(!$is_update): ?>
-                    <option value="<?= esc_attr($value) ?>" <?= selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])) ?>><?= esc_attr($label) ?></option>
+                    <option value="<?php echo esc_attr($value) ?>" <?php echo selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])) ?>><?php echo esc_attr($label) ?></option>
+                <?php elseif (!$is_update): ?>
+                    <option value="<?php echo esc_attr($value) ?>" <?php echo selected(in_array($value, $meta['_reepay_discount_eligible_plans'][0] ?? [])) ?>><?php echo esc_attr($label) ?></option>
                 <?php endif; ?>
             <?php endforeach; ?>
         </select>

@@ -11,18 +11,18 @@
 
 <ul class="reepay_subscription_info">
     <?php if (!empty($billing_plan)) : ?>
-        <li><?php echo $billing_plan ?></li>
+        <li><?php esc_attr_e($billing_plan) ?></li>
     <?php endif; ?>
 
     <?php if (!empty($trial)) : ?>
-        <li><?php echo $trial ?></li>
+        <li><?php esc_attr_e($trial) ?></li>
     <?php endif; ?>
 
     <?php if (!empty($contract_periods)) : ?>
-        <li><?php esc_html_e('Contract Period', $domain) . ': ' . $contract_periods ?></li>
+        <li><?php esc_html_e('Contract Period', $domain) . ': ' . esc_attr($contract_periods) ?></li>
     <?php endif; ?>
 
     <?php if (!empty($setup_fee)) : ?>
-        <li><?php echo __($setup_fee, $domain) ?></li>
+        <li><?php echo esc_attr_e($setup_fee) ?></li>
     <?php endif; ?>
 </ul>

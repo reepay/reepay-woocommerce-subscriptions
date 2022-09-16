@@ -21,9 +21,9 @@ global $post;
         <span> <?php _e('Amount', $domain); ?>: <?php echo floatval(esc_attr($addon['amount'])) * 100 ?></span>
 
 
-        <input type="hidden" name="product_addon_position[<?php echo $loop; ?>]" class="product_addon_position"
+        <input type="hidden" name="product_addon_position[<?php esc_attr_e($loop) ?>]" class="product_addon_position"
                value="<?php esc_attr_e($loop); ?>"/>
-        <input type="hidden" name="product_addon_handle[<?php echo $loop; ?>]" class="product_addon_position"
+        <input type="hidden" name="product_addon_handle[<?php esc_attr_e($loop) ?>]" class="product_addon_position"
                value="<?php echo !empty($addon['handle']) ? esc_attr($addon['handle']) : '' ?>"/>
     </h3>
 

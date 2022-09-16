@@ -28,7 +28,7 @@ class WC_Reepay_Account_Page
     public function add_subscription_arg($url)
     {
         if ($_GET['reepay_subscription']) {
-            return add_query_arg('reepay_subscription', sanitize_text_field($_GET['reepay_subscription']), $url);
+            return sanitize_url(add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url));
         }
         return $url;
     }

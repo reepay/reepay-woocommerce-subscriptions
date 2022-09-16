@@ -100,7 +100,7 @@ class WC_Reepay_Subscription_Admin_Notice
         $notices = self::$activation_notices;
         if (!empty($notices)) {
             foreach ($notices as $notice) {
-                echo "<div class='error'><p>$notice</p></div>";
+                echo "<div class='error'><p>esc_html__($notice)</p></div>";
             }
             update_option('reepay_admin_activation_notices', array());
         }

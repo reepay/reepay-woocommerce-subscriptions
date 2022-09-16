@@ -6,12 +6,12 @@
     <?php foreach ($addons as $i => $addon): ?>
         <p>
             <?php if ($addon['type'] == 'on_off'): ?>
-                <input type="checkbox" name="addon-<?php echo $addon['handle'] ?>" value="yes">
+                <input type="checkbox" name="addon-<?php esc_attr_e($addon['handle']) ?>" value="yes">
             <?php elseif ($addon['type'] == 'quantity'): ?>
-                <input type="number" min="0" name="addon-<?php echo $addon['handle'] ?>" value="0">
+                <input type="number" min="0" name="addon-<?php esc_attr_e($addon['handle']) ?>" value="0">
             <?php endif; ?>
-            <?php echo $addon['name'] ?> +<?php echo wc_price($addon['amount']) ?>
-            / <?php echo $billing_plan ?> <?php echo !empty($addon['description']) ? '(' . $addon['description'] . ')' : '' ?>
+            <?php esc_attr_e($addon['name']) ?> +<?php echo wc_price(esc_attr($addon['amount'])) ?>
+            / <?php esc_attr_e($billing_plan) ?> <?php echo !empty($addon['description']) ? '(' . esc_attr($addon['description']) . ')' : '' ?>
         </p>
     <?php endforeach; ?>
 </div>

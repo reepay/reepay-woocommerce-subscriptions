@@ -45,7 +45,7 @@ global $post;
             ?>
         </label>
         <textarea cols="20" id="addon_description_<?php esc_html_e($loop); ?>"
-                  rows="3" <?php echo $addon['disabled'] ? 'disabled' : '' ?> name="product_addon_description[<?php echo $loop; ?>]"><?php echo !empty($addon['description']) ? esc_textarea($addon['description']) : '' ?></textarea>
+                  rows="3" <?php echo $addon['disabled'] ? 'disabled' : '' ?> name="product_addon_description[<?php esc_attr_e($loop) ?>]"><?php echo !empty($addon['description']) ? esc_textarea($addon['description']) : '' ?></textarea>
     </td>
 </tr>
 

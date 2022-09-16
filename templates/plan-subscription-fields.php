@@ -10,17 +10,17 @@ $variable = $variable ?? false;
         </label>
         <?php esc_html_e('Create new plan', $domain); ?> &nbsp
         <input type="radio" id="_reepay_subscription_choose"
-               name="_reepay_subscription_choose<?php echo $variable ? '[' . $loop . ']' : '' ?>"
+               name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
                value="new" <?php checked('new', esc_attr($_reepay_subscription_choose), true); ?>>
         &nbsp&nbsp<?php esc_html_e('Choose existing plan', $domain); ?> &nbsp
         <input type="radio" id="_reepay_subscription_choose"
-               name="_reepay_subscription_choose<?php echo $variable ? '[' . $loop . ']' : '' ?>"
+               name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
                value="exist" <?php checked('exist', esc_attr($_reepay_subscription_choose), true); ?>>
     </p>
 </div>
 
 <div class="reepay_subscription_settings">
-    <?php echo $settings ?>
+    <?php echo wp_kses_post($settings) ?>
 </div>
 
 <div class="reepay_subscription_choose_exist">
@@ -31,7 +31,7 @@ $variable = $variable ?? false;
             </label>
             <?php if (!empty($plans_list)): ?>
                 <select id="_subscription_choose_exist"
-                        name="_reepay_choose_exist<?php echo $variable ? '[' . $loop . ']' : '' ?>"
+                        name="_reepay_choose_exist<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
                         class="wc_input_subscription_period_interval">
                     <option value=""><?php esc_html_e('Select plan', $domain); ?></option>
                     <?php foreach ($plans_list as $plan): ?>
@@ -44,7 +44,7 @@ $variable = $variable ?? false;
         </p>
     </div>
     <div class="reepay_subscription_settings_exist">
-        <?php echo $settings_exist ?? '' ?>
+        <?php echo wp_kses_post($settings_exist) ?? '' ?>
     </div>
 </div>
 

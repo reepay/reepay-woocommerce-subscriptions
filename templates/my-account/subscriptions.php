@@ -110,7 +110,7 @@ foreach ($user_payment_methods['reepay'] ?? [] as $user_payment_method) {
                         <?php if ($payment_method->get_token() === $subscription_payment_method['id']): ?>
                             <?php _e('Current', $domain); ?>
                         <?php else: ?>
-                            <a href="?change_payment_method=<?php echo $subscription['handle'] ?>&token_id=<?php echo $payment_method->get_id() ?>"
+                            <a href="?change_payment_method=<?php esc_html_e($subscription['handle']) ?>&token_id=<?php esc_html_e($payment_method->get_id()) ?>"
                                class="button"><?php _e('Change', $domain); ?></a>
                         <?php endif; ?>
                     </td>
