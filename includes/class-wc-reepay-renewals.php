@@ -703,7 +703,7 @@ class WC_Reepay_Renewals
      */
     private static function is_locked($order_id)
     {
-        return (bool)get_post_meta($order_id, '_reepay_subscriptions_locked', true);;
+        return (bool)get_post_meta($order_id, '_reepay_subscriptions_locked', true);
     }
 
     /**

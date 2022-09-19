@@ -105,6 +105,7 @@ class WooCommerce_Reepay_Subscriptions
         add_filter('plugin_row_meta', array($this, 'plugin_row_meta'), 10, 2);
         register_activation_hook(REEPAY_PLUGIN_FILE, 'flush_rewrite_rules');
         add_action('admin_init', [$this, 'reepay_admin_notices']);
+        add_action('init', [$this, 'reepay_load_textdomain']);
 
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
@@ -112,10 +113,23 @@ class WooCommerce_Reepay_Subscriptions
         new WC_Reepay_Subscription_Plan_Variable();
     }
 
+    public function reepay_load_textdomain()
+    {
+        load_plugin_textdomain(self::settings('domain'), false, dirname(plugin_basename(__FILE__)) . '/languages');
+    }
+
     public function reepay_admin_notices()
     {
         if (!class_exists('WC_ReepayCheckout', false)) {
-            WC_Reepay_Subscription_Admin_Notice::add_activation_notice('The plugin Reepay Checkout for WooCommerce is required for Reepay Subscriptions for WooCommerce. <a target="_blank" href="https://wordpress.org/plugins/reepay-checkout-gateway/">Please install and activate the plugin.</a>');
+
+            WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
+                sprintf(
+                    __('The plugin Reepay Checkout for WooCommerce is required for Reepay Subscriptions for WooCommerce. <a target="_blank" href="%s">Please install and activate the plugin.</a>',
+                        self::settings('domain')
+                    ),
+                    'https://wordpress.org/plugins/reepay-checkout-gateway/'
+                )
+            );
         }
 
         $settings = get_option('woocommerce_reepay_checkout_settings');
@@ -124,7 +138,14 @@ class WooCommerce_Reepay_Subscriptions
 
         if (!empty($test_subscriptions) && !empty($test_gateway)) {
             if ($test_subscriptions != $test_gateway) {
-                WC_Reepay_Subscription_Admin_Notice::add_activation_notice('Reepay checkout test key must match with Reepay subscriptions test key, please <a href="' . get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions">check settings</a>');
+                WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
+                    sprintf(
+                        __('Reepay checkout test key must match with Reepay subscriptions test key, please <a href="%s">check settings</a>',
+                            self::settings('domain')
+                        ),
+                        get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions'
+                    )
+                );
             }
         }
 
@@ -133,7 +154,14 @@ class WooCommerce_Reepay_Subscriptions
 
         if (!empty($live_subscriptions) && !empty($live_gateway)) {
             if ($live_subscriptions != $live_gateway) {
-                WC_Reepay_Subscription_Admin_Notice::add_activation_notice('Reepay checkout live key must match with Reepay subscriptions live key, please <a href="' . get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions">check settings</a>');
+                WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
+                    sprintf(
+                        __('Reepay checkout live key must match with Reepay subscriptions live key, please <a href="%s">check settings</a>',
+                            self::settings('domain')
+                        ),
+                        get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions'
+                    )
+                );
             }
         }
     }
@@ -155,7 +183,7 @@ class WooCommerce_Reepay_Subscriptions
 
         $row_meta = array(
             'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . esc_html__('Get free test account', reepay_s()->settings('domain')) . '</a>',
-            'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . esc_html__('Pricing', reepay_s()->settings('domain')) . '</a>',
+            'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . esc_html__('Pricing', self::settings('domain')) . '</a>',
         );
 
 
@@ -203,7 +231,7 @@ class WooCommerce_Reepay_Subscriptions
     public function plugin_action_links($links)
     {
         $plugin_links = [
-            '<a href="' . admin_url('admin.php?page=wc-settings&tab=reepay_subscriptions') . '">' . __('Settings', 'reepay-checkout-gateway') . '</a>'
+            '<a href="' . admin_url('admin.php?page=wc-settings&tab=reepay_subscriptions') . '">' . __('Settings', self::settings('domain')) . '</a>'
         ];
 
         return array_merge($plugin_links, $links);
@@ -211,7 +239,7 @@ class WooCommerce_Reepay_Subscriptions
 
     public function add_settings_tab($settings_tabs)
     {
-        $settings_tabs['reepay_subscriptions'] = __('Reepay Subscriptions Settings', reepay_s()->settings('domain'));
+        $settings_tabs['reepay_subscriptions'] = __('Reepay Subscriptions Settings', self::settings('domain'));
         return $settings_tabs;
     }
 
@@ -234,33 +262,33 @@ class WooCommerce_Reepay_Subscriptions
 
         $settings = [
             'section_title' => [
-                'name' => __('Reepay Subscription Settings', reepay_s()->settings('domain')),
+                'name' => __('Reepay Subscription Settings', self::settings('domain')),
                 'type' => 'title',
                 'desc' => '',
                 'id' => 'reepay_section_title'
             ],
             'test_mode' => [
-                'name' => __('Test mode', reepay_s()->settings('domain')),
+                'name' => __('Test mode', self::settings('domain')),
                 'type' => 'checkbox',
-                'desc' => __('Enable test API mode', reepay_s()->settings('domain')),
+                'desc' => __('Enable test API mode', self::settings('domain')),
                 'id' => '_reepay_test_mode'
             ],
             'debug' => [
-                'name' => __('Enable logging', reepay_s()->settings('domain')),
+                'name' => __('Enable logging', self::settings('domain')),
                 'type' => 'checkbox',
                 'desc' => __('Enable API logging. Logs can be seen in WooCommerce > Status > Logs', reepay_s()->settings('domain')),
                 'id' => '_reepay_debug'
             ],
             'api_private_key' => [
-                'name' => __('Private Key Live', reepay_s()->settings('domain')),
+                'name' => __('Private Key Live', self::settings('domain')),
                 'type' => 'text',
-                'desc' => __('Private Key Live for API', reepay_s()->settings('domain')),
+                'desc' => __('Private Key Live for API', self::settings('domain')),
                 'id' => '_reepay_api_private_key'
             ],
             'api_private_key_test' => [
-                'name' => __('Private Key Test', reepay_s()->settings('domain')),
+                'name' => __('Private Key Test', self::settings('domain')),
                 'type' => 'text',
-                'desc' => __('Private Key Test for test API', reepay_s()->settings('domain')),
+                'desc' => __('Private Key Test for test API', self::settings('domain')),
                 'id' => '_reepay_api_private_key_test'
             ],
             /*'_reepay_enable_downgrade' => [
@@ -290,29 +318,29 @@ class WooCommerce_Reepay_Subscriptions
                 'id' => '_reepay_upgrade_compensation_method'
             ],*/
             '_reepay_enable_on_hold' => [
-                'name' => __('Enable On Hold', reepay_s()->settings('domain')),
+                'name' => __('Enable On Hold', self::settings('domain')),
                 'type' => 'checkbox',
-                'desc' => __('Enable On Hold', reepay_s()->settings('domain')),
+                'desc' => __('Enable On Hold', self::settings('domain')),
                 'id' => '_reepay_enable_on_hold'
             ],
             '_reepay_on_hold_compensation_method' => [
-                'name' => __('Compensation method for On Hold', reepay_s()->settings('domain')),
+                'name' => __('Compensation method for On Hold', self::settings('domain')),
                 'type' => 'select',
                 'options' => static::$compensation_methods,
-                'desc' => __('Compensation method for on_hold', reepay_s()->settings('domain')),
+                'desc' => __('Compensation method for on_hold', self::settings('domain')),
                 'id' => '_reepay_on_hold_compensation_method'
             ],
             '_reepay_enable_cancel' => [
-                'name' => __('Enable Cancel', reepay_s()->settings('domain')),
+                'name' => __('Enable Cancel', self::settings('domain')),
                 'type' => 'checkbox',
-                'desc' => __('Enable Cancel', reepay_s()->settings('domain')),
+                'desc' => __('Enable Cancel', self::settings('domain')),
                 'id' => '_reepay_enable_cancel'
             ],
             '_reepay_cancel_compensation_method' => [
-                'name' => __('Compensation method for Cancel', reepay_s()->settings('domain')),
+                'name' => __('Compensation method for Cancel', self::settings('domain')),
                 'type' => 'select',
                 'options' => static::$compensation_methods,
-                'desc' => __('Compensation method for cancel', reepay_s()->settings('domain')),
+                'desc' => __('Compensation method for cancel', self::settings('domain')),
                 'id' => '_reepay_cancel_compensation_method'
             ],
             'section_end' => [
