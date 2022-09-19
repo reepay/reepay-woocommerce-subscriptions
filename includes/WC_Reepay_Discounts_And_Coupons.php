@@ -196,6 +196,10 @@ class WC_Reepay_Discounts_And_Coupons
             return $discountObj;
         } catch (Exception $e) {
             WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+            wp_update_post([
+                'ID' => $coupon->get_id(),
+                'status' => 'draft',
+            ]);
         }
         return false;
     }
@@ -245,6 +249,10 @@ class WC_Reepay_Discounts_And_Coupons
             return $result2;
         } catch (Exception $e) {
             WC_Reepay_Subscription_Admin_Notice::add_notice($e->getMessage());
+            wp_update_post([
+                'ID' => $coupon->get_id(),
+                'status' => 'draft',
+            ]);
         }
 
         return false;
