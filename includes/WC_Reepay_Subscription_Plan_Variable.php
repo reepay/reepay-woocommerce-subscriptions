@@ -6,7 +6,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
     public function create_subscription_product_class()
     {
-        include_once(reepay_s()->settings('plugin_path') . '/includes/class-wc-reepay-plan-variable-product.php');
+        include_once(reepay_s()->settings('plugin_path') . '/includes/WC_Product_Reepay_Variable_Subscription.php');
     }
 
     public function load_subscription_product_class($php_classname, $product_type)
