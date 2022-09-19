@@ -15,14 +15,14 @@
     <?php endif; ?>
 
     <?php if (!empty($trial)) : ?>
-        <li><?php esc_attr_e($trial) ?></li>
+        <li><?php wp_kses_post($trial) ?></li>
     <?php endif; ?>
 
     <?php if (!empty($contract_periods)) : ?>
-        <li><?php esc_html_e('Contract Period', $domain) . ': ' . esc_attr($contract_periods) ?></li>
+        <li><?php esc_html_e('Contract Period', $domain) . ': ' . wp_kses_post($contract_periods) ?></li>
     <?php endif; ?>
 
     <?php if (!empty($setup_fee)) : ?>
-        <li><?php echo esc_attr_e($setup_fee) ?></li>
+        <li><?php echo wp_kses_post($setup_fee) ?></li>
     <?php endif; ?>
 </ul>
