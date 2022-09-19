@@ -131,7 +131,7 @@ class WooCommerce_Reepay_Subscriptions
 
         $settings = get_option('woocommerce_reepay_checkout_settings');
         $test_subscriptions = get_option('_reepay_api_private_key_test');
-        $test_gateway = $settings["private_key_test"];
+        $test_gateway = $settings["private_key_test"] ?? '';
 
         if (!empty($test_subscriptions) && !empty($test_gateway)) {
             if ($test_subscriptions != $test_gateway) {
@@ -147,7 +147,7 @@ class WooCommerce_Reepay_Subscriptions
         }
 
         $live_subscriptions = get_option('_reepay_api_private_key');
-        $live_gateway = $settings["private_key"];
+        $live_gateway = $settings["private_key"] ?? '';
 
         if (!empty($live_subscriptions) && !empty($live_gateway)) {
             if ($live_subscriptions != $live_gateway) {
