@@ -20,7 +20,7 @@ $variable = $variable ?? false;
 </div>
 
 <div class="reepay_subscription_settings">
-    <?php echo wp_kses_post($settings) ?>
+    <?php echo $settings ?>
 </div>
 
 <div class="reepay_subscription_choose_exist">
@@ -44,7 +44,7 @@ $variable = $variable ?? false;
         </p>
     </div>
     <div class="reepay_subscription_settings_exist">
-        <?php echo wp_kses_post($settings_exist) ?? '' ?>
+        <?php echo !empty($settings_exist) ? $settings_exist : '' ?>
     </div>
 </div>
 
