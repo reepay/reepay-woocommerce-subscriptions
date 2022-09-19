@@ -172,8 +172,8 @@ class WC_Reepay_Discounts_And_Coupons
         }
 
         $post_id = $coupon->get_id();
-        $apply_items = array_map('sanitize_text_field', $_REQUEST['_reepay_discount_apply_to_items']) ?? ['all'];
-        $duration_type = sanitize_text_field($_REQUEST['_reepay_discount_duration']) ?? 'forever';
+        $apply_items = array_map('sanitize_text_field', $_REQUEST['_reepay_discount_apply_to_items'] ?? ['all']);
+        $duration_type = sanitize_text_field($_REQUEST['_reepay_discount_duration'] ?? 'forever');
 
         $discountHandle = 'discount' . $post_id;
         $params["handle"] = $discountHandle;
@@ -285,14 +285,14 @@ class WC_Reepay_Discounts_And_Coupons
         if (!empty($_REQUEST)) {
             foreach (self::$meta_fields as $key) {
                 if (isset($_REQUEST[$key])) {
-                    update_post_meta($post_id, $key, sanitize_text_field($_REQUEST[$key]) ?? '');
+                    update_post_meta($post_id, $key, sanitize_text_field($_REQUEST[$key] ?? ''));
                 }
             }
         }
 
         $discountHandle = get_post_meta($post_id, '_reepay_discount_handle', true);
         $couponHandle = get_post_meta($post_id, '_reepay_coupon_handle', true);
-        $duration = sanitize_text_field($_REQUEST['_reepay_discount_duration']) ?? 'forever';
+        $duration = sanitize_text_field($_REQUEST['_reepay_discount_duration'] ?? 'forever');
 
         $is_update = false;
 
