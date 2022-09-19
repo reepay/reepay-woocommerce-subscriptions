@@ -416,25 +416,7 @@ class WooCommerce_Reepay_Subscriptions
 
     public function includes()
     {
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-api.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-log.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-admin-notice.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-checkout.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-plan-variable.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-addons.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-rest.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-addons-rest.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-coupons-rest.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-rest.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-renewals.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-discounts-and-coupons.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-account-page.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-statistics.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-addons-shipping.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-list.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-subscriptions-table.php');
-        include_once($this->settings('plugin_path') . '/includes/class-wc-reepay-admin-frontend.php');
+        include_once($this->settings('plugin_path') . '/autoloader.php');
     }
 }
 

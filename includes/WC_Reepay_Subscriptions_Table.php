@@ -13,7 +13,7 @@ if (!class_exists(\WP_List_Table::class)) {
  * @package Admin_Table_Tut
  * @see WP_List_Table
  */
-class Subscriptions_Table extends \WP_List_Table
+class WC_Reepay_Subscriptions_Table extends \WP_List_Table
 {
 
     /**

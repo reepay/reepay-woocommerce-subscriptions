@@ -48,7 +48,7 @@ class WC_Reepay_Subscriptions_List
         <form action="" method="get" class="reepay-subscriptions-page">
             <input type="hidden" name="page" value="reepay-subscriptions"/>
             <?php
-            $drafts_table = new Subscriptions_Table();
+            $drafts_table = new WC_Reepay_Subscriptions_Table();
             $drafts_table->prepare_items();
             $drafts_table->search_box('Search', 'search');
             $drafts_table->display();
