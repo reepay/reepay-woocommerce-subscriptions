@@ -132,5 +132,3 @@ class WC_Reepay_Subscription_Admin_Notice
         return $ret;
     }
 }
-
-new WC_Reepay_Subscription_Admin_Notice();

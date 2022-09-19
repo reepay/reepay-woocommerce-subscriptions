@@ -110,4 +110,3 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller
     }
 }
 
-new WC_Reepay_Subscription_Plan_Simple_Rest;

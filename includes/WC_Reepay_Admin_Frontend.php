@@ -200,5 +200,3 @@ class WC_Reepay_Admin_Frontend
         return $orderby;
     }
 }
-
-new WC_Reepay_Admin_Frontend();

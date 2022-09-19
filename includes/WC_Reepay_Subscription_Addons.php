@@ -460,5 +460,3 @@ class WC_Reepay_Subscription_Addons
         return $product_addons;
     }
 }
-
-new WC_Reepay_Subscription_Addons();

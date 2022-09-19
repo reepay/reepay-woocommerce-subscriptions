@@ -481,5 +481,3 @@ class WC_Reepay_Discounts_And_Coupons
         ]);
     }
 }
-
-new WC_Reepay_Discounts_And_Coupons();

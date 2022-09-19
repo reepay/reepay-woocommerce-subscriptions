@@ -68,4 +68,3 @@ class WC_Reepay_Subscription_Discounts_Rest extends WC_Reepay_Subscription_Plan_
     }
 }
 
-new WC_Reepay_Subscription_Discounts_Rest();

@@ -88,5 +88,3 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
         }
     }
 }
-
-new WC_Reepay_Subscription_Coupons_Rest();

@@ -62,4 +62,3 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
     }
 }
 
-new WC_Reepay_Subscription_Addons_Rest();

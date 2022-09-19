@@ -135,5 +135,3 @@ class WC_Reepay_Checkout
         return str_contains($product->get_type(), 'reepay');
     }
 }
-
-new WC_Reepay_Checkout();

@@ -1,0 +1,19 @@
+{
+  "name": "reepay/reepay-subscriptions-for-woocommerce",
+  "description": "description",
+  "minimum-stability": "stable",
+  "license": "proprietary",
+  "authors": [
+    {
+      "name": "reepay",
+      "email": "support@reepay.com"
+    }
+  ],
+  "require": {
+  },
+  "autoload": {
+    "classmap": [
+      "includes"
+    ]
+  }
+}

@@ -376,5 +376,3 @@ class WC_Reepay_Account_Page
         }
     }
 }
-
-new WC_Reepay_Account_Page();

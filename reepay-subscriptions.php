@@ -96,6 +96,8 @@ class WooCommerce_Reepay_Subscriptions
 
 
         $this->includes();
+        $this->init_classes();
+
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue_scripts']);
         add_action('admin_enqueue_scripts', [$this, 'admin_customer_report']);
         add_filter('plugin_action_links_' . plugin_basename(__FILE__), [$this, 'plugin_action_links']);
@@ -106,11 +108,6 @@ class WooCommerce_Reepay_Subscriptions
         register_activation_hook(REEPAY_PLUGIN_FILE, 'flush_rewrite_rules');
         add_action('admin_init', [$this, 'reepay_admin_notices']);
         add_action('init', [$this, 'reepay_load_textdomain']);
-
-        $this->api = WC_Reepay_Subscription_API::get_instance();
-        $this->log = WC_RS_Log::get_instance();
-        $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
-        new WC_Reepay_Subscription_Plan_Variable();
     }
 
     public function reepay_load_textdomain()
@@ -416,7 +413,31 @@ class WooCommerce_Reepay_Subscriptions
 
     public function includes()
     {
-        include_once($this->settings('plugin_path') . '/autoloader.php');
+        include_once($this->settings('plugin_path') . '/vendor/autoload.php');
+
+    }
+
+    public function init_classes()
+    {
+        $this->api = WC_Reepay_Subscription_API::get_instance();
+        $this->log = WC_RS_Log::get_instance();
+        $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
+
+        new WC_Reepay_Subscription_Plan_Variable();
+        new WC_Reepay_Subscription_Addons();
+        new WC_Reepay_Account_Page();
+        new WC_Reepay_Admin_Frontend();
+        new WC_Reepay_Checkout();
+        new WC_Reepay_Discounts_And_Coupons();
+        new WC_Reepay_Renewals();
+        new WC_Reepay_Statistics();
+        new WC_Reepay_Subscription_Addons_Rest();
+        new WC_Reepay_Subscription_Addons_Shipping();
+        new WC_Reepay_Subscription_Admin_Notice();
+        new WC_Reepay_Subscription_Coupons_Rest();
+        new WC_Reepay_Subscription_Discounts_Rest();
+        new WC_Reepay_Subscription_Plan_Simple_Rest();
+        new WC_Reepay_Subscriptions_List();
     }
 }
 

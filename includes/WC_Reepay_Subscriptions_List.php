@@ -59,6 +59,3 @@ class WC_Reepay_Subscriptions_List
     }
 
 }
-
-
-new WC_Reepay_Subscriptions_List();

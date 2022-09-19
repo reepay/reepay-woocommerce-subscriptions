@@ -155,5 +155,3 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
     }
 }
 
-new WC_Reepay_Subscription_Addons_Shipping();
-

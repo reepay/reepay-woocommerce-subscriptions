@@ -720,5 +720,3 @@ class WC_Reepay_Renewals
         }
     }
 }
-
-new WC_Reepay_Renewals();
