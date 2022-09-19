@@ -75,7 +75,7 @@ class WC_Reepay_Discounts_And_Coupons
 
     function get_coupon_default_params(WC_Coupon $coupon)
     {
-        $apply_plans = array_map('sanitize_text_field', $_REQUEST['_reepay_discount_eligible_plans']);
+        $apply_plans = array_map('sanitize_text_field', $_REQUEST['_reepay_discount_eligible_plans'] ?? []);
         $end = $coupon->get_date_expires();
 
         $name = get_post_meta($coupon->get_id(), '_reepay_discount_name', true);
@@ -418,7 +418,7 @@ class WC_Reepay_Discounts_And_Coupons
             }
         }
 
-        if (!$apply) {
+        if ($apply_to_all_plans === '0' && !$apply) {
             throw new Exception(__('Sorry, this coupon is not applicable to the products', 'woocommerce'), 113);
         }
         return $valid;
