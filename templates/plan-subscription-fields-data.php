@@ -649,16 +649,20 @@ $variable = !empty($variable);
         ?>
     </div>
 
-<?php if (isset($is_exist) && $is_exist): ?>
-    <div class="options_group show_if_reepay_subscription">
+<?php if (isset($is_exist) && $is_exist):
+    $_reepay_subscription_supersedes = !empty($_reepay_subscription_supersedes) ? $_reepay_subscription_supersedes : 'no_sub_update'; ?>
+    <div class="options_group show_if_reepay_subscription reepay-supersedes">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_supersedes"><?php esc_html_e('Supersede mode', $domain); ?></label>
-            <?php esc_html_e("Don't schedule subscription update", $domain); ?> &nbsp
+            <?php esc_html_e("Don't schedule subscription update", $domain); ?>
+            <?php echo wc_help_tip(__('Using this, existing subscriptions will stay on the current version of the plan', $domain)); ?>
             <input type="radio"
                    id="_reepay_subscription_supersedes" <?php echo $disabled ?>
                    name="_reepay_subscription_supersedes<?php echo $variable ? '[' . $loop . ']' : '' ?>"
-                   value="no_sub_update" <?php !empty($_reepay_subscription_supersedes) ?? checked('no_sub_update', $_reepay_subscription_supersedes, true); ?>/>
-            &nbsp&nbsp <?php esc_html_e('Schedule subscription update', $domain); ?> &nbsp
+                   value="no_sub_update" <?php checked('no_sub_update', $_reepay_subscription_supersedes, true); ?>/>
+
+            &nbsp&nbsp <?php esc_html_e('Schedule subscription update', $domain); ?>
+            <?php echo wc_help_tip(__('This will update all subscriptions to use the new version after the current billing period', $domain)); ?>
             <input type="radio"
                    id="_reepay_subscription_supersedes" <?php echo $disabled ?>
                    name="_reepay_subscription_supersedes<?php echo $variable ? '[' . $loop . ']' : '' ?>"
