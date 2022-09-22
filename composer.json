@@ -9,11 +9,12 @@
       "email": "support@reepay.com"
     }
   ],
-  "require": {
-  },
   "autoload": {
     "classmap": [
       "includes"
     ]
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9"
   }
 }
