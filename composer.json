@@ -13,8 +13,5 @@
     "classmap": [
       "includes"
     ]
-  },
-  "require-dev": {
-    "phpunit/phpunit": "^9"
   }
 }
