@@ -420,8 +420,8 @@ class WooCommerce_Reepay_Subscriptions
         wp_localize_script('admin-reepay-subscription', 'reepay', [
             'amountPercentageLabel' => __('Percentage', reepay_s()->settings('domain')),
             'product' => [
-            	'id' => $product->get_id(),
-	            'is_variable' => $product->is_type('reepay_variable_subscriptions'),
+            	'id' => empty($product) ? 0 : $product->get_id(),
+	            'is_variable' => empty($product) ? false : $product->is_type('reepay_variable_subscriptions'),
             ],
             'rest_urls' => [
                 'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/"),
