@@ -54,6 +54,11 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
         $data['variable'] = true;
         $data['loop'] = $this->loop;
 
+        $data['data_plan'] = json_encode([
+        	'product_id' => $data['post_id'],
+	        'loop' => $data['loop']
+        ]);
+
         return $data;
     }
 
@@ -106,15 +111,26 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
      */
     public function add_custom_field_to_variations($loop, $variation_data, $variation)
     {
-        global $post;
-        $_post = $post;
-        $post = $variation;
+	    global $post;
+	    $post = $variation;
 
-        $this->loop = $loop;
-        $this->subscription_pricing_fields();
+	    $this->loop = $loop;
+	    $this->subscription_pricing_fields( $post->ID );
 
-        $post = $_post;
+	    wp_reset_postdata();
     }
+
+	/**
+	 * @param string $handle reepay plan handle
+	 *
+	 * @return array<string, mixed> meta fields to save
+	 */
+	public function get_remote_plan_meta($handle) {
+		$plan_data = parent::get_remote_plan_meta($handle);
+		$plan_data['variable'] = true;
+
+		return $plan_data;
+	}
 
     public function add_to_cart()
     {

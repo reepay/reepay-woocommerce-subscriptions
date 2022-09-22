@@ -205,21 +205,32 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table
         $this->_column_headers = array($columns, $hidden, $sortable, $primary);
         $data = array();
 
-        $subscriptions = $this->get_subscriptions();
+	    $subscriptions = [];
 
-        if (!empty($subscriptions['content'])) {
-            foreach ($subscriptions['content'] as $subscription) {
-                $data[$subscription['handle']] = array(
-                    'id' => $subscription['handle'],
-                    'handle' => $subscription['handle'],
-                    'status' => $this->format_status($subscription),
-                    'date' => $subscription['created'],
-                    'next_period_start' => $subscription['next_period_start'],
-                    'customer_handle' => $subscription['customer'],
-                    'plan' => $subscription['plan'],
-                );
-            }
+	    try {
+		    $subscriptions = $this->get_subscriptions();
+	    } catch (Exception $e) {
+		    reepay_s()->log()->log([
+			    'source' => 'WC_Reepay_Subscriptions_Table::prepare_items',
+			    'exception' => $e,
+		    ], 'error');
         }
+
+        if (empty($subscriptions) || empty($subscriptions['content'])) {
+            return;
+        }
+
+	    foreach ($subscriptions['content'] as $subscription) {
+		    $data[$subscription['handle']] = array(
+			    'id' => $subscription['handle'],
+			    'handle' => $subscription['handle'],
+			    'status' => $this->format_status($subscription),
+			    'date' => $subscription['created'],
+			    'next_period_start' => $subscription['next_period_start'],
+			    'customer_handle' => $subscription['customer'],
+			    'plan' => $subscription['plan'],
+		    );
+	    }
 
         $this->items = $data;
 

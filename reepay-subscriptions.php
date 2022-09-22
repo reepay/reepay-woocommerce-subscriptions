@@ -35,10 +35,15 @@ class WooCommerce_Reepay_Subscriptions
      */
     private $log;
 
-    /**
-     * @var WC_Reepay_Subscription_Plan_Simple
-     */
-    private $plan_simple;
+	/**
+	 * @var WC_Reepay_Subscription_Plan_Simple
+	 */
+	private $plan_simple;
+
+	/**
+	 * @var WC_Reepay_Subscription_Plan_Variable
+	 */
+	private $plan_variable;
 
     /**
      * @var array<string, mixed>
@@ -131,7 +136,7 @@ class WooCommerce_Reepay_Subscriptions
 
         $settings = get_option('woocommerce_reepay_checkout_settings');
         $test_subscriptions = get_option('_reepay_api_private_key_test');
-        $test_gateway = $settings["private_key_test"];
+        $test_gateway = $settings["private_key_test"] ?? '';
 
         if (!empty($test_subscriptions) && !empty($test_gateway)) {
             if ($test_subscriptions != $test_gateway) {
@@ -147,7 +152,7 @@ class WooCommerce_Reepay_Subscriptions
         }
 
         $live_subscriptions = get_option('_reepay_api_private_key');
-        $live_gateway = $settings["private_key"];
+        $live_gateway = $settings["private_key"] ?? '';
 
         if (!empty($live_subscriptions) && !empty($live_gateway)) {
             if ($live_subscriptions != $live_gateway) {
@@ -380,10 +385,20 @@ class WooCommerce_Reepay_Subscriptions
     /**
      * @return WC_Reepay_Subscription_Plan_Simple
      */
-    public function plan()
-    {
-        return $this->plan_simple;
-    }
+	public function plan( $product = null )
+	{
+		if ( is_null( $product ) ) {
+			return $this->plan_simple;
+		}
+
+		$product = wc_get_product( $product );
+
+		if ( $product->is_type( 'reepay_simple_subscriptions' ) ) {
+			return $this->plan_simple;
+		}
+
+		return $this->plan_variable;
+	}
 
     /**
      * Return plugin settings
@@ -398,12 +413,18 @@ class WooCommerce_Reepay_Subscriptions
 
     public function admin_enqueue_scripts()
     {
+    	$product = wc_get_product();
+
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         wp_localize_script('admin-reepay-subscription', 'reepay', [
             'amountPercentageLabel' => __('Percentage', reepay_s()->settings('domain')),
+            'product' => [
+            	'id' => empty($product) ? 0 : $product->get_id(),
+	            'is_variable' => empty($product) ? false : $product->is_type('reepay_variable_subscriptions'),
+            ],
             'rest_urls' => [
-                'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/") . '?product_id=' . (!empty($_GET['post']) ? intval($_GET['post']) : 0),
+                'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/"),
                 'get_coupon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/coupon/"),
                 'get_discount' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/discount/"),
                 'get_addon' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/addon/"),
@@ -421,9 +442,10 @@ class WooCommerce_Reepay_Subscriptions
     {
         $this->api = WC_Reepay_Subscription_API::get_instance();
         $this->log = WC_RS_Log::get_instance();
-        $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
 
-        new WC_Reepay_Subscription_Plan_Variable();
+        $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
+	    $this->plan_variable = new WC_Reepay_Subscription_Plan_Variable();
+
         new WC_Reepay_Subscription_Addons();
         new WC_Reepay_Account_Page();
         new WC_Reepay_Admin_Frontend();
