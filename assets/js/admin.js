@@ -13,15 +13,11 @@ jQuery(function ($) {
     });
 
     $body.on('woocommerce-product-type-change', function () {
-        let tab;
-
         if ('reepay_simple_subscriptions' === $selectProductType.val()) {
-            tab = '#general_product_data';
+            init('#general_product_data')
         } else if ('reepay_variable_subscriptions' === $selectProductType.val()) {
-            tab = '#variable_product_options';
+            init('#variable_product_options')
         }
-
-        init(tab);
     });
 
     $body.on('init_tooltips', function () {
@@ -589,6 +585,8 @@ jQuery(function ($) {
 
     function init(tab) {
         const $tab = $(tab);
+
+        $(`a[href="${tab}"]`).click()
 
         show_settings();
 
