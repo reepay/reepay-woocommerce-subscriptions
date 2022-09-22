@@ -240,7 +240,7 @@ class WC_Reepay_Discounts_And_Coupons
 
         $paramsCoupon = $this->get_coupon_default_params($coupon, $data);
 
-        $apply_plans = array_map('sanitize_text_field', $data['_reepay_discount_eligible_plans']);
+        $apply_plans = array_map('sanitize_text_field', $data['_reepay_discount_eligible_plans'] ?? []);
 
         $post_id = $coupon->get_id();
         $couponHandle = 'coupon' . $post_id;
