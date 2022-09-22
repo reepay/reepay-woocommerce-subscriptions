@@ -20,37 +20,7 @@ class WC_Reepay_Subscription_Discounts_Rest extends WC_Reepay_Subscription_Plan_
     public function get_item($request)
     {
         try {
-            $discountObj = reepay_s()->api()->request('discount/' . $request['handle']);
-
-            $discount_data = [];
-
-            $amount = !empty($discountObj['amount']) ? $discountObj['amount'] / 100 : $discountObj['percentage'];
-
-            if (!empty($discountObj['amount'])) {
-                $discount_data['_reepay_discount_type'] = 'reepay_fixed_product';
-            }
-
-            if (!empty($discountObj['percentage'])) {
-                $discount_data['_reepay_discount_type'] = 'reepay_percentage';
-            }
-
-            $discount_data['_reepay_discount_name'] = $discountObj['name'];
-            $discount_data['_reepay_discount_apply_to'] = empty($discountObj['apply_to']) ? 'all' : 'custom';
-            $discount_data['_reepay_discount_apply_to_items'] = $discountObj['apply_to'];
-            $discount_data['_reepay_discount_duration'] = 'forever';
-            $discount_data['_reepay_discount_amount'] = !empty($amount) ? $amount : 0;
-
-            if (!empty($discountObj['fixed_count'])) {
-                $discount_data['_reepay_discount_duration'] = 'fixed_number';
-                $discount_data['_reepay_discount_fixed_count'] = $discountObj['fixed_count'];
-            }
-
-            if (!empty($discountObj['fixed_period'])) {
-                $discount_data['_reepay_discount_duration'] = 'limited_time';
-                $discount_data['_reepay_discount_fixed_period'] = $discountObj['fixed_period'];
-                $discount_data['_reepay_discount_fixed_period_unit'] = $discountObj['fixed_period_unit'];
-            }
-
+            $discount_data = WC_Reepay_Discounts_And_Coupons::get_existing_discount($request['handle']);
 
             return new WP_REST_Response([
                 'success' => true,

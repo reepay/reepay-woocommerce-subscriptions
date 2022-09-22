@@ -501,7 +501,7 @@ jQuery(function ($) {
                 }
 
                 $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
-
+                $container.find('.wc-enhanced-select').select2()
                 updateCouponContainer($container)
             },
             error: function (request, status, error) {
