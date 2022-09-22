@@ -16,6 +16,9 @@ $variable = !empty($variable);
             <span class="wrap">
                 <input type="number"
                        id="_subscription_price" <?php echo $disabled ?> name="_reepay_subscription_price<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
+                       <?php if($variable) : ?>
+                        style="float: unset"
+                        <?php endif; ?>
                        class="wc_input_price wc_input_subscription_price"
                        placeholder="<?php esc_attr_e('e.g. 5.90', $domain); ?>" step="any" min="0"
                        value="<?php echo !empty($_reepay_subscription_price) ? esc_attr(wc_format_localized_price($_reepay_subscription_price)) : 0 ?>"/>
@@ -500,7 +503,7 @@ $variable = !empty($variable);
             &nbsp<input <?php echo esc_attr($disabled) ?>
                     type="radio" id="_reepay_subscription_contract_periods_full"
                     name="_reepay_subscription_contract_periods_full<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
-                    value="true" <?php checked('true', $_reepay_subscription_contract_periods_full, false); ?>/>
+                    value="true" <?php checked('true', $_reepay_subscription_contract_periods_full ?? false, false); ?>/>
         </p>
     </div>
 

@@ -32,7 +32,10 @@ $variable = $variable ?? false;
             <?php if (!empty($plans_list)): ?>
                 <select id="_subscription_choose_exist"
                         name="_reepay_choose_exist<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
-                        class="wc_input_subscription_period_interval">
+                        class="wc_input_subscription_period_interval"
+                        <?php if(isset($data_plan)) : ?>
+                        data-plan='<?= $data_plan ?>'
+                        <?php endif; ?>>
                     <option value=""><?php esc_html_e('Select plan', $domain); ?></option>
                     <?php foreach ($plans_list as $plan): ?>
                         <option value="<?php esc_attr_e($plan['handle']) ?>" <?php echo $_reepay_subscription_choose == 'exist' ? selected($plan['handle'], $_reepay_choose_exist) : '' ?>><?php esc_attr_e($plan['name']) ?></option>

@@ -358,6 +358,7 @@ class WC_Reepay_Subscription_Plan_Simple
     public function get_subscription_template_data($post_id)
     {
         $data = [
+        	'post_id' => $post_id,
             'plans_list' => $this->get_reepay_plans_list() ?: [],
             'domain' => reepay_s()->settings('domain'),
         ];
@@ -396,16 +397,14 @@ class WC_Reepay_Subscription_Plan_Simple
             }
         }
 
-        $dataNew['domain'] = $data['domain'];
         ob_start();
         wc_get_template(
             'plan-subscription-fields-data.php',
-            $dataNew,
+	        $data,
             '',
             reepay_s()->settings('plugin_path') . 'templates/'
         );
         $data['settings'] = ob_get_clean();
-
 
         if ($data['is_exist']) {
             ob_start();
@@ -601,7 +600,6 @@ class WC_Reepay_Subscription_Plan_Simple
 
         $request_data = $this->get_meta_from_request();
 
-
         if (!empty($request_data['_reepay_subscription_choose']) && $request_data['_reepay_subscription_choose'] == 'exist') {
             if (!empty($request_data['_reepay_choose_exist'])) {
                 $this->save_remote_plan($post_id, $request_data['_reepay_choose_exist']);
@@ -616,6 +614,7 @@ class WC_Reepay_Subscription_Plan_Simple
                 }
 
                 $title = get_the_title($post_id);
+
                 if (!empty($title) && strpos($title, 'AUTO-DRAFT') === false) {
                     $handle = get_post_meta($post_id, '_reepay_subscription_handle', true);
                     $this->save_meta_from_request($post_id);
