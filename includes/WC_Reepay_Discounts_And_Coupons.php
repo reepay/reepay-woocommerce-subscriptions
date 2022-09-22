@@ -115,6 +115,9 @@ class WC_Reepay_Discounts_And_Coupons
 
         $discount_data['_reepay_discount_name'] = $discountObj['name'];
         $discount_data['_reepay_discount_apply_to'] = empty($discountObj['apply_to']) ? 'all' : 'custom';
+        if (isset($discountObj['apply_to'][0]) && $discountObj['apply_to'][0] === 'all') {
+            $discount_data['_reepay_discount_apply_to'] = 'all';
+        }
         $discount_data['_reepay_discount_apply_to_items'] = $discountObj['apply_to'];
         $discount_data['_reepay_discount_amount'] = !empty($amount) ? $amount : 0;
 
