@@ -190,7 +190,7 @@ class WC_Reepay_Subscription_Plan_Simple
 
     public function create_subscription_product_class()
     {
-        include_once(reepay_s()->settings('plugin_path') . '/includes/class-wc-reepay-plan-simple-product.php');
+        include_once(reepay_s()->settings('plugin_path') . '/includes/WC_Product_Reepay_Simple_Subscription.php');
     }
 
     public function load_subscription_product_class($php_classname, $product_type)
