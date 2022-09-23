@@ -18,11 +18,11 @@
     <?php endif; ?>
 
     <?php if (!empty($trial)) : ?>
-        <li><?php wp_kses_post($trial) ?></li>
+        <li><?php esc_html_e($trial) ?></li>
     <?php endif; ?>
 
-    <?php if (!empty($contract_periods)) : ?>
-        <li><?php esc_html_e('Contract Period', $domain) . ': ' . wp_kses_post($contract_periods) ?></li>
+    <?php if (!empty($contract_period)) : ?>
+        <li><?php echo $contract_period ?></li>
     <?php endif; ?>
 
     <?php if (!empty($setup_fee)) : ?>

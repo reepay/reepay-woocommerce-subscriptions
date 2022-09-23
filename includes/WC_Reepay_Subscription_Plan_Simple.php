@@ -269,6 +269,7 @@ class WC_Reepay_Subscription_Plan_Simple
                 'trial' => self::get_trial($product),
                 'setup_fee' => self::get_setup_fee($product),
                 'contract_periods' => $product->get_meta('_reepay_subscription_contract_periods'),
+                'contract_period' => self::get_contract_period($product),
                 'domain' => reepay_s()->settings('domain'),
                 'is_checkout' => $is_checkout
             ],
@@ -984,6 +985,23 @@ class WC_Reepay_Subscription_Plan_Simple
         $ret = '';
         if (!empty($fee) && !empty($fee['enabled']) && $fee['enabled'] == 'yes') {
             $ret = $fee["text"] . ': ' . wc_price($fee["amount"]);
+        }
+
+        return $ret;
+    }
+
+    /**
+     * @param WC_Product $product
+     *
+     * @return string
+     */
+    public static function get_contract_period($product)
+    {
+        $periods = $product->get_meta('_reepay_subscription_contract_periods');
+        $plan = WC_Reepay_Subscription_Plan_Simple::get_billing_plan($product, true);
+        $ret = '';
+        if (!empty($periods)) {
+            $ret = __('Contract Period', reepay_s()->settings('domain')) . ': ' . $periods . ' x ' . $plan;
         }
 
         return $ret;
