@@ -303,8 +303,20 @@ class WC_Reepay_Subscription_Plan_Simple
                 ]
             ]
         ]);
+        $varPlansQuery = new WP_Query([
+            'post_type' => 'product_variation',
+            'post_status' => 'publish',
+            'posts_per_page' => -1,
+            'meta_query' => [
+                [
+                    'key' => '_reepay_subscription_handle',
+                    'compare' => 'EXISTS',
+                ]
+            ]
+        ]);
+        $posts = array_merge($plansQuery->posts ?? [], $varPlansQuery->posts ?? []);
         $plans = [];
-        foreach ($plansQuery->posts as $item) {
+        foreach ($posts as $item) {
             $handle = get_post_meta($item->ID, '_reepay_subscription_handle', true);
             $plans[$handle] = $item->post_title;
         }
