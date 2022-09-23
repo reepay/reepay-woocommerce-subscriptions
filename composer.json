@@ -9,8 +9,6 @@
       "email": "support@reepay.com"
     }
   ],
-  "require": {
-  },
   "autoload": {
     "classmap": [
       "includes"

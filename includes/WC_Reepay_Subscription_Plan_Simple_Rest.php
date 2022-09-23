@@ -50,12 +50,16 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller
     public function get_item($request)
     {
         try {
-            $plan_meta_data = reepay_s()->plan()->get_remote_plan_meta($request['handle']);
+            $plan_meta_data = reepay_s()->plan($request['product_id'])->get_remote_plan_meta($request['handle']);
             $plan_meta_data['disabled'] = true;
             $plan_meta_data['plans_list'] = reepay_s()->plan()->get_reepay_plans_list() ?: [];
             $plan_meta_data['domain'] = reepay_s()->settings('domain');
             $plan_meta_data['is_exist'] = true;
             $plan_meta_data['is_creating_new_product'] = false;
+
+	        if ( isset( $request['loop'] ) ) {
+				$plan_meta_data['loop'] = $request['loop'];
+	        }
 
             foreach (WC_Reepay_Subscription_Plan_Simple::$meta_fields as $key) {
                 if (!isset($plan_meta_data[$key])) {
