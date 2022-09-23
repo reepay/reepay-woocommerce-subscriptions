@@ -16,9 +16,9 @@ $variable = !empty($variable);
             <span class="wrap">
                 <input type="number"
                        id="_subscription_price" <?php echo $disabled ?> name="_reepay_subscription_price<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
-                       <?php if($variable) : ?>
-                        style="float: unset"
-                        <?php endif; ?>
+                       <?php if ($variable) : ?>
+                           style="float: unset"
+                       <?php endif; ?>
                        class="wc_input_price wc_input_subscription_price"
                        placeholder="<?php esc_attr_e('e.g. 5.90', $domain); ?>" step="any" min="0"
                        value="<?php echo !empty($_reepay_subscription_price) ? esc_attr(wc_format_localized_price($_reepay_subscription_price)) : 0 ?>"/>
@@ -33,7 +33,7 @@ $variable = !empty($variable);
                     name="_reepay_subscription_schedule_type<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>"
                     class="wc_input_subscription_period_interval">
                 <?php foreach (WC_Reepay_Subscription_Plan_Simple::$schedule_types as $value => $label) { ?>
-                    <option value="<?php esc_attr_e($value); ?>" <?php echo !empty($_reepay_subscription_schedule_type) ? selected($value, $_reepay_subscription_schedule_type, false) : ''?>><?php esc_html_e($label); ?></option>
+                    <option value="<?php esc_attr_e($value); ?>" <?php echo !empty($_reepay_subscription_schedule_type) ? selected($value, $_reepay_subscription_schedule_type, false) : '' ?>><?php esc_html_e($label); ?></option>
                 <?php } ?>
             </select>
         </p>
@@ -80,16 +80,16 @@ $variable = !empty($variable);
             <select id="_subscription_month_fixedday_period" <?php echo esc_attr($disabled) ?>
                     name="_reepay_subscription_month_fixedday<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>[period]"
                     class="wc_input_subscription_period_interval">
-                <option value="bill_prorated" <?php echo !empty($month_fixedday['period']) ? selected('bill_prorated', $month_fixedday['period'], false ) : '' ?>>
+                <option value="bill_prorated" <?php echo !empty($month_fixedday['period']) ? selected('bill_prorated', $month_fixedday['period'], false) : '' ?>>
                     Bill prorated (Default)
                 </option>
-                <option value="bill_full" <?php echo !empty($month_fixedday['period']) ? selected('bill_full', $month_fixedday['period'], false)  : ''?>>
+                <option value="bill_full" <?php echo !empty($month_fixedday['period']) ? selected('bill_full', $month_fixedday['period'], false) : '' ?>>
                     Bill for full period
                 </option>
-                <option value="bill_zero_amount" <?php echo !empty($month_fixedday['period']) ? selected('bill_zero_amount', $month_fixedday['period'], false)  : ''?>>
+                <option value="bill_zero_amount" <?php echo !empty($month_fixedday['period']) ? selected('bill_zero_amount', $month_fixedday['period'], false) : '' ?>>
                     Bill a zero amount
                 </option>
-                <option value="no_bill" <?php echo !empty($month_fixedday['period']) ? selected('no_bill', $month_fixedday['period'], false)  : ''?>>
+                <option value="no_bill" <?php echo !empty($month_fixedday['period']) ? selected('no_bill', $month_fixedday['period'], false) : '' ?>>
                     Do not consider the partial period a billing period
                 </option>
             </select>
@@ -102,7 +102,7 @@ $variable = !empty($variable);
                 <option value="full_day" <?php echo !empty($month_fixedday['proration']) ? selected('full_day', $month_fixedday['proration'], false) : '' ?>>
                     Full day proration
                 </option>
-                <option value="by_minute" <?php echo !empty($month_fixedday['proration']) ? selected('full_day', $month_fixedday['proration'], false ) : '' ?>>
+                <option value="by_minute" <?php echo !empty($month_fixedday['proration']) ? selected('full_day', $month_fixedday['proration'], false) : '' ?>>
                     By the minute proration
                 </option>
             </select>
@@ -153,7 +153,7 @@ $variable = !empty($variable);
                 <option value="full_day" <?php echo !empty($month_lastday['proration']) ? selected('full_day', $month_lastday['proration'], false) : '' ?>>
                     Full day proration
                 </option>
-                <option value="by_minute" <?php echo !empty($month_lastday['proration']) ? selected('by_minute', $month_lastday['proration'], false) : ''?>>
+                <option value="by_minute" <?php echo !empty($month_lastday['proration']) ? selected('by_minute', $month_lastday['proration'], false) : '' ?>>
                     By the minute proration
                 </option>
             </select>
@@ -185,13 +185,13 @@ $variable = !empty($variable);
                 <option value="bill_prorated" <?php echo !empty($primo['period']) ? selected('bill_prorated', $primo['period'], false) : '' ?>>
                     Bill prorated (Default)
                 </option>
-                <option value="bill_full" <?php echo !empty($primo['period']) ? selected('bill_full', $primo['period'], false) : ''  ?>>
+                <option value="bill_full" <?php echo !empty($primo['period']) ? selected('bill_full', $primo['period'], false) : '' ?>>
                     Bill for full period
                 </option>
-                <option value="bill_zero_amount" <?php echo !empty($primo['period']) ? selected('bill_zero_amount', $primo['period'], false) : ''  ?>>
+                <option value="bill_zero_amount" <?php echo !empty($primo['period']) ? selected('bill_zero_amount', $primo['period'], false) : '' ?>>
                     Bill a zero amount
                 </option>
-                <option value="no_bill" <?php echo !empty($primo['period']) ? selected('no_bill', $primo['period'], false) : ''  ?>>
+                <option value="no_bill" <?php echo !empty($primo['period']) ? selected('no_bill', $primo['period'], false) : '' ?>>
                     Do
                     not consider the partial period a billing period
                 </option>
@@ -202,10 +202,10 @@ $variable = !empty($variable);
             <select id="_subscription_primo_proration" <?php echo esc_attr($disabled) ?>
                     name="_reepay_subscription_primo<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>[proration]"
                     class="wc_input_subscription_period_interval">
-                <option value="full_day" <?php echo !empty($primo['proration']) ? selected('full_day', $primo['proration'], false) : ''  ?>>
+                <option value="full_day" <?php echo !empty($primo['proration']) ? selected('full_day', $primo['proration'], false) : '' ?>>
                     Full day proration
                 </option>
-                <option value="by_minute" <?php echo !empty($primo['proration']) ? selected('by_minute', $primo['proration'], false) : ''  ?>>
+                <option value="by_minute" <?php echo !empty($primo['proration']) ? selected('by_minute', $primo['proration'], false) : '' ?>>
                     By the minute proration
                 </option>
             </select>
@@ -287,16 +287,16 @@ $variable = !empty($variable);
             <select id="_subscription_half_yearly_period" <?php echo esc_attr($disabled) ?>
                     name="_reepay_subscription_half_yearly<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>[period]"
                     class="wc_input_subscription_period_interval">
-                <option value="bill_prorated" <?php echo !empty($half_yearly['period']) ? selected('bill_prorated', $half_yearly['period'], false) : ''?>>
+                <option value="bill_prorated" <?php echo !empty($half_yearly['period']) ? selected('bill_prorated', $half_yearly['period'], false) : '' ?>>
                     Bill prorated (Default)
                 </option>
-                <option value="bill_full" <?php echo !empty($half_yearly['period']) ? selected('bill_full', $half_yearly['period'], false) : ''?>>
+                <option value="bill_full" <?php echo !empty($half_yearly['period']) ? selected('bill_full', $half_yearly['period'], false) : '' ?>>
                     Bill for full period
                 </option>
-                <option value="bill_zero_amount" <?php echo !empty($half_yearly['period']) ? selected('bill_zero_amount', $half_yearly['period'], false) : ''?>>
+                <option value="bill_zero_amount" <?php echo !empty($half_yearly['period']) ? selected('bill_zero_amount', $half_yearly['period'], false) : '' ?>>
                     Bill a zero amount
                 </option>
-                <option value="no_bill" <?php echo !empty($half_yearly['period']) ? selected('no_bill', $half_yearly['period'], false) : ''?>>
+                <option value="no_bill" <?php echo !empty($half_yearly['period']) ? selected('no_bill', $half_yearly['period'], false) : '' ?>>
                     Do not consider the partial period a billing period
                 </option>
             </select>
@@ -571,7 +571,8 @@ $variable = !empty($variable);
             <select id="_subscription_trial_unit" <?php echo esc_attr($disabled) ?>
                     name="_reepay_subscription_trial<?php echo $variable ? '[' . esc_attr($loop) . ']' : '' ?>[unit]"
                     class="wc_input_subscription_period_interval">
-                <option value="days" <?php echo !empty($trial['unit']) ? selected('days', $trial['unit'], false) : '' ?>>Days
+                <option value="days" <?php echo !empty($trial['unit']) ? selected('days', $trial['unit'], false) : '' ?>>
+                    Days
                 </option>
                 <option value="months" <?php echo !empty($trial['unit']) ? selected('months', $trial['unit'], false) : '' ?>>
                     Months
@@ -652,7 +653,10 @@ $variable = !empty($variable);
         ?>
     </div>
 
-<?php if (isset($is_exist) && $is_exist): ?>
+<?php if (isset($is_exist) && $is_exist):
+    if (empty($_reepay_subscription_supersedes)) {
+        $_reepay_subscription_supersedes = 'no_sub_update';
+    } ?>
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_supersedes"><?php esc_html_e('Supersede mode', $domain); ?></label>
