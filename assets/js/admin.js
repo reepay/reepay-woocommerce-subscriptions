@@ -402,6 +402,7 @@ jQuery(function ($) {
                 $('input#reepay-publish').val('Create plan');
                 $reepay_subscription_settings.show();
                 $reepay_subscription_choose_exist.hide();
+                $('.reepay_subscription_supersedes_block').hide();
             } else {
                 $reepay_subscription_choose_exist.find("input").prop("disabled", false);
                 $reepay_subscription_choose_exist.find("select").prop("disabled", false);

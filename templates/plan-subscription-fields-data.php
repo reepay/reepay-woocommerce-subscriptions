@@ -657,7 +657,7 @@ $variable = !empty($variable);
     if (empty($_reepay_subscription_supersedes)) {
         $_reepay_subscription_supersedes = 'no_sub_update';
     } ?>
-    <div class="options_group show_if_reepay_subscription">
+    <div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_reepay_subscription_supersedes"><?php esc_html_e('Supersede mode', $domain); ?></label>
             <?php esc_html_e("Don't schedule subscription update", $domain); ?>
