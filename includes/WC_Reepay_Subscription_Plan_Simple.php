@@ -176,7 +176,7 @@ class WC_Reepay_Subscription_Plan_Simple
     public function checkout_subscription_info($name, $cart_item, $cart_item_key)
     {
         if (!empty($cart_item['data']) && WC_Reepay_Checkout::is_reepay_product($cart_item['data'])) {
-            $name = $name . $this->get_subscription_info_frontend($cart_item['data']);
+            $name = $name . $this->get_subscription_info_frontend($cart_item['data'], true);
         }
         return $name;
     }
@@ -251,7 +251,7 @@ class WC_Reepay_Subscription_Plan_Simple
         echo $this->get_subscription_info_frontend($product);
     }
 
-    public function get_subscription_info_frontend($product)
+    public function get_subscription_info_frontend($product, $is_checkout = false)
     {
         if (!WC_Reepay_Checkout::is_reepay_product($product)) {
             return '';
@@ -269,7 +269,8 @@ class WC_Reepay_Subscription_Plan_Simple
                 'trial' => self::get_trial($product),
                 'setup_fee' => self::get_setup_fee($product),
                 'contract_periods' => $product->get_meta('_reepay_subscription_contract_periods'),
-                'domain' => reepay_s()->settings('domain')
+                'domain' => reepay_s()->settings('domain'),
+                'is_checkout' => $is_checkout
             ],
             '',
             reepay_s()->settings('plugin_path') . 'templates/'
@@ -370,7 +371,7 @@ class WC_Reepay_Subscription_Plan_Simple
     public function get_subscription_template_data($post_id)
     {
         $data = [
-        	'post_id' => $post_id,
+            'post_id' => $post_id,
             'plans_list' => $this->get_reepay_plans_list() ?: [],
             'domain' => reepay_s()->settings('domain'),
         ];
@@ -412,7 +413,7 @@ class WC_Reepay_Subscription_Plan_Simple
         ob_start();
         wc_get_template(
             'plan-subscription-fields-data.php',
-	        $data,
+            $data,
             '',
             reepay_s()->settings('plugin_path') . 'templates/'
         );
@@ -677,11 +678,11 @@ class WC_Reepay_Subscription_Plan_Simple
     {
         foreach (self::$meta_fields as $key) {
             if (isset($_REQUEST[$key])) {
-	            update_post_meta(
-	            	$post_id,
-		            $key,
-		            is_array( $_REQUEST[ $key ] ) ? $_REQUEST[ $key ] : sanitize_text_field( $_REQUEST[ $key ] )
-	            );
+                update_post_meta(
+                    $post_id,
+                    $key,
+                    is_array($_REQUEST[$key]) ? $_REQUEST[$key] : sanitize_text_field($_REQUEST[$key])
+                );
             }
         }
     }
@@ -982,7 +983,7 @@ class WC_Reepay_Subscription_Plan_Simple
         $fee = $product->get_meta('_reepay_subscription_fee');
         $ret = '';
         if (!empty($fee) && !empty($fee['enabled']) && $fee['enabled'] == 'yes') {
-            $ret = 'Setup fee (' . $fee["text"] . '): +' . wc_price($fee["amount"]);
+            $ret = $fee["text"] . ': ' . wc_price($fee["amount"]);
         }
 
         return $ret;

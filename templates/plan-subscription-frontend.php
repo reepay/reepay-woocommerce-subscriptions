@@ -8,7 +8,10 @@
  */
 
 ?>
-<h4><?php _e('Subscription details', $domain) ?></h4>
+<?php if (!empty(!$is_checkout)) : ?>
+    <h4><?php _e('Subscription details', $domain) ?></h4>
+<?php endif; ?>
+
 <ul class="reepay_subscription_info">
     <?php if (!empty($billing_plan)) : ?>
         <li><?php esc_attr_e($billing_plan) ?></li>
