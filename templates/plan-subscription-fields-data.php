@@ -658,7 +658,7 @@ $variable = !empty($variable);
         $_reepay_subscription_supersedes = 'no_sub_update';
     } ?>
     <div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
-        <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
+        <p class="form-field <?php echo $variable ? 'supersedes_block_variable"' : '' ?>">
             <label for="_reepay_subscription_supersedes"><?php esc_html_e('Supersede mode', $domain); ?></label>
             <?php esc_html_e("Don't schedule subscription update", $domain); ?>
             <?php echo wc_help_tip(__('Using this, existing subscriptions will stay on the current version of the plan', $domain)); ?>
