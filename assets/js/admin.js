@@ -405,19 +405,32 @@ jQuery(function ($) {
             } else {
                 $reepay_subscription_choose_exist.find("input").prop("disabled", false);
                 $reepay_subscription_choose_exist.find("select").prop("disabled", false);
+                var existing_val = $reepay_subscription_choose_exist.find("select#_subscription_choose_exist").val();
+                if (existing_val == '') {
+                    $reepay_subscription_choose_exist.find(".reepay_subscription_settings_exist").hide();
+                } else {
+                    $reepay_subscription_choose_exist.show();
+                }
                 $('input#reepay-publish').val('Update plan');
                 $reepay_subscription_settings.hide();
-                $reepay_subscription_choose_exist.show();
+
             }
         }
     }
 
-    function show_trial_settings($container) {
-        const type = $container.find('#_subscription_trial').val()
-        const subs_block = $container.find('.reepay_subscription_trial');
+    function show_trial_settings($container, elem = false) {
+        var val;
+        if (elem) {
+            val = elem;
+        } else {
+            val = $container.find('#_subscription_trial');
+        }
 
-        subs_block.find('.trial-fields').hide();
-        subs_block.find('.fields-' + type).show();
+        var block = val.closest('.reepay_subscription_trial')
+        const type = block.find('#_subscription_trial').val()
+
+        block.find('.trial-fields').hide();
+        block.find('.fields-' + type).show();
     }
 
     function show_notice_settings($container) {
@@ -458,6 +471,9 @@ jQuery(function ($) {
             return;
         }
 
+        if (handle != '') {
+            $container.show();
+        }
         $container.html('')
 
         const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
@@ -601,7 +617,7 @@ jQuery(function ($) {
         }).trigger('change');
 
         $(tab + ' #_subscription_trial').on('change', function () {
-            show_trial_settings($tab);
+            show_trial_settings($tab, $(this));
         }).trigger('change');
 
         $(tab + ' #_subscription_notice_period').on('change', function () {
