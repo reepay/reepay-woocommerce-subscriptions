@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.0
+ * Version: 1.0.1
  * Text Domain: reepay-woocommerce-subscriptions
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -35,15 +35,15 @@ class WooCommerce_Reepay_Subscriptions
      */
     private $log;
 
-	/**
-	 * @var WC_Reepay_Subscription_Plan_Simple
-	 */
-	private $plan_simple;
+    /**
+     * @var WC_Reepay_Subscription_Plan_Simple
+     */
+    private $plan_simple;
 
-	/**
-	 * @var WC_Reepay_Subscription_Plan_Variable
-	 */
-	private $plan_variable;
+    /**
+     * @var WC_Reepay_Subscription_Plan_Variable
+     */
+    private $plan_variable;
 
     /**
      * @var array<string, mixed>
@@ -385,20 +385,20 @@ class WooCommerce_Reepay_Subscriptions
     /**
      * @return WC_Reepay_Subscription_Plan_Simple
      */
-	public function plan( $product = null )
-	{
-		if ( is_null( $product ) ) {
-			return $this->plan_simple;
-		}
+    public function plan($product = null)
+    {
+        if (is_null($product)) {
+            return $this->plan_simple;
+        }
 
-		$product = wc_get_product( $product );
+        $product = wc_get_product($product);
 
-		if ( $product->is_type( 'reepay_simple_subscriptions' ) ) {
-			return $this->plan_simple;
-		}
+        if ($product->is_type('reepay_simple_subscriptions')) {
+            return $this->plan_simple;
+        }
 
-		return $this->plan_variable;
-	}
+        return $this->plan_variable;
+    }
 
     /**
      * Return plugin settings
@@ -413,15 +413,15 @@ class WooCommerce_Reepay_Subscriptions
 
     public function admin_enqueue_scripts()
     {
-    	$product = wc_get_product();
+        $product = wc_get_product();
 
         wp_enqueue_script('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/js/admin.js', ['jquery'], $this->settings('version'), true);
         wp_enqueue_style('admin-reepay-subscription', $this->settings('plugin_url') . 'assets/css/admin.css');
         wp_localize_script('admin-reepay-subscription', 'reepay', [
             'amountPercentageLabel' => __('Percentage', reepay_s()->settings('domain')),
             'product' => [
-            	'id' => empty($product) ? 0 : $product->get_id(),
-	            'is_variable' => empty($product) ? false : $product->is_type('reepay_variable_subscriptions'),
+                'id' => empty($product) ? 0 : $product->get_id(),
+                'is_variable' => empty($product) ? false : $product->is_type('reepay_variable_subscriptions'),
             ],
             'rest_urls' => [
                 'get_plan' => get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/plan_simple/"),
@@ -444,7 +444,7 @@ class WooCommerce_Reepay_Subscriptions
         $this->log = WC_RS_Log::get_instance();
 
         $this->plan_simple = new WC_Reepay_Subscription_Plan_Simple;
-	    $this->plan_variable = new WC_Reepay_Subscription_Plan_Variable();
+        $this->plan_variable = new WC_Reepay_Subscription_Plan_Variable();
 
         new WC_Reepay_Subscription_Addons();
         new WC_Reepay_Account_Page();
