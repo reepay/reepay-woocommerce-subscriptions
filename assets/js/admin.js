@@ -408,9 +408,8 @@ jQuery(function ($) {
                 var existing_val = $reepay_subscription_choose_exist.find("select#_subscription_choose_exist").val();
                 if (existing_val == '') {
                     $reepay_subscription_choose_exist.find(".reepay_subscription_settings_exist").hide();
-                } else {
-                    $reepay_subscription_choose_exist.show();
                 }
+                $reepay_subscription_choose_exist.show();
                 $('input#reepay-publish').val('Update plan');
                 $reepay_subscription_settings.hide();
 
