@@ -342,7 +342,7 @@ jQuery(function ($) {
 
         if ('reepay_variable_subscriptions' === $selectProductType.val() ||
             'variable' === $selectProductType.val()) {
-            jQuery.each($variablePricing, function() {
+            jQuery.each($variablePricing, function () {
                 const $this = $(this);
                 $this.children(':first').hide();
                 $this.children(':nth-child(2)').hide();
@@ -355,7 +355,7 @@ jQuery(function ($) {
         } else {
             $('.show_if_variable').hide();
 
-            jQuery.each($variablePricing, function() {
+            jQuery.each($variablePricing, function () {
                 const $this = $(this);
                 $this.children(':first').show();
                 $this.children(':nth-child(2)').show();
@@ -556,7 +556,7 @@ jQuery(function ($) {
         discount['_reepay_discount_type'] = $container.find('[name="_reepay_discount_type"]:checked').val() || 'reepay_fixed_product'
         discount['_reepay_discount_apply_to'] = $container.find('[name="_reepay_discount_apply_to"]:checked').val() || 'all'
         let apply_to_items = [];
-        $container.find('[name="_reepay_discount_apply_to_items[]"]:checked').each(function(i){
+        $container.find('[name="_reepay_discount_apply_to_items[]"]:checked').each(function (i) {
             apply_to_items[i] = $(this).val();
         });
 
@@ -586,7 +586,7 @@ jQuery(function ($) {
     function init(tab) {
         const $tab = $(tab);
 
-        $(`a[href="${tab}"]`).click()
+        //$(`a[href="${tab}"]`).click()
 
         show_settings();
 
