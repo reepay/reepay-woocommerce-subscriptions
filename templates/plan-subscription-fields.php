@@ -1,18 +1,17 @@
 <?php
 
 $variable = $variable ?? false;
-
 ?>
 <div class="options_group reepay_subscription_choose show_if_reepay_subscription">
     <p class="form-field choose-fields <?php echo $variable ? 'form-row' : '' ?> ">
         <label for="_subscription_price">
 			<?php esc_html_e( 'Creation type', 'reepay-subscriptions' ); ?>
         </label>
-		<?php esc_html_e( 'Create new plan', 'reepay-subscriptions' ); ?> &nbsp
+		<?php esc_html_e( 'Create new plan', 'reepay-subscriptions' ); ?>
         <input type="radio" id="_reepay_subscription_choose"
                name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                value="new" <?php checked( 'new', esc_attr( $_reepay_subscription_choose ), true ); ?>>
-        &nbsp&nbsp<?php esc_html_e( 'Choose existing plan', 'reepay-subscriptions' ); ?> &nbsp
+		<?php esc_html_e( 'Choose existing plan', 'reepay-subscriptions' ); ?>
         <input type="radio" id="_reepay_subscription_choose"
                name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                value="exist" <?php checked( 'exist', esc_attr( $_reepay_subscription_choose ), true ); ?>>
@@ -20,20 +19,7 @@ $variable = $variable ?? false;
 </div>
 
 <div class="reepay_subscription_settings">
-	<?php
-	$allowed_html = array(
-		'a'     => array(
-			'href'  => true,
-			'title' => true,
-		),
-		'br'    => array(),
-		'input' => array(),
-		'tr'    => array(),
-		'td'    => array(),
-	);
-
-	$test = wp_kses( $settings, $allowed_html );
-	var_dump( $test ); ?>
+	<?php echo wp_kses_normalize_entities( $settings ) ?>
 </div>
 
 <div class="reepay_subscription_choose_exist">
@@ -60,7 +46,7 @@ $variable = $variable ?? false;
         </p>
     </div>
     <div class="reepay_subscription_settings_exist">
-		<?php echo ! empty( $settings_exist ) ? $settings_exist : '' ?>
+		<?php echo ! empty( $settings_exist ) ? wp_kses_normalize_entities( $settings_exist ) : '' ?>
     </div>
 </div>
 

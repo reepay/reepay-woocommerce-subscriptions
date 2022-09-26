@@ -44,7 +44,7 @@ $variable = ! empty( $variable );
             <input type="number" min="0" id="_reepay_subscription_daily" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_daily<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                    value="<?php echo ! empty( $_reepay_subscription_daily ) ? esc_attr( $_reepay_subscription_daily ) : 1 ?>">
-            &nbsp<?php esc_html_e( 'Day', 'reepay-subscriptions' ); ?>
+			<?php esc_html_e( 'Day', 'reepay-subscriptions' ); ?>
         </p>
 
         <!--Monthly-->
@@ -53,7 +53,7 @@ $variable = ! empty( $variable );
             <input type="number" min="0" id="_subscription_month_startdate" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_month_startdate<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                    value="<?php echo ! empty( $_reepay_subscription_month_startdate ) ? esc_attr( $_reepay_subscription_month_startdate ) : 1 ?>">
-            &nbsp<?php esc_html_e( 'Month', 'reepay-subscriptions' ); ?>
+			<?php esc_html_e( 'Month', 'reepay-subscriptions' ); ?>
         </p>
 
         <!--Fixed day of month-->
@@ -63,7 +63,7 @@ $variable = ! empty( $variable );
             <input type="number" min="0" id="_subscription_month_fixedday" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_month_fixedday<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[month]"
                    value="<?php echo ! empty( $month_fixedday['month'] ) ? esc_attr( $month_fixedday['month'] ) : 1 ?>">
-            &nbsp<?php esc_html_e( 'Month', 'reepay-subscriptions' ); ?>
+			<?php esc_html_e( 'Month', 'reepay-subscriptions' ); ?>
         </p>
         <p class="form-field type-fields fields-month_fixedday <?php echo $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_fixedday_day"><?php esc_html_e( 'On this day of the month', 'reepay-subscriptions' ); ?></label>
@@ -124,7 +124,7 @@ $variable = ! empty( $variable );
                    id="_subscription_month_lastday<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[month]" <?php echo esc_attr( $disabled ) ?>
                    value="<?php echo ! empty( $month_lastday['month'] ) ? $month_lastday['month'] : 0 ?>"
                    name="_reepay_subscription_month_lastday<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[month]">
-            &nbsp<?php esc_html_e( 'Month', 'reepay-subscriptions' ); ?>
+			<?php esc_html_e( 'Month', 'reepay-subscriptions' ); ?>
         </p>
         <p class="form-field type-fields fields-month_lastday <?php echo $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_month_lastday_period"><?php esc_html_e( 'Partial Period Handling', 'reepay-subscriptions' ); ?></label>
@@ -386,7 +386,7 @@ $variable = ! empty( $variable );
             <label for="_subscription_weekly_fixedday"><?php esc_html_e( 'Charge every', 'reepay-subscriptions' ); ?></label>
             <input type="number" min="0" id="_subscription_weekly_fixedday" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_weekly_fixedday<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[week]">
-            &nbsp<?php esc_html_e( 'Week', 'reepay-subscriptions' ); ?>
+			<?php esc_html_e( 'Week', 'reepay-subscriptions' ); ?>
         </p>
         <p class="form-field type-fields fields-weekly_fixedday <?php echo $variable ? 'form-row' : '' ?> hidden">
             <label for="_subscription_weekly_fixedday_day"><?php esc_html_e( 'On this day of the week', 'reepay-subscriptions' ); ?></label>
@@ -494,13 +494,13 @@ $variable = ! empty( $variable );
         <p class="form-field fields-contract_periods hidden">
             <label for="_reepay_subscription_contract_periods_full"></label>
 			<?php esc_html_e( 'When the subscription is created', 'reepay-subscriptions' ); ?>
-            &nbsp<input <?php echo esc_attr( $disabled ) ?>
+            <input <?php echo esc_attr( $disabled ) ?>
                     type="radio"
                     id="_reepay_subscription_contract_periods_full"
                     name="_reepay_subscription_contract_periods_full<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                     value="false" <?php echo ! empty( $_reepay_subscription_contract_periods_full ) ? checked( 'false', $_reepay_subscription_contract_periods_full, false ) : ''; ?>/>
-            &nbsp&nbsp <?php esc_html_e( 'When the first period starts', 'reepay-subscriptions' ); ?>
-            &nbsp<input <?php echo esc_attr( $disabled ) ?>
+			<?php esc_html_e( 'When the first period starts', 'reepay-subscriptions' ); ?>
+            <input <?php echo esc_attr( $disabled ) ?>
                     type="radio" id="_reepay_subscription_contract_periods_full"
                     name="_reepay_subscription_contract_periods_full<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                     value="true" <?php checked( 'true', $_reepay_subscription_contract_periods_full ?? false, false ); ?>/>
@@ -518,12 +518,12 @@ $variable = ! empty( $variable );
         </p>
         <p class="form-field fields-notice_period hidden">
             <label for="_subscription_notice_period_start"></label>
-			<?php esc_html_e( 'When the current cancelled period ends', 'reepay-subscriptions' ); ?> &nbsp<input
+			<?php esc_html_e( 'When the current cancelled period ends', 'reepay-subscriptions' ); ?> <input
                     type="radio"
                     id="_subscription_notice_period_start"
                     name="_reepay_subscription_notice_period_start<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                     value="true" <?php echo ! empty( $_reepay_subscription_notice_period_start ) ? checked( 'true', $_reepay_subscription_notice_period_start, false ) : ''; ?>/>
-            &nbsp&nbsp <?php esc_html_e( 'Immediately after cancellation', 'reepay-subscriptions' ); ?> &nbsp<input
+			<?php esc_html_e( 'Immediately after cancellation', 'reepay-subscriptions' ); ?> <input
                     type="radio"
                     id="_subscription_notice_period_start"
                     name="_reepay_subscription_notice_period_start<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
@@ -534,11 +534,11 @@ $variable = ! empty( $variable );
     <div class="options_group show_if_reepay_subscription billing_cycles_block">
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>">
             <label for="_subscription_billing_cycles"><?php esc_html_e( 'Billing Cycles', 'reepay-subscriptions' ); ?></label>
-			<?php esc_html_e( 'Auto Renew until cancelled', 'reepay-subscriptions' ); ?> &nbsp<input type="radio"
-                                                                                                     id="_subscription_billing_cycles" <?php echo esc_attr( $disabled ) ?>
-                                                                                                     name="_reepay_subscription_billing_cycles<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
-                                                                                                     value="false" <?php echo ! empty( $_reepay_subscription_billing_cycles ) ? checked( 'false', $_reepay_subscription_billing_cycles, false ) : ''; ?>/>
-            &nbsp&nbsp <?php esc_html_e( 'Fixed Number of billing cycles', 'reepay-subscriptions' ); ?> &nbsp<input
+			<?php esc_html_e( 'Auto Renew until cancelled', 'reepay-subscriptions' ); ?> <input type="radio"
+                                                                                                id="_subscription_billing_cycles" <?php echo esc_attr( $disabled ) ?>
+                                                                                                name="_reepay_subscription_billing_cycles<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
+                                                                                                value="false" <?php echo ! empty( $_reepay_subscription_billing_cycles ) ? checked( 'false', $_reepay_subscription_billing_cycles, false ) : ''; ?>/>
+			<?php esc_html_e( 'Fixed Number of billing cycles', 'reepay-subscriptions' ); ?> <input
                     type="radio"
                     id="_subscription_billing_cycles" <?php echo esc_attr( $disabled ) ?>
                     name="_reepay_subscription_billing_cycles<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
@@ -662,19 +662,19 @@ $variable = ! empty( $variable );
 	} ?>
     <div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
         <p class="form-field <?php echo $variable ? 'supersedes_block_variable"' : '' ?>">
-            <label for="_reepay_subscription_supersedes"><?php esc_html_e('Supersede mode', 'reepay-subscriptions'); ?></label>
-            <?php esc_html_e("Don't schedule subscription update", 'reepay-subscriptions'); ?>
-            <?php echo wc_help_tip(__('Using this, existing subscriptions will stay on the current version of the plan', 'reepay-subscriptions')); ?>
+            <label for="_reepay_subscription_supersedes"><?php esc_html_e( 'Supersede mode', 'reepay-subscriptions' ); ?></label>
+			<?php esc_html_e( "Don't schedule subscription update", 'reepay-subscriptions' ); ?>
+			<?php echo wc_help_tip( __( 'Using this, existing subscriptions will stay on the current version of the plan', 'reepay-subscriptions' ) ); ?>
             <input type="radio"
                    id="_reepay_subscription_supersedes" <?php echo $disabled ?>
                    name="_reepay_subscription_supersedes<?php echo $variable ? '[' . $loop . ']' : '' ?>"
-                   value="no_sub_update" <?php echo !empty($_reepay_subscription_supersedes) ? checked('no_sub_update', $_reepay_subscription_supersedes, false) : ''; ?>/>
-            &nbsp&nbsp <?php esc_html_e('Schedule subscription update', 'reepay-subscriptions'); ?>
-            <?php echo wc_help_tip(__('This will update all subscriptions to use the new version after the current billing period', 'reepay-subscriptions')); ?>
+                   value="no_sub_update" <?php echo ! empty( $_reepay_subscription_supersedes ) ? checked( 'no_sub_update', $_reepay_subscription_supersedes, false ) : ''; ?>/>
+			<?php esc_html_e( 'Schedule subscription update', 'reepay-subscriptions' ); ?>
+			<?php echo wc_help_tip( __( 'This will update all subscriptions to use the new version after the current billing period', 'reepay-subscriptions' ) ); ?>
             <input type="radio"
                    id="_reepay_subscription_supersedes" <?php echo $disabled ?>
                    name="_reepay_subscription_supersedes<?php echo $variable ? '[' . $loop . ']' : '' ?>"
-                   value="scheduled_sub_update" <?php echo !empty($_reepay_subscription_supersedes) ? checked('scheduled_sub_update', $_reepay_subscription_supersedes, false) : ''; ?>/>
+                   value="scheduled_sub_update" <?php echo ! empty( $_reepay_subscription_supersedes ) ? checked( 'scheduled_sub_update', $_reepay_subscription_supersedes, false ) : ''; ?>/>
         </p>
 
     </div>
