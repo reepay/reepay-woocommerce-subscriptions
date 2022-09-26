@@ -60,12 +60,53 @@ class WooCommerce_Reepay_Subscriptions
      */
     public static $rest_api_namespace = 'reepay_subscription';
 
+    /**
+     * @var <string, string>
+     */
     public static $compensation_methods = [
         'none' => 'None',
         'full_refund' => 'Full refund',
         'prorated_refund' => 'Prorated refund',
         'full_credit' => 'Full credit',
         'prorated_credit' => 'Prorated credit',
+    ];
+
+    /**
+     * @var <string>
+     */
+    public static $webhook_event_types = [
+        "subscription_reactivated",
+        "invoice_cancelled",
+        "subscription_on_hold_dunning",
+        "subscription_created",
+        "invoice_failed",
+        "subscription_renewal",
+        "invoice_dunning",
+        "subscription_on_hold",
+        "invoice_credited",
+        "subscription_changed",
+        "invoice_adjustment",
+        "invoice_created",
+        "subscription_cancelled",
+        "subscription_payment_method_changed",
+        "invoice_changed",
+        "invoice_dunning_cancelled",
+        "subscription_payment_method_added",
+        "subscription_trial_end",
+        "subscription_uncancelled",
+        "subscription_trial_end_reminder",
+        "customer_created",
+        "customer_payment_method_added",
+        "invoice_dunning_notification",
+        "invoice_reactivate",
+        "subscription_renewal_reminder",
+        "customer_changed",
+        "subscription_expired",
+        "subscription_expired_dunning",
+        "invoice_authorized",
+        "customer_deleted",
+        "invoice_settled",
+        "invoice_refund"
     ];
 
     /**
@@ -252,11 +293,33 @@ class WooCommerce_Reepay_Subscriptions
 
     public function update_settings()
     {
-        if ($_POST['_reepay_api_private_key'] !== static::settings('api_private_key')) {
-            WC_Reepay_Statistics::private_key_activated();
-        }
+	    if ( $_POST['_reepay_api_private_key'] !== static::settings( 'api_private_key' ) ) {
+		    WC_Reepay_Statistics::private_key_activated();
+	    }
 
-        woocommerce_update_options(static::get_settings());
+	    woocommerce_update_options( static::get_settings() );
+
+	    $this->enable_all_webhook_event_types();
+    }
+
+    public function enable_all_webhook_event_types()
+    {
+	    $webhook_settings = reepay_s()->api()->request( 'account/webhook_settings' );
+
+	    if ( count( $webhook_settings['event_types'] ) < count( static::$webhook_event_types ) ) {
+		    $webhook_settings['event_types'] = static::$webhook_event_types;
+
+		    try {
+			    reepay_s()->api()->request( 'account/webhook_settings', 'PUT', $webhook_settings );
+		    } catch ( Exception $e ) {
+			    reepay_s()->log()->log( [
+				    'source'  => 'WooCommerce_Reepay_Subscriptions::update_settings',
+				    'message' => 'Updating webhook settings',
+				    'request' => $webhook_settings,
+				    'error'   => $e
+			    ], 'error' );
+		    }
+	    }
     }
 
     public function get_settings()
