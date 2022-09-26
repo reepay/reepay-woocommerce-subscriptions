@@ -5,374 +5,367 @@
  *
  * @since 1.0.0
  */
-class WC_Reepay_Account_Page
-{
+class WC_Reepay_Account_Page {
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        add_action('init', [$this, 'init']);
-        add_action('template_redirect', [$this, 'check_action']);
-        add_action('woocommerce_account_subscriptions_endpoint', [$this, 'subscriptions_endpoint']);
-        add_filter('woocommerce_account_menu_items', [$this, 'add_subscriptions_menu_item']);
-        add_filter('woocommerce_get_query_vars', [$this, 'subscriptions_query_vars'], 0);
+	/**
+	 * Constructor
+	 */
+	public function __construct() {
+		add_action( 'init', [ $this, 'init' ] );
+		add_action( 'template_redirect', [ $this, 'check_action' ] );
+		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ] );
+		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
+		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
 
-        add_filter('woocommerce_reepay_payment_accept_url', [$this, 'add_subscription_arg']);
-        add_filter('woocommerce_reepay_payment_cancel_url', [$this, 'add_subscription_arg']);
-        add_action('woocommerce_reepay_payment_method_added', [$this, 'payment_method_added']);
-        add_filter('woocommerce_endpoint_subscriptions_title', [$this, 'get_title']);
-    }
+		add_filter( 'woocommerce_reepay_payment_accept_url', [ $this, 'add_subscription_arg' ] );
+		add_filter( 'woocommerce_reepay_payment_cancel_url', [ $this, 'add_subscription_arg' ] );
+		add_action( 'woocommerce_reepay_payment_method_added', [ $this, 'payment_method_added' ] );
+		add_filter( 'woocommerce_endpoint_subscriptions_title', [ $this, 'get_title' ] );
+	}
 
-    public function add_subscription_arg($url)
-    {
-        if ($_GET['reepay_subscription']) {
-            return sanitize_url(add_query_arg('reepay_subscription', $_GET['reepay_subscription'], $url));
-        }
-        return $url;
-    }
+	public function add_subscription_arg( $url ) {
+		if ( $_GET['reepay_subscription'] ) {
+			return sanitize_url( add_query_arg( 'reepay_subscription', $_GET['reepay_subscription'], $url ) );
+		}
 
-    public function payment_method_added(WC_Payment_Token $token)
-    {
-        $handle = sanitize_text_field($_GET['reepay_subscription']) ?? '';
-        if (!empty($handle)) {
-            try {
-                $payment_methods = reepay_s()->api()->request('subscription/' . $handle . '/pm', 'POST', [
-                    'source' => $token->get_token(),
-                ]);
-                set_transient($handle . '_payment_methods', $payment_methods);
-                wc_add_notice(__('Payment method successfully added.', reepay_s()->settings('domain')));
-            } catch (Exception $exception) {
-                wc_add_notice($exception->getMessage());
-            }
-        }
-        wp_redirect(wc_get_account_endpoint_url('subscriptions'));
-        exit;
-    }
+		return $url;
+	}
 
-    public function init()
-    {
-        $this->rewrite_endpoint();
-    }
+	public function payment_method_added( WC_Payment_Token $token ) {
+		$handle = sanitize_text_field( $_GET['reepay_subscription'] ) ?? '';
+		if ( ! empty( $handle ) ) {
+			try {
+				$payment_methods = reepay_s()->api()->request( 'subscription/' . $handle . '/pm', 'POST', [
+					'source' => $token->get_token(),
+				] );
+				set_transient( $handle . '_payment_methods', $payment_methods );
+				wc_add_notice( __( 'Payment method successfully added.', 'reepay-subscriptions' ) );
+			} catch ( Exception $exception ) {
+				wc_add_notice( $exception->getMessage() );
+			}
+		}
+		wp_redirect( wc_get_account_endpoint_url( 'subscriptions' ) );
+		exit;
+	}
 
-    public function rewrite_endpoint()
-    {
-        add_rewrite_endpoint('subscriptions', EP_ROOT | EP_PAGES);
-    }
+	public function init() {
+		$this->rewrite_endpoint();
+	}
 
-    /**
-     * Verify subscription belongs to customer
-     * @param $handle
-     * @return mixed|WC_Order|null
-     */
-    public function get_customer_subscription_by_handle($handle)
-    {
-        $order = wc_get_orders([
-                'meta_key' => '_reepay_subscription_handle',
-                'meta_value' => $handle,
-            ])[0] ?? null;
-        if ($order && $order->get_customer_id() === get_current_user_id()) {
-            return $order;
-        }
-        return null;
-    }
+	public function rewrite_endpoint() {
+		add_rewrite_endpoint( 'subscriptions', EP_ROOT | EP_PAGES );
+	}
 
-    public function check_action()
-    {
+	/**
+	 * Verify subscription belongs to customer
+	 *
+	 * @param $handle
+	 *
+	 * @return mixed|WC_Order|null
+	 */
+	public function get_customer_subscription_by_handle( $handle ) {
+		$order = wc_get_orders( [
+				'meta_key'   => '_reepay_subscription_handle',
+				'meta_value' => $handle,
+			] )[0] ?? null;
+		if ( $order && $order->get_customer_id() === get_current_user_id() ) {
+			return $order;
+		}
 
-        if (!empty($_GET['cancel_subscription'])) {
-            if (!reepay_s()->settings('_reepay_enable_cancel')) {
-                return;
-            }
+		return null;
+	}
 
-            $handle = sanitize_text_field($_GET['cancel_subscription']);
-            $handle = urlencode($handle);
+	public function check_action() {
 
-            $order = wc_get_orders([
-                    'meta_key' => '_reepay_subscription_handle',
-                    'meta_value' => $handle,
-                ])[0] ?? null;
+		if ( ! empty( $_GET['cancel_subscription'] ) ) {
+			if ( ! reepay_s()->settings( '_reepay_enable_cancel' ) ) {
+				return;
+			}
 
-            if ($order && $order->get_customer_id() === get_current_user_id()) {
-                try {
-                    $result = reepay_s()->api()->request("subscription/{$handle}/cancel", 'POST');
-                } catch (Exception $exception) {
-                    wc_add_notice($exception->getMessage(), 'error');
-                }
-            } else {
-                wc_add_notice('Permission denied', 'error');
-            }
+			$handle = sanitize_text_field( $_GET['cancel_subscription'] );
+			$handle = urlencode( $handle );
 
-            wp_redirect(wc_get_endpoint_url('subscriptions'));
-            exit;
-        }
+			$order = wc_get_orders( [
+					'meta_key'   => '_reepay_subscription_handle',
+					'meta_value' => $handle,
+				] )[0] ?? null;
+
+			if ( $order && $order->get_customer_id() === get_current_user_id() ) {
+				try {
+					$result = reepay_s()->api()->request( "subscription/{$handle}/cancel", 'POST' );
+				} catch ( Exception $exception ) {
+					wc_add_notice( $exception->getMessage(), 'error' );
+				}
+			} else {
+				wc_add_notice( 'Permission denied', 'error' );
+			}
+
+			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			exit;
+		}
 
 
-        if (!empty($_GET['uncancel_subscription'])) {
+		if ( ! empty( $_GET['uncancel_subscription'] ) ) {
 
-            $handle = sanitize_text_field($_GET['uncancel_subscription']);
-            $handle = urlencode($handle);
+			$handle = sanitize_text_field( $_GET['uncancel_subscription'] );
+			$handle = urlencode( $handle );
 
-            $order = wc_get_orders([
-                    'meta_key' => '_reepay_subscription_handle',
-                    'meta_value' => $handle,
-                ])[0] ?? null;
-
-
-            if ($order && $order->get_customer_id() === get_current_user_id()) {
-                try {
-                    $result = reepay_s()->api()->request("subscription/{$handle}/uncancel", 'POST');
-                } catch (Exception $exception) {
-                    wc_add_notice($exception->getMessage(), 'error');
-                }
-            } else {
-                wc_add_notice('Permission denied', 'error');
-            }
-
-            wp_redirect(wc_get_endpoint_url('subscriptions'));
-            exit;
-        }
-
-        if (!empty($_GET['put_on_hold'])) {
-            if (!reepay_s()->settings('_reepay_enable_on_hold')) {
-                return;
-            }
-            $handle = sanitize_text_field($_GET['put_on_hold']);
-            $handle = urlencode($handle);
-
-            $order = wc_get_orders([
-                    'meta_key' => '_reepay_subscription_handle',
-                    'meta_value' => $handle,
-                ])[0] ?? null;
+			$order = wc_get_orders( [
+					'meta_key'   => '_reepay_subscription_handle',
+					'meta_value' => $handle,
+				] )[0] ?? null;
 
 
-            if ($order && $order->get_customer_id() === get_current_user_id()) {
-                $compensation_method = reepay_s()->settings('_reepay_on_hold_compensation_method');
+			if ( $order && $order->get_customer_id() === get_current_user_id() ) {
+				try {
+					$result = reepay_s()->api()->request( "subscription/{$handle}/uncancel", 'POST' );
+				} catch ( Exception $exception ) {
+					wc_add_notice( $exception->getMessage(), 'error' );
+				}
+			} else {
+				wc_add_notice( 'Permission denied', 'error' );
+			}
 
-                $params = [
-                    "compensation_method" => $compensation_method,
-                ];
+			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			exit;
+		}
 
-                try {
-                    $result = reepay_s()->api()->request("subscription/{$handle}/on_hold", 'POST', $params);
-                } catch (Exception $e) {
-                    wc_add_notice($e->getMessage(), 'error');
-                }
-            } else {
-                wc_add_notice('Permission denied', 'error');
-            }
+		if ( ! empty( $_GET['put_on_hold'] ) ) {
+			if ( ! reepay_s()->settings( '_reepay_enable_on_hold' ) ) {
+				return;
+			}
+			$handle = sanitize_text_field( $_GET['put_on_hold'] );
+			$handle = urlencode( $handle );
+
+			$order = wc_get_orders( [
+					'meta_key'   => '_reepay_subscription_handle',
+					'meta_value' => $handle,
+				] )[0] ?? null;
 
 
-            wp_redirect(wc_get_endpoint_url('subscriptions'));
-            exit;
-        }
+			if ( $order && $order->get_customer_id() === get_current_user_id() ) {
+				$compensation_method = reepay_s()->settings( '_reepay_on_hold_compensation_method' );
 
-        if (!empty($_GET['reactivate'])) {
-            $handle = sanitize_text_field($_GET['reactivate']);
-            $handle = urlencode($handle);
+				$params = [
+					"compensation_method" => $compensation_method,
+				];
 
-            $order = wc_get_orders([
-                    'meta_key' => '_reepay_subscription_handle',
-                    'meta_value' => $handle,
-                ])[0] ?? null;
+				try {
+					$result = reepay_s()->api()->request( "subscription/{$handle}/on_hold", 'POST', $params );
+				} catch ( Exception $e ) {
+					wc_add_notice( $e->getMessage(), 'error' );
+				}
+			} else {
+				wc_add_notice( 'Permission denied', 'error' );
+			}
 
-            if ($order && $order->get_customer_id() === get_current_user_id()) {
-                try {
-                    $result = reepay_s()->api()->request("subscription/{$handle}/reactivate", 'POST');
-                } catch (Exception $e) {
-                    wc_add_notice($e->getMessage());
-                }
-            } else {
-                wc_add_notice('Permission denied', 'error');
-            }
-            wp_redirect(wc_get_endpoint_url('subscriptions'));
-            exit;
-        }
 
-        if (!empty($_GET['change_payment_method'])) {
-            $handle = sanitize_text_field($_GET['change_payment_method']);
-            $token_id = intval($_GET['token_id']);
-            $token = WC_Payment_Tokens::get($token_id);
-            $handle = urlencode($handle);
+			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			exit;
+		}
 
-            $order = wc_get_orders([
-                    'meta_key' => '_reepay_subscription_handle',
-                    'meta_value' => $handle,
-                ])[0] ?? null;
+		if ( ! empty( $_GET['reactivate'] ) ) {
+			$handle = sanitize_text_field( $_GET['reactivate'] );
+			$handle = urlencode( $handle );
 
-            $params = [
-                'source' => $token->get_token(),
-            ];
+			$order = wc_get_orders( [
+					'meta_key'   => '_reepay_subscription_handle',
+					'meta_value' => $handle,
+				] )[0] ?? null;
 
-            if ($order && $order->get_customer_id() === get_current_user_id()) {
-                try {
-                    $payment_methods = reepay_s()->api()->request("subscription/{$handle}/pm", 'POST', $params);
-                    set_transient($handle . '_payment_methods', $payment_methods);
-                } catch (Exception $e) {
-                    wc_add_notice($e->getMessage());
-                }
-            } else {
-                wc_add_notice('Permission denied', 'error');
-            }
-            wp_redirect(wc_get_endpoint_url('subscriptions'));
-            exit;
-        }
-    }
+			if ( $order && $order->get_customer_id() === get_current_user_id() ) {
+				try {
+					$result = reepay_s()->api()->request( "subscription/{$handle}/reactivate", 'POST' );
+				} catch ( Exception $e ) {
+					wc_add_notice( $e->getMessage() );
+				}
+			} else {
+				wc_add_notice( 'Permission denied', 'error' );
+			}
+			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			exit;
+		}
 
-    public function subscriptions_query_vars($endpoints)
-    {
-        $endpoints['subscriptions'] = 'subscriptions';
-        return $endpoints;
-    }
+		if ( ! empty( $_GET['change_payment_method'] ) ) {
+			$handle   = sanitize_text_field( $_GET['change_payment_method'] );
+			$token_id = intval( $_GET['token_id'] );
+			$token    = WC_Payment_Tokens::get( $token_id );
+			$handle   = urlencode( $handle );
 
-    public function get_title()
-    {
-        return __("Subscriptions", reepay_s()->settings('domain'));
-    }
+			$order = wc_get_orders( [
+					'meta_key'   => '_reepay_subscription_handle',
+					'meta_value' => $handle,
+				] )[0] ?? null;
 
-    public function subscriptions_endpoint($next_page_token = '')
-    {
+			$params = [
+				'source' => $token->get_token(),
+			];
 
-        $customer = 'customer-' . get_current_user_id();
+			if ( $order && $order->get_customer_id() === get_current_user_id() ) {
+				try {
+					$payment_methods = reepay_s()->api()->request( "subscription/{$handle}/pm", 'POST', $params );
+					set_transient( $handle . '_payment_methods', $payment_methods );
+				} catch ( Exception $e ) {
+					wc_add_notice( $e->getMessage() );
+				}
+			} else {
+				wc_add_notice( 'Permission denied', 'error' );
+			}
+			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			exit;
+		}
+	}
 
-        $subscriptionsParams = [
-            'size' => 10,
-            'customer' => $customer,
-        ];
+	public function subscriptions_query_vars( $endpoints ) {
+		$endpoints['subscriptions'] = 'subscriptions';
 
-        if (!empty($next_page_token)) {
-            $subscriptionsParams['next_page_token'] = $next_page_token;
-        }
+		return $endpoints;
+	}
 
-        $subsResult = reepay_s()->api()->request("list/subscription?" . http_build_query($subscriptionsParams));
-        $planResult = reepay_s()->api()->request("plan");
-        $plans = [];
+	public function get_title() {
+		return __( "Subscriptions", 'reepay-subscriptions' );
+	}
 
-        foreach ($planResult as $item) {
-            $plans[$item['handle']] = $item;
-        }
+	public function subscriptions_endpoint( $next_page_token = '' ) {
 
-        $subscriptions = $subsResult['content'];
+		$customer = 'customer-' . get_current_user_id();
 
-        $subscriptionsArr = [];
+		$subscriptionsParams = [
+			'size'     => 10,
+			'customer' => $customer,
+		];
 
-        foreach ($subscriptions as $subscription) {
-            $payment_methods = get_transient($subscription['handle'] . '_payment_methods');
-            if (!$payment_methods) {
-                $payment_methods = reepay_s()->api()->request("subscription/" . $subscription['handle'] . "/pm");
-                set_transient($subscription['handle'] . '_payment_methods', $payment_methods);
-            }
-            $plan = WC_Reepay_Subscription_Plan_Simple::wc_get_plan($subscription['plan']);
-            $subscriptionsArr[] = [
-                'state' => $subscription['state'],
-                'handle' => $subscription['handle'],
-                'is_cancelled' => $subscription['is_cancelled'],
-                'renewing' => $subscription['renewing'],
-                'first_period_start' => $subscription['first_period_start'],
-                'formatted_first_period_start' => $this->format_date($subscription['first_period_start']),
-                'current_period_start' => $subscription['current_period_start'] ?? null,
-                'formatted_current_period_start' => $this->format_date($subscription['current_period_start'] ?? null),
-                'next_period_start' => $subscription['next_period_start'] ?? null,
-                'formatted_next_period_start' => $this->format_date($subscription['next_period_start'] ?? null),
-                'expired_date' => $subscription['expired_date'] ?? null,
-                'formatted_expired_date' => $this->format_date($subscription['expired_date'] ?? null),
-                'formatted_status' => $this->get_status($subscription),
-                'formatted_schedule' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan($plan),
-                'payment_methods' => $payment_methods,
-                'plan' => $subscription['plan']
-            ];
-        }
-        $previous_token = get_transient($next_page_token . '_previous_token');
-        if ($previous_token === false) {
-            set_transient($subsResult['next_page_token'] . '_previous_token', $next_page_token);
-            $previous_token = '';
-        }
-        wc_get_template(
-            'my-account/subscriptions.php',
-            [
-                'subscriptions' => $subscriptionsArr,
-                'plans' => $plans,
-                'domain' => reepay_s()->settings('domain'),
-                'current_token' => $next_page_token,
-                'previous_token' => $previous_token,
-                'next_page_token' => $subsResult['next_page_token'] ?? ''
-            ],
-            '',
-            reepay_s()->settings('plugin_path') . 'templates/'
-        );
-    }
+		if ( ! empty( $next_page_token ) ) {
+			$subscriptionsParams['next_page_token'] = $next_page_token;
+		}
 
-    public function add_subscriptions_menu_item($menu_items)
-    {
-        $returnArr = [];
-        foreach ($menu_items as $key => $menu_item) {
-            $returnArr[$key] = $menu_item;
-            if ($key === 'orders') {
-                $returnArr["subscriptions"] = $this->get_title();
-            }
-        }
-        return $returnArr;
-    }
+		$subsResult = reepay_s()->api()->request( "list/subscription?" . http_build_query( $subscriptionsParams ) );
+		$planResult = reepay_s()->api()->request( "plan" );
+		$plans      = [];
 
-    function get_status($subscription)
-    {
-        if ($subscription['is_cancelled'] === true) {
-            return 'Cancelled';
-        }
-        if ($subscription['state'] === 'expired') {
-            return 'Expired';
-        }
+		foreach ( $planResult as $item ) {
+			$plans[ $item['handle'] ] = $item;
+		}
 
-        if ($subscription['state'] === 'on_hold') {
-            return 'On hold';
-        }
+		$subscriptions = $subsResult['content'];
 
-        if ($subscription['state'] === 'is_cancelled') {
-            return 'Cancelled';
-        }
+		$subscriptionsArr = [];
 
-        if ($subscription['state'] === 'active') {
-            if (isset($subscription['trial_end'])) {
-                $now = new DateTime();
-                $trial_end = new DateTime($subscription['trial_end']);
-                if ($trial_end > $now) {
-                    return 'Trial';
-                }
-            }
-            return 'Active';
-        }
+		foreach ( $subscriptions as $subscription ) {
+			$payment_methods = get_transient( $subscription['handle'] . '_payment_methods' );
+			if ( ! $payment_methods ) {
+				$payment_methods = reepay_s()->api()->request( "subscription/" . $subscription['handle'] . "/pm" );
+				set_transient( $subscription['handle'] . '_payment_methods', $payment_methods );
+			}
+			$plan               = WC_Reepay_Subscription_Plan_Simple::wc_get_plan( $subscription['plan'] );
+			$subscriptionsArr[] = [
+				'state'                          => $subscription['state'],
+				'handle'                         => $subscription['handle'],
+				'is_cancelled'                   => $subscription['is_cancelled'],
+				'renewing'                       => $subscription['renewing'],
+				'first_period_start'             => $subscription['first_period_start'],
+				'formatted_first_period_start'   => $this->format_date( $subscription['first_period_start'] ),
+				'current_period_start'           => $subscription['current_period_start'] ?? null,
+				'formatted_current_period_start' => $this->format_date( $subscription['current_period_start'] ?? null ),
+				'next_period_start'              => $subscription['next_period_start'] ?? null,
+				'formatted_next_period_start'    => $this->format_date( $subscription['next_period_start'] ?? null ),
+				'expired_date'                   => $subscription['expired_date'] ?? null,
+				'formatted_expired_date'         => $this->format_date( $subscription['expired_date'] ?? null ),
+				'formatted_status'               => $this->get_status( $subscription ),
+				'formatted_schedule'             => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $plan ),
+				'payment_methods'                => $payment_methods,
+				'plan'                           => $subscription['plan']
+			];
+		}
+		$previous_token = get_transient( $next_page_token . '_previous_token' );
+		if ( $previous_token === false ) {
+			set_transient( $subsResult['next_page_token'] . '_previous_token', $next_page_token );
+			$previous_token = '';
+		}
+		wc_get_template(
+			'my-account/subscriptions.php',
+			[
+				'subscriptions'   => $subscriptionsArr,
+				'plans'           => $plans,
+				'domain'          => 'reepay-subscriptions',
+				'current_token'   => $next_page_token,
+				'previous_token'  => $previous_token,
+				'next_page_token' => $subsResult['next_page_token'] ?? ''
+			],
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+	}
 
-        return $subscription['state'];
-    }
+	public function add_subscriptions_menu_item( $menu_items ) {
+		$returnArr = [];
+		foreach ( $menu_items as $key => $menu_item ) {
+			$returnArr[ $key ] = $menu_item;
+			if ( $key === 'orders' ) {
+				$returnArr["subscriptions"] = $this->get_title();
+			}
+		}
 
-    public function get_formatted_schedule_type($plan)
-    {
-        if ($plan['schedule_type'] === 'manual') {
-            return 'Manual';
-        }
-        if ($plan['schedule_type'] === 'daily') {
-            return 'Every day';
-        }
-        if ($plan['schedule_type'] === 'weekly_fixedday') {
-            return 'Weekly fixedday';
-        }
-        if ($plan['schedule_type'] === 'month_startdate') {
-            return 'Month startdate';
-        }
-        if ($plan['schedule_type'] === 'month_fixedday') {
-            return 'Month fixedday';
-        }
-        if ($plan['schedule_type'] === 'month_lastday') {
-            return 'Month lastdate';
-        }
-        return $plan['schedule_type'];
-    }
+		return $returnArr;
+	}
 
-    function format_date($dateStr)
-    {
-        if (!empty($dateStr)) {
-            return (new DateTime($dateStr))->format('d M Y');
-        }
-    }
+	function get_status( $subscription ) {
+		if ( $subscription['is_cancelled'] === true ) {
+			return 'Cancelled';
+		}
+		if ( $subscription['state'] === 'expired' ) {
+			return 'Expired';
+		}
+
+		if ( $subscription['state'] === 'on_hold' ) {
+			return 'On hold';
+		}
+
+		if ( $subscription['state'] === 'is_cancelled' ) {
+			return 'Cancelled';
+		}
+
+		if ( $subscription['state'] === 'active' ) {
+			if ( isset( $subscription['trial_end'] ) ) {
+				$now       = new DateTime();
+				$trial_end = new DateTime( $subscription['trial_end'] );
+				if ( $trial_end > $now ) {
+					return 'Trial';
+				}
+			}
+
+			return 'Active';
+		}
+
+		return $subscription['state'];
+	}
+
+	public function get_formatted_schedule_type( $plan ) {
+		if ( $plan['schedule_type'] === 'manual' ) {
+			return 'Manual';
+		}
+		if ( $plan['schedule_type'] === 'daily' ) {
+			return 'Every day';
+		}
+		if ( $plan['schedule_type'] === 'weekly_fixedday' ) {
+			return 'Weekly fixedday';
+		}
+		if ( $plan['schedule_type'] === 'month_startdate' ) {
+			return 'Month startdate';
+		}
+		if ( $plan['schedule_type'] === 'month_fixedday' ) {
+			return 'Month fixedday';
+		}
+		if ( $plan['schedule_type'] === 'month_lastday' ) {
+			return 'Month lastdate';
+		}
+
+		return $plan['schedule_type'];
+	}
+
+	function format_date( $dateStr ) {
+		if ( ! empty( $dateStr ) ) {
+			return ( new DateTime( $dateStr ) )->format( 'd M Y' );
+		}
+	}
 }

@@ -1,41 +1,41 @@
 <?php
 ?>
 <div id="product_addons_data" class="panel woocommerce_options_panel wc-metaboxes-wrapper">
-    <?php do_action('woocommerce-product-addons_panel_start'); ?>
+	<?php do_action( 'woocommerce-product-addons_panel_start' ); ?>
 
     <p class="woocommerce-product-add-ons-toolbar woocommerce-product-add-ons-toolbar--open-close toolbar">
-        <a href="#" class="close_all"><?php _e('Close all', $domain); ?></a> / <a href="#"
-                                                                                  class="expand_all"><?php _e('Expand all', $domain); ?></a>
+        <a href="#" class="close_all"><?php _e( 'Close all', 'reepay-subscriptions' ); ?></a> / <a href="#"
+                                                                                                   class="expand_all"><?php _e( 'Expand all', 'reepay-subscriptions' ); ?></a>
     </p>
 
     <div class="woocommerce_product_addons wc-metaboxes">
 
-        <?php
-        $loop = 0;
+		<?php
+		$loop = 0;
 
-        foreach ($product_addons as $addon) {
-            wc_get_template(
-                'admin-addon-single.php',
-                array(
-                    'addon' => $addon,
-                    'loop' => $loop,
-                    'domain' => $domain,
-                    'addons_list' => $addons_list['content']
-                ),
-                '',
-                reepay_s()->settings('plugin_path') . 'templates/'
-            );
+		foreach ( $product_addons as $addon ) {
+			wc_get_template(
+				'admin-addon-single.php',
+				array(
+					'addon'       => $addon,
+					'loop'        => $loop,
+					'domain'      => 'reepay-subscriptions',
+					'addons_list' => $addons_list['content']
+				),
+				'',
+				reepay_s()->settings( 'plugin_path' ) . 'templates/'
+			);
 
-            $loop++;
-        }
-        ?>
+			$loop ++;
+		}
+		?>
 
     </div>
 
     <div class="woocommerce-product-add-ons-toolbar woocommerce-product-add-ons-toolbar--add-import-export toolbar">
         <button type="submit"
-                class="button button-primary save-addons-button hidden"><?php _e('Save changes', $domain); ?></button>
-        <button type="button" class="button add_new_addon"><?php _e('New add-on', $domain); ?></button>
+                class="button button-primary save-addons-button hidden"><?php _e( 'Save changes', 'reepay-subscriptions' ); ?></button>
+        <button type="button" class="button add_new_addon"><?php _e( 'New add-on', 'reepay-subscriptions' ); ?></button>
     </div>
 
 </div>
@@ -71,34 +71,34 @@
                 }
 
                 let html = '<?php
-                    ob_start();
+					ob_start();
 
-                    $addon['name'] = '';
-                    $addon['handle'] = '';
-                    $addon['description'] = '';
-                    $addon['type'] = 'on-off';
-                    $addon['amount'] = '';
-                    $addon['avai'] = '';
-                    $addon['vat'] = 25;
-                    $addon['vat_type'] = 'include';
+					$addon['name'] = '';
+					$addon['handle'] = '';
+					$addon['description'] = '';
+					$addon['type'] = 'on-off';
+					$addon['amount'] = '';
+					$addon['avai'] = '';
+					$addon['vat'] = 25;
+					$addon['vat_type'] = 'include';
 
-                    $loop = "{loop}";
+					$loop = "{loop}";
 
-                    wc_get_template(
-                        'admin-addon-single.php',
-                        array(
-                            'addon' => $addon,
-                            'loop' => $loop,
-                            'domain' => $domain,
-                            'addons_list' => $addons_list['content']
-                        ),
-                        '',
-                        reepay_s()->settings('plugin_path') . 'templates/'
-                    );
+					wc_get_template(
+						'admin-addon-single.php',
+						array(
+							'addon'       => $addon,
+							'loop'        => $loop,
+							'domain'      => 'reepay-subscriptions',
+							'addons_list' => $addons_list['content']
+						),
+						'',
+						reepay_s()->settings( 'plugin_path' ) . 'templates/'
+					);
 
-                    $html = ob_get_clean();
-                    echo str_replace(array("\n", "\r"), '', str_replace("'", '"', $html));
-                    ?>';
+					$html = ob_get_clean();
+					echo str_replace( array( "\n", "\r" ), '', str_replace( "'", '"', $html ) );
+					?>';
 
                 html = html.replace(/{loop}/g, loop);
 
@@ -109,7 +109,7 @@
                 return false;
             })
             .on('click', '.remove_addon', function () {
-                const answer = confirm('<?php _e('Are you sure you want remove this add-on?', $domain); ?>');
+                const answer = confirm('<?php _e( 'Are you sure you want remove this add-on?', 'reepay-subscriptions' ); ?>');
 
                 if (answer) {
                     var addon = $(this).closest('.woocommerce_product_addon');
@@ -132,7 +132,7 @@
                 $container.html('');
 
                 $.ajax({
-                    url: '<?php echo get_rest_url(0, reepay_s()->settings('rest_api_namespace') . "/addon/") . '?product_id=' . (intval($_GET['post']) ?? 0) ?>' + `&handle=${handle}`,
+                    url: '<?php echo get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . '?product_id=' . ( intval( $_GET['post'] ) ?? 0 ) ?>' + `&handle=${handle}`,
                     method: 'GET',
                     beforeSend: function (xhr) {
 
