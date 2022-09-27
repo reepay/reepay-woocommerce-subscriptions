@@ -903,22 +903,26 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 * @return string
 	 */
 	public static function get_billing_plan( $product, $is_short = false ) {
-		$type      = $product->get_meta( '_reepay_subscription_schedule_type' );
-		$type_data = $product->get_meta( '_reepay_subscription_' . $type );
-		$interval  = self::get_interval( $product->get_id(), $type, $type_data );
+		if ( $product ) {
+			$type      = $product->get_meta( '_reepay_subscription_schedule_type' );
+			$type_data = $product->get_meta( '_reepay_subscription_' . $type );
+			$interval  = self::get_interval( $product->get_id(), $type, $type_data );
 
-		$types_info = $is_short ? self::$types_info_short : self::$types_info;
+			$types_info = $is_short ? self::$types_info_short : self::$types_info;
 
-		$type_str = $types_info[ $interval > 1 ? $type . '_multiple' : $type ] ?? $types_info[ $type ] ?? '';
-		$ret      = '';
-		if ( ! empty( $type_str ) ) {
-			$ret = sprintf(
-				__( $type_str, 'reepay-subscriptions' ),
-				$interval
-			);
+			$type_str = $types_info[ $interval > 1 ? $type . '_multiple' : $type ] ?? $types_info[ $type ] ?? '';
+			$ret      = '';
+			if ( ! empty( $type_str ) ) {
+				$ret = sprintf(
+					__( $type_str, 'reepay-subscriptions' ),
+					$interval
+				);
+			}
+
+			return $ret;
 		}
 
-		return $ret;
+		return '';
 	}
 
 	/**
