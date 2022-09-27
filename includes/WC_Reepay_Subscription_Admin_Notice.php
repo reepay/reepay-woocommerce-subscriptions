@@ -108,7 +108,8 @@ class WC_Reepay_Subscription_Admin_Notice {
 				'message' => $notice
 			);
 		} else {
-			$reloaded = get_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
+			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle', true );
+			$reloaded   = get_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
 
 			if ( empty( $reloaded ) ) {
 				$order = wc_get_order( $order_id );
@@ -117,6 +118,21 @@ class WC_Reepay_Subscription_Admin_Notice {
 						'state' => 'reload',
 					);
 					update_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
+				}
+			} elseif ( ! empty( $sub_handle ) ) {
+				try {
+					$sub = reepay_s()->api()->request( "subscription/{$sub_handle}" );
+					if ( $sub['in_trial'] ) {
+						$ret = array(
+							'state'   => 'paid',
+							'message' => 'Subscription is activated in trial'
+						);
+					}
+				} catch ( Exception $exception ) {
+					$ret = array(
+						'state'   => 'failed',
+						'message' => $exception->getMessage()
+					);
 				}
 			}
 		}
