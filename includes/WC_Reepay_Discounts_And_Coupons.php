@@ -67,7 +67,7 @@ class WC_Reepay_Discounts_And_Coupons {
 			if ( $type === 'reepay_percentage' ) {
 				$params['percentage'] = $amount;
 			} else if ( $type === 'reepay_fixed_product' ) {
-				$params['amount'] = $amount;
+				$params['amount'] = $amount * 100;
 			}
 		}
 
@@ -158,18 +158,6 @@ class WC_Reepay_Discounts_And_Coupons {
 	function create_discount( WC_Coupon $coupon, $data ) {
 
 		$params = $this->get_discount_default_params( $coupon );
-
-		$type = get_post_meta( $coupon->get_id(), '_reepay_discount_type', true );
-
-		$amount = $coupon->get_amount();
-
-		if ( $amount >= 1 ) {
-			if ( $type === 'reepay_percentage' ) {
-				$params['percentage'] = $amount;
-			} else if ( $type === 'reepay_fixed_product' ) {
-				$params['amount'] = $amount;
-			}
-		}
 
 		$post_id       = $coupon->get_id();
 		$apply_items   = array_map( 'sanitize_text_field', $data['_reepay_discount_apply_to_items'] ?? [ 'all' ] );
