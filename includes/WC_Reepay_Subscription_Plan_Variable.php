@@ -1,6 +1,8 @@
 <?php
 
 class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_Simple {
+    public static $frontend_template = 'plan-subscription-frontend-variable.php';
+
 	public $loop = 0;
 
 	public function create_subscription_product_class() {
@@ -22,10 +24,11 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	protected function register_actions() {
-		add_action( "woocommerce_reepay_variable_subscriptions_add_to_cart", array( $this, 'add_to_cart' ) );
-		add_action( 'woocommerce_variation_options_pricing', array( $this, 'add_custom_field_to_variations' ), 10, 3 );
-		add_action( 'woocommerce_save_product_variation', array( $this, 'save_subscription_meta' ), 10, 2 );
-		add_filter( 'woocommerce_add_to_cart_handler', array( $this, 'variable_add_to_cart_fix' ), 10, 2 );
+		add_action( "woocommerce_reepay_variable_subscriptions_add_to_cart", [ $this, 'add_to_cart' ] );
+		add_action( 'woocommerce_variation_options_pricing', [ $this, 'add_custom_field_to_variations' ], 10, 3 );
+		add_action( 'woocommerce_save_product_variation', [ $this, 'save_subscription_meta' ], 10, 2 );
+		add_filter( 'woocommerce_add_to_cart_handler', [ $this, 'variable_add_to_cart_fix' ], 10, 2 );
+		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts' ] );
 	}
 
 	public function variable_add_to_cart_fix( $type, $adding_to_cart ) {
@@ -125,7 +128,45 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		return $plan_data;
 	}
 
+	public function register_scripts() {
+		wp_register_script( 'reepay-variable-product',
+			reepay_s()->settings( 'plugin_url' ) . 'assets/js/product-variable.js',
+			[ 'jquery' ],
+			reepay_s()->settings( 'version' ),
+			true
+		);
+	}
+
+	/**
+	 * @param  WC_Product  $product
+	 */
+	public function enqueue_variable_product_script( $product ) {
+		$variable_template         = static::$frontend_template;
+		static::$frontend_template = parent::$frontend_template;
+
+		$variations_info = [];
+
+		foreach ( $product->get_children() as $variation_id ) {
+			$variation_product                = wc_get_product( $variation_id );
+			$variations_info[ $variation_id ] = $this->get_subscription_info_html( $variation_product );
+		}
+
+		static::$frontend_template = $variable_template;
+
+		wp_enqueue_script( 'reepay-variable-product' );
+		wp_localize_script(
+			'reepay-variable-product',
+			'reepay_variable_product_info',
+			$variations_info
+		);
+	}
+
 	public function add_to_cart() {
+		$product = wc_get_product();
+
+		echo $this->get_subscription_info_html( $product );
 		do_action( 'woocommerce_variable_add_to_cart' );
+
+		$this->enqueue_variable_product_script( $product );
 	}
 }

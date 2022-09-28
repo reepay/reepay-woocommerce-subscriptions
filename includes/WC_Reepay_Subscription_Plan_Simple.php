@@ -111,6 +111,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 		'_reepay_subscription_fee',
 	];
 
+    /**
+     * @var string
+     */
+	public static $frontend_template = 'plan-subscription-frontend.php';
+
 	/**
 	 * Constructor
 	 */
@@ -170,7 +175,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 	public function checkout_subscription_info( $name, $cart_item, $cart_item_key ) {
 		if ( ! empty( $cart_item['data'] ) && WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
-			$name = $name . $this->get_subscription_info_frontend( $cart_item['data'], true );
+			$name = $name . $this->get_subscription_info_html( $cart_item['data'], true );
 		}
 
 		return $name;
@@ -178,7 +183,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 	public function admin_order_subscription_info( $item_id, $item, $product ) {
 		if ( ! empty( $product ) && WC_Reepay_Checkout::is_reepay_product( $product ) ) {
-			echo $this->get_subscription_info_frontend( $product );
+			echo $this->get_subscription_info_html( $product );
 		}
 	}
 
@@ -208,6 +213,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 */
 	public function format_price( $price, $product ) {
 		$product = wc_get_product( $product['variation_id'] ?: $product['product_id'] );
+
 		if ( empty( $product ) || ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 			return $price;
 		}
@@ -221,7 +227,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	}
 
 	public function add_to_cart() {
-		$this->display_subscription_info();
+		echo $this->get_subscription_info_html( wc_get_product() );
 		do_action( 'woocommerce_simple_add_to_cart' );
 	}
 
@@ -233,23 +239,18 @@ class WC_Reepay_Subscription_Plan_Simple {
 		update_post_meta( $post_id, '_sold_individually', 'no' );
 	}
 
-	public function display_subscription_info() {
-		global $product;
-		echo $this->get_subscription_info_frontend( $product );
-	}
-
-	public function get_subscription_info_frontend( $product, $is_checkout = false ) {
+	public function get_subscription_info_html( $product, $is_checkout = false ) {
 		if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 			return '';
 		}
 
-		if ( $product->is_type( 'variation' ) ) {
-			$product = wc_get_product( $product->get_parent_id() );
-		}
+//		if ( $product->is_type( 'variation' ) ) {
+//			$product = wc_get_product( $product->get_parent_id() );
+//		}
 
 		ob_start();
 		wc_get_template(
-			'plan-subscription-frontend.php',
+			static::$frontend_template,
 			[
 				'billing_plan'     => self::get_billing_plan( $product ),
 				'trial'            => self::get_trial( $product ),
