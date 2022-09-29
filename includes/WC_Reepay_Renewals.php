@@ -319,6 +319,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
+		self::update_subscription_status( $data, 'wc-completed' );
 		self::create_child_order( $data, 'wc-completed' );
 	}
 
@@ -335,7 +336,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function hold_subscription( $data ) {
-		self::create_child_order( $data, 'wc-on-hold' );
+		self::update_subscription_status( $data, 'wc-on-hold' );
 	}
 
 	/**
@@ -351,7 +352,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function cancel_subscription( $data ) {
-		self::create_child_order( $data, 'wc-cancelled' );
+		self::update_subscription_status( $data, 'wc-cancelled' );
 	}
 
 	/**
@@ -367,7 +368,7 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function uncancel_subscription( $data ) {
-		self::create_child_order( $data, 'wc-completed' );
+		self::update_subscription_status( $data, 'wc-completed' );
 	}
 
 	/**
@@ -497,6 +498,46 @@ class WC_Reepay_Renewals {
 			'parent'      => $parent_order->get_id(),
 			'customer_id' => $parent_order->get_customer_id(),
 		], $parent_order, $items );
+	}
+
+	/**
+	 * @param array[
+	 *     'id' => string
+	 *     'timestamp' => string
+	 *     'signature' => string
+	 *     'subscription' => string
+	 *     'customer' => string
+	 *     'event_type' => string
+	 *     'event_id' => string
+	 * ] $data
+	 * @param string $status
+	 *
+	 * @return bool|WP_Error
+	 */
+	public static function update_subscription_status( $data, $status ) {
+		$order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::update_subscription_status',
+				'$data'   => $data,
+				'$status'   => $status,
+				'$order' => $order
+			]
+		] );
+
+		if ( empty( $order ) ) {
+			return new WP_Error( 'Undefined parent order' );
+		}
+
+		if ( $order->get_status() === $status ) {
+			return new WP_Error( 'Duplication of order status' );
+		}
+
+		$order->set_status( $status );
+		$order->save();
+
+		return true;
 	}
 
 	/**
