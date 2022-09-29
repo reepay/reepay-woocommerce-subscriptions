@@ -535,7 +535,6 @@ class WC_Reepay_Renewals {
 		}
 
 		$order->set_status( $status );
-		$order->add_order_note("Order status changed by Reepay" );
 		$order->save();
 
 		return true;
