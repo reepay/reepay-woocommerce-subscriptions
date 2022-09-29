@@ -516,7 +516,16 @@ class WC_Reepay_Renewals {
 	public static function update_subscription_status( $data, $status ) {
 		$order = self::get_order_by_subscription_handle( $data['subscription'] );
 
-		if ( empty( $parent_order ) ) {
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::update_subscription_status',
+				'$data'   => $data,
+				'$status'   => $status,
+				'$order' => $order
+			]
+		] );
+
+		if ( empty( $order ) ) {
 			return new WP_Error( 'Undefined parent order' );
 		}
 
