@@ -530,6 +530,10 @@ class WC_Reepay_Renewals {
 			return new WP_Error( 'Undefined parent order' );
 		}
 
+		if ( $order->get_status() === $status ) {
+			return new WP_Error( 'Duplication of order status' );
+		}
+
 		$order->set_status( $status );
 		$order->add_order_note("Order status changed by Reepay" );
 		$order->save();
