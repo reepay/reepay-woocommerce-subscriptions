@@ -14,7 +14,7 @@ return array(
     'WC_Reepay_Admin_Frontend' => $baseDir . '/includes/WC_Reepay_Admin_Frontend.php',
     'WC_Reepay_Checkout' => $baseDir . '/includes/WC_Reepay_Checkout.php',
     'WC_Reepay_Discounts_And_Coupons' => $baseDir . '/includes/WC_Reepay_Discounts_And_Coupons.php',
-    'WC_Reepay_Helpers' => $baseDir . '/includes/WC_Reepay_Helpers.php',
+    'WC_Reepay_Import' => $baseDir . '/includes/import/WC_Reepay_Import.php',
     'WC_Reepay_Renewals' => $baseDir . '/includes/WC_Reepay_Renewals.php',
     'WC_Reepay_Statistics' => $baseDir . '/includes/WC_Reepay_Statistics.php',
     'WC_Reepay_Subscription_API' => $baseDir . '/includes/WC_Reepay_Subscription_API.php',
