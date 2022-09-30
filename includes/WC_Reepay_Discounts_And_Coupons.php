@@ -194,8 +194,8 @@ class WC_Reepay_Discounts_And_Coupons {
 		return false;
 	}
 
-	function update_discount( WC_Coupon $coupon, $data = [] ) {
-		$params = $this->get_discount_default_params( $coupon, $data );
+	function update_discount( WC_Coupon $coupon ) {
+		$params = $this->get_discount_default_params( $coupon );
 		$handle = get_post_meta( $coupon->get_id(), '_reepay_discount_handle', true );
 
 		try {
@@ -220,7 +220,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 	function create_coupon( WC_Coupon $coupon, $discount_handle, $data ) {
 
-		$paramsCoupon = $this->get_coupon_default_params( $coupon, $data );
+		$paramsCoupon = $this->get_coupon_default_params( $coupon );
 
 		$apply_plans = array_map( 'sanitize_text_field', $data['_reepay_discount_eligible_plans'] ?? [] );
 
@@ -261,7 +261,7 @@ class WC_Reepay_Discounts_And_Coupons {
 		return false;
 	}
 
-	function update_coupon( WC_Coupon $coupon, $data = [] ) {
+	function update_coupon( WC_Coupon $coupon ) {
 		$paramsCoupon = $this->get_coupon_default_params( $coupon );
 		$handle       = get_post_meta( $coupon->get_id(), '_reepay_coupon_handle', true );
 
@@ -354,13 +354,13 @@ class WC_Reepay_Discounts_And_Coupons {
 			$discount       = $this->create_discount( $coupon, $data );
 			$discountHandle = $discount['handle'];
 		} else {
-			$this->update_discount( $coupon, $data );
+			$this->update_discount( $coupon );
 		}
 
 		if ( empty( $couponHandle ) && ! empty( $discountHandle ) ) {
 			$this->create_coupon( $coupon, $discountHandle, $data );
 		} else if ( ! empty( $couponHandle ) ) {
-			$this->update_coupon( $coupon, $data );
+			$this->update_coupon( $coupon );
 		}
 
 		$coupon->save();

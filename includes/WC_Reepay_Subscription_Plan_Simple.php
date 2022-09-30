@@ -111,9 +111,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 		'_reepay_subscription_fee',
 	];
 
-    /**
-     * @var string
-     */
+	/**
+	 * @var string
+	 */
 	public static $frontend_template = 'plan-subscription-frontend.php';
 
 	/**
@@ -660,7 +660,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				update_post_meta(
 					$post_id,
 					$key,
-					is_array( $_REQUEST[ $key ] ) ? $_REQUEST[ $key ] : sanitize_text_field( $_REQUEST[ $key ] )
+					is_array( $_REQUEST[ $key ] ) ? array_map( 'sanitize_text_field', $_REQUEST[ $key ] ) : sanitize_text_field( $_REQUEST[ $key ] )
 				);
 			}
 		}

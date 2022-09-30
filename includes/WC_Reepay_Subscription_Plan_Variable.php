@@ -1,7 +1,7 @@
 <?php
 
 class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_Simple {
-    public static $frontend_template = 'plan-subscription-frontend-variable.php';
+	public static $frontend_template = 'plan-subscription-frontend-variable.php';
 
 	public $loop = 0;
 
@@ -94,7 +94,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 					$post_id,
 					$key,
 					is_array( $_REQUEST[ $key ][ $this->loop ] ) ?
-						$_REQUEST[ $key ][ $this->loop ] :
+						array_map( 'sanitize_text_field', $_REQUEST[ $key ][ $this->loop ] ) :
 						sanitize_text_field( $_REQUEST[ $key ][ $this->loop ] )
 				);
 			}
@@ -138,7 +138,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	/**
-	 * @param  WC_Product  $product
+	 * @param WC_Product $product
 	 */
 	public function enqueue_variable_product_script( $product ) {
 		$variable_template         = static::$frontend_template;
