@@ -183,7 +183,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 	public function admin_order_subscription_info( $item_id, $item, $product ) {
 		if ( ! empty( $product ) && WC_Reepay_Checkout::is_reepay_product( $product ) ) {
-			echo $this->get_subscription_info_html( $product );
+			echo $this->get_subscription_info_html( $product, true );
 		}
 	}
 
@@ -243,10 +243,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 		if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 			return '';
 		}
-
-//		if ( $product->is_type( 'variation' ) ) {
-//			$product = wc_get_product( $product->get_parent_id() );
-//		}
 
 		ob_start();
 		wc_get_template(
