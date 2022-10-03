@@ -244,10 +244,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 			return '';
 		}
 
-//		if ( $product->is_type( 'variation' ) ) {
-//			$product = wc_get_product( $product->get_parent_id() );
-//		}
-
 		ob_start();
 		wc_get_template(
 			static::$frontend_template,

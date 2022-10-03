@@ -519,10 +519,10 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source' => 'WC_Reepay_Renewals::update_subscription_status',
+				'source'  => 'WC_Reepay_Renewals::update_subscription_status',
 				'$data'   => $data,
-				'$status'   => $status,
-				'$order' => $order
+				'$status' => $status,
+				'$order'  => $order
 			]
 		] );
 
@@ -552,6 +552,7 @@ class WC_Reepay_Renewals {
 		$new_order->save();
 
 		$main_order = wc_get_order( $main_order );
+
 
 		$fields_to_copy = [
 			'_order_shipping',
@@ -611,6 +612,20 @@ class WC_Reepay_Renewals {
 				$product_item->set_product_id( $item->get_product_id() );
 				$product_item->set_subtotal( $item->get_subtotal() );
 				$product_item->set_total( $item->get_total() );
+
+				$meta_item = $item->get_formatted_meta_data();
+				if ( ! empty( $meta_item ) ) {
+					foreach ( $meta_item as $value ) {
+						$product_item->add_meta_data( $value->key, $value->value );
+					}
+				}
+				self::log( [
+					'log' => [
+						'source' => 'WC_Reepay_Renewals::create_subscription_item_data',
+						'data'   => $item->get_formatted_meta_data()
+					],
+				] );
+
 				$new_order->add_item( $product_item );
 			}
 
