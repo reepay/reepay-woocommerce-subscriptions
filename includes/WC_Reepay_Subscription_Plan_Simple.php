@@ -111,9 +111,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 		'_reepay_subscription_fee',
 	];
 
-    /**
-     * @var string
-     */
+	/**
+	 * @var string
+	 */
 	public static $frontend_template = 'plan-subscription-frontend.php';
 
 	/**
@@ -183,7 +183,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 	public function admin_order_subscription_info( $item_id, $item, $product ) {
 		if ( ! empty( $product ) && WC_Reepay_Checkout::is_reepay_product( $product ) ) {
-			echo $this->get_subscription_info_html( $product );
+			echo $this->get_subscription_info_html( $product, true );
 		}
 	}
 
