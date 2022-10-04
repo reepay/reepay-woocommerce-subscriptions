@@ -17,11 +17,11 @@ $variable = $variable ?? false;
 		<?php echo esc_html( 'Create new plan', 'reepay-subscriptions' ); ?>
         <input type="radio" id="_reepay_subscription_choose"
                name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
-               value="new" <?php checked( 'new', esc_attr( $_reepay_subscription_choose ), true ); ?>>
+               value="new" <?php checked( 'new', esc_attr( $_reepay_subscription_choose ) ); ?>>
 		<?php echo esc_html( 'Choose existing plan', 'reepay-subscriptions' ); ?>
         <input type="radio" id="_reepay_subscription_choose"
                name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
-               value="exist" <?php checked( 'exist', esc_attr( $_reepay_subscription_choose ), true ); ?>>
+               value="exist" <?php checked( 'exist', esc_attr( $_reepay_subscription_choose ) ); ?>>
     </p>
 </div>
 
