@@ -1,4 +1,11 @@
 <?php
+/**
+ * @var Int $loop
+ * @var String $_reepay_subscription_choose
+ * @var String $settings
+ * @var Bool $is_exist
+ * @var String $_reepay_choose_exist
+ */
 
 $variable = $variable ?? false;
 ?>

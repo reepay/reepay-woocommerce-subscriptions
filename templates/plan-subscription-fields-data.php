@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var Int $loop
+ */
+
 $disabled = '';
 $variable = ! empty( $variable );
 ?>

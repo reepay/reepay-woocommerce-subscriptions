@@ -33,7 +33,7 @@ global $post;
     </h3>
 
 
-    <table cellpadding="0" cellspacing="0" class="wc-metabox-content">
+    <table class="wc-metabox-content">
         <tr>
             <td class="addon_name">
                 <p class="form-row choose-radio">
@@ -65,7 +65,7 @@ global $post;
         </tbody>
         <tbody class="exist <?php echo $addon['choose'] == 'new' ? 'hidden' : '' ?>">
         <tr>
-            <td class="addon_name" width="100%">
+            <td class="addon_name" style="width: 100%">
 				<?php if ( ! empty( $addons_list ) ): ?>
                     <select id="_subscription_choose_exist" name="addon_choose_exist[<?php echo $loop; ?>]"
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">

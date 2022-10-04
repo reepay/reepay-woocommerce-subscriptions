@@ -1,4 +1,8 @@
 <?php
+/**
+ * @var String $billing_plan
+ * @var Array $addons
+ */
 ?>
 
 <h4><?php echo esc_html( 'Add-ons', 'reepay-subscriptions' ); ?></h4>

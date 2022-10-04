@@ -1,3 +1,7 @@
+<?php
+/** @var Bool $is_update */
+?>
+
 <!-- Amount -->
 <p class="form-field">
     <label for="_reepay_discount_amount"><?php echo esc_html( 'Amount', 'reepay-subscriptions' ); ?></label>

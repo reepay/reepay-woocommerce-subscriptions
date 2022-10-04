@@ -1,3 +1,11 @@
+<?php
+/**
+ * @var Bool $is_update
+ * @var Array $coupons
+ * @var Array $meta
+ * @var Array $plans
+ */
+?>
 <div class="show_if_reepay hidden">
 	<?php if ( ! $is_update ): ?>
         <p class="form-field">
