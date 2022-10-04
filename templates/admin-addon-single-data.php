@@ -25,10 +25,11 @@ global $post;
                value="<?php echo esc_attr( $addon['name'] ) ?>"/>
     </td>
     <td class="addon_name" style="width: 50%;">
-        <label for="addon_name_<?php echo esc_html( $loop ); ?>">
+        <label for="addon_type_<?php echo esc_html( $loop ); ?>">
 			<?php _e( 'Type', 'reepay-subscriptions' ); ?>
         </label>
-        <select name="product_addon_type[<?php echo esc_html( $loop ); ?>]"
+        <select id="addon_type_<?php echo esc_html( $loop ); ?>"
+                name="product_addon_type[<?php echo esc_html( $loop ); ?>]"
                 class="product_addon_type" <?php echo $addon['choose'] == 'exist' || $addon['disabled'] ? 'disabled' : '' ?>
                 style="min-height: 38px">
             <option <?php selected( 'on_off', $addon['type'] ); ?>
@@ -68,7 +69,7 @@ global $post;
 <tr>
     <td class="addon_name">
         <p class="form-row choose-radio">
-            <label><?php echo esc_html( 'Add-on availability', 'reepay-subscriptions' ); ?></label>
+            <label for="_reepay_subscription_avai"><?php echo esc_html( 'Add-on availability', 'reepay-subscriptions' ); ?></label>
             &nbsp&nbsp<?php echo esc_html( 'Current plan', 'reepay-subscriptions' ); ?> &nbsp
             <input type="radio" id="_reepay_subscription_avai"
                    name="_reepay_addon_avai[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>

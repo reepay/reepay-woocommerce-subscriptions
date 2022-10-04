@@ -44,7 +44,7 @@
 		?>
 		<?php if ( ! $is_update ): ?>
             <p class="form-field">
-                <label for="_reepay_discount_all_plans"><?php echo esc_html( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
+                <label for="use_existing_discount"><?php echo esc_html( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
 				<?php echo esc_html( 'Create new discount', 'reepay-subscriptions' ); ?> &nbsp
                 <input type="radio"
                        id="use_existing_discount"

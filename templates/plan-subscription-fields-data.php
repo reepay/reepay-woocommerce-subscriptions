@@ -28,7 +28,7 @@ $variable = ! empty( $variable );
 
         <!--Type-->
         <p class="form-field pricing-fields <?php echo $variable ? 'form-row' : '' ?>">
-            <label for="_reepay_subscription_daily"><?php echo esc_html( 'Schedule Type', 'reepay-subscriptions' ); ?></label>
+            <label for="_subscription_schedule_type"><?php echo esc_html( 'Schedule Type', 'reepay-subscriptions' ); ?></label>
             <select id="_subscription_schedule_type" <?php echo esc_attr( $disabled ) ?>
                     name="_reepay_subscription_schedule_type<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
                     class="wc_input_subscription_period_interval">
@@ -119,7 +119,7 @@ $variable = ! empty( $variable );
         <!--Last day of month-->
 		<?php $month_lastday = ! empty( $_reepay_subscription_month_lastday ) ? $_reepay_subscription_month_lastday : [] ?>
         <p class="form-field type-fields fields-month_lastday <?php echo $variable ? 'form-row' : '' ?> hidden">
-            <label for="_subscription_month_fixedday"><?php echo esc_html( 'Charge every', 'reepay-subscriptions' ); ?></label>
+            <label for="_subscription_month_lastday<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[month]"><?php echo esc_html( 'Charge every', 'reepay-subscriptions' ); ?></label>
             <input type="number" min="0"
                    id="_subscription_month_lastday<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[month]" <?php echo esc_attr( $disabled ) ?>
                    value="<?php echo ! empty( $month_lastday['month'] ) ? $month_lastday['month'] : 0 ?>"
@@ -583,7 +583,7 @@ $variable = ! empty( $variable );
             </select>
         </p>
         <p class="form-field <?php echo $variable ? 'form-row' : '' ?>  trial-fields fields-7days fields-14days fields-1month fields-customize hidden">
-            <label for="_subscription_billing_trial_reminder"><?php echo esc_html( 'Optional Trial Reminder Schedule', 'reepay-subscriptions' ); ?></label>
+            <label for="_subscription_trial_reminder"><?php echo esc_html( 'Optional Trial Reminder Schedule', 'reepay-subscriptions' ); ?></label>
             <input type="number" min="0" id="_subscription_trial_reminder" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_trial<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>[reminder]"
                    placeholder="<?php echo esc_html( 'Days', 'reepay-subscriptions' ); ?>"

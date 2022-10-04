@@ -4,7 +4,7 @@ $variable = $variable ?? false;
 ?>
 <div class="options_group reepay_subscription_choose show_if_reepay_subscription">
     <p class="form-field choose-fields <?php echo $variable ? 'form-row' : '' ?> ">
-        <label for="_subscription_price">
+        <label for="_reepay_subscription_choose">
 			<?php echo esc_html( 'Creation type', 'reepay-subscriptions' ); ?>
         </label>
 		<?php echo esc_html( 'Create new plan', 'reepay-subscriptions' ); ?>
@@ -25,7 +25,7 @@ $variable = $variable ?? false;
 <div class="reepay_subscription_choose_exist">
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field exist-fields <?php echo $variable ? 'dimensions_field form-row' : '' ?> ">
-            <label for="_subscription_price">
+            <label for="_subscription_choose_exist">
 				<?php echo esc_html( 'Choose plan', 'reepay-subscriptions' ); ?>
             </label>
 			<?php if ( ! empty( $plans_list ) ): ?>

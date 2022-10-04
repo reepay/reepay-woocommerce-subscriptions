@@ -37,7 +37,7 @@ global $post;
         <tr>
             <td class="addon_name">
                 <p class="form-row choose-radio">
-                    <label><?php echo esc_html( 'Creation type', 'reepay-subscriptions' ); ?></label>
+                    <label for="_reepay_subscription_choose"><?php echo esc_html( 'Creation type', 'reepay-subscriptions' ); ?></label>
                     &nbsp&nbsp<?php echo esc_html( 'Create new', 'reepay-subscriptions' ); ?> &nbsp
                     <input type="radio" id="_reepay_subscription_choose"
                            name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"

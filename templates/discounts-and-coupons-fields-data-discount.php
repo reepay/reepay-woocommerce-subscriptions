@@ -137,7 +137,7 @@
 </p>
 <p class="form-field show_if_limited_time">
     <label for="_reepay_discount_fixed_period_unit"><?php echo esc_html( 'Unit', 'reepay-subscriptions' ); ?></label>
-    <select name="_reepay_discount_fixed_period_unit" id="coupon_id"
+    <select id="_reepay_discount_fixed_period_unit" name="_reepay_discount_fixed_period_unit" id="coupon_id"
             class="short"
 		<?php echo $is_update ? 'disabled="disabled"' : '' ?>>
         <option value="days">Days</option>
