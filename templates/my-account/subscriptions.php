@@ -131,11 +131,11 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
 <div class="woocommerce-pagination woocommerce-pagination--without-numbers woocommerce-Pagination">
 	<?php if ( $args['current_token'] !== "" && $args['previous_token'] !== null ) : ?>
         <a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button"
-           href="<?php esc_url_e( wc_get_endpoint_url( 'subscriptions', $args['previous_token'] ) ); ?>"><?php echo __( 'Previous', 'woocommerce' ); ?></a>
+           href="<?php echo esc_url( wc_get_endpoint_url( 'subscriptions', $args['previous_token'] ) ); ?>"><?php echo __( 'Previous', 'woocommerce' ); ?></a>
 	<?php endif; ?>
 
 	<?php if ( ! empty( $args['next_page_token'] ) ) : ?>
         <a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button"
-           href="<?php esc_url_e( wc_get_endpoint_url( 'subscriptions', $args['next_page_token'] ) ); ?>"><?php echo __( 'Next', 'woocommerce' ); ?></a>
+           href="<?php echo esc_url( wc_get_endpoint_url( 'subscriptions', $args['next_page_token'] ) ); ?>"><?php echo __( 'Next', 'woocommerce' ); ?></a>
 	<?php endif; ?>
 </div>
