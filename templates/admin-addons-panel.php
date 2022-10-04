@@ -112,7 +112,7 @@
                 const answer = confirm('<?php _e( 'Are you sure you want remove this add-on?', 'reepay-subscriptions' ); ?>');
 
                 if (answer) {
-                    var addon = $(this).closest('.woocommerce_product_addon');
+                    const addon = $(this).closest('.woocommerce_product_addon');
                     $(addon).find('input').val('');
                     $(addon).hide();
                 }
