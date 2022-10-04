@@ -1,14 +1,14 @@
 <div class="show_if_reepay hidden">
 	<?php if ( ! $is_update ): ?>
         <p class="form-field">
-            <label for="use_existing_coupon"><?php esc_html_e( 'Coupon creation type', 'reepay-subscriptions' ); ?></label>
-			<?php esc_html_e( 'Create new coupon', 'reepay-subscriptions' ); ?> &nbsp
+            <label for="use_existing_coupon"><?php echo esc_html( 'Coupon creation type', 'reepay-subscriptions' ); ?></label>
+			<?php echo esc_html( 'Create new coupon', 'reepay-subscriptions' ); ?> &nbsp
             <input type="radio"
                    id="use_existing_coupon"
                    name="use_existing_coupon"
                    value="false" checked/>
             &nbsp&nbsp
-			<?php esc_html_e( 'Use existing coupon', 'reepay-subscriptions' ); ?> &nbsp
+			<?php echo esc_html( 'Use existing coupon', 'reepay-subscriptions' ); ?> &nbsp
             <input
                     type="radio" id="use_existing_coupon"
                     name="use_existing_coupon"
@@ -19,7 +19,7 @@
                 <select name="_reepay_discount_use_existing_coupon_id" id="coupon_id" class="short">
                     <option value="">Select coupon</option>
 					<?php foreach ( $coupons as $coupon ): ?>
-                        <option value="<?php esc_attr_e( $coupon['handle'] ) ?>"><?php esc_attr_e( $coupon['code'] ) ?></option>
+                        <option value="<?php echo esc_attr( $coupon['handle'] ) ?>"><?php echo esc_attr( $coupon['code'] ) ?></option>
 					<?php endforeach; ?>
                 </select>
 				<?php if ( empty( $coupons ) ):
@@ -44,14 +44,14 @@
 		?>
 		<?php if ( ! $is_update ): ?>
             <p class="form-field">
-                <label for="_reepay_discount_all_plans"><?php esc_html_e( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
-				<?php esc_html_e( 'Create new discount', 'reepay-subscriptions' ); ?> &nbsp
+                <label for="_reepay_discount_all_plans"><?php echo esc_html( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
+				<?php echo esc_html( 'Create new discount', 'reepay-subscriptions' ); ?> &nbsp
                 <input type="radio"
                        id="use_existing_discount"
                        name="use_existing_discount"
                        value="false" checked/>
                 &nbsp&nbsp
-				<?php esc_html_e( 'Use existing discount', 'reepay-subscriptions' ); ?> &nbsp
+				<?php echo esc_html( 'Use existing discount', 'reepay-subscriptions' ); ?> &nbsp
                 <input
                         type="radio" id="use_existing_discount"
                         name="use_existing_discount"

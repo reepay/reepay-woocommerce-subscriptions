@@ -71,7 +71,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	 * Display text for when there are no items.
 	 */
 	public function no_items() {
-		esc_html_e( 'No subscriptions found.', 'admin-table-tut' );
+		echo esc_html( 'No subscriptions found.', 'admin-table-tut' );
 	}
 
 	/**

@@ -14,15 +14,15 @@
 
     <ul class="reepay_subscription_info">
 		<?php if ( ! empty( $billing_plan ) ) : ?>
-            <li><?php esc_attr_e( $billing_plan ) ?></li>
+            <li><?php echo esc_html( $billing_plan ) ?></li>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $trial ) ) : ?>
-            <li><?php esc_html_e( $trial ) ?></li>
+            <li><?php echo esc_html( $trial ) ?></li>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $contract_period ) ) : ?>
-            <li><?php echo $contract_period ?></li>
+            <li><?php echo esc_html( $contract_period ) ?></li>
 		<?php endif; ?>
 
 		<?php if ( ! empty( $setup_fee ) ) : ?>

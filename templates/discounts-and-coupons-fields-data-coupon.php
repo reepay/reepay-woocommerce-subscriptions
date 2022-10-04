@@ -1,6 +1,6 @@
 <!-- Name -->
 <p class="form-field">
-    <label for="_reepay_discount_name"><?php esc_html_e( 'Name', 'reepay-subscriptions' ); ?></label>
+    <label for="_reepay_discount_name"><?php echo esc_html( 'Name', 'reepay-subscriptions' ); ?></label>
     <input
             type="text"
             id="_reepay_discount_name"
@@ -13,13 +13,13 @@
 <!--End Name -->
 <!--Availability-->
 <p class="form-field">
-    <label for="_reepay_discount_all_plans"><?php esc_html_e( 'Availability', 'reepay-subscriptions' ); ?></label>
+    <label for="_reepay_discount_all_plans"><?php echo esc_html( 'Availability', 'reepay-subscriptions' ); ?></label>
     <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
            class="reepay-required"
            value="1" <?php checked( '1', esc_attr( $meta['_reepay_discount_all_plans'][0] ?? '1' ) ); ?>
 		<?php echo $is_update ? 'disabled="disabled"' : '' ?>
     />
-    &nbsp<?php esc_html_e( 'All plans', 'reepay-subscriptions' ); ?>
+    &nbsp<?php echo esc_html( 'All plans', 'reepay-subscriptions' ); ?>
 </p>
 <p class="form-field">
     <input type="radio" id="_reepay_discount_all_plans" name="_reepay_discount_all_plans"
@@ -27,12 +27,12 @@
            value="0" <?php checked( '0', esc_attr( $meta['_reepay_discount_all_plans'][0] ?? '' ) ); ?>
 		<?php echo $is_update ? 'disabled="disabled"' : '' ?>
     />
-    &nbsp<?php esc_html_e( 'Selected plans', 'reepay-subscriptions' ); ?>
+    &nbsp<?php echo esc_html( 'Selected plans', 'reepay-subscriptions' ); ?>
 </p>
 <p class="form-field show_if_selected_plans">
 	<?php if ( ! empty( $plans ) ): ?>
 		<?php if ( ! $is_update ): ?>
-			<?php esc_html_e( 'Select one or more plans', 'reepay-subscriptions' ); ?>
+			<?php echo esc_html( 'Select one or more plans', 'reepay-subscriptions' ); ?>
             <br>
 		<?php endif; ?>
         <select name="_reepay_discount_eligible_plans[]" id="_reepay_discount_eligible_plans"
@@ -48,7 +48,7 @@
         </select>
 	<?php endif; ?>
 	<?php if ( empty( $plans ) ): ?>
-		<?php esc_html_e( 'No plans found', 'reepay-subscriptions' ); ?>
+		<?php echo esc_html( 'No plans found', 'reepay-subscriptions' ); ?>
 	<?php endif; ?>
 </p>
 <!--End Availability to-->

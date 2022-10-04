@@ -248,13 +248,12 @@ class WC_Reepay_Subscription_Plan_Simple {
 		wc_get_template(
 			static::$frontend_template,
 			[
-				'billing_plan'     => self::get_billing_plan( $product ),
-				'trial'            => self::get_trial( $product ),
-				'setup_fee'        => self::get_setup_fee( $product ),
-				'contract_periods' => $product->get_meta( '_reepay_subscription_contract_periods' ),
-				'contract_period'  => self::get_contract_period( $product ),
-				'domain'           => 'reepay-subscriptions',
-				'is_checkout'      => $is_checkout
+				'billing_plan'    => self::get_billing_plan( $product ),
+				'trial'           => self::get_trial( $product ),
+				'setup_fee'       => self::get_setup_fee( $product ),
+				'contract_period' => self::get_contract_period( $product ),
+				'domain'          => 'reepay-subscriptions',
+				'is_checkout'     => $is_checkout
 			],
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
