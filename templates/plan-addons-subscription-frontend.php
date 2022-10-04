@@ -5,7 +5,7 @@
  */
 ?>
 
-<h4><?php echo esc_html( 'Add-ons', 'reepay-subscriptions' ); ?></h4>
+<h4><?php echo __( 'Add-ons', 'reepay-subscriptions' ); ?></h4>
 <div class="reepay_subscription_addons">
 	<?php foreach ( $addons as $i => $addon ): ?>
         <p>

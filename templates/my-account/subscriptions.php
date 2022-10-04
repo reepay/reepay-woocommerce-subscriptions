@@ -110,7 +110,7 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
 						<?php if ( $payment_method->get_token() === $subscription_payment_method['id'] ): ?>
 							<?php _e( 'Current', 'reepay-subscriptions' ); ?>
 						<?php else: ?>
-                            <a href="?change_payment_method=<?php echo esc_html( $subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"
+                            <a href="?change_payment_method=<?php echo __( $subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"
                                class="button"><?php _e( 'Change', 'reepay-subscriptions' ); ?></a>
 						<?php endif; ?>
                     </td>
@@ -131,11 +131,11 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
 <div class="woocommerce-pagination woocommerce-pagination--without-numbers woocommerce-Pagination">
 	<?php if ( $args['current_token'] !== "" && $args['previous_token'] !== null ) : ?>
         <a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button"
-           href="<?php esc_url_e( wc_get_endpoint_url( 'subscriptions', $args['previous_token'] ) ); ?>"><?php echo esc_html( 'Previous', 'woocommerce' ); ?></a>
+           href="<?php esc_url_e( wc_get_endpoint_url( 'subscriptions', $args['previous_token'] ) ); ?>"><?php echo __( 'Previous', 'woocommerce' ); ?></a>
 	<?php endif; ?>
 
 	<?php if ( ! empty( $args['next_page_token'] ) ) : ?>
         <a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button"
-           href="<?php esc_url_e( wc_get_endpoint_url( 'subscriptions', $args['next_page_token'] ) ); ?>"><?php echo esc_html( 'Next', 'woocommerce' ); ?></a>
+           href="<?php esc_url_e( wc_get_endpoint_url( 'subscriptions', $args['next_page_token'] ) ); ?>"><?php echo __( 'Next', 'woocommerce' ); ?></a>
 	<?php endif; ?>
 </div>

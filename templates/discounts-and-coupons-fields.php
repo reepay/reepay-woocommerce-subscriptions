@@ -9,14 +9,14 @@
 <div class="show_if_reepay hidden">
 	<?php if ( ! $is_update ): ?>
         <p class="form-field">
-            <label for="use_existing_coupon"><?php echo esc_html( 'Coupon creation type', 'reepay-subscriptions' ); ?></label>
-			<?php echo esc_html( 'Create new coupon', 'reepay-subscriptions' ); ?> &nbsp
+            <label for="use_existing_coupon"><?php echo __( 'Coupon creation type', 'reepay-subscriptions' ); ?></label>
+			<?php echo __( 'Create new coupon', 'reepay-subscriptions' ); ?> &nbsp
             <input type="radio"
                    id="use_existing_coupon"
                    name="use_existing_coupon"
                    value="false" checked/>
             &nbsp&nbsp
-			<?php echo esc_html( 'Use existing coupon', 'reepay-subscriptions' ); ?> &nbsp
+			<?php echo __( 'Use existing coupon', 'reepay-subscriptions' ); ?> &nbsp
             <input
                     type="radio" id="use_existing_coupon"
                     name="use_existing_coupon"
@@ -52,14 +52,14 @@
 		?>
 		<?php if ( ! $is_update ): ?>
             <p class="form-field">
-                <label for="use_existing_discount"><?php echo esc_html( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
-				<?php echo esc_html( 'Create new discount', 'reepay-subscriptions' ); ?> &nbsp
+                <label for="use_existing_discount"><?php echo __( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
+				<?php echo __( 'Create new discount', 'reepay-subscriptions' ); ?> &nbsp
                 <input type="radio"
                        id="use_existing_discount"
                        name="use_existing_discount"
                        value="false" checked/>
                 &nbsp&nbsp
-				<?php echo esc_html( 'Use existing discount', 'reepay-subscriptions' ); ?> &nbsp
+				<?php echo __( 'Use existing discount', 'reepay-subscriptions' ); ?> &nbsp
                 <input
                         type="radio" id="use_existing_discount"
                         name="use_existing_discount"
