@@ -1,4 +1,9 @@
 <?php
+/**
+ * @var Array $product_addons
+ * @var Array $addons_list
+ */
+
 ?>
 <div id="product_addons_data" class="panel woocommerce_options_panel wc-metaboxes-wrapper">
 	<?php do_action( 'woocommerce-product-addons_panel_start' ); ?>

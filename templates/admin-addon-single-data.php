@@ -69,12 +69,12 @@ global $post;
 <tr>
     <td class="addon_name">
         <p class="form-row choose-radio">
-            <label for="_reepay_subscription_avai"><?php echo esc_html( 'Add-on availability', 'reepay-subscriptions' ); ?></label>
-            &nbsp&nbsp<?php echo esc_html( 'Current plan', 'reepay-subscriptions' ); ?> &nbsp
+            <label for="_reepay_subscription_avai"><?php echo __( 'Add-on availability', 'reepay-subscriptions' ); ?></label>
+            &nbsp&nbsp<?php echo __( 'Current plan', 'reepay-subscriptions' ); ?> &nbsp
             <input type="radio" id="_reepay_subscription_avai"
                    name="_reepay_addon_avai[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
                    value="current" <?php echo empty( $addon['avai'] ) || $addon['avai'] == 'current' ? 'checked' : '' ?>>
-            &nbsp&nbsp<?php echo esc_html( 'All plans', 'reepay-subscriptions' ); ?> &nbsp
+            &nbsp&nbsp<?php echo __( 'All plans', 'reepay-subscriptions' ); ?> &nbsp
             <input type="radio" id="_reepay_subscription_avai"
                    name="_reepay_addon_avai[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
                    value="all" <?php checked( 'all', $addon['avai'] ); ?>>

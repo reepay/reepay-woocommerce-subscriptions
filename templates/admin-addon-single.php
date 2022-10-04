@@ -33,19 +33,19 @@ global $post;
     </h3>
 
 
-    <table cellpadding="0" cellspacing="0" class="wc-metabox-content">
+    <table class="wc-metabox-content">
         <tr>
             <td class="addon_name">
                 <p class="form-row choose-radio">
-                    <label for="_reepay_subscription_choose"><?php echo esc_html( 'Creation type', 'reepay-subscriptions' ); ?></label>
-                    &nbsp&nbsp<?php echo esc_html( 'Create new', 'reepay-subscriptions' ); ?> &nbsp
+                    <label for="_reepay_subscription_choose"><?php echo __( 'Creation type', 'reepay-subscriptions' ); ?></label>
+                    &nbsp&nbsp<?php echo __( 'Create new', 'reepay-subscriptions' ); ?> &nbsp
                     <input type="radio" id="_reepay_subscription_choose"
                            name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
-                           value="new" <?php checked( 'new', esc_attr( $addon['choose'] ) ); ?>>
-                    &nbsp&nbsp<?php echo esc_html( 'Choose existing', 'reepay-subscriptions' ); ?> &nbsp
+                           value="new" <?php checked( 'new', esc_attr( $addon['choose'] ), true ); ?>>
+                    &nbsp&nbsp<?php echo __( 'Choose existing', 'reepay-subscriptions' ); ?> &nbsp
                     <input type="radio" id="_reepay_subscription_choose"
                            name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
-                           value="exist" <?php checked( 'exist', esc_attr( $addon['choose'] ) ); ?>>
+                           value="exist" <?php checked( 'exist', esc_attr( $addon['choose'] ), true ); ?>>
                 </p>
             </td>
         </tr>
@@ -65,17 +65,17 @@ global $post;
         </tbody>
         <tbody class="exist <?php echo $addon['choose'] == 'new' ? 'hidden' : '' ?>">
         <tr>
-            <td class="addon_name" width="100%">
+            <td class="addon_name" style="width: 100%">
 				<?php if ( ! empty( $addons_list ) ): ?>
                     <select id="_subscription_choose_exist" name="addon_choose_exist[<?php echo $loop; ?>]"
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">
-                        <option value=""><?php echo esc_html( 'Select add-on', 'reepay-subscriptions' ); ?></option>
+                        <option value=""><?php echo __( 'Select add-on', 'reepay-subscriptions' ); ?></option>
 						<?php foreach ( $addons_list as $addon_rem ): ?>
-                            <option value="<?php echo esc_attr( $addon_rem['handle'] ) ?>" <?php echo ! empty( $addon['exist'] ) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'], false ) : '' ?>><?php echo esc_attr( $addon_rem['name'] ) ?></option>
+                            <option value="<?php echo esc_attr( $addon_rem['handle'] ) ?>" <?php ! empty( $addon['exist'] ) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'], true ) : '' ?>><?php echo esc_attr( $addon_rem['name'] ) ?></option>
 						<?php endforeach; ?>
                     </select>
 				<?php else: ?>
-					<?php echo esc_html( 'Add-ons list is empty', 'reepay-subscriptions' ); ?>
+					<?php echo __( 'Add-ons list is empty', 'reepay-subscriptions' ); ?>
 				<?php endif; ?>
             </td>
         </tr>

@@ -48,7 +48,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 		}
 
 		$settings['reepay_shipping_addon'] = array(
-			'title'       => esc_html__( 'Reepay Add-on', 'reepay-subscriptions' ),
+			'title'       => __( 'Reepay Add-on', 'reepay-subscriptions' ),
 			'type'        => 'select',
 			'default'     => '',
 			'class'       => 'wc-enhanced-select addon-shipping-choose',
@@ -58,14 +58,14 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 		);
 
 		$settings['reepay_shipping_addon_name'] = array(
-			'title'   => esc_html__( 'Add-on name', 'reepay-subscriptions' ),
+			'title'   => __( 'Add-on name', 'reepay-subscriptions' ),
 			'type'    => 'text',
 			'default' => '',
 			'class'   => 'addon-shipping-new',
 		);
 
 		$settings['reepay_shipping_addon_description'] = array(
-			'title'   => esc_html__( 'Add-on description', 'reepay-subscriptions' ),
+			'title'   => __( 'Add-on description', 'reepay-subscriptions' ),
 			'type'    => 'textarea',
 			'default' => '',
 			'class'   => 'addon-shipping-new',

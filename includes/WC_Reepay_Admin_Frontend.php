@@ -101,7 +101,7 @@ class WC_Reepay_Admin_Frontend {
 			case 'order_number':
 				if ( $post->post_parent !== 0 ) {
 					$output = '<strong>';
-					$output .= esc_html__( '&nbsp;Sub Order of', 'reepay-subscriptions' );
+					$output .= __( '&nbsp;Sub Order of', 'reepay-subscriptions' );
 					$output .= sprintf( ' <a href="%s">#%s</a>', esc_url( admin_url( 'post.php?action=edit&post=' . $post->post_parent ) ),
 						esc_html( $post->post_parent ) );
 					$output .= '</strong>';
