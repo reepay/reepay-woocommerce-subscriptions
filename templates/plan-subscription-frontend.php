@@ -2,13 +2,15 @@
 /**
  * @var string $billing_plan
  * @var string $trial
- * @var string $contract_periods
+ * @var string $contract_period
  * @var string $setup_fee
  * @var string 'reepay-subscriptions'
+ * @var boolean $is_checkout
  */
 ?>
 <div class="reepay_subscription_info_container">
-	<?php if ( ! $is_checkout ) : ?>
+    <?php
+	if ( ! $is_checkout ) : ?>
         <h4><?php _e( 'Subscription details', 'reepay-subscriptions' ) ?></h4>
 	<?php endif; ?>
 
