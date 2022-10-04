@@ -77,7 +77,7 @@ global $post;
             &nbsp&nbsp<?php echo esc_html( 'All plans', 'reepay-subscriptions' ); ?> &nbsp
             <input type="radio" id="_reepay_subscription_avai"
                    name="_reepay_addon_avai[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
-                   value="all" <?php checked( 'all', $addon['avai'], true ); ?>>
+                   value="all" <?php checked( 'all', $addon['avai'] ); ?>>
         </p>
     </td>
 </tr>
