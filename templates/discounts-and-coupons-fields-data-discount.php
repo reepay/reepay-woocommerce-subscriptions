@@ -67,7 +67,7 @@
                    name="_reepay_discount_apply_to_items[]"
                    required
 				<?php echo $is_update ? 'disabled="disabled"' : '' ?>
-                   value="<?php echo esc_attr( $value ) ?>" <?php checked( in_array( $value, $meta['_reepay_discount_apply_to_items'][0] ?? [] ), true ); ?>/> &nbsp<?php echo esc_html( $label, 'reepay-subscriptions' ); ?>
+                   value="<?php echo esc_attr( $value ) ?>" <?php checked( in_array( $value, $meta['_reepay_discount_apply_to_items'][0] ?? [] ) ); ?>/> &nbsp<?php echo esc_html( $label, 'reepay-subscriptions' ); ?>
             &nbsp
 		<?php endforeach; ?>
         <br>
