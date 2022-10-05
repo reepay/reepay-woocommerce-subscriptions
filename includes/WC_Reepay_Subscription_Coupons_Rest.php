@@ -33,7 +33,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 					'plans'     => $plans,
 					'is_update' => true,
 					'loop'      => - 1,
-					'domain'    => 'reepay-subscriptions-for-woocommerce'
+					'domain'    => 'reepay-subscriptions'
 				),
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'
@@ -45,7 +45,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 					'plans'     => $plans,
 					'is_update' => true,
 					'loop'      => - 1,
-					'domain'    => 'reepay-subscriptions-for-woocommerce'
+					'domain'    => 'reepay-subscriptions'
 				),
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'

@@ -14,15 +14,15 @@ global $post;
 ?>
 <div class="woocommerce_product_addon wc-metabox closed">
     <h3>
-        <button type="button" class="remove_addon button"><?php _e( 'Remove', 'reepay-subscriptions-for-woocommerce' ); ?></button>
+        <button type="button" class="remove_addon button"><?php _e( 'Remove', 'reepay-subscriptions' ); ?></button>
 
-        <div class="handlediv" title="<?php _e( 'Click to toggle', 'reepay-subscriptions-for-woocommerce' ); ?>"></div>
-        <strong><?php _e( 'Add-on', 'reepay-subscriptions-for-woocommerce' ); ?>: <span
+        <div class="handlediv" title="<?php _e( 'Click to toggle', 'reepay-subscriptions' ); ?>"></div>
+        <strong><?php _e( 'Add-on', 'reepay-subscriptions' ); ?>: <span
                     class="group_name"><?php if ( $addon['name'] ) {
 					echo '"' . esc_attr( $addon['name'] ) . '"';
 				} ?></span></strong>;
-        <span> <?php _e( 'Type', 'reepay-subscriptions-for-woocommerce' ); ?>: <?php $addon['type'] === 'on_off' ? _e( 'On/Off', 'reepay-subscriptions-for-woocommerce' ) : _e( 'Quantity', 'reepay-subscriptions-for-woocommerce' ) ?></span>;
-        <span> <?php _e( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?>: <?php echo floatval( esc_attr( $addon['amount'] ) ) * 100 ?></span>
+        <span> <?php _e( 'Type', 'reepay-subscriptions' ); ?>: <?php $addon['type'] === 'on_off' ? _e( 'On/Off', 'reepay-subscriptions' ) : _e( 'Quantity', 'reepay-subscriptions' ) ?></span>;
+        <span> <?php _e( 'Amount', 'reepay-subscriptions' ); ?>: <?php echo floatval( esc_attr( $addon['amount'] ) ) * 100 ?></span>
 
 
         <input type="hidden" name="product_addon_position[<?php echo esc_attr( $loop ) ?>]"
@@ -37,12 +37,12 @@ global $post;
         <tr>
             <td class="addon_name">
                 <p class="form-row choose-radio">
-                    <label for="_reepay_subscription_choose"><?php echo __( 'Creation type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-                    &nbsp&nbsp<?php echo __( 'Create new', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
+                    <label for="_reepay_subscription_choose"><?php echo __( 'Creation type', 'reepay-subscriptions' ); ?></label>
+                    &nbsp&nbsp<?php echo __( 'Create new', 'reepay-subscriptions' ); ?> &nbsp
                     <input type="radio" id="_reepay_subscription_choose"
                            name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
                            value="new" <?php checked( 'new', esc_attr( $addon['choose'] ) ); ?>>
-                    &nbsp&nbsp<?php echo __( 'Choose existing', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
+                    &nbsp&nbsp<?php echo __( 'Choose existing', 'reepay-subscriptions' ); ?> &nbsp
                     <input type="radio" id="_reepay_subscription_choose"
                            name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
                            value="exist" <?php checked( 'exist', esc_attr( $addon['choose'] ) ); ?>>
@@ -56,7 +56,7 @@ global $post;
 			[
 				'addon'  => $addon,
 				'loop'   => $loop,
-				'domain' => 'reepay-subscriptions-for-woocommerce',
+				'domain' => 'reepay-subscriptions',
 			],
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
@@ -69,13 +69,13 @@ global $post;
 				<?php if ( ! empty( $addons_list ) ): ?>
                     <select id="_subscription_choose_exist" name="addon_choose_exist[<?php echo $loop; ?>]"
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">
-                        <option value=""><?php echo __( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ); ?></option>
+                        <option value=""><?php echo __( 'Select add-on', 'reepay-subscriptions' ); ?></option>
 						<?php foreach ( $addons_list as $addon_rem ): ?>
                             <option value="<?php echo esc_attr( $addon_rem['handle'] ) ?>" <?php ! empty( $addon['exist'] ) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'] ) : '' ?>><?php echo esc_attr( $addon_rem['name'] ) ?></option>
 						<?php endforeach; ?>
                     </select>
 				<?php else: ?>
-					<?php echo __( 'Add-ons list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
+					<?php echo __( 'Add-ons list is empty', 'reepay-subscriptions' ); ?>
 				<?php endif; ?>
             </td>
         </tr>

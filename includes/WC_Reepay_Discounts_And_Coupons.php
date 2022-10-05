@@ -149,7 +149,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 	function plugin_coupon_error_message( $err, $err_code, WC_Coupon $coupon ) {
 		if ( $coupon->is_type( 'reepay_type' ) && intval( $err_code ) === 117 ) {
-			return __( 'Coupon is not applied for this plans', 'reepay-subscriptions-for-woocommerce' );
+			return __( 'Coupon is not applied for this plans', 'reepay-subscriptions' );
 		}
 
 		return $err;

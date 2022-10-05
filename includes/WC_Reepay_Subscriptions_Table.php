@@ -71,7 +71,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	 * Display text for when there are no items.
 	 */
 	public function no_items() {
-		echo __( 'No subscriptions found.', 'reepay-subscriptions-for-woocommerce' );
+		echo __( 'No subscriptions found.', 'reepay-subscriptions' );
 	}
 
 	/**
@@ -81,12 +81,12 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	 */
 	public function get_columns() {
 		return array(
-			'status'            => __( 'Status', 'reepay-subscriptions-for-woocommerce' ),
-			'handle'            => __( 'Subscription handle', 'reepay-subscriptions-for-woocommerce' ),
-			'customer_handle'   => __( 'Customer handle', 'reepay-subscriptions-for-woocommerce' ),
-			'plan'              => __( 'Plan', 'reepay-subscriptions-for-woocommerce' ),
-			'date'              => __( 'Created date', 'reepay-subscriptions-for-woocommerce' ),
-			'next_period_start' => __( 'Next renewal date', 'reepay-subscriptions-for-woocommerce' ),
+			'status'            => __( 'Status', 'reepay-subscriptions' ),
+			'handle'            => __( 'Subscription handle', 'reepay-subscriptions' ),
+			'customer_handle'   => __( 'Customer handle', 'reepay-subscriptions' ),
+			'plan'              => __( 'Plan', 'reepay-subscriptions' ),
+			'date'              => __( 'Created date', 'reepay-subscriptions' ),
+			'next_period_start' => __( 'Next renewal date', 'reepay-subscriptions' ),
 		);
 	}
 

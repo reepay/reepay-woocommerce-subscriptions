@@ -19,7 +19,7 @@ class WC_Reepay_Subscriptions_List {
 			$admin_page = 'https://app.reepay.com/#/rp/';
 
 			$link = $admin_page . 'subscriptions/subscription/' . $sub_handle;
-			echo '&nbsp<a class="button capture-item-button" href="' . esc_url( $link ) . '" target="_blank">' . __( 'See subscription', 'reepay-subscriptions-for-woocommerce' ) . '</a>';
+			echo '&nbsp<a class="button capture-item-button" href="' . esc_url( $link ) . '" target="_blank">' . __( 'See subscription', 'reepay-subscriptions' ) . '</a>';
 		}
 
 	}
@@ -32,7 +32,7 @@ class WC_Reepay_Subscriptions_List {
 			'Subscriptions',
 			'Subscriptions',
 			'edit_pages',
-			'reepay-subscriptions-for-woocommerce',
+			'reepay-subscriptions',
 			[ $this, 'render_page' ]
 		);
 	}
