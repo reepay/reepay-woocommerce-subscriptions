@@ -669,7 +669,7 @@ class WC_Reepay_Renewals {
 		foreach ( $order->get_coupon_codes() as $coupon_code ) {
 			$c = new WC_Coupon( $coupon_code );
 
-			if ( $c->is_type( 'reepay_fixed_product' ) || $c->is_type( 'reepay_percentage' ) ) {
+			if ( $c->is_type( 'reepay_type' ) ) {
 				$coupons[] = $coupon_code;
 			}
 		}
