@@ -39,7 +39,7 @@ class WC_Reepay_Account_Page {
 					'source' => $token->get_token(),
 				] );
 				set_transient( $handle . '_payment_methods', $payment_methods );
-				wc_add_notice( __( 'Payment method successfully added.', 'reepay-subscriptions' ) );
+				wc_add_notice( __( 'Payment method successfully added.', 'reepay-subscriptions-for-woocommerce' ) );
 			} catch ( Exception $exception ) {
 				wc_add_notice( $exception->getMessage() );
 			}
@@ -223,7 +223,7 @@ class WC_Reepay_Account_Page {
 	}
 
 	public function get_title() {
-		return __( "Subscriptions", 'reepay-subscriptions' );
+		return __( "Subscriptions", 'reepay-subscriptions-for-woocommerce' );
 	}
 
 	public function subscriptions_endpoint( $next_page_token = '' ) {
@@ -287,7 +287,7 @@ class WC_Reepay_Account_Page {
 			[
 				'subscriptions'   => $subscriptionsArr,
 				'plans'           => $plans,
-				'domain'          => 'reepay-subscriptions',
+				'domain'          => 'reepay-subscriptions-for-woocommerce',
 				'current_token'   => $next_page_token,
 				'previous_token'  => $previous_token,
 				'next_page_token' => $subsResult['next_page_token'] ?? ''

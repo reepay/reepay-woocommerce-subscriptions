@@ -18,7 +18,7 @@ global $post;
 <tr style="display: flex">
     <td class="addon_name" style="width: 50%;">
         <label for="addon_name_<?php echo esc_html( $loop ); ?>">
-			<?php _e( 'Name', 'reepay-subscriptions' ); ?>
+			<?php _e( 'Name', 'reepay-subscriptions-for-woocommerce' ); ?>
         </label>
         <input style="width: 100%;" type="text" id="addon_name_<?php echo esc_html( $loop ); ?>"
                name="product_addon_name[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
@@ -26,16 +26,16 @@ global $post;
     </td>
     <td class="addon_name" style="width: 50%;">
         <label for="addon_type_<?php echo esc_html( $loop ); ?>">
-			<?php _e( 'Type', 'reepay-subscriptions' ); ?>
+			<?php _e( 'Type', 'reepay-subscriptions-for-woocommerce' ); ?>
         </label>
         <select id="addon_type_<?php echo esc_html( $loop ); ?>"
                 name="product_addon_type[<?php echo esc_html( $loop ); ?>]"
                 class="product_addon_type" <?php echo $addon['choose'] == 'exist' || $addon['disabled'] ? 'disabled' : '' ?>
                 style="min-height: 38px">
             <option <?php selected( 'on_off', $addon['type'] ); ?>
-                    value="on_off"><?php _e( 'On/Off', 'reepay-subscriptions' ); ?></option>
+                    value="on_off"><?php _e( 'On/Off', 'reepay-subscriptions-for-woocommerce' ); ?></option>
             <option <?php selected( 'quantity', $addon['type'] ); ?>
-                    value="quantity"><?php _e( 'Quantity', 'reepay-subscriptions' ); ?></option>
+                    value="quantity"><?php _e( 'Quantity', 'reepay-subscriptions-for-woocommerce' ); ?></option>
         </select>
     </td>
 </tr>
@@ -44,8 +44,8 @@ global $post;
     <td class="addon_description" style="width: 100%">
         <label for="addon_description_<?php echo esc_html( $loop ); ?>">
 			<?php
-			_e( 'Description', 'reepay-subscriptions' );
-			echo wc_help_tip( __( 'Will display on the frontend', 'reepay-subscriptions' ) );
+			_e( 'Description', 'reepay-subscriptions-for-woocommerce' );
+			echo wc_help_tip( __( 'Will display on the frontend', 'reepay-subscriptions-for-woocommerce' ) );
 			?>
         </label>
         <textarea cols="20" id="addon_description_<?php echo esc_html( $loop ); ?>"
@@ -56,10 +56,10 @@ global $post;
 <tr style="display: flex">
     <td class="addon_name" style="width: 33%">
         <label for="addon_amount_<?php echo esc_html( $loop ); ?>">
-			<?php _e( 'Amount (per unit)', 'reepay-subscriptions' ); ?>
+			<?php _e( 'Amount (per unit)', 'reepay-subscriptions-for-woocommerce' ); ?>
         </label>
         <input style="width: 100%;" type="number"
-               placeholder="<?php _e( 'kr 0.00', 'reepay-subscriptions' ); ?>" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
+               placeholder="<?php _e( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
                id="addon_amount_<?php echo esc_html( $loop ); ?>"
                name="product_addon_amount[<?php echo esc_html( $loop ); ?>]"
                value="<?php echo esc_attr( $addon['amount'] ) ?>"/>
@@ -69,12 +69,12 @@ global $post;
 <tr>
     <td class="addon_name">
         <p class="form-row choose-radio">
-            <label for="_reepay_subscription_avai"><?php echo __( 'Add-on availability', 'reepay-subscriptions' ); ?></label>
-            &nbsp&nbsp<?php echo __( 'Current plan', 'reepay-subscriptions' ); ?> &nbsp
+            <label for="_reepay_subscription_avai"><?php echo __( 'Add-on availability', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            &nbsp&nbsp<?php echo __( 'Current plan', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input type="radio" id="_reepay_subscription_avai"
                    name="_reepay_addon_avai[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
                    value="current" <?php echo empty( $addon['avai'] ) || $addon['avai'] == 'current' ? 'checked' : '' ?>>
-            &nbsp&nbsp<?php echo __( 'All plans', 'reepay-subscriptions' ); ?> &nbsp
+            &nbsp&nbsp<?php echo __( 'All plans', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input type="radio" id="_reepay_subscription_avai"
                    name="_reepay_addon_avai[<?php echo esc_html( $loop ); ?>]" <?php echo $addon['disabled'] ? 'disabled' : '' ?>
                    value="all" <?php checked( 'all', $addon['avai'] ); ?>>

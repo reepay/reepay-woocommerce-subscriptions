@@ -4,14 +4,14 @@
  * @var string $trial
  * @var string $contract_period
  * @var string $setup_fee
- * @var string 'reepay-subscriptions'
+ * @var string 'reepay-subscriptions-for-woocommerce'
  * @var boolean $is_checkout
  */
 ?>
 <div class="reepay_subscription_info_container">
     <?php
 	if ( ! $is_checkout ) : ?>
-        <h4><?php _e( 'Subscription details', 'reepay-subscriptions' ) ?></h4>
+        <h4><?php _e( 'Subscription details', 'reepay-subscriptions-for-woocommerce' ) ?></h4>
 	<?php endif; ?>
 
     <ul class="reepay_subscription_info">

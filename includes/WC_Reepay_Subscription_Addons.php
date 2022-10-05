@@ -204,7 +204,7 @@ class WC_Reepay_Subscription_Addons {
 					'billing_plan' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true ),
 					'product'      => $product,
 					'addons'       => $product_addons,
-					'domain'       => 'reepay-subscriptions'
+					'domain'       => 'reepay-subscriptions-for-woocommerce'
 				],
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'
@@ -221,7 +221,7 @@ class WC_Reepay_Subscription_Addons {
 		if ( $_product->is_type( 'reepay_simple_subscriptions' ) || $_product->is_type( 'reepay_variable_subscriptions' ) ) {
 			?>
             <li class="addons_tab product_addons">
-            <a href="#product_addons_data"><span><?php _e( 'Add-ons', 'reepay-subscriptions' ); ?></span></a>
+            <a href="#product_addons_data"><span><?php _e( 'Add-ons', 'reepay-subscriptions-for-woocommerce' ); ?></span></a>
             </li><?php
 		}
 	}
@@ -241,7 +241,7 @@ class WC_Reepay_Subscription_Addons {
 		wc_get_template(
 			'admin-addons-panel.php',
 			[
-				'domain'         => 'reepay-subscriptions',
+				'domain'         => 'reepay-subscriptions-for-woocommerce',
 				'product_addons' => $product_addons,
 				'addons_list'    => $addons_list
 			],
