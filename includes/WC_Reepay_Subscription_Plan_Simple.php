@@ -142,7 +142,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$fee     = $product->get_meta( '_reepay_subscription_fee' );
 				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
 					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
-					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions' ), $amount, false );
+					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
 				}
 			}
 		}
@@ -200,7 +200,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	}
 
 	public function add_subscription_product_type( $types ) {
-		$types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', 'reepay-subscriptions' );
+		$types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', 'reepay-subscriptions-for-woocommerce' );
 
 		return $types;
 	}
@@ -252,7 +252,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				'trial'           => self::get_trial( $product ),
 				'setup_fee'       => self::get_setup_fee( $product ),
 				'contract_period' => self::get_contract_period( $product ),
-				'domain'          => 'reepay-subscriptions',
+				'domain'          => 'reepay-subscriptions-for-woocommerce',
 				'is_checkout'     => $is_checkout
 			],
 			'',
@@ -353,7 +353,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$data = [
 			'post_id'    => $post_id,
 			'plans_list' => $this->get_reepay_plans_list() ?: [],
-			'domain'     => 'reepay-subscriptions',
+			'domain'     => 'reepay-subscriptions-for-woocommerce',
 		];
 
 		foreach ( self::$meta_fields as $meta_field ) {
@@ -443,7 +443,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$plan_meta = [];
 
 		if ( empty( $plan_data ) ) {
-			$this->plan_error( __( 'Plan not found', 'reepay-subscriptions' ) );
+			$this->plan_error( __( 'Plan not found', 'reepay-subscriptions-for-woocommerce' ) );
 
 			return [];
 		}
@@ -614,7 +614,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				}
 
 			} else {
-				$this->plan_error( __( 'Please choose the plan', 'reepay-subscriptions' ) );
+				$this->plan_error( __( 'Please choose the plan', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 		} else {
 			if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
@@ -910,7 +910,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$ret      = '';
 			if ( ! empty( $type_str ) ) {
 				$ret = sprintf(
-					__( $type_str, 'reepay-subscriptions' ),
+					__( $type_str, 'reepay-subscriptions-for-woocommerce' ),
 					$interval
 				);
 			}
@@ -966,7 +966,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$plan    = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true );
 		$ret     = '';
 		if ( ! empty( $periods ) ) {
-			$ret = __( 'Contract Period', 'reepay-subscriptions' ) . ': ' . $periods . ' x ' . $plan;
+			$ret = __( 'Contract Period', 'reepay-subscriptions-for-woocommerce' ) . ': ' . $periods . ' x ' . $plan;
 		}
 
 		return $ret;

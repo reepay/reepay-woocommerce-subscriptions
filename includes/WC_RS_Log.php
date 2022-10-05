@@ -61,7 +61,7 @@ class WC_RS_Log {
 		}
 
 		$logger->log( $level, $message, array(
-			'source'  => 'reepay-subscriptions',
+			'source'  => 'reepay-subscriptions-for-woocommerce',
 			'_legacy' => true
 		) );
 	}

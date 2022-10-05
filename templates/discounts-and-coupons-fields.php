@@ -9,14 +9,14 @@
 <div class="show_if_reepay hidden">
 	<?php if ( ! $is_update ): ?>
         <p class="form-field">
-            <label for="use_existing_coupon"><?php echo __( 'Coupon creation type', 'reepay-subscriptions' ); ?></label>
-			<?php echo __( 'Create new coupon', 'reepay-subscriptions' ); ?> &nbsp
+            <label for="use_existing_coupon"><?php echo __( 'Coupon creation type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+			<?php echo __( 'Create new coupon', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input type="radio"
                    id="use_existing_coupon"
                    name="use_existing_coupon"
                    value="false" checked/>
             &nbsp&nbsp
-			<?php echo __( 'Use existing coupon', 'reepay-subscriptions' ); ?> &nbsp
+			<?php echo __( 'Use existing coupon', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input
                     type="radio" id="use_existing_coupon"
                     name="use_existing_coupon"
@@ -31,7 +31,7 @@
 					<?php endforeach; ?>
                 </select>
 				<?php if ( empty( $coupons ) ):
-					_e( 'No coupons found', 'reepay-subscriptions' );
+					_e( 'No coupons found', 'reepay-subscriptions-for-woocommerce' );
 				endif; ?>
             </p>
         </div>
@@ -44,7 +44,7 @@
 				'meta'      => $meta,
 				'plans'     => $plans,
 				'is_update' => $is_update,
-				'domain'    => 'reepay-subscriptions'
+				'domain'    => 'reepay-subscriptions-for-woocommerce'
 			),
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
@@ -52,14 +52,14 @@
 		?>
 		<?php if ( ! $is_update ): ?>
             <p class="form-field">
-                <label for="use_existing_discount"><?php echo __( 'Discount creation type', 'reepay-subscriptions' ); ?></label>
-				<?php echo __( 'Create new discount', 'reepay-subscriptions' ); ?> &nbsp
+                <label for="use_existing_discount"><?php echo __( 'Discount creation type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+				<?php echo __( 'Create new discount', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
                 <input type="radio"
                        id="use_existing_discount"
                        name="use_existing_discount"
                        value="false" checked/>
                 &nbsp&nbsp
-				<?php echo __( 'Use existing discount', 'reepay-subscriptions' ); ?> &nbsp
+				<?php echo __( 'Use existing discount', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
                 <input
                         type="radio" id="use_existing_discount"
                         name="use_existing_discount"
@@ -76,7 +76,7 @@
                         </select>
 					<?php endif; ?>
 					<?php if ( empty( $discounts ) ):
-						_e( 'No discounts found', 'reepay-subscriptions' );
+						_e( 'No discounts found', 'reepay-subscriptions-for-woocommerce' );
 					endif; ?>
                 </p>
             </div>
@@ -88,7 +88,7 @@
 				'meta'      => $meta,
 				'plans'     => $plans,
 				'is_update' => $is_update,
-				'domain'    => 'reepay-subscriptions'
+				'domain'    => 'reepay-subscriptions-for-woocommerce'
 			),
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'

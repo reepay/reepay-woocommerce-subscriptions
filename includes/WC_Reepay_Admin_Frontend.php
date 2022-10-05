@@ -101,7 +101,7 @@ class WC_Reepay_Admin_Frontend {
 			case 'order_number':
 				if ( $post->post_parent !== 0 ) {
 					$output = '<strong>';
-					$output .= __( '&nbsp;Sub Order of', 'reepay-subscriptions' );
+					$output .= __( '&nbsp;Sub Order of', 'reepay-subscriptions-for-woocommerce' );
 					$output .= sprintf( ' <a href="%s">#%s</a>', esc_url( admin_url( 'post.php?action=edit&post=' . $post->post_parent ) ),
 						esc_html( $post->post_parent ) );
 					$output .= '</strong>';
@@ -112,8 +112,8 @@ class WC_Reepay_Admin_Frontend {
 				$handle = $the_order->get_meta( '_reepay_subscription_handle', true );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
 					$output = sprintf( '<a href="#" class="show-sub-orders" data-class="parent-%1$d" data-show="%2$s" data-hide="%3$s">%2$s</a>',
-						esc_attr( $post->ID ), esc_attr__( 'Show history', 'reepay-subscriptions' ),
-						esc_attr__( 'Hide history', 'reepay-subscriptions' ) );
+						esc_attr( $post->ID ), esc_attr__( 'Show history', 'reepay-subscriptions-for-woocommerce' ),
+						esc_attr__( 'Hide history', 'reepay-subscriptions-for-woocommerce' ) );
 				}
 				break;
 
@@ -148,13 +148,13 @@ class WC_Reepay_Admin_Frontend {
 
 			$columns = array_slice( $existing_columns, 0, count( $existing_columns ), true ) +
 			           array(
-				           'reepay_sub' => __( 'Subscription', 'reepay-subscriptions' ),
-				           'suborder'   => __( 'Sub Order', 'reepay-subscriptions' ),
+				           'reepay_sub' => __( 'Subscription', 'reepay-subscriptions-for-woocommerce' ),
+				           'suborder'   => __( 'Sub Order', 'reepay-subscriptions-for-woocommerce' ),
 			           )
 			           + array_slice( $existing_columns, count( $existing_columns ), count( $existing_columns ) - 1, true );
 		} else {
-			$existing_columns['reepay_sub'] = __( 'Vendor', 'reepay-subscriptions' );
-			$existing_columns['suborder']   = __( 'Sub Order', 'reepay-subscriptions' );
+			$existing_columns['reepay_sub'] = __( 'Vendor', 'reepay-subscriptions-for-woocommerce' );
+			$existing_columns['suborder']   = __( 'Sub Order', 'reepay-subscriptions-for-woocommerce' );
 		}
 
 		if ( WC_VERSION > '3.2.6' ) {

@@ -35,8 +35,8 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 	 * @return array
 	 */
 	function reepay_shipping_instance_form_add_extra_fields( $settings ) {
-		$options['']    = __( 'Choose add-on', 'reepay-subscriptions' );
-		$options['new'] = __( 'New add-on', 'reepay-subscriptions' );
+		$options['']    = __( 'Choose add-on', 'reepay-subscriptions-for-woocommerce' );
+		$options['new'] = __( 'New add-on', 'reepay-subscriptions-for-woocommerce' );
 
 		$addons_list = $this->get_reepay_addons_list();
 		if ( ! empty( $addons_list["content"] ) ) {
@@ -48,24 +48,24 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 		}
 
 		$settings['reepay_shipping_addon'] = array(
-			'title'       => __( 'Reepay Add-on', 'reepay-subscriptions' ),
+			'title'       => __( 'Reepay Add-on', 'reepay-subscriptions-for-woocommerce' ),
 			'type'        => 'select',
 			'default'     => '',
 			'class'       => 'wc-enhanced-select addon-shipping-choose',
 			'options'     => $options,
-			'description' => __( 'Only add-ons not related to plans are available.', 'reepay-subscriptions' ),
+			'description' => __( 'Only add-ons not related to plans are available.', 'reepay-subscriptions-for-woocommerce' ),
 			'desc_tip'    => true,
 		);
 
 		$settings['reepay_shipping_addon_name'] = array(
-			'title'   => __( 'Add-on name', 'reepay-subscriptions' ),
+			'title'   => __( 'Add-on name', 'reepay-subscriptions-for-woocommerce' ),
 			'type'    => 'text',
 			'default' => '',
 			'class'   => 'addon-shipping-new',
 		);
 
 		$settings['reepay_shipping_addon_description'] = array(
-			'title'   => __( 'Add-on description', 'reepay-subscriptions' ),
+			'title'   => __( 'Add-on description', 'reepay-subscriptions-for-woocommerce' ),
 			'type'    => 'textarea',
 			'default' => '',
 			'class'   => 'addon-shipping-new',
