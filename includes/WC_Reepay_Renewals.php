@@ -167,6 +167,7 @@ class WC_Reepay_Renewals {
 			//Get the WC_Product object
 			$product         = $order_item->get_product();
 			$items_to_create = [ $order_item ];
+
 			$fee             = $product->get_meta( '_reepay_subscription_fee' );
 			if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
 				foreach ( $main_order->get_items( 'fee' ) as $item_id => $item ) {
@@ -186,7 +187,6 @@ class WC_Reepay_Renewals {
 			], $main_order, $items_to_create );
 
 			$orders[] = $created_order;
-
 			$created_orders[] = $created_order->get_id();
 		}
 
@@ -610,6 +610,7 @@ class WC_Reepay_Renewals {
 				$product_item->set_name( $item->get_name() );
 				$product_item->set_quantity( $item->get_quantity() );
 				$product_item->set_product_id( $item->get_product_id() );
+				$product_item->set_variation_id( $item->get_variation_id() );
 				$product_item->set_subtotal( $item->get_subtotal() );
 				$product_item->set_total( $item->get_total() );
 
