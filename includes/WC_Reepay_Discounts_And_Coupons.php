@@ -80,7 +80,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 
 	function get_coupon_default_params( WC_Coupon $coupon ) {
-		$apply_plans = get_post_meta( $coupon->get_id(), '_reepay_discount_eligible_plans', true );
+		$apply_plans = get_post_meta( $coupon->get_id(), '_reepay_discount_eligible_plans', true ) ?: [];
 
 		$name = get_post_meta( $coupon->get_id(), '_reepay_discount_name', true );
 
