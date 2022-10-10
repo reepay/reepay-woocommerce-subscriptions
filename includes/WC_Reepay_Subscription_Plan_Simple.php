@@ -642,7 +642,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 		foreach ( self::$meta_fields as $key ) {
 			if ( isset( $_REQUEST[ $key ] ) ) {
-				$data[ $key ] = sanitize_text_field( $_REQUEST[ $key ] );
+				$data[ $key ] = wc_clean( $_REQUEST[ $key ] );
 			}
 		}
 
