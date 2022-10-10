@@ -436,15 +436,6 @@ class WC_Reepay_Discounts_And_Coupons {
 				}
 			}
 		}
-        if (count($discounts->get_items_to_validate()) > 1) {
-
-            add_filter( 'woocommerce_coupon_message', function($msg, $code) {
-                if ($code === WC_Coupon::WC_COUPON_SUCCESS) {
-                    return __( 'Coupon will be applied only for the first product', 'woocommerce' );
-                }
-                return $msg;
-            }, 10 ,2);
-        }
 
 		if ( $apply_to_all_plans === '0' && ! $apply ) {
 			throw new Exception( __( 'Sorry, this coupon is not applicable to the products', 'woocommerce' ), 113 );

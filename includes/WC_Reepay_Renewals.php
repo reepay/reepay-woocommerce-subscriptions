@@ -140,7 +140,6 @@ class WC_Reepay_Renewals {
 			$token = self::get_payment_token_order( $main_order );
 		}
 
-
 		if ( empty( $token ) ) {
 			self::log( [
 				'log'    => [
@@ -199,6 +198,8 @@ class WC_Reepay_Renewals {
 				continue;
 			}
 
+
+
 			$order_items = $order->get_items();
 			$order_item  = reset( $order_items );
 
@@ -241,6 +242,10 @@ class WC_Reepay_Renewals {
 				if ( ! empty( $addons ) ) {
 					$sub_data['add_ons'] = $addons;
 				}
+
+				if ($main_order->get_id() !== $order->get_id()) {
+				    $sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $handle );
+                }
 
 				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
 			} catch ( Exception $e ) {
@@ -675,6 +680,33 @@ class WC_Reepay_Renewals {
 		}
 
 		return $coupons;
+	}
+
+    /**
+     * @param WC_Order $order
+     *
+     *
+     * @param $handle
+     * @return array<string>
+     */
+	public static function get_reepay_discounts( $order, $handle ) {
+		$discounts = [];
+
+		foreach ( $order->get_coupon_codes() as $coupon_code ) {
+			$c = new WC_Coupon( $coupon_code );
+
+            if ( $c->is_type( 'reepay_type' ) ) {
+                $discount_handle = get_post_meta($c->get_id(), '_reepay_discount_handle', true);
+				if ($discount_handle) {
+                    $discounts[] = [
+                        'handle' => $handle . '_' . $discount_handle,
+                        'discount' => $discount_handle
+                    ];
+                }
+			}
+		}
+
+		return $discounts;
 	}
 
 	/**
