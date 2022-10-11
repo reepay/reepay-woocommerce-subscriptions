@@ -58,7 +58,7 @@ class WC_Reepay_Import {
 				}
 			}
 
-			$_SESSION[$this->session_notices_key] = $notices;
+			$_SESSION[ $this->session_notices_key ] = $notices;
 		}
 
 		return $args;
@@ -115,18 +115,18 @@ class WC_Reepay_Import {
 	}
 
 	public function process_import_cards() {
-		return new WP_Error(500, 'Method doesn\'t implemented');
+		return new WP_Error( 500, 'Method doesn\'t implemented' );
 	}
 
 	public function process_import_subscriptions() {
-		return new WP_Error(500, 'Method doesn\'t implemented');
+		return new WP_Error( 500, 'Method doesn\'t implemented' );
 	}
 
 	function add_notices() {
-		foreach ( $_SESSION[$this->session_notices_key] ?? [] as $message ) {
+		foreach ( $_SESSION[ $this->session_notices_key ] ?? [] as $message ) {
 			printf( '<div class="notice notice-error"><p>%1$s</p></div>', esc_html( $message ) );
 		}
 
-		$_SESSION[$this->session_notices_key] = [];
+		$_SESSION[ $this->session_notices_key ] = [];
 	}
 }

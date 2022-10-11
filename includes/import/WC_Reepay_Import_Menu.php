@@ -19,14 +19,14 @@ class WC_Reepay_Import_Menu {
 	/**
 	 * WC_Reepay_Import_Menu constructor.
 	 *
-	 * @param string $option_name
-	 * @param string $menu_slug
-	 * @param array<string> $import_objects
+	 * @param  string  $option_name
+	 * @param  string  $menu_slug
+	 * @param  array<string>  $import_objects
 	 */
-	public function __construct($option_name, $menu_slug, $import_objects) {
-	    $this->option_name = $option_name;
-	    $this->menu_slug = $menu_slug;
-	    $this->import_objects = $import_objects;
+	public function __construct( $option_name, $menu_slug, $import_objects ) {
+		$this->option_name    = $option_name;
+		$this->menu_slug      = $menu_slug;
+		$this->import_objects = $import_objects;
 
 		add_action( 'admin_menu', [ $this, 'create_submenu' ] );
 		add_action( 'admin_init', [ $this, 'create_settings_fields' ] );
