@@ -80,7 +80,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 
 	function get_coupon_default_params( WC_Coupon $coupon ) {
-		$apply_plans = get_post_meta( $coupon->get_id(), '_reepay_discount_eligible_plans', true );
+		$apply_plans = get_post_meta( $coupon->get_id(), '_reepay_discount_eligible_plans', true ) ?: [];
 
 		$name = get_post_meta( $coupon->get_id(), '_reepay_discount_name', true );
 
@@ -389,11 +389,12 @@ class WC_Reepay_Discounts_And_Coupons {
 			$product = $cart_item['data'];
 			if ( $this->is_coupon_applied_for_plans( $coupon, $product ) ) {
 				$discount = (float) $coupon->get_amount() * ( $discounting_amount / 100 );
+
 			}
 		}
 
 		if ( ! $this->applied_fixed_coupon && $type === 'reepay_fixed_product' ) {
-			$discount                   = $coupon->get_amount();
+			$discount                   = $coupon->get_amount() / $cart_item['quantity'];
 			$this->applied_fixed_coupon = true;
 		}
 
