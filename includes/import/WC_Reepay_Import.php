@@ -1,27 +1,39 @@
 <?php
 
 class WC_Reepay_Import {
+	/**
+	 * @var string
+	 */
+    public $option_name = 'reepay_import';
+
+    public $menu_slug = 'reepay_import';
+
+	public $import_objects = [ 'users', 'cards', 'subscriptions' ];
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', [ $this, 'import_submenu' ] );
-		add_action( 'admin_init', [ $this, 'import_settings_fields' ] );
-		add_action( 'admin_init', [ $this, 'process_import' ] );
+	    new WC_Reepay_Import_Menu($this->option_name, $this->menu_slug, $this->import_objects);
+
+		/*
+		 * Start import with saving import settings
+		 * Use pre_update for the case when the options have not changed
+		 * Also use filter as action, but don't forget to return the value
+		 */
+		add_filter( 'pre_update_option', [ $this, 'process_import' ], 10, 2 );
 	}
 
-	public function process_import() {
-		if ( isset( $_POST['import_tipple'] ) ) {
-			try {
-				if ( isset( $_POST['import_checkbox_users'] ) && $_POST['import_checkbox_users'] == 'on' ) {
-					$this->process_import_users();
-				}
-			} catch ( Exception $e ) {
-				WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
-			}
+	public function process_import( $args, $option ) {
+		if($option == $this->option_name) {
+            foreach ($this->import_objects as $object) {
+	            if ( ! empty( $args[$object] ) && 'yes' == $args[$object] ) {
+                    call_user_func(array($this, "process_import_$object"));
+	            }
+            }
+        }
 
-		}
+		return $args;
 	}
 
 	public function process_import_users( $token = '' ) {
@@ -64,110 +76,11 @@ class WC_Reepay_Import {
 		}
 	}
 
-
-	function import_submenu() {
-
-		add_submenu_page(
-			'tools.php', // parent page slug
-			'Reepay Import',
-			'Reepay Import',
-			'manage_options',
-			'reepay_import',
-			[ $this, 'import_page_callback' ],
-			0 // menu position
-		);
-	}
-
-	function import_settings_fields() {
-		// I created variables to make the things clearer
-		$page_slug    = 'reepay_import';
-		$option_group = 'reepay_import_settings';
-
-		// 1. create section
-		add_settings_section(
-			'import_section', // section ID
-			'', // title (optional)
-			'', // callback function to display the section (optional)
-			$page_slug
-		);
-
-		// 2. register fields
-		register_setting( $option_group, 'slider_on', [ $this, 'import_sanitize_checkbox' ] );
-
-		// 3. add fields
-		add_settings_field(
-			'import_users',
-			'Import users',
-			[ $this, 'import_checkbox_users' ], // function to print the field
-			$page_slug,
-			'import_section' // section ID
-		);
-		add_settings_field(
-			'import_cards',
-			'Import cards',
-			[ $this, 'import_checkbox_cards' ], // function to print the field
-			$page_slug,
-			'import_section' // section ID
-		);
-		add_settings_field(
-			'import_subscriptions',
-			'Import subscriptions',
-			[ $this, 'import_checkbox_subscriptions' ], // function to print the field
-			$page_slug,
-			'import_section' // section ID
-		);
+	public function process_import_cards() {
 
 	}
 
-	// custom callback function to print checkbox field HTML
-	function import_checkbox_users( $args ) {
-		$value = get_option( 'import_checkbox_users' );
-		?>
-        <label>
-            <input type="checkbox" name="import_checkbox_users" <?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
+	public function process_import_subscriptions() {
+
 	}
-
-	// custom callback function to print checkbox field HTML
-	function import_checkbox_cards( $args ) {
-		$value = get_option( 'import_checkbox_cards' );
-		?>
-        <label>
-            <input type="checkbox" name="import_checkbox_cards" <?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
-	}
-
-	// custom callback function to print checkbox field HTML
-	function import_checkbox_subscriptions( $args ) {
-		$value = get_option( 'import_checkbox_subscriptions' );
-		?>
-        <label>
-            <input type="checkbox" name="import_checkbox_subscriptions" <?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
-	}
-
-// custom sanitization function for a checkbox field
-	function import_sanitize_checkbox( $value ) {
-		return 'on' === $value ? 'yes' : 'no';
-	}
-
-	function import_page_callback() {
-		?>
-        <div class="wrap">
-            <h1><?php echo get_admin_page_title() ?></h1>
-            <form method="post" action="options.php">
-				<?php
-				settings_fields( 'reepay_import_settings' ); // settings group name
-				do_settings_sections( 'reepay_import' ); // just a page slug
-				?>
-
-                <input type="submit" name="import_tipple" id="submit" class="button button-primary" value="Import">
-            </form>
-        </div>
-		<?php
-	}
-
 }
