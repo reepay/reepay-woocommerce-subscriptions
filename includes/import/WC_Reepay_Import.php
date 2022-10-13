@@ -183,7 +183,7 @@ class WC_Reepay_Import {
 			'message' => $error->get_error_messages()
 		] );
 
-		$this->notices = $notice;
+		$this->notices[] = $notice;
 	}
 
 	function add_notices() {
