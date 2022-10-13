@@ -16,6 +16,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Checkout' => __DIR__ . '/../..' . '/includes/WC_Reepay_Checkout.php',
         'WC_Reepay_Discounts_And_Coupons' => __DIR__ . '/../..' . '/includes/WC_Reepay_Discounts_And_Coupons.php',
         'WC_Reepay_Import' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import.php',
+        'WC_Reepay_Import_Helpers' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import_Helpers.php',
         'WC_Reepay_Import_Menu' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import_Menu.php',
         'WC_Reepay_Renewals' => __DIR__ . '/../..' . '/includes/WC_Reepay_Renewals.php',
         'WC_Reepay_Statistics' => __DIR__ . '/../..' . '/includes/WC_Reepay_Statistics.php',
