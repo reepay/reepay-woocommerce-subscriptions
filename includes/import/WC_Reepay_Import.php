@@ -158,7 +158,7 @@ class WC_Reepay_Import {
 
 			foreach ( $subscriptions as $subscription ) {
 				if ( true ) {
-					// Обновить подписку
+					WC_Reepay_Import_Helpers::woo_reepay_subscription_exists($subscription['handle']);
 				} else {
 					//Создать подписку
 				}

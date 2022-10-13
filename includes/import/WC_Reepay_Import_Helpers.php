@@ -58,4 +58,14 @@ class WC_Reepay_Import_Helpers {
 
 		return $user_id;
 	}
+
+	/**
+	 * @param string $handle
+	 */
+	public static function woo_reepay_subscription_exists($handle) {
+		wc_get_orders([
+			'limit' => 1,
+			'meta_key' =>
+		]);
+	}
 }
