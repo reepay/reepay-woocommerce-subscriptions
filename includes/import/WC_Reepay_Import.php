@@ -14,7 +14,12 @@ class WC_Reepay_Import {
 	/**
 	 * @var string[]
 	 */
-	public $import_objects = [ 'users', 'cards', 'subscriptions' ];
+	public $import_objects = [ 'customers', 'cards', 'subscriptions' ];
+
+	/**
+	 * @var string[]
+	 */
+	public $notices = [];
 
 	/**
 	 * @var string
@@ -41,24 +46,21 @@ class WC_Reepay_Import {
 
 	public function process_import( $args, $option ) {
 		if ( $option == $this->option_name ) {
-			$notices = [];
-
 			foreach ( $this->import_objects as $object ) {
 				if ( ! empty( $args[ $object ] ) && 'yes' == $args[ $object ] ) {
 					$res = call_user_func( [ $this, "process_import_$object" ] );
 
 					if ( is_wp_error( $res ) ) {
-						reepay_s()->log()->log( [
-							'source'  => "WC_Reepay_Import::process_import::process_import_$object",
-							'message' => $res->get_error_messages()
-						] );
-
-						$notices[] = "Error with $object import: " . $res->get_error_message();
+						$this->log(
+							"WC_Reepay_Import::process_import::process_import_$object",
+							$res,
+							"Error with $object import: " . $res->get_error_message()
+						);
 					}
 				}
 			}
 
-			$_SESSION[ $this->session_notices_key ] = $notices;
+			$_SESSION[ $this->session_notices_key ] = $this->notices;
 		}
 
 		return $args;
@@ -69,7 +71,7 @@ class WC_Reepay_Import {
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function process_import_users( $token = '' ) {
+	public function process_import_customers( $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -83,31 +85,34 @@ class WC_Reepay_Import {
 			/**
 			 * @see https://reference.reepay.com/api/#get-list-of-customers
 			 **/
-			$users_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
+			$customers_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
 		} catch ( Exception $e ) {
 			return new WP_Error( 400, $e->getMessage() );
 		}
 
 
-		if ( ! empty( $users_data ) && ! empty( $users_data['content'] ) ) {
-			$users = $users_data['content'];
+		if ( ! empty( $customers_data ) && ! empty( $customers_data['content'] ) ) {
+			$customers = $customers_data['content'];
 
-			foreach ( $users as $user ) {
-				if ( $wp_user = get_user_by( 'email', $user['email'] ) ) {
-					$wp_user_data = $wp_user->data;
-					if ( ! empty( get_user_meta( $wp_user_data->ID, 'reepay_customer_id', true ) ) ) {
-						// Что если handel не совпадает?
-						continue;
-					} else {
-						update_user_meta( $wp_user_data->ID, 'reepay_customer_id', $user['handle'] );
-					}
+			foreach ( $customers as $customer ) {
+				if ( $wp_user = get_user_by( 'email', $customer['email'] ) ) {
+					update_user_meta( $wp_user->ID, 'reepay_customer_id', $customer['handle'] );
 				} else {
-					//Создать юзера
+					$wp_user_id = WC_Reepay_Import_Helpers::create_woo_customer( $customer );
+
+					if ( is_wp_error( $wp_user_id ) ) {
+						$this->log(
+							"WC_Reepay_Import::process_import_customers",
+							$wp_user_id,
+							"Error with creating wp user - " . $customer['email']
+						);
+					}
+
 				}
 			}
 
-			if ( ! empty( $users_data['next_page_token'] ) ) {
-				return $this->process_import_users();
+			if ( ! empty( $customers_data['next_page_token'] ) ) {
+				return $this->process_import_customers();
 			}
 		}
 
@@ -115,11 +120,70 @@ class WC_Reepay_Import {
 	}
 
 	public function process_import_cards() {
+		/**
+		 * @see ???
+		 **/
+
+
 		return new WP_Error( 500, 'Method doesn\'t implemented' );
 	}
 
-	public function process_import_subscriptions() {
-		return new WP_Error( 500, 'Method doesn\'t implemented' );
+	/**
+	 * @param  string  $token
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function process_import_subscriptions( $token = '' ) {
+		$params = [
+			'from' => '1970-01-01',
+			'size' => 100,
+		];
+
+		if ( ! empty( $token ) ) {
+			$params['next_page_token'] = $token;
+		}
+
+		try {
+			/**
+			 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
+			 **/
+			$subscriptions_data = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
+		} catch ( Exception $e ) {
+			return new WP_Error( 400, $e->getMessage() );
+		}
+
+
+		if ( ! empty( $subscriptions_data ) && ! empty( $subscriptions_data['content'] ) ) {
+			$subscriptions = $subscriptions_data['content'];
+
+			foreach ( $subscriptions as $subscription ) {
+				if ( true ) {
+					// Обновить подписку
+				} else {
+					//Создать подписку
+				}
+			}
+
+			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
+				return $this->process_import_subscriptions( $subscriptions_data['next_page_token'] );
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param  string  $source
+	 * @param  WP_Error $error
+	 * @param  string  $notice
+	 */
+	function log( $source, $error, $notice ) {
+		reepay_s()->log()->log( [
+			'source' => $source,
+			'message' => $error->get_error_messages()
+		] );
+
+		$this->notices = $notice;
 	}
 
 	function add_notices() {
