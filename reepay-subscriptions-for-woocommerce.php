@@ -108,6 +108,8 @@ class WooCommerce_Reepay_Subscriptions {
 		"invoice_refund"
 	];
 
+	public static $db_version = '1.0.2';
+
 	/**
 	 * Constructor
 	 */
@@ -142,6 +144,8 @@ class WooCommerce_Reepay_Subscriptions {
 		$this->includes();
 		$this->init_classes();
 
+		register_activation_hook( REEPAY_PLUGIN_FILE, __CLASS__ . '::install' );
+
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_enqueue_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'admin_customer_report' ] );
 		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ $this, 'plugin_action_links' ] );
@@ -149,13 +153,22 @@ class WooCommerce_Reepay_Subscriptions {
 		add_action( 'woocommerce_settings_tabs_reepay_subscriptions', [ $this, 'settings_tab' ] );
 		add_action( 'woocommerce_update_options_reepay_subscriptions', [ $this, 'update_settings' ] );
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
-		register_activation_hook( REEPAY_PLUGIN_FILE, 'flush_rewrite_rules' );
 		add_action( 'admin_init', [ $this, 'reepay_admin_notices' ] );
-		add_action( 'init', [ $this, 'reepay_load_textdomain' ] );
+		add_action( 'init', [ $this, 'init' ] );
 	}
 
-	public function reepay_load_textdomain() {
+	public static function install() {
+		flush_rewrite_rules();
+
+		if ( ! get_option( 'woocommerce_reepay_subscriptions_version' ) ) {
+			add_option( 'woocommerce_reepay_subscriptions_version', self::$db_version );
+		}
+	}
+
+	public function init() {
 		load_plugin_textdomain( self::settings( 'domain' ), false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+
+		new WC_Reepay_Subscriptions_Update( self::$db_version );
 	}
 
 	public function reepay_admin_notices() {
