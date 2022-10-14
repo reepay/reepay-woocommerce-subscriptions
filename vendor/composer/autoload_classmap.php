@@ -29,4 +29,5 @@ return array(
     'WC_Reepay_Subscription_Plan_Variable' => $baseDir . '/includes/WC_Reepay_Subscription_Plan_Variable.php',
     'WC_Reepay_Subscriptions_List' => $baseDir . '/includes/WC_Reepay_Subscriptions_List.php',
     'WC_Reepay_Subscriptions_Table' => $baseDir . '/includes/WC_Reepay_Subscriptions_Table.php',
+    'WC_Reepay_Subscriptions_Update' => $baseDir . '/includes/update/WC_Reepay_Subscriptions_Update.php',
 );
