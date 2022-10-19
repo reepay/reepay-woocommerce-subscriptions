@@ -140,7 +140,6 @@ class WC_Reepay_Renewals {
 			$token = self::get_payment_token_order( $main_order );
 		}
 
-
 		if ( empty( $token ) ) {
 			self::log( [
 				'log'    => [
@@ -421,9 +420,10 @@ class WC_Reepay_Renewals {
 	 * @return bool|WC_Order|WC_Order_Refund
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		// $handle - "subscription_handle_<order_id>_<product_id>"
+		//$handle - "<order_id>_<product_id>"
 		$parts = explode( '_', $handle );
 
+		//ToDo replace with meta _reepay_order
 		return wc_get_order( (int) $parts[0] );
 	}
 

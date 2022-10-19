@@ -62,6 +62,8 @@ class WC_Reepay_Import_Helpers {
 	/**
 	 * @param  int  $user_id
 	 * @param  array<string, mixed>  $card
+	 *
+	 * @return bool|WP_Error
 	 */
 	public static function add_card_to_user( $user_id, $card ) {
 		if ( 'ms_' == substr( $card['id'], 0, 3 ) ) {
@@ -97,7 +99,7 @@ class WC_Reepay_Import_Helpers {
 	 * @return string[]
 	 */
 	public static function get_customer_tokens( $user_id ) {
-		$tokens = WC_Payment_Tokens::get_customer_tokens( $user_id ) ?: [];
+		$tokens    = WC_Payment_Tokens::get_customer_tokens( $user_id ) ?: [];
 		$token_ids = [];
 
 		foreach ( $tokens as $token ) {
@@ -108,12 +110,27 @@ class WC_Reepay_Import_Helpers {
 	}
 
 	/**
-	 * @param  string  $handle
+	 * @param  string  $handle  <order_id>_<product_id>
+	 *
+	 * @return bool order exists
 	 */
 	public static function woo_reepay_subscription_exists( $handle ) {
-		wc_get_orders( [
-			'limit'    => 1,
-			'meta_key' => ''
-		] );
+		return ! empty( WC_Reepay_Renewals::get_order_by_subscription_handle( $handle ) );
+	}
+
+	/**
+	 * @param  array  $subscription  - reepay subscription object @see https://reference.reepay.com/api/#the-subscription-object
+	 *
+	 * @return bool|WP_Error
+	 */
+	public static function import_reepay_subscription( $subscription ) {
+		try {
+			$plan = $subscription['plan'];
+			$plan = reepay_s()->api()->request( "plan/$plan/current" );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'Plan request error' );
+		}
+
+		return true;
 	}
 }
