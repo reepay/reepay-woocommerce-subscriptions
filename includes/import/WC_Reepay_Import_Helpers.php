@@ -122,6 +122,7 @@ class WC_Reepay_Import_Helpers {
 	 * @param  array  $subscription  - reepay subscription object @see https://reference.reepay.com/api/#the-subscription-object
 	 *
 	 * @return bool|WP_Error
+	 * @throws WC_Data_Exception
 	 */
 	public static function import_reepay_subscription( $subscription ) {
 		try {
@@ -130,6 +131,53 @@ class WC_Reepay_Import_Helpers {
 		} catch ( Exception $e ) {
 			return new WP_Error( 'Plan request error' );
 		}
+
+		try {
+			$customer = $subscription['customer'];
+			$customer = reepay_s()->api()->request( "customer/$customer" );
+		} catch ( Exception $e ) {
+			return new WP_Error( 'Plan request error' );
+		}
+
+		$order = wc_create_order( [
+			'status' => '', //activated, expired, cancelled, on_hold or reactivated
+		] );
+
+		//import logic
+		$order->set_billing_city( $customer['city'] );
+		$order->set_billing_postcode( $customer['postal_code'] );
+		$order->set_billing_email( $customer['email'] );
+		$order->set_billing_phone( $customer['phone'] );
+		$order->set_billing_address_1( $customer['address'] );
+		$order->set_billing_address_2( $customer['address2'] );
+		$order->set_billing_country( $customer['country'] );
+		$order->set_billing_first_name( $customer['first_name'] );
+		$order->set_billing_last_name( $customer['last_name'] );
+		$order->set_billing_company( $customer['company'] );
+
+		$order->set_payment_method( 'reepay_checkout' );
+		$order->set_payment_method_title( 'Reepay Checkout' );
+		$order->add_meta_data( '_reepay_order', $subscription['handle'] );
+		$order->add_meta_data( '_reepay_state_authorized', 1 );
+
+		$fees_item = new WC_Order_Item_Product();
+		$fees_item->set_name( 'Plan ' . $plan['name'] );
+		$fees_item->set_quantity( $plan['quantity'] );
+		$fees_item->set_product_id( 0 );
+		$fees_item->set_subtotal( $plan['amount'] / 100 );
+		$fees_item->set_total( $plan['amount'] / 100 );
+		$order->add_item( $fees_item );
+
+		if ( ! empty( $plan['setup_fee'] ) && $plan['setup_fee'] > 0 ) {
+			$fees_item = new WC_Order_Item_Fee();
+			$fees_item->set_name( 'Fee ' . $plan['setup_fee_text'] );
+			$fees_item->set_amount( $plan['setup_fee'] / 100 );
+			$fees_item->set_total( $plan['setup_fee'] / 100 );
+			$order->add_item( $fees_item );
+		}
+
+		$order->save();
+		$order->calculate_totals();
 
 		return true;
 	}
