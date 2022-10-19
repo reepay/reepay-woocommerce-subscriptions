@@ -420,11 +420,13 @@ class WC_Reepay_Renewals {
 	 * @return bool|WC_Order|WC_Order_Refund
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		//$handle - "<order_id>_<product_id>"
-		$parts = explode( '_', $handle );
+		$orders = wc_get_orders([
+			'limit' => 1,
+			'meta_key' => '_reepay_order',
+			'meta_value' => $handle
+		]);
 
-		//ToDo replace with meta _reepay_order
-		return wc_get_order( (int) $parts[0] );
+		return $orders[0] ?? false;
 	}
 
 	/**
