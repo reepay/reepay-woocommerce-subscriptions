@@ -125,7 +125,48 @@ class WC_Reepay_Import {
 		 **/
 
 
-		return new WP_Error( 500, 'Method doesn\'t implemented' );
+		$users = get_users( [ 'fields' => [ 'ID' ] ] );
+
+		foreach ( $users as $user ) {
+			/** @var WP_User $user */
+			$reepay_user_id = rp_get_customer_handle( $user->ID );
+
+			try {
+				/**
+				 * @see ? https://reference.reepay.com/api/#get-customer
+				 **/
+				$res = reepay_s()->api()->request(
+					'customer/' . $reepay_user_id . '/payment_method'
+				);
+
+				if ( is_wp_error( $res ) || empty( $res['cards'] ) ) {
+					continue;
+				}
+
+				$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user->ID );
+
+				foreach ( $res['cards'] as $card ) {
+					if ( in_array( $card['id'], $customer_tokens ) ) {
+						continue;
+					}
+
+					$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $user->ID, $card );
+
+					if ( is_wp_error( $card_added ) ) {
+						$this->log(
+							"WC_Reepay_Import::process_import_customers",
+							$card_added,
+							"Error with import customer card - " . $user->user_email
+						);
+					}
+				}
+
+			} catch ( Exception $e ) {
+
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -158,7 +199,7 @@ class WC_Reepay_Import {
 
 			foreach ( $subscriptions as $subscription ) {
 				if ( true ) {
-					WC_Reepay_Import_Helpers::woo_reepay_subscription_exists($subscription['handle']);
+					WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] );
 				} else {
 					//Создать подписку
 				}
@@ -174,16 +215,18 @@ class WC_Reepay_Import {
 
 	/**
 	 * @param  string  $source
-	 * @param  WP_Error $error
+	 * @param  WP_Error  $error
 	 * @param  string  $notice
 	 */
-	function log( $source, $error, $notice ) {
+	function log( $source, $error, $notice = null ) {
 		reepay_s()->log()->log( [
-			'source' => $source,
+			'source'  => $source,
 			'message' => $error->get_error_messages()
 		] );
 
-		$this->notices[] = $notice;
+		if ( ! empty( $notice ) ) {
+			$this->notices[] = $notice;
+		}
 	}
 
 	function add_notices() {
