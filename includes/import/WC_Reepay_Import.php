@@ -1,30 +1,77 @@
 <?php
 
 class WC_Reepay_Import {
+	/**
+	 * @var string
+	 */
+	public $option_name = 'reepay_import';
+
+	/**
+	 * @var string
+	 */
+	public $menu_slug = 'reepay_import';
+
+	/**
+	 * @var string[]
+	 */
+	public $import_objects = [ 'customers', 'cards', 'subscriptions' ];
+
+	/**
+	 * @var string[]
+	 */
+	public $notices = [];
+
+	/**
+	 * @var string
+	 */
+	public $session_notices_key = 'reepay_import_notices';
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'admin_menu', [ $this, 'import_submenu' ] );
-		add_action( 'admin_init', [ $this, 'import_settings_fields' ] );
-		add_action( 'admin_init', [ $this, 'process_import' ] );
+		session_start();
+
+		new WC_Reepay_Import_Menu( $this->option_name, $this->menu_slug, $this->import_objects );
+
+		/*
+		 * Start import with saving import settings
+		 * Use pre_update for the case when the options have not changed
+		 * Also use filter as action, but don't forget to return the value
+		 */
+		add_filter( 'pre_update_option', [ $this, 'process_import' ], 10, 2 );
+
+		add_action( 'admin_notices', [ $this, 'add_notices' ] );
 	}
 
-	public function process_import() {
-		if ( isset( $_POST['import_tipple'] ) ) {
-			try {
-				if ( isset( $_POST['import_checkbox_users'] ) && $_POST['import_checkbox_users'] == 'on' ) {
-					$this->process_import_users();
+	public function process_import( $args, $option ) {
+		if ( $option == $this->option_name ) {
+			foreach ( $this->import_objects as $object ) {
+				if ( ! empty( $args[ $object ] ) && 'yes' == $args[ $object ] ) {
+					$res = call_user_func( [ $this, "process_import_$object" ] );
+
+					if ( is_wp_error( $res ) ) {
+						$this->log(
+							"WC_Reepay_Import::process_import::process_import_$object",
+							$res,
+							"Error with $object import: " . $res->get_error_message()
+						);
+					}
 				}
-			} catch ( Exception $e ) {
-				WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
 			}
 
+			$_SESSION[ $this->session_notices_key ] = $this->notices;
 		}
+
+		return $args;
 	}
 
-	public function process_import_users( $token = '' ) {
+	/**
+	 * @param  string  $token
+	 *
+	 * @return bool|WP_Error
+	 */
+	public function process_import_customers( $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -35,139 +82,159 @@ class WC_Reepay_Import {
 		}
 
 		try {
-			$users_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
+			/**
+			 * @see https://reference.reepay.com/api/#get-list-of-customers
+			 **/
+			$customers_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
 		} catch ( Exception $e ) {
 			return new WP_Error( 400, $e->getMessage() );
 		}
 
 
-		if ( ! empty( $users_data ) && ! empty( $users_data['content'] ) ) {
-			$users = $users_data['content'];
+		if ( ! empty( $customers_data ) && ! empty( $customers_data['content'] ) ) {
+			$customers = $customers_data['content'];
 
-			foreach ( $users as $user ) {
-				if ( $wp_user = get_user_by( 'email', $user['email'] ) ) {
-					$wp_user_data = $wp_user->data;
-					if ( ! empty( get_user_meta( $wp_user_data->ID, 'reepay_customer_id', true ) ) ) {
-						// Что если handel не совпадает?
-						continue;
-					} else {
-						update_user_meta( $wp_user_data->ID, 'reepay_customer_id', $user['handle'] );
-					}
+			foreach ( $customers as $customer ) {
+				if ( $wp_user = get_user_by( 'email', $customer['email'] ) ) {
+					update_user_meta( $wp_user->ID, 'reepay_customer_id', $customer['handle'] );
 				} else {
-					//Создать юзера
+					$wp_user_id = WC_Reepay_Import_Helpers::create_woo_customer( $customer );
+
+					if ( is_wp_error( $wp_user_id ) ) {
+						$this->log(
+							"WC_Reepay_Import::process_import_customers",
+							$wp_user_id,
+							"Error with creating wp user - " . $customer['email']
+						);
+					}
+
 				}
 			}
 
-			if ( ! empty( $users_data['next_page_token'] ) ) {
-				$this->process_import_users();
+			if ( ! empty( $customers_data['next_page_token'] ) ) {
+				return $this->process_import_customers();
 			}
+		}
+
+		return true;
+	}
+
+	public function process_import_cards() {
+		$users = get_users( [ 'fields' => [ 'ID' ] ] );
+
+		foreach ( $users as $user ) {
+			/** @var WP_User $user */
+			$reepay_user_id = rp_get_customer_handle( $user->ID );
+
+			try {
+				/**
+				 * @see ? https://reference.reepay.com/api/#get-customer
+				 **/
+				$res = reepay_s()->api()->request(
+					'customer/' . $reepay_user_id . '/payment_method'
+				);
+
+				if ( is_wp_error( $res ) || empty( $res['cards'] ) ) {
+					continue;
+				}
+
+				$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user->ID );
+
+				foreach ( $res['cards'] as $card ) {
+					if ( in_array( $card['id'], $customer_tokens ) ) {
+						continue;
+					}
+
+					$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $user->ID, $card );
+
+					if ( is_wp_error( $card_added ) ) {
+						$this->log(
+							"WC_Reepay_Import::process_import_cards",
+							$card_added,
+							"Error with import customer's card - " . $user->user_email
+						);
+					}
+				}
+
+			} catch ( Exception $e ) {
+
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param  string  $token
+	 *
+	 * @return bool|WP_Error
+	 * @throws WC_Data_Exception
+	 */
+	public function process_import_subscriptions( $token = '' ) {
+		$params = [
+			'from' => '1970-01-01',
+			'size' => 100,
+		];
+
+		if ( ! empty( $token ) ) {
+			$params['next_page_token'] = $token;
+		}
+
+		try {
+			/**
+			 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
+			 **/
+			$subscriptions_data = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
+		} catch ( Exception $e ) {
+			return new WP_Error( 400, $e->getMessage() );
+		}
+
+		if ( ! empty( $subscriptions_data ) && ! empty( $subscriptions_data['content'] ) ) {
+			$subscriptions = $subscriptions_data['content'];
+
+			foreach ( $subscriptions as $subscription ) {
+				if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] ) ) {
+					$imported = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscription );
+
+					if ( is_wp_error( $imported ) ) {
+						$this->log(
+							"WC_Reepay_Import::process_import_subscriptions",
+							$imported,
+							"Error with import subscription - " . $subscription['handle']
+						);
+					}
+				}
+			}
+
+			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
+				return $this->process_import_subscriptions( $subscriptions_data['next_page_token'] );
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * @param  string  $source
+	 * @param  WP_Error  $error
+	 * @param  string  $notice
+	 */
+	function log( $source, $error, $notice = null ) {
+		reepay_s()->log()->log( [
+			'source'  => $source,
+			'message' => $error->get_error_messages()
+		] );
+
+		if ( ! empty( $notice ) ) {
+			$this->notices[] = $notice;
 		}
 	}
 
+	function add_notices() {
+		foreach ( $_SESSION[ $this->session_notices_key ] ?? [] as $message ) {
+			printf( '<div class="notice notice-error"><p>%1$s</p></div>', esc_html( $message ) );
+		}
 
-	function import_submenu() {
-
-		add_submenu_page(
-			'tools.php', // parent page slug
-			'Reepay Import',
-			'Reepay Import',
-			'manage_options',
-			'reepay_import',
-			[ $this, 'import_page_callback' ],
-			0 // menu position
-		);
+		$_SESSION[ $this->session_notices_key ] = [];
 	}
-
-	function import_settings_fields() {
-		// I created variables to make the things clearer
-		$page_slug    = 'reepay_import';
-		$option_group = 'reepay_import_settings';
-
-		// 1. create section
-		add_settings_section(
-			'import_section', // section ID
-			'', // title (optional)
-			'', // callback function to display the section (optional)
-			$page_slug
-		);
-
-		// 2. register fields
-		register_setting( $option_group, 'slider_on', [ $this, 'import_sanitize_checkbox' ] );
-
-		// 3. add fields
-		add_settings_field(
-			'import_users',
-			'Import users',
-			[ $this, 'import_checkbox_users' ], // function to print the field
-			$page_slug,
-			'import_section' // section ID
-		);
-		add_settings_field(
-			'import_cards',
-			'Import cards',
-			[ $this, 'import_checkbox_cards' ], // function to print the field
-			$page_slug,
-			'import_section' // section ID
-		);
-		add_settings_field(
-			'import_subscriptions',
-			'Import subscriptions',
-			[ $this, 'import_checkbox_subscriptions' ], // function to print the field
-			$page_slug,
-			'import_section' // section ID
-		);
-
-	}
-
-	// custom callback function to print checkbox field HTML
-	function import_checkbox_users( $args ) {
-		$value = get_option( 'import_checkbox_users' );
-		?>
-        <label>
-            <input type="checkbox" name="import_checkbox_users" <?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
-	}
-
-	// custom callback function to print checkbox field HTML
-	function import_checkbox_cards( $args ) {
-		$value = get_option( 'import_checkbox_cards' );
-		?>
-        <label>
-            <input type="checkbox" name="import_checkbox_cards" <?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
-	}
-
-	// custom callback function to print checkbox field HTML
-	function import_checkbox_subscriptions( $args ) {
-		$value = get_option( 'import_checkbox_subscriptions' );
-		?>
-        <label>
-            <input type="checkbox" name="import_checkbox_subscriptions" <?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
-	}
-
-// custom sanitization function for a checkbox field
-	function import_sanitize_checkbox( $value ) {
-		return 'on' === $value ? 'yes' : 'no';
-	}
-
-	function import_page_callback() {
-		?>
-        <div class="wrap">
-            <h1><?php echo get_admin_page_title() ?></h1>
-            <form method="post" action="options.php">
-				<?php
-				settings_fields( 'reepay_import_settings' ); // settings group name
-				do_settings_sections( 'reepay_import' ); // just a page slug
-				?>
-
-                <input type="submit" name="import_tipple" id="submit" class="button button-primary" value="Import">
-            </form>
-        </div>
-		<?php
-	}
-
 }
