@@ -91,11 +91,13 @@ class WC_Reepay_Subscription_Admin_Notice {
 		$notices = self::$activation_notices;
 		if ( ! empty( $notices ) ) {
 			foreach ( $notices as $notice ) {
-				echo "<div class='error'><p>" . wp_kses( $notice, array(
-						'a' => array(),
-					) ) . "</p></div>";
+				echo "<div class='error'><p>" . wp_kses( $notice, [
+						'a' => [
+							'href' => true
+						]
+					] ) . "</p></div>";
 			}
-			update_option( 'reepay_admin_activation_notices', array() );
+			update_option( 'reepay_admin_activation_notices', [] );
 		}
 	}
 
