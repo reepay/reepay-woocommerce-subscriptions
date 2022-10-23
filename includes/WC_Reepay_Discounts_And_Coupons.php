@@ -78,7 +78,6 @@ class WC_Reepay_Discounts_And_Coupons {
 		return $params;
 	}
 
-
 	function get_coupon_default_params( WC_Coupon $coupon ) {
 		$apply_plans = get_post_meta( $coupon->get_id(), '_reepay_discount_eligible_plans', true ) ?: [];
 
@@ -208,7 +207,6 @@ class WC_Reepay_Discounts_And_Coupons {
 
 		return false;
 	}
-
 
 	function get_coupons() {
 		return reepay_s()->api()->request( 'coupon' )['content'] ?? [];
@@ -504,5 +502,27 @@ class WC_Reepay_Discounts_And_Coupons {
 		return array_merge( $discount_types, [
 			'reepay_type' => 'Reepay discount',
 		] );
+	}
+
+	/**
+	 * @param string$code
+	 * @param string $customer_handle
+	 * @param  string  $plan
+	 *
+	 * @return bool
+	 */
+	public static function coupon_can_be_applied( $code, $customer_handle, $plan = '' ) {
+		$request_url = "coupon/code/validate?code=$code&customer=$customer_handle";
+
+		if ( ! empty( $plan ) ) {
+			$request_url .= "&plan=$plan";
+		}
+
+		try {
+			reepay_s()->api()->request( $request_url );
+			return true;
+		} catch (Exception $e) {
+			return false;
+		}
 	}
 }
