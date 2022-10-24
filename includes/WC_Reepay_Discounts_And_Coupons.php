@@ -385,9 +385,8 @@ class WC_Reepay_Discounts_And_Coupons {
 
 		if ( $type === 'reepay_percentage' ) {
 			$product = $cart_item['data'];
-			if ( $this->is_coupon_applied_for_plans( $coupon, $product ) ) {
-				$discount = (float) $coupon->get_amount() * ( $discounting_amount / 100 );
-
+			if ( ! empty( $product ) && $this->is_coupon_applied_for_plans( $coupon, $product ) ) {
+				$discount = $coupon->get_amount() * ( $discounting_amount / 100 );
 			}
 		}
 
