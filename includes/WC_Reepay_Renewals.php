@@ -234,7 +234,7 @@ class WC_Reepay_Renewals {
 //					'no_setup_fee' => null,
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
-					'coupon_codes'    => self::get_reepay_coupons( $order ),
+					'coupon_codes'    => self::get_reepay_coupons( $order, $data['customer'] ),
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				];
@@ -668,17 +668,23 @@ class WC_Reepay_Renewals {
 
 	/**
 	 * @param WC_Order $order
+	 * @param string $customer_handle
 	 *
 	 *
 	 * @return array<string>
 	 */
-	public static function get_reepay_coupons( $order ) {
+	public static function get_reepay_coupons( $order, $customer_handle = null ) {
 		$coupons = [];
 
 		foreach ( $order->get_coupon_codes() as $coupon_code ) {
 			$c = new WC_Coupon( $coupon_code );
 
-			if ( $c->is_type( 'reepay_type' ) ) {
+			if ( $c->is_type( 'reepay_type' ) &&
+			     (
+				     empty( $customer_handle ) ||
+				     WC_Reepay_Discounts_And_Coupons::coupon_can_be_applied( $coupon_code, $customer_handle )
+			     )
+			) {
 				$coupons[] = $coupon_code;
 			}
 		}
