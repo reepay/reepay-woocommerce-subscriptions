@@ -44,7 +44,8 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		try {
-			$plan_meta_data                            = reepay_s()->plan( $request['product_id'] )->get_remote_plan_meta( $request['handle'] );
+			$plan = reepay_s()->plan( $request['product_id'] );
+			$plan_meta_data                            = $plan->get_remote_plan_meta( $request['handle'] );
 			$plan_meta_data['disabled']                = true;
 			$plan_meta_data['plans_list']              = reepay_s()->plan()->get_reepay_plans_list() ?: [];
 			$plan_meta_data['domain']                  = 'reepay-subscriptions-for-woocommerce';
@@ -61,17 +62,9 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 				}
 			}
 
-			ob_start();
-			wc_get_template(
-				'plan-subscription-fields-data.php',
-				$plan_meta_data,
-				'',
-				reepay_s()->settings( 'plugin_path' ) . 'templates/'
-			);
-
 			return new WP_REST_Response( [
 				'success' => true,
-				'html'    => ob_get_clean(),
+				'html'    => $plan->get_plan_fields_data_template( $plan_meta_data ),
 			] );
 		} catch ( Exception $e ) {
 			reepay_s()->log()->log( [
