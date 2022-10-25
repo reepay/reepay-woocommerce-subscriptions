@@ -666,27 +666,30 @@ class WC_Reepay_Renewals {
 		return $new_order;
 	}
 
-	/**
-	 * @param WC_Order $order
-	 * @param string $customer_handle
-	 *
-	 *
-	 * @return array<string>
-	 */
+    /**
+     * @param WC_Order $order
+     * @param string $customer_handle
+     *
+     *
+     * @return array<string>
+     * @throws Exception
+     */
 	public static function get_reepay_coupons( $order, $customer_handle = null ) {
 		$coupons = [];
 
 		foreach ( $order->get_coupon_codes() as $coupon_code ) {
 			$c = new WC_Coupon( $coupon_code );
 
-			if ( $c->is_type( 'reepay_type' ) &&
-			     (
-				     empty( $customer_handle ) ||
-				     WC_Reepay_Discounts_And_Coupons::coupon_can_be_applied( $coupon_code, $customer_handle )
-			     )
-			) {
-				$coupons[] = $coupon_code;
-			}
+
+            if ($c->is_type('reepay_type')) {
+                $coupon_code_real = WC_Reepay_Discounts_And_Coupons::get_coupon_code_real($c);
+                if (
+                    empty($customer_handle) ||
+                    WC_Reepay_Discounts_And_Coupons::coupon_can_be_applied($coupon_code_real, $customer_handle)
+                ) {
+                    $coupons[] = $coupon_code_real;
+                }
+            }
 		}
 
 		return $coupons;
