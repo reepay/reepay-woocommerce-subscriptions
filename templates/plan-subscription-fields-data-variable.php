@@ -5,7 +5,7 @@
 
 $disabled = '';
 ?>
-    <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
+    <div class="options_group reepay_subscription_pricing">
         <p class="form-field fields-name form-row">
             <label for="_reepay_subscription_name"><?php echo __( 'Name', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <input type="text" id="_reepay_subscription_name" <?php echo esc_attr( $disabled ) ?>
@@ -483,7 +483,7 @@ $disabled = '';
         </p>
     </div>
 
-    <div class="options_group show_if_reepay_subscription">
+    <div class="options_group">
         <p class="form-field form-row">
             <label for="_subscription_contract_periods"><?php echo __( 'Minimum Contract Period', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo wc_help_tip( __( 'Periods are relative to the billing frequency. If you have chosen to bill every month, a period is one month.', 'reepay-subscriptions-for-woocommerce' ) ); ?>
@@ -508,7 +508,7 @@ $disabled = '';
         </p>
     </div>
 
-    <div class="options_group show_if_reepay_subscription">
+    <div class="options_group">
         <p class="form-field">
             <label for="_subscription_notice_period"><?php echo __( 'Notice period', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo wc_help_tip( __( 'Periods are relative to the billing frequency. If you have chosen to bill every month, a period is one month.', 'reepay-subscriptions-for-woocommerce' ) ); ?>
@@ -532,7 +532,7 @@ $disabled = '';
         </p>
     </div>
 
-    <div class="options_group show_if_reepay_subscription billing_cycles_block">
+    <div class="options_group billing_cycles_block">
         <p class="form-field form-row">
             <label for="_subscription_billing_cycles"><?php echo __( 'Billing Cycles', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo __( 'Auto Renew until cancelled', 'reepay-subscriptions-for-woocommerce' ); ?> <input type="radio"
@@ -555,7 +555,7 @@ $disabled = '';
     </div>
 
 <?php $trial = ! empty( $_reepay_subscription_trial ) ? $_reepay_subscription_trial : [] ?>
-    <div class="options_group reepay_subscription_trial show_if_reepay_subscription">
+    <div class="options_group reepay_subscription_trial">
         <p class="form-field form-row">
             <label for="_subscription_trial"><?php echo __( 'Trial', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <select id="_subscription_trial" <?php echo esc_attr( $disabled ) ?>
@@ -593,7 +593,7 @@ $disabled = '';
     </div>
 
 <?php $fee = ! empty( $_reepay_subscription_fee ) ? $_reepay_subscription_fee : [] ?>
-    <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
+    <div class="options_group reepay_subscription_fee">
         <p class="form-field">
             <label for="_subscription_fee"><?php echo __( 'Include setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <input type="checkbox" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
@@ -622,7 +622,8 @@ $disabled = '';
         </span>
         </p>
     </div>
-    <div class="options_group show_if_reepay_subscription">
+
+    <div class="options_group">
 		<?php
 		if ( ! empty( $product_object ) && function_exists( 'woocommerce_wp_select' ) ) {
 			woocommerce_wp_select(
@@ -657,11 +658,11 @@ $disabled = '';
 		?>
     </div>
 
-<?php if ( isset( $is_exist ) && $is_exist ):
+<?php if ( ! empty( $is_exist ) ):
 	if ( empty( $_reepay_subscription_supersedes ) ) {
 		$_reepay_subscription_supersedes = 'no_sub_update';
 	} ?>
-    <div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
+    <div class="options_group reepay_subscription_supersedes_block">
         <p class="form-field supersedes_block_variable">
             <label for="_reepay_subscription_supersedes"><?php echo __( 'Supersede mode', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo __( "Don't schedule subscription update", 'reepay-subscriptions-for-woocommerce' ); ?>
