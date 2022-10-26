@@ -234,7 +234,7 @@ class WC_Reepay_Renewals {
 //					'no_setup_fee' => null,
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
-					'coupon_codes'    => self::get_reepay_coupons( $order ),
+					'coupon_codes'    => self::get_reepay_coupons( $order, $data['customer'] ),
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				];
@@ -426,10 +426,13 @@ class WC_Reepay_Renewals {
 	 * @return bool|WC_Order|WC_Order_Refund
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		// $handle - "subscription_handle_<order_id>_<product_id>"
-		$parts = explode( '_', $handle );
+		$orders = wc_get_orders([
+			'limit' => 1,
+			'meta_key' => '_reepay_order',
+			'meta_value' => $handle
+		]);
 
-		return wc_get_order( (int) $parts[0] );
+		return $orders[0] ?? false;
 	}
 
 	/**
@@ -663,21 +666,30 @@ class WC_Reepay_Renewals {
 		return $new_order;
 	}
 
-	/**
-	 * @param WC_Order $order
-	 *
-	 *
-	 * @return array<string>
-	 */
-	public static function get_reepay_coupons( $order ) {
+    /**
+     * @param WC_Order $order
+     * @param string $customer_handle
+     *
+     *
+     * @return array<string>
+     * @throws Exception
+     */
+	public static function get_reepay_coupons( $order, $customer_handle = null ) {
 		$coupons = [];
 
 		foreach ( $order->get_coupon_codes() as $coupon_code ) {
 			$c = new WC_Coupon( $coupon_code );
 
-			if ( $c->is_type( 'reepay_type' ) ) {
-				$coupons[] = $coupon_code;
-			}
+
+            if ($c->is_type('reepay_type')) {
+                $coupon_code_real = WC_Reepay_Discounts_And_Coupons::get_coupon_code_real($c);
+                if (
+                    empty($customer_handle) ||
+                    WC_Reepay_Discounts_And_Coupons::coupon_can_be_applied($coupon_code_real, $customer_handle)
+                ) {
+                    $coupons[] = $coupon_code_real;
+                }
+            }
 		}
 
 		return $coupons;
