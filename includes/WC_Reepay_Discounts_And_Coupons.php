@@ -146,6 +146,25 @@ class WC_Reepay_Discounts_And_Coupons {
 		return $coupon_data;
 	}
 
+    /**
+     * @param WC_Coupon $coupon
+     * @return mixed
+     * @throws Exception
+     */
+	static function get_coupon_code_real(WC_Coupon $coupon) {
+        $coupon_code_real = get_post_meta($coupon->get_id(), '_reepay_coupon_code_real', true);
+
+        if (empty($coupon_code_real)) {
+            $handle = get_post_meta( $coupon->get_id(), '_reepay_coupon_handle', true );
+            if (!empty($handle)) {
+                $couponObj   = reepay_s()->api()->request( 'coupon/' . $handle );
+                $coupon_code_real = $couponObj['code'];
+                update_post_meta($coupon->get_id(), '_reepay_coupon_code_real', $coupon_code_real);
+            }
+        }
+        return $coupon_code_real;
+    }
+
 	function plugin_coupon_error_message( $err, $err_code, WC_Coupon $coupon = null ) {
 		if ( ! is_null( $coupon ) && $coupon->is_type( 'reepay_type' ) && intval( $err_code ) === 117 ) {
 			return __( 'Coupon is not applied for this plans', 'reepay-subscriptions-for-woocommerce' );
@@ -246,6 +265,7 @@ class WC_Reepay_Discounts_And_Coupons {
 		try {
 			$result2 = reepay_s()->api()->request( 'coupon', 'POST', $paramsCoupon );
 			update_post_meta( $post_id, '_reepay_coupon_handle', $paramsCoupon['handle'] );
+            update_post_meta( $post_id, '_reepay_coupon_code_real', $paramsCoupon["code"]  );
 
 			return $result2;
 		} catch ( Exception $e ) {
@@ -287,6 +307,7 @@ class WC_Reepay_Discounts_And_Coupons {
 			$couponData = static::get_existing_coupon( sanitize_text_field( $_REQUEST['_reepay_discount_use_existing_coupon_id'] ) );
 			update_post_meta( $post_id, '_reepay_coupon_handle', $couponData['coupon_handle'] );
 			update_post_meta( $post_id, '_reepay_discount_handle', $couponData['discount_handle'] );
+			update_post_meta( $post_id, '_reepay_coupon_code_real', $couponData['code'] );
 			$data         = array_merge( $data, $couponData );
 			$use_existing = true;
 		}
@@ -438,7 +459,9 @@ class WC_Reepay_Discounts_And_Coupons {
 			throw new Exception( __( 'Sorry, this coupon is not applicable to the products', 'woocommerce' ), 113 );
 		}
 
-		$check_coupon = self::coupon_can_be_applied( $coupon->get_code() );
+		$coupon_code_real = static::get_coupon_code_real($coupon);
+
+		$check_coupon = self::coupon_can_be_applied( $coupon_code_real );
 
 		if ( true === $check_coupon ) {
 			return true;
