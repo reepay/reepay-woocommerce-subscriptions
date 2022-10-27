@@ -436,7 +436,17 @@ class WC_Reepay_Renewals {
 			'meta_value' => $handle
 		] );
 
-		return $orders[0] ?? false;
+		if ( ! empty( $orders[0] ) ) {
+			return $orders[0];
+		} else {
+			$orders = wc_get_orders( [
+				'limit'      => 1,
+				'meta_key'   => '_reepay_subscription_handle',
+				'meta_value' => $handle
+			] );
+
+			return $orders[0] ?? false;
+		}
 	}
 
 	/**
