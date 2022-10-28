@@ -666,7 +666,7 @@ $variable = ! empty( $variable );
 	if ( empty( $_reepay_subscription_supersedes ) ) {
 		$_reepay_subscription_supersedes = 'no_sub_update';
 	} ?>
-    <div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
+    <div class="options_group reepay_subscription_supersedes_block">
         <p class="form-field <?php echo $variable ? 'supersedes_block_variable"' : '' ?>">
             <label for="_reepay_subscription_supersedes"><?php echo __( 'Supersede mode', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo __( "Don't schedule subscription update", 'reepay-subscriptions-for-woocommerce' ); ?>

@@ -236,3 +236,7 @@
 p.form-field.form-row .woocommerce-help-tip {
     float: unset !important;
 }
+
+.reepay_subscription_supersedes_block {
+    display: none;
+}
