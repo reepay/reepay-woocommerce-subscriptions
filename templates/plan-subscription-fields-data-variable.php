@@ -21,7 +21,7 @@ $disabled = '';
                        id="_subscription_price" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_price[<?php echo esc_attr( $loop ) ?>]"
                        style="float: unset"
                        class="wc_input_price wc_input_subscription_price"
-                       placeholder="<?php echo esc_attr( 'e.g. 5.90', 'reepay-subscriptions-for-woocommerce' ); ?>" step="any" min="0"
+                       placeholder="<?php echo esc_attr( 'e.g. 5.90' ); ?>" step="any" min="0"
                        value="<?php echo ! empty( $_reepay_subscription_price ) ? esc_attr( wc_format_localized_price( $_reepay_subscription_price ) ) : 0 ?>"/>
 
             </span>
@@ -114,7 +114,7 @@ $disabled = '';
                    id="_subscription_month_fixedday_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    value="<?php echo ! empty( $month_fixedday['proration_minimum'] ) ? esc_attr( $month_fixedday['proration_minimum'] ) : 0 ?>"
                    name="_reepay_subscription_month_fixedday[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"/>
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"/>
         </p>
 
         <!--Last day of month-->
@@ -165,7 +165,7 @@ $disabled = '';
                    id="_subscription_month_lastday_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    value="<?php echo ! empty( $month_lastday['proration_minimum'] ) ? esc_attr( $month_lastday['proration_minimum'] ) : 0 ?>"
                    name="_subscription_month_lastday[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"/>
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"/>
         </p>
 
         <!--Quarterly Primo-->
@@ -215,7 +215,7 @@ $disabled = '';
             <label for="_subscription_primo_proration_minimum"><?php echo __( 'Minimum prorated amount', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <input type="number" min="0" id="_subscription_primo_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_primo[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"
                    value="<?php echo ! empty( $primo['proration_minimum'] ) ? esc_attr( $primo['proration_minimum'] ) : 0 ?>"/>
         </p>
 
@@ -265,7 +265,7 @@ $disabled = '';
             <label for="_subscription_ultimo_proration_minimum"><?php echo __( 'Minimum prorated amount', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <input type="number" min="0" id="_subscription_ultimo_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_ultimo[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"
                    value="<?php echo ! empty( $ultimo['proration_minimum'] ) ? esc_attr( $ultimo['proration_minimum'] ) : 0 ?>"/>
         </p>
 
@@ -320,7 +320,7 @@ $disabled = '';
             <input type="number" min="0"
                    id="_subscription_half_yearly_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_half_yearly[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"
                    value="<?php echo ! empty( $half_yearly['proration_minimum'] ) ? esc_attr( $half_yearly['proration_minimum'] ) : 0 ?>"/>
         </p>
 
@@ -376,7 +376,7 @@ $disabled = '';
             <input type="number" min="0"
                    id="_subscription_month_startdate_12_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_month_startdate_12[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"
                    value="<?php echo ! empty( $month_startdate_12['proration_minimum'] ) ? esc_attr( $month_startdate_12['proration_minimum'] ) : 0 ?>"/>
         </p>
 
@@ -454,7 +454,7 @@ $disabled = '';
             <input type="number" min="0"
                    id="_subscription_weekly_fixedday_proration_minimum" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_weekly_fixedday[<?php echo esc_attr( $loop ) ?>][proration_minimum]"
-                   placeholder="<?php echo esc_attr( 'kr 0.00', 'reepay-subscriptions-for-woocommerce' ); ?>"
+                   placeholder="<?php echo esc_attr( 'kr 0.00' ); ?>"
                    value="<?php echo ! empty( $weekly_fixedday['proration_minimum'] ) ? esc_attr( $weekly_fixedday['proration_minimum'] ) : 0 ?>"/>
         </p>
 
@@ -607,11 +607,11 @@ $disabled = '';
             <input type="number" min="0"
                    id="_subscription_fee_amount" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[<?php echo esc_attr( $loop ) ?>][amount]"
                    class="wc_input_price wc_input_subscription_price"
-                   placeholder="<?php echo esc_attr( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?>" step="any" min="0"
+                   placeholder="<?php echo esc_attr( 'Amount' ); ?>" step="any" min="0"
                    value="<?php echo ! empty( $fee['amount'] ) ? esc_attr( $fee['amount'] ) : 0 ?>"/>
             <input type="text"
                    id="_subscription_fee_text" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[<?php echo esc_attr( $loop ) ?>][text]"
-                   placeholder="<?php echo esc_attr( 'Text', 'reepay-subscriptions-for-woocommerce' ); ?>"
+                   placeholder="<?php echo esc_attr( 'Text' ); ?>"
                    value="<?php echo ! empty( $fee['text'] ) ? esc_attr( $fee['text'] ) : '' ?>"/>
             <select id="_subscription_fee_handling" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[<?php echo esc_attr( $loop ) ?>][handling]"
                     class="wc_input_subscription_period_interval">
