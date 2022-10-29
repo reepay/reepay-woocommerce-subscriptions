@@ -9,7 +9,7 @@
 
 ?>
 
-<div class="reepay_subscription_variable">
+<div class="reepay_subscription_variable show_if_reepay_subscription">
     <h6 style="padding:0;margin: 0;font-size:18px;"><?php _e('Reepay plan options', 'reepay-subscriptions-for-woocommerce' ) ?></h6>
 
     <div class="options_group reepay_subscription_choose">

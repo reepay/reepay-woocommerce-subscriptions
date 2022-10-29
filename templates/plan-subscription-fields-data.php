@@ -1,8 +1,4 @@
 <?php
-/**
- * @var Int $loop
- */
-
 $disabled = '';
 ?>
     <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
