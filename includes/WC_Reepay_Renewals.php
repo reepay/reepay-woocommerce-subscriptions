@@ -472,7 +472,20 @@ class WC_Reepay_Renewals {
 			'offset'         => 0,
 		) );
 
-		if ( ! empty( $query->posts ) && $query->posts[0]->post_status === $status ) {
+		$query = new WP_Query( [
+			'post_parent'    => $parent_order->get_id(),
+			'post_type'      => 'shop_order',
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+			'meta_query'     => [
+				[
+					'key'   => '_reepay_order',
+					'value' => $data['invoice'],
+				]
+			]
+		] );
+
+		if ( ! empty( $query->posts ) ) {
 			self::log( [
 				'log' => [
 					'source' => 'WC_Reepay_Renewals::create_child_order',
