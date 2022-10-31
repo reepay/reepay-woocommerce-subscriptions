@@ -502,7 +502,7 @@ class WooCommerce_Reepay_Subscriptions {
 			'product'               => [
 				'id'          => empty( $product ) ? 0 : $product->get_id(),
 				'is_variable' => empty( $product ) ? false : $product->is_type( 'reepay_variable_subscriptions' ),
-				'status'      => $product->get_status( '' )
+				'status'      => empty( $product ) ? '' : $product->get_status( '' )
 			],
 			'rest_urls'             => [
 				'get_plan'     => get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/plan_simple/" ),
