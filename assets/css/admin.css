@@ -240,3 +240,13 @@ p.form-field.form-row .woocommerce-help-tip {
 .reepay_subscription_supersedes_block {
     display: none;
 }
+
+.reepay_subscription_variable {
+    padding: 5px;
+    border: 1px solid #eee;
+}
+
+.reepay_subscription_settings_exist.variable .options_group {
+    border-top: 1px solid #fff;
+    border-bottom: 1px solid #eee;
+}

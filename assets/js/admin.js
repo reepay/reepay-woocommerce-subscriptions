@@ -420,6 +420,7 @@ jQuery(function ($) {
                 }
                 $reepay_subscription_choose_exist.show();
                 $('input#reepay-publish').val('Choose plan');
+                $('.reepay_subscription_supersedes_block').show();
                 $reepay_subscription_settings.hide();
 
             }
@@ -476,16 +477,22 @@ jQuery(function ($) {
     }
 
     function load_plan($select, $container) {
+        console.log($select, $container);
+
         const handle = $select.val();
 
         if (!handle) {
             return;
         }
 
-        if (handle != '') {
-            $container.show();
-        }
-        $container.html('')
+        $container
+            .show()
+            .html('<span class="spinner is-active" style="margin:0;float:unset"></span>');
+
+        const $submitBtn = $container
+            .parents('.variable_pricing')
+            .find('#reepay_subscription_publish_btn')
+            .hide();
 
         const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
         const product_id = dataPlan.product_id || window.reepay.product.id
@@ -507,13 +514,15 @@ jQuery(function ($) {
                     return;
                 }
 
-                $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
+                $container.html(`<div style="width: 100%">${response_data.html}</div>`)
 
                 show_plan_settings($container);
                 show_trial_settings($container);
                 show_notice_settings($container);
                 show_contract_settings($container);
                 show_fee_settings($container);
+
+                $submitBtn.show();
             },
             error: function (request, status, error) {
 
