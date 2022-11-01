@@ -23,7 +23,7 @@ global $post;
 					echo '"' . esc_attr( $addon['name'] ) . '"';
 				} ?></span></strong>;
         <span> <?php _e( 'Type', 'reepay-subscriptions-for-woocommerce' ); ?>: <?php $addon['type'] === 'on_off' ? _e( 'On/Off', 'reepay-subscriptions-for-woocommerce' ) : _e( 'Quantity', 'reepay-subscriptions-for-woocommerce' ) ?></span>;
-        <span> <?php _e( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?>: <?php echo floatval( esc_attr( $addon['amount'] ) ) * 100 ?></span>
+        <span> <?php _e( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?>: <?php echo floatval( esc_attr( $addon['amount'] ) ) ?></span>
 
 
         <input type="hidden" name="product_addon_position[<?php echo esc_attr( $loop ) ?>]"
