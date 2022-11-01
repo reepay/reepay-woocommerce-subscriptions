@@ -164,10 +164,15 @@ class WC_Reepay_Renewals {
 			}
 
 			//Get the WC_Product object
-			$product         = $order_item->get_product();
+			$product = $order_item->get_product();
+
+			if ( ! $product->is_type( 'reepay_variable_subscriptions' ) && ! $product->is_type( 'reepay_simple_subscriptions' ) ) {
+				continue;
+			}
+
 			$items_to_create = [ $order_item ];
 
-			$fee             = $product->get_meta( '_reepay_subscription_fee' );
+			$fee = $product->get_meta( '_reepay_subscription_fee' );
 			if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
 				foreach ( $main_order->get_items( 'fee' ) as $item_id => $item ) {
 					if ( $product->get_name() . ' - ' . $fee["text"] === $item['name'] ) {
@@ -185,7 +190,7 @@ class WC_Reepay_Renewals {
 				'customer_id' => $main_order->get_customer_id(),
 			], $main_order, $items_to_create );
 
-			$orders[] = $created_order;
+			$orders[]         = $created_order;
 			$created_orders[] = $created_order->get_id();
 		}
 
@@ -197,7 +202,6 @@ class WC_Reepay_Renewals {
 			if ( ! self::is_order_contain_subscription( $order ) ) {
 				continue;
 			}
-
 
 
 			$order_items = $order->get_items();
@@ -234,7 +238,7 @@ class WC_Reepay_Renewals {
 //					'no_setup_fee' => null,
 //					'trial_period' => null,
 //					'subscription_discounts' => null,
-					'coupon_codes'    => self::get_reepay_coupons( $order ),
+					'coupon_codes'    => self::get_reepay_coupons( $order, $data['customer'] ),
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				];
@@ -243,9 +247,9 @@ class WC_Reepay_Renewals {
 					$sub_data['add_ons'] = $addons;
 				}
 
-				if ($main_order->get_id() !== $order->get_id()) {
-				    $sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $handle );
-                }
+				if ( $main_order->get_id() !== $order->get_id() ) {
+					$sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $handle );
+				}
 
 				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
 			} catch ( Exception $e ) {
@@ -426,10 +430,23 @@ class WC_Reepay_Renewals {
 	 * @return bool|WC_Order|WC_Order_Refund
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		// $handle - "subscription_handle_<order_id>_<product_id>"
-		$parts = explode( '_', $handle );
+		$orders = wc_get_orders( [
+			'limit'      => 1,
+			'meta_key'   => '_reepay_order',
+			'meta_value' => $handle
+		] );
 
-		return wc_get_order( (int) $parts[0] );
+		if ( ! empty( $orders[0] ) ) {
+			return $orders[0];
+		} else {
+			$orders = wc_get_orders( [
+				'limit'      => 1,
+				'meta_key'   => '_reepay_subscription_handle',
+				'meta_value' => $handle
+			] );
+
+			return $orders[0] ?? false;
+		}
 	}
 
 	/**
@@ -455,7 +472,20 @@ class WC_Reepay_Renewals {
 			'offset'         => 0,
 		) );
 
-		if ( ! empty( $query->posts ) && $query->posts[0]->post_status === $status ) {
+		$query = new WP_Query( [
+			'post_parent'    => $parent_order->get_id(),
+			'post_type'      => 'shop_order',
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+			'meta_query'     => [
+				[
+					'key'   => '_reepay_order',
+					'value' => $data['invoice'],
+				]
+			]
+		] );
+
+		if ( ! empty( $query->posts ) ) {
 			self::log( [
 				'log' => [
 					'source' => 'WC_Reepay_Renewals::create_child_order',
@@ -665,45 +695,55 @@ class WC_Reepay_Renewals {
 
 	/**
 	 * @param WC_Order $order
+	 * @param string $customer_handle
 	 *
 	 *
 	 * @return array<string>
+	 * @throws Exception
 	 */
-	public static function get_reepay_coupons( $order ) {
+	public static function get_reepay_coupons( $order, $customer_handle = null ) {
 		$coupons = [];
 
 		foreach ( $order->get_coupon_codes() as $coupon_code ) {
 			$c = new WC_Coupon( $coupon_code );
 
+
 			if ( $c->is_type( 'reepay_type' ) ) {
-				$coupons[] = $coupon_code;
+				$coupon_code_real = WC_Reepay_Discounts_And_Coupons::get_coupon_code_real( $c );
+				if (
+					empty( $customer_handle ) ||
+					WC_Reepay_Discounts_And_Coupons::coupon_can_be_applied( $coupon_code_real, $customer_handle )
+				) {
+					$coupons[] = $coupon_code_real;
+				}
 			}
 		}
 
 		return $coupons;
 	}
 
-    /**
-     * @param WC_Order $order
-     *
-     *
-     * @param $handle
-     * @return array<string>
-     */
+	/**
+	 * @param WC_Order $order
+	 *
+	 *
+	 * @param $handle
+	 *
+	 * @return array<string>
+	 */
 	public static function get_reepay_discounts( $order, $handle ) {
 		$discounts = [];
 
 		foreach ( $order->get_coupon_codes() as $coupon_code ) {
 			$c = new WC_Coupon( $coupon_code );
 
-            if ( $c->is_type( 'reepay_type' ) ) {
-                $discount_handle = get_post_meta($c->get_id(), '_reepay_discount_handle', true);
-				if ($discount_handle) {
-                    $discounts[] = [
-                        'handle' => $handle . '_' . $discount_handle,
-                        'discount' => $discount_handle
-                    ];
-                }
+			if ( $c->is_type( 'reepay_type' ) ) {
+				$discount_handle = get_post_meta( $c->get_id(), '_reepay_discount_handle', true );
+				if ( $discount_handle ) {
+					$discounts[] = [
+						'handle'   => $handle . '_' . $discount_handle,
+						'discount' => $discount_handle
+					];
+				}
 			}
 		}
 

@@ -363,6 +363,15 @@ jQuery(function ($) {
         }
     }
 
+    function show_update_settings(tab) {
+        var choose = tab.find('[name^="_reepay_subscription_choose"]:checked')
+        if (choose.val() == 'exist') {
+            $('input#reepay-publish').val('Supersede plan');
+            $('.reepay_subscription_supersedes_block').show();
+        }
+
+    }
+
     function show_plan_settings($container) {
         const type = $container.find('#_subscription_schedule_type').val()
         const subs_block = $container.find('.reepay_subscription_pricing');
@@ -402,7 +411,6 @@ jQuery(function ($) {
                 $('input#reepay-publish').val('Create plan');
                 $reepay_subscription_settings.show();
                 $reepay_subscription_choose_exist.hide();
-                $('.reepay_subscription_supersedes_block').hide();
             } else {
                 $reepay_subscription_choose_exist.find("input").prop("disabled", false);
                 $reepay_subscription_choose_exist.find("select").prop("disabled", false);
@@ -411,11 +419,15 @@ jQuery(function ($) {
                     $reepay_subscription_choose_exist.find(".reepay_subscription_settings_exist").hide();
                 }
                 $reepay_subscription_choose_exist.show();
-                $('input#reepay-publish').val('Update plan');
+                $('input#reepay-publish').val('Choose plan');
+                $('.reepay_subscription_supersedes_block').show();
                 $reepay_subscription_settings.hide();
 
             }
+
+            $('.reepay_subscription_supersedes_block').hide();
         }
+
     }
 
     function show_trial_settings($container, elem = false) {
@@ -465,16 +477,22 @@ jQuery(function ($) {
     }
 
     function load_plan($select, $container) {
+        console.log($select, $container);
+
         const handle = $select.val();
 
         if (!handle) {
             return;
         }
 
-        if (handle != '') {
-            $container.show();
-        }
-        $container.html('')
+        $container
+            .show()
+            .html('<span class="spinner is-active" style="margin:0;float:unset"></span>');
+
+        const $submitBtn = $container
+            .parents('.variable_pricing')
+            .find('#reepay_subscription_publish_btn')
+            .hide();
 
         const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
         const product_id = dataPlan.product_id || window.reepay.product.id
@@ -496,13 +514,15 @@ jQuery(function ($) {
                     return;
                 }
 
-                $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
+                $container.html(`<div style="width: 100%">${response_data.html}</div>`)
 
                 show_plan_settings($container);
                 show_trial_settings($container);
                 show_notice_settings($container);
                 show_contract_settings($container);
                 show_fee_settings($container);
+
+                $submitBtn.show();
             },
             error: function (request, status, error) {
 
@@ -611,6 +631,14 @@ jQuery(function ($) {
         } else {
             $('.fee-fields').hide();
         }
+
+        $(tab + ' input').on('change', function () {
+            show_update_settings($tab);
+        })
+
+        $(tab + ' select').on('change', function () {
+            show_update_settings($tab);
+        })
 
         $(tab + ' #_subscription_schedule_type').on('change', function () {
             show_plan_settings($tab);

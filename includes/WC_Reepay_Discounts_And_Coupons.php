@@ -78,7 +78,6 @@ class WC_Reepay_Discounts_And_Coupons {
 		return $params;
 	}
 
-
 	function get_coupon_default_params( WC_Coupon $coupon ) {
 		$apply_plans = get_post_meta( $coupon->get_id(), '_reepay_discount_eligible_plans', true ) ?: [];
 
@@ -147,8 +146,27 @@ class WC_Reepay_Discounts_And_Coupons {
 		return $coupon_data;
 	}
 
-	function plugin_coupon_error_message( $err, $err_code, WC_Coupon $coupon ) {
-		if ( $coupon->is_type( 'reepay_type' ) && intval( $err_code ) === 117 ) {
+    /**
+     * @param WC_Coupon $coupon
+     * @return mixed
+     * @throws Exception
+     */
+	static function get_coupon_code_real(WC_Coupon $coupon) {
+        $coupon_code_real = get_post_meta($coupon->get_id(), '_reepay_coupon_code_real', true);
+
+        if (empty($coupon_code_real)) {
+            $handle = get_post_meta( $coupon->get_id(), '_reepay_coupon_handle', true );
+            if (!empty($handle)) {
+                $couponObj   = reepay_s()->api()->request( 'coupon/' . $handle );
+                $coupon_code_real = $couponObj['code'];
+                update_post_meta($coupon->get_id(), '_reepay_coupon_code_real', $coupon_code_real);
+            }
+        }
+        return $coupon_code_real;
+    }
+
+	function plugin_coupon_error_message( $err, $err_code, WC_Coupon $coupon = null ) {
+		if ( ! is_null( $coupon ) && $coupon->is_type( 'reepay_type' ) && intval( $err_code ) === 117 ) {
 			return __( 'Coupon is not applied for this plans', 'reepay-subscriptions-for-woocommerce' );
 		}
 
@@ -209,7 +227,6 @@ class WC_Reepay_Discounts_And_Coupons {
 		return false;
 	}
 
-
 	function get_coupons() {
 		return reepay_s()->api()->request( 'coupon' )['content'] ?? [];
 	}
@@ -248,6 +265,7 @@ class WC_Reepay_Discounts_And_Coupons {
 		try {
 			$result2 = reepay_s()->api()->request( 'coupon', 'POST', $paramsCoupon );
 			update_post_meta( $post_id, '_reepay_coupon_handle', $paramsCoupon['handle'] );
+            update_post_meta( $post_id, '_reepay_coupon_code_real', $paramsCoupon["code"]  );
 
 			return $result2;
 		} catch ( Exception $e ) {
@@ -289,6 +307,7 @@ class WC_Reepay_Discounts_And_Coupons {
 			$couponData = static::get_existing_coupon( sanitize_text_field( $_REQUEST['_reepay_discount_use_existing_coupon_id'] ) );
 			update_post_meta( $post_id, '_reepay_coupon_handle', $couponData['coupon_handle'] );
 			update_post_meta( $post_id, '_reepay_discount_handle', $couponData['discount_handle'] );
+			update_post_meta( $post_id, '_reepay_coupon_code_real', $couponData['code'] );
 			$data         = array_merge( $data, $couponData );
 			$use_existing = true;
 		}
@@ -387,9 +406,8 @@ class WC_Reepay_Discounts_And_Coupons {
 
 		if ( $type === 'reepay_percentage' ) {
 			$product = $cart_item['data'];
-			if ( $this->is_coupon_applied_for_plans( $coupon, $product ) ) {
-				$discount = (float) $coupon->get_amount() * ( $discounting_amount / 100 );
-
+			if ( ! empty( $product ) && $this->is_coupon_applied_for_plans( $coupon, $product ) ) {
+				$discount = $coupon->get_amount() * ( $discounting_amount / 100 );
 			}
 		}
 
@@ -441,7 +459,15 @@ class WC_Reepay_Discounts_And_Coupons {
 			throw new Exception( __( 'Sorry, this coupon is not applicable to the products', 'woocommerce' ), 113 );
 		}
 
-		return $valid;
+		$coupon_code_real = static::get_coupon_code_real($coupon);
+
+		$check_coupon = self::coupon_can_be_applied( $coupon_code_real );
+
+		if ( true === $check_coupon ) {
+			return true;
+		}
+
+		throw new Exception( $check_coupon->get_error_message() );
 	}
 
 	function validate_coupon_for_product( $valid, WC_Product $product, WC_Coupon $coupon, $values ) {
@@ -504,5 +530,36 @@ class WC_Reepay_Discounts_And_Coupons {
 		return array_merge( $discount_types, [
 			'reepay_type' => 'Reepay discount',
 		] );
+	}
+
+	/**
+	 * @param string  $code
+	 * @param string  $customer_handle - current user by default
+	 * @param string  $plan
+	 *
+	 * @return bool|WP_Error
+	 */
+	public static function coupon_can_be_applied( $code, $customer_handle = null, $plan = '' ) {
+		$request_url = "coupon/code/validate?code=$code";
+
+		if ( empty( $customer_handle ) ) {
+			$customer_handle = get_user_meta( get_current_user_id() )['reepay_customer_id'] ?? null;
+			$customer_handle = is_array($customer_handle) ? $customer_handle[0] : $customer_handle;
+
+			if(!empty($customer_handle)) {
+				$request_url .= "&customer=$customer_handle";
+			}
+		}
+
+		if ( ! empty( $plan ) ) {
+			$request_url .= "&plan=$plan";
+		}
+
+		try {
+			reepay_s()->api()->request( $request_url );
+			return true;
+		} catch (Exception $e) {
+			return new WP_Error( 404, 'This coupon cannot be used. Try another' );
+		}
 	}
 }

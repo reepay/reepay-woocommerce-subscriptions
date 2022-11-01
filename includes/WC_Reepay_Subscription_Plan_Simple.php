@@ -117,6 +117,16 @@ class WC_Reepay_Subscription_Plan_Simple {
 	public static $frontend_template = 'plan-subscription-frontend.php';
 
 	/**
+	 * @var string
+	 */
+	public $plan_fields_template = 'plan-subscription-fields.php';
+
+	/**
+	 * @var string
+	 */
+	public $plan_fields_data_template = 'plan-subscription-fields-data.php';
+
+	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -388,33 +398,45 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$data[ $key ] = '';
 			}
 		}
-
-		ob_start();
-		wc_get_template(
-			'plan-subscription-fields-data.php',
-			$data,
-			'',
-			reepay_s()->settings( 'plugin_path' ) . 'templates/'
-		);
-		$data['settings'] = ob_get_clean();
+		$data['settings'] = $this->get_plan_fields_data_template($data);
 
 		if ( $data['is_exist'] ) {
-			ob_start();
-			wc_get_template(
-				'plan-subscription-fields-data.php',
-				$data,
-				'',
-				reepay_s()->settings( 'plugin_path' ) . 'templates/'
-			);
-			$data['settings_exist'] = ob_get_clean();
+			$data['settings_exist'] = $this->get_plan_fields_data_template($data);;
 		}
 
+		echo $this->get_plan_fields_template($data);
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return false|string
+	 */
+	public function get_plan_fields_data_template($data) {
+		ob_start();
 		wc_get_template(
-			'plan-subscription-fields.php',
+			$this->plan_fields_data_template,
 			$data,
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
+		return ob_get_clean();
+	}
+
+	/**
+	 * @param array $data
+	 *
+	 * @return false|string
+	 */
+	public function get_plan_fields_template($data) {
+		ob_start();
+		wc_get_template(
+			$this->plan_fields_template,
+			$data,
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+		return ob_get_clean();
 	}
 
 	public function save_remote_plan( $post_id, $handle ) {

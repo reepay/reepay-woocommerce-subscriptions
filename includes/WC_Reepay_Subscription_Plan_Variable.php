@@ -3,6 +3,10 @@
 class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_Simple {
 	public static $frontend_template = 'plan-subscription-frontend-variable.php';
 
+	public $plan_fields_template = 'plan-subscription-fields-variable.php';
+
+	public $plan_fields_data_template = 'plan-subscription-fields-data-variable.php';
+
 	public $loop = 0;
 
 	public function create_subscription_product_class() {
@@ -47,7 +51,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	public function get_subscription_template_data( $post_id ) {
 		$data = parent::get_subscription_template_data( $post_id );
 
-		$data['variable'] = true;
 		$data['loop']     = $this->loop;
 
 		$data['data_plan'] = json_encode( [

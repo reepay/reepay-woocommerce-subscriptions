@@ -47,8 +47,12 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 
 		$paged = filter_input( INPUT_GET, 'paged', FILTER_VALIDATE_INT );
 
+		$params['size'] = 20;
+
 		if ( $paged ) {
 			$params['page'] = $paged;
+		} else {
+			$params['page'] = 1;
 		}
 
 		if ( ! empty( $search ) ) {
@@ -61,6 +65,8 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 		if ( $orderby === 'date' && $order === 'asc' ) {
 			$params['sort'] = 'created';
 		}
+
+		//$subsResult = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
 
 		$subsResult = reepay_s()->api()->request( "subscription?" . http_build_query( $params ) );
 

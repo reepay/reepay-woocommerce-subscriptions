@@ -12,7 +12,8 @@
   "autoload": {
     "classmap": [
       "includes",
-      "includes/import"
+      "includes/import",
+      "includes/update"
     ]
   }
 }

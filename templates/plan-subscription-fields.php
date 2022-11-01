@@ -6,21 +6,19 @@
  * @var Bool $is_exist
  * @var String $_reepay_choose_exist
  */
-
-$variable = $variable ?? false;
 ?>
 <div class="options_group reepay_subscription_choose show_if_reepay_subscription">
-    <p class="form-field choose-fields <?php echo $variable ? 'form-row' : '' ?> ">
+    <p class="form-field choose-fields">
         <label for="_reepay_subscription_choose">
 			<?php echo __( 'Creation type', 'reepay-subscriptions-for-woocommerce' ); ?>
         </label>
 		<?php echo __( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ); ?>
         <input type="radio" id="_reepay_subscription_choose"
-               name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
+               name="_reepay_subscription_choose"
                value="new" <?php checked( 'new', esc_attr( $_reepay_subscription_choose ) ); ?>>
 		<?php echo __( 'Choose existing plan', 'reepay-subscriptions-for-woocommerce' ); ?>
         <input type="radio" id="_reepay_subscription_choose"
-               name="_reepay_subscription_choose<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
+               name="_reepay_subscription_choose"
                value="exist" <?php checked( 'exist', esc_attr( $_reepay_subscription_choose ) ); ?>>
     </p>
 </div>
@@ -31,13 +29,13 @@ $variable = $variable ?? false;
 
 <div class="reepay_subscription_choose_exist">
     <div class="options_group show_if_reepay_subscription">
-        <p class="form-field exist-fields <?php echo $variable ? 'dimensions_field form-row' : '' ?> ">
+        <p class="form-field exist-fields">
             <label for="_subscription_choose_exist">
 				<?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
             </label>
 			<?php if ( ! empty( $plans_list ) ): ?>
                 <select id="_subscription_choose_exist"
-                        name="_reepay_choose_exist<?php echo $variable ? '[' . esc_attr( $loop ) . ']' : '' ?>"
+                        name="_reepay_choose_exist"
                         class="wc_input_subscription_period_interval"
 					<?php if ( isset( $data_plan ) ) : ?>
                         data-plan='<?php echo esc_html( $data_plan ) ?>'
