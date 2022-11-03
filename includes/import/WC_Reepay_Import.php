@@ -102,10 +102,13 @@ class WC_Reepay_Import {
 
 					if ( is_wp_error( $wp_user_id ) ) {
 						/** @var WP_Error $wp_user_id */
+
+						$name = $customer['email'] ?? $customer['handle'];
+
 						$this->log(
 							"WC_Reepay_Import::process_import_customers",
 							$wp_user_id,
-							"Error with creating wp user - {$customer['email']}. " . $wp_user_id->get_error_message()
+							"Error with creating wp user - {$name}. " . $wp_user_id->get_error_message()
 						);
 					}
 				}
