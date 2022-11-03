@@ -39,9 +39,8 @@ class WC_Reepay_Admin_Frontend {
 	public function reepay_show_extra_order_fields( $order ) {
 
 		echo '<p>
-            <strong>' . __( 'Customer Handle' ) . ':</strong>
-            <a href="https://app.reepay.com/#/rp/customers/customers/customer/customer-' . $order->get_customer_id() . '" target="_blank">
-            customer-' . $order->get_customer_id() . '
+            <a class="button refund-items" role="button" href="https://app.reepay.com/#/rp/customers/customers/customer/customer-' . $order->get_customer_id() . '" target="_blank">
+            ' . __( 'See customer', 'reepay-subscriptions-for-woocommerce' ) . '
             </a>
         </p>';
 	}
