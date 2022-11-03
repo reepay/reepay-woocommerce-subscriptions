@@ -509,7 +509,7 @@ $disabled = '';
     </div>
 
     <div class="options_group">
-        <p class="form-field">
+        <p class="form-field form-row">
             <label for="_subscription_notice_period"><?php echo __( 'Notice period', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo wc_help_tip( __( 'Periods are relative to the billing frequency. If you have chosen to bill every month, a period is one month.', 'reepay-subscriptions-for-woocommerce' ) ); ?>
             <input type="number" min="0" id="_subscription_notice_period" <?php echo esc_attr( $disabled ) ?>

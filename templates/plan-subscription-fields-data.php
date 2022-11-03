@@ -40,7 +40,7 @@ $disabled = '';
             <input type="number" min="0" id="_reepay_subscription_daily" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_daily"
                    value="<?php echo ! empty( $_reepay_subscription_daily ) ? esc_attr( $_reepay_subscription_daily ) : 1 ?>">
-			<?php echo __( 'Day', 'reepay-subscriptions-for-woocommerce' ); ?>
+			<span class="form-field_time-type"><?php echo __( 'Day', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
 
         <!--Monthly-->
@@ -49,7 +49,7 @@ $disabled = '';
             <input type="number" min="0" id="_subscription_month_startdate" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_month_startdate"
                    value="<?php echo ! empty( $_reepay_subscription_month_startdate ) ? esc_attr( $_reepay_subscription_month_startdate ) : 1 ?>">
-			<?php echo __( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?>
+            <span class="form-field_time-type"><?php echo __( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
 
         <!--Fixed day of month-->
@@ -59,7 +59,7 @@ $disabled = '';
             <input type="number" min="0" id="_subscription_month_fixedday" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_month_fixedday[month]"
                    value="<?php echo ! empty( $month_fixedday['month'] ) ? esc_attr( $month_fixedday['month'] ) : 1 ?>">
-			<?php echo __( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?>
+            <span class="form-field_time-type"><?php echo __( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field type-fields fields-month_fixedday hidden">
             <label for="_subscription_month_fixedday_day"><?php echo __( 'On this day of the month', 'reepay-subscriptions-for-woocommerce' ); ?></label>
@@ -120,7 +120,7 @@ $disabled = '';
                    id="_subscription_month_lastday[month]" <?php echo esc_attr( $disabled ) ?>
                    value="<?php echo ! empty( $month_lastday['month'] ) ? $month_lastday['month'] : 0 ?>"
                    name="_reepay_subscription_month_lastday[month]">
-			<?php echo __( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?>
+            <span class="form-field_time-type"><?php echo __( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field type-fields fields-month_lastday hidden">
             <label for="_subscription_month_lastday_period"><?php echo __( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
