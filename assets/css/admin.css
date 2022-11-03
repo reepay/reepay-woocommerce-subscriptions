@@ -237,6 +237,10 @@ p.form-field.form-row .woocommerce-help-tip {
     float: unset !important;
 }
 
+p.form-field span.form-field_time-type {
+    margin-left: 9px;
+}
+
 .reepay_subscription_supersedes_block {
     display: none;
 }
