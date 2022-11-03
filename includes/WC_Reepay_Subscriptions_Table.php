@@ -182,7 +182,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 			return '<mark class="active"><span>Active</span></mark>';
 		}
 
-		return $subscription['state'];
+		return '<mark class="'.$subscription['state'].'"><span>'.ucfirst($subscription['state']).'</span></mark>';
 	}
 
 	/**
