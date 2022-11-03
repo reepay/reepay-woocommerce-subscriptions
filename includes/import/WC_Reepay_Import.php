@@ -95,19 +95,19 @@ class WC_Reepay_Import {
 			$customers = $customers_data['content'];
 
 			foreach ( $customers as $customer ) {
-				if ( $wp_user = get_user_by( 'email', $customer['email'] ) ) {
-					update_user_meta( $wp_user->ID, 'reepay_customer_id', $customer['handle'] );
-				} else {
+				$wp_user_id = rp_get_userid_by_handle( $customer['handle'] );
+
+				if ( false === get_user_by( 'id', $wp_user_id ) ) {
 					$wp_user_id = WC_Reepay_Import_Helpers::create_woo_customer( $customer );
 
 					if ( is_wp_error( $wp_user_id ) ) {
+						/** @var WP_Error $wp_user_id */
 						$this->log(
 							"WC_Reepay_Import::process_import_customers",
 							$wp_user_id,
-							"Error with creating wp user - " . $customer['email']
+							"Error with creating wp user - {$customer['email']}. " . $wp_user_id->get_error_message()
 						);
 					}
-
 				}
 			}
 

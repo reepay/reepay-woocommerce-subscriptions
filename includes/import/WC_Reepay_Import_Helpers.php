@@ -13,9 +13,9 @@ class WC_Reepay_Import_Helpers {
 	 */
 	public static function create_woo_customer( $customer_data ) {
 		$user_id = wp_create_user(
-			$customer_data['email'],
+			$customer_data['email'] ?? $customer_data['handle'],
 			wp_generate_password( 8, false ),
-			$customer_data['email']
+			$customer_data['email'] ?? ''
 		);
 
 		if ( is_wp_error( $user_id ) ) {
@@ -23,31 +23,29 @@ class WC_Reepay_Import_Helpers {
 		}
 
 		$meta_to_data = [
-			"first_name" => $customer_data['first_name'],
-			"last_name"  => $customer_data['last_name'],
+			"first_name" => $customer_data['first_name'] ?? '',
+			"last_name"  => $customer_data['last_name'] ?? '',
 
-			"billing_first_name" => $customer_data['first_name'],
-			"billing_last_name"  => $customer_data['last_name'],
-			"billing_company"    => $customer_data['company'],
-			"billing_email"      => $customer_data['email'],
-			"billing_address_1"  => $customer_data['address'],
-			"billing_address_2"  => $customer_data['address2'],
-			"billing_city"       => $customer_data['city'],
-			"billing_postcode"   => $customer_data['postal_code'],
-			"billing_country"    => $customer_data['country'],
-//			"billing_state"     => $customer_data[''],
-			"billing_phone"      => $customer_data['phone'],
+			"billing_first_name" => $customer_data['first_name'] ?? '',
+			"billing_last_name"  => $customer_data['last_name'] ?? '',
+			"billing_company"    => $customer_data['company'] ?? '',
+			"billing_email"      => $customer_data['email'] ?? '',
+			"billing_address_1"  => $customer_data['address'] ?? '',
+			"billing_address_2"  => $customer_data['address2'] ?? '',
+			"billing_city"       => $customer_data['city'] ?? '',
+			"billing_postcode"   => $customer_data['postal_code'] ?? '',
+			"billing_country"    => $customer_data['country'] ?? '',
+			"billing_phone"      => $customer_data['phone'] ?? '',
 
-			"shipping_first_name" => $customer_data['first_name'],
-			"shipping_last_name"  => $customer_data['last_name'],
-			"shipping_company"    => $customer_data['company'],
-			"shipping_address_1"  => $customer_data['address'],
-			"shipping_address_2"  => $customer_data['address2'],
-			"shipping_city"       => $customer_data['city'],
-			"shipping_postcode"   => $customer_data['postal_code'],
-			"shipping_country"    => $customer_data['country'],
-//			"shipping_state"      => $customer_data['']
-			"shipping_phone"      => $customer_data['phone'],
+			"shipping_first_name" => $customer_data['first_name'] ?? '',
+			"shipping_last_name"  => $customer_data['last_name'] ?? '',
+			"shipping_company"    => $customer_data['company'] ?? '',
+			"shipping_address_1"  => $customer_data['address'] ?? '',
+			"shipping_address_2"  => $customer_data['address2'] ?? '',
+			"shipping_city"       => $customer_data['city'] ?? '',
+			"shipping_postcode"   => $customer_data['postal_code'] ?? '',
+			"shipping_country"    => $customer_data['country'] ?? '',
+			"shipping_phone"      => $customer_data['phone'] ?? '',
 
 			"reepay_customer_id" => $customer_data['handle'],
 		];
