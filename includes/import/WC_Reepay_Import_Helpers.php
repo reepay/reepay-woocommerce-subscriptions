@@ -137,8 +137,17 @@ class WC_Reepay_Import_Helpers {
 			return new WP_Error( 'Plan request error' );
 		}
 
+		$reepay_to_woo_statuses = [
+			'active'      => 'wc-completed',
+			'expired'     => 'wc-cancelled',
+			'on_hold'     => 'wc-on-hold',
+			'pending'     => 'wc-pending',
+			'cancelled'   => 'wc-cancelled',
+			'reactivated' => 'wc-completed',
+		];
+
 		$order = wc_create_order( [
-			'status' => '', //activated, expired, cancelled, on_hold or reactivated
+			'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? ''
 		] );
 
 		//import logic
