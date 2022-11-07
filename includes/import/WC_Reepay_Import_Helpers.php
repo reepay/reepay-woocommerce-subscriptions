@@ -167,20 +167,20 @@ class WC_Reepay_Import_Helpers {
 		$order->add_meta_data( '_reepay_order', $subscription['handle'] );
 		$order->add_meta_data( '_reepay_state_authorized', 1 );
 
-		$fees_item = new WC_Order_Item_Product();
-		$fees_item->set_name( 'Plan ' . $plan['name'] );
-		$fees_item->set_quantity( $plan['quantity'] );
-		$fees_item->set_product_id( 0 );
-		$fees_item->set_subtotal( $plan['amount'] / 100 );
-		$fees_item->set_total( $plan['amount'] / 100 );
-		$order->add_item( $fees_item );
+		$order_item = new WC_Order_Item_Product();
+		$order_item->set_name( 'Plan ' . $plan['name'] );
+		$order_item->set_quantity( $plan['quantity'] );
+		$order_item->set_product_id( 0 );
+		$order_item->set_subtotal( $plan['amount'] / 100 );
+		$order_item->set_total( $plan['amount'] / 100 );
+		$order->add_item( $order_item );
 
 		if ( ! empty( $plan['setup_fee'] ) && $plan['setup_fee'] > 0 ) {
-			$fees_item = new WC_Order_Item_Fee();
-			$fees_item->set_name( 'Fee ' . $plan['setup_fee_text'] );
-			$fees_item->set_amount( $plan['setup_fee'] / 100 );
-			$fees_item->set_total( $plan['setup_fee'] / 100 );
-			$order->add_item( $fees_item );
+			$order_item = new WC_Order_Item_Fee();
+			$order_item->set_name( 'Fee ' . $plan['setup_fee_text'] );
+			$order_item->set_amount( $plan['setup_fee'] / 100 );
+			$order_item->set_total( $plan['setup_fee'] / 100 );
+			$order->add_item( $order_item );
 		}
 
 		$order->save();
