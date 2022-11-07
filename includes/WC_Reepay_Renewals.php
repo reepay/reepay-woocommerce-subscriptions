@@ -13,6 +13,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook', [ $this, 'create_subscriptions_handle' ] );
 		add_action( 'reepay_create_subscription', [ $this, 'create_subscriptions' ], 10, 2 );
 
+		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
@@ -101,7 +102,7 @@ class WC_Reepay_Renewals {
 		foreach ( $order->get_items() as $item_key => $item_values ) {
 			$product = $item_values->get_product();
 
-			if ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) {
+			if ( method_exists( $product, 'is_type' ) && ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) ) {
 				return true;
 			}
 
