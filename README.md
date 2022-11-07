@@ -12,3 +12,4 @@ Use the reepay plugin for:
 * WordPress Version: 4.0 or higher
 * Tested up to: 5.3.2
 
+
