@@ -465,6 +465,8 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	/**
+	 * @param  mixed|null  $product  Current product
+	 *
 	 * @return WC_Reepay_Subscription_Plan_Simple
 	 */
 	public function plan( $product = null ) {
@@ -473,6 +475,10 @@ class WooCommerce_Reepay_Subscriptions {
 		}
 
 		$product = wc_get_product( $product );
+
+		if ( $product->is_type( 'variation' ) ) {
+			$product = wc_get_product( $product->get_parent_id() );
+		}
 
 		if ( $product->is_type( 'reepay_variable_subscriptions' ) ) {
 			return $this->plan_variable;
