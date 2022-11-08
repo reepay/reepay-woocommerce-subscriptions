@@ -33,9 +33,12 @@ class WC_Reepay_Subscription_Addons {
 			$addons_info = [];
 
 			foreach ( $values['addons'] as $addon ) {
+			    /**
+                 * @see https://reference.reepay.com/api/#the-add-on-object
+                 */
 				$result = reepay_s()->api()->request( "add_on/{$addon['handle']}" );
 
-				$addons_info[] = [
+				$addons_info_item = [
 					'name'        => $result['name'],
 					'description' => $result['description'],
 					'type'        => $result['type'],
@@ -52,9 +55,11 @@ class WC_Reepay_Subscription_Addons {
 				if ( ! empty( $addon['quantity'] ) && apply_filters( 'woocommerce_addons_add_price_to_name', '__return_true' ) ) {
 					$key   .= ' x' . $addon['quantity'];
 					$price = $price * intval( $addon['quantity'] );
+					$addons_info_item['quantity'] = intval( $addon['quantity'] );
 				}
 
 				$item->add_meta_data( $key, '+' . wc_price( $price ) );
+				$addons_info[] = $addons_info_item;
 			}
 
 			$item->add_meta_data( 'addons', $addons_info );

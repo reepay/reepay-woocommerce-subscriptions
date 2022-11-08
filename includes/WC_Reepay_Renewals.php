@@ -102,7 +102,12 @@ class WC_Reepay_Renewals {
 		foreach ( $order->get_items() as $item_key => $item_values ) {
 			$product = $item_values->get_product();
 
-			if ( method_exists( $product, 'is_type' ) && ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) ) {
+			//Imported subscriptions are empty
+			if ( empty( $product ) ) {
+				continue;
+			}
+
+			if ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) {
 				return true;
 			}
 
@@ -167,7 +172,7 @@ class WC_Reepay_Renewals {
 			//Get the WC_Product object
 			$product = $order_item->get_product();
 
-			if ( ! $product->is_type( 'reepay_variable_subscriptions' ) && ! $product->is_type( 'reepay_simple_subscriptions' ) ) {
+			if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 				continue;
 			}
 
