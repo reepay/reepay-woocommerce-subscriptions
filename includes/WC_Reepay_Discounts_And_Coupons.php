@@ -50,6 +50,8 @@ class WC_Reepay_Discounts_And_Coupons {
 
 		add_filter( "woocommerce_coupon_error", [ $this, "plugin_coupon_error_message" ], 10, 3 );
 
+        add_action('woocommerce_after_order_object_save', [ $this, "on_order_save" ]);
+
 	}
 
 	function get_discount_default_params( WC_Coupon $coupon, $data = [] ) {
@@ -400,6 +402,10 @@ class WC_Reepay_Discounts_And_Coupons {
 
 		return false;
 	}
+
+    function on_order_save() {
+        $this->applied_fixed_coupon = false;
+    }
 
 	function apply_discount( $discount, $discounting_amount, $cart_item, $single, WC_Coupon $coupon ) {
 		$type = get_post_meta( $coupon->get_id(), '_reepay_discount_type', true );
