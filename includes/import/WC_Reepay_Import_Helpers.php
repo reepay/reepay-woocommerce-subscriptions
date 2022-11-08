@@ -164,8 +164,11 @@ class WC_Reepay_Import_Helpers {
 
 		$order->set_payment_method( 'reepay_checkout' );
 		$order->set_payment_method_title( 'Reepay Checkout' );
-		$order->add_meta_data( '_reepay_order', $subscription['handle'] );
 		$order->add_meta_data( '_reepay_state_authorized', 1 );
+
+		$order->add_meta_data( '_reepay_order', $subscription['handle'] );
+		$order->add_meta_data( '_reepay_subscription_handle', $subscription['handle'] );
+		$order->add_meta_data( '_reepay_imported', 1 );
 
 		$order_item = new WC_Order_Item_Product();
 		$order_item->set_name( 'Plan ' . $plan['name'] );
