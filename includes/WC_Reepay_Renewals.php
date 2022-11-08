@@ -18,6 +18,22 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
+		add_filter( 'woocommerce_get_formatted_order_total', array(
+			$this,
+			'display_real_total'
+		), 10, 4 );
+	}
+
+	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
+		if ( self::is_order_contain_subscription( $order ) && floatval( $order->get_total() ) == 0 && ! is_admin() ) {
+			$real_total = get_post_meta( $order->get_id(), '_real_total', true );
+			if ( ! empty( $real_total ) ) {
+				return wc_price( $real_total );
+			}
+
+		}
+
+		return $formatted_total;
 	}
 
 	/**
@@ -207,6 +223,13 @@ class WC_Reepay_Renewals {
 		foreach ( $orders as $order ) {
 			if ( ! self::is_order_contain_subscription( $order ) ) {
 				continue;
+			}
+
+
+			if ( floatval( $order->get_total() ) != 0 ) {
+				update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
+				$new_total = 0;
+				$order->set_total( $new_total );
 			}
 
 
@@ -468,15 +491,6 @@ class WC_Reepay_Renewals {
 		if ( empty( $parent_order ) ) {
 			return new WP_Error( 'Undefined parent order' );
 		}
-
-		$query = new WP_Query( array(
-			'post_parent'    => $parent_order->get_id(),
-			'post_type'      => 'shop_order',
-			'post_status'    => 'any',
-			'orderby'        => 'ID',
-			'posts_per_page' => 1,
-			'offset'         => 0,
-		) );
 
 		$query = new WP_Query( [
 			'post_parent'    => $parent_order->get_id(),
