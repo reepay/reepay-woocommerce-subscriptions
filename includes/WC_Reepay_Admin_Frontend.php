@@ -108,8 +108,9 @@ class WC_Reepay_Admin_Frontend {
 				break;
 
 			case 'suborder':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle', true );
-				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
+				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+				$imported = $the_order->get_meta( '_reepay_imported' );
+				if ( ! empty( $handle ) && $post->post_parent == 0 && ! $imported ) {
 					$output = sprintf( '<a href="#" class="show-sub-orders" data-class="parent-%1$d" data-show="%2$s" data-hide="%3$s">%2$s</a>',
 						esc_attr( $post->ID ), esc_attr__( 'Show history', 'reepay-subscriptions-for-woocommerce' ),
 						esc_attr__( 'Hide history', 'reepay-subscriptions-for-woocommerce' ) );
