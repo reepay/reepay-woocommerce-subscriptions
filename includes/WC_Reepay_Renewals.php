@@ -485,6 +485,17 @@ class WC_Reepay_Renewals {
 	 * @return WC_Order|WP_Error
 	 */
 	public static function create_child_order( $data, $status ) {
+		self::log( [
+			'log' => [
+				'source'  => 'WC_Reepay_Renewals::create_child_order',
+				'$data'   => $data,
+				'$status' => $status
+			]
+		] );
+
+		if ( empty( $data['subscription'] ) ) {
+			return new WP_Error( 'Undefined subscription handle' );
+		}
 
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
@@ -570,13 +581,23 @@ class WC_Reepay_Renewals {
 	 * @return bool|WP_Error
 	 */
 	public static function update_subscription_status( $data, $status ) {
-		$order = self::get_order_by_subscription_handle( $data['subscription'] );
-
 		self::log( [
 			'log' => [
 				'source'  => 'WC_Reepay_Renewals::update_subscription_status',
 				'$data'   => $data,
-				'$status' => $status,
+				'$status' => $status
+			]
+		] );
+
+		if ( empty( $data['subscription'] ) ) {
+			return new WP_Error( 'Undefined subscription handle' );
+		}
+
+		$order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		self::log( [
+			'log' => [
+				'source'  => 'WC_Reepay_Renewals::update_subscription_status::order',
 				'$order'  => $order
 			]
 		] );
