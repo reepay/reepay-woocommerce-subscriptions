@@ -54,6 +54,8 @@ class WC_Reepay_Import_Helpers {
 			update_user_meta( $user_id, $meta_key, $datum );
 		}
 
+		wp_new_user_notification( $user_id, null, 'user' );
+
 		return $user_id;
 	}
 
