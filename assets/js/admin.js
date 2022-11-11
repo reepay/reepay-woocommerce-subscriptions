@@ -303,7 +303,7 @@ jQuery(function ($) {
 
     }
 
-    if (('.wp-list-table').length) {
+    /*if (('.wp-list-table').length) {
         init_table();
     }
 
@@ -329,7 +329,7 @@ jQuery(function ($) {
 
             $('tr.sub-order').toggle();
         });
-    }
+    }*/
 
     function show_settings() {
         if ('reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val()) {
