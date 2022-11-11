@@ -357,8 +357,10 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
-		self::update_subscription_status( $data, 'wc-completed' );
-		self::create_child_order( $data, 'wc-completed' );
+		$status = reepay_s()->settings( '_reepay_suborders_default_renew_status' );
+
+		self::update_subscription_status( $data, $status );
+		self::create_child_order( $data, $status );
 	}
 
 	/**

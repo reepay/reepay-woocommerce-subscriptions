@@ -122,22 +122,23 @@ class WooCommerce_Reepay_Subscriptions {
 		}
 
 		self::$settings = [
-			'domain'                                => 'reepay-subscriptions-for-woocommerce',
-			'plugin_url'                            => plugin_dir_url( __FILE__ ),
-			'plugin_path'                           => plugin_dir_path( __FILE__ ),
-			'version'                               => static::$version,
-			'rest_api_namespace'                    => static::$rest_api_namespace,
-			'debug'                                 => get_option( '_reepay_debug' ) === 'yes',
-			'test_mode'                             => get_option( '_reepay_test_mode' ) === 'yes',
-			'api_private_key'                       => get_option( '_reepay_api_private_key' ),
-			'api_private_key_test'                  => get_option( '_reepay_api_private_key_test' ),
-			'_reepay_enable_downgrade'              => get_option( '_reepay_enable_downgrade' ) === 'yes',
-			'_reepay_downgrade_compensation_method' => get_option( '_reepay_downgrade_compensation_method' ),
-			'_reepay_enable_upgrade'                => get_option( '_reepay_enable_upgrade' ) === 'yes',
-			'_reepay_upgrade_compensation_method'   => get_option( '_reepay_upgrade_compensation_method' ),
-			'_reepay_enable_on_hold'                => get_option( '_reepay_enable_on_hold' ) === 'yes',
-			'_reepay_on_hold_compensation_method'   => get_option( '_reepay_on_hold_compensation_method' ),
-			'_reepay_enable_cancel'                 => get_option( '_reepay_enable_cancel' ) === 'yes',
+			'domain'                                 => 'reepay-subscriptions-for-woocommerce',
+			'plugin_url'                             => plugin_dir_url( __FILE__ ),
+			'plugin_path'                            => plugin_dir_path( __FILE__ ),
+			'version'                                => static::$version,
+			'rest_api_namespace'                     => static::$rest_api_namespace,
+			'debug'                                  => get_option( '_reepay_debug' ) === 'yes',
+			'test_mode'                              => get_option( '_reepay_test_mode' ) === 'yes',
+			'api_private_key'                        => get_option( '_reepay_api_private_key' ),
+			'api_private_key_test'                   => get_option( '_reepay_api_private_key_test' ),
+			'_reepay_enable_downgrade'               => get_option( '_reepay_enable_downgrade' ) === 'yes',
+			'_reepay_downgrade_compensation_method'  => get_option( '_reepay_downgrade_compensation_method' ),
+			'_reepay_enable_upgrade'                 => get_option( '_reepay_enable_upgrade' ) === 'yes',
+			'_reepay_upgrade_compensation_method'    => get_option( '_reepay_upgrade_compensation_method' ),
+			'_reepay_enable_on_hold'                 => get_option( '_reepay_enable_on_hold' ) === 'yes',
+			'_reepay_on_hold_compensation_method'    => get_option( '_reepay_on_hold_compensation_method' ),
+			'_reepay_enable_cancel'                  => get_option( '_reepay_enable_cancel' ) === 'yes',
+			'_reepay_suborders_default_renew_status' => get_option( '_reepay_suborders_default_renew_status' ) ?: 'wc-completed',
 		];
 
 
@@ -429,6 +430,13 @@ class WooCommerce_Reepay_Subscriptions {
 				'options' => static::$compensation_methods,
 				'desc'    => __( 'Compensation method for cancel', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_cancel_compensation_method'
+			],
+			'_reepay_suborders_default_renew_status' => [
+				'name'    => __( 'Suborders default status after renew', 'reepay-subscriptions-for-woocommerce' ),
+				'type'    => 'select',
+				'options' => wc_get_order_statuses(),
+				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
+				'id'      => '_reepay_suborders_default_renew_status'
 			],
 			'section_end'                         => [
 				'type' => 'sectionend',
