@@ -13,7 +13,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook', [ $this, 'create_subscriptions_handle' ] );
 		add_action( 'reepay_create_subscription', [ $this, 'create_subscriptions' ], 10, 2 );
 
-		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
+		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ], );
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
@@ -553,6 +553,49 @@ class WC_Reepay_Renewals {
 			}
 		}
 
+		$gateway      = rp_get_payment_method( $parent_order );
+		$invoice_data = $gateway->api->get_invoice_by_handle( $data['invoice'] );
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::create_child_invoice_data',
+				'data'   => $invoice_data,
+			]
+		] );
+
+		if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
+			$new_items = [];
+			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
+				$is_exist = false;
+				foreach ( $items as $item ) {
+					if ( $item['name'] == $invoice_lines['ordertext'] ) {
+						$is_exist    = true;
+						$new_items[] = $item;
+					}
+				}
+
+				if ( ! $is_exist ) {
+					if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
+						$fees_item = new WC_Order_Item_Fee();
+						$fees_item->set_name( $invoice_lines['ordertext'] );
+						$fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
+						$fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+						$new_items[] = $fees_item;
+					} else {
+						$product_item = new WC_Order_Item_Product();
+						$product_item->set_name( $invoice_lines['ordertext'] );
+						$product_item->set_quantity( $invoice_lines['quantity'] );
+						$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
+						$product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+						$new_items[] = $product_item;
+					}
+				}
+
+
+			}
+
+			$items = $new_items;
+		}
+
 
 		self::log( [
 			'log' => [
@@ -599,8 +642,8 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source'  => 'WC_Reepay_Renewals::update_subscription_status::order',
-				'$order'  => $order
+				'source' => 'WC_Reepay_Renewals::update_subscription_status::order',
+				'$order' => $order
 			]
 		] );
 
