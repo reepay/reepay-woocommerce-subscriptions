@@ -328,7 +328,32 @@ class WC_Reepay_Subscription_Addons {
 	}
 
 	public function save_to_reepay( $product_addon, $post_id, $i ) {
-		$plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
+	    $product = wc_get_product( $post_id );
+
+		if ( $product->is_type( 'reepay_simple_subscriptions' ) ) {
+		    $plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
+
+			if ( empty( $plan_handle ) ) {
+				WC_Reepay_Subscription_Admin_Notice::add_notice( 'Wrong plan_handle. Order - #' . $post_id );
+				return [];
+			}
+
+			$plan_handles = [ $plan_handle ];
+		} elseif ( $product->is_type( 'reepay_variable_subscriptions' ) ) {
+			$plan_handles = [];
+			$children_posts = $product->get_children();
+
+			foreach ( $children_posts as $children_post ) {
+			    $plan_handle = get_post_meta( $children_post, '_reepay_subscription_handle', true );
+
+				if ( empty( $plan_handle ) ) {
+					WC_Reepay_Subscription_Admin_Notice::add_notice( 'Wrong plan_handle. Variation - #' . $children_post );
+					return [];
+				}
+
+				$plan_handles[] = $plan_handle;
+			}
+		}
 
 		$params = [
 			'name'            => ! empty( $product_addon['name'] ) ? $product_addon['name'] : '',
@@ -338,7 +363,7 @@ class WC_Reepay_Subscription_Addons {
 			'type'            => $product_addon['type'],
 			'amount_incl_vat' => $product_addon['vat_type'] == 'include',
 			'all_plans'       => $product_addon['avai'] == 'all',
-			'eligible_plans'  => $product_addon['avai'] == 'all' ? [] : [ $plan_handle ],
+			'eligible_plans'  => $product_addon['avai'] == 'all' ? [] : $plan_handles,
 		];
 
 		if ( ! empty( $product_addon['handle'] ) ) { //Update
