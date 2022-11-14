@@ -15,7 +15,8 @@ class WC_Reepay_Admin_Frontend {
 		add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
 
-		add_filter( 'posts_orderby', [ $this, 'modify_search_results_order' ], 10, 2 );
+		//add_filter( 'posts_orderby', [ $this, 'modify_search_results_order' ], 10, 2 );
+		add_action( 'pre_get_posts', [ $this, 'add_invoice_to_search' ], 10, 1 );
 		add_filter( 'posts_fields', [ $this, 'modify_search_results_fields' ], 10, 2 );
 		add_filter( 'woocommerce_order_number', [ $this, 'modify_order_id' ], 10, 2 );
 
@@ -25,11 +26,38 @@ class WC_Reepay_Admin_Frontend {
 		) );
 	}
 
+	public function add_invoice_to_search( $query ) {
+
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		global $pagenow;
+
+		if ( 'edit.php' === $pagenow && 'shop_order' === $query->query['post_type'] && isset( $query->query['s'] ) ) {
+			$s          = str_replace( '#', '', $query->query['s'] );
+			$meta_query = array(
+				array(
+					'key'     => '_reepay_order',
+					'value'   => $s,
+					'compare' => 'LIKE'
+				)
+			);
+
+			unset( $query->query['s'] );
+			unset( $query->query_vars['s'] );
+
+			$query->set( 'meta_query', $meta_query );
+		}
+
+		return;
+	}
+
 	public function modify_order_id( $id, $order ) {
 		global $post;
 
 		$reepay_order = get_post_meta( $order->get_id(), '_reepay_order', true );
-		if ( ! empty( $reepay_order ) && strpos( $reepay_order, 'inv' ) !== false && ! empty( $post->post_parent ) && $post->post_parent !== 0 ) {
+		if ( ! empty( $reepay_order ) && ! empty( $post->post_parent ) && $post->post_parent !== 0 ) {
 			return $reepay_order;
 		}
 
@@ -91,7 +119,7 @@ class WC_Reepay_Admin_Frontend {
 			return;
 		}
 
-		if ( ! in_array( $col, [ 'order_number', 'suborder', 'reepay_sub' ], true ) ) {
+		if ( ! in_array( $col, [ 'order_number', 'order_type', 'reepay_sub' ], true ) ) {
 			return;
 		}
 
@@ -107,13 +135,20 @@ class WC_Reepay_Admin_Frontend {
 				}
 				break;
 
-			case 'suborder':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle', true );
+			case 'order_type':
+				$handle   = $the_order->get_meta( '_reepay_subscription_handle' );
+				$imported = $the_order->get_meta( '_reepay_imported' );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
-					$output = sprintf( '<a href="#" class="show-sub-orders" data-class="parent-%1$d" data-show="%2$s" data-hide="%3$s">%2$s</a>',
+					/*$output = sprintf( '<a href="#" class="show-sub-orders" data-class="parent-%1$d" data-show="%2$s" data-hide="%3$s">%2$s</a>',
 						esc_attr( $post->ID ), esc_attr__( 'Show history', 'reepay-subscriptions-for-woocommerce' ),
-						esc_attr__( 'Hide history', 'reepay-subscriptions-for-woocommerce' ) );
+						esc_attr__( 'Hide history', 'reepay-subscriptions-for-woocommerce' ) );*/
+					$output = 'Subscription';
+				} elseif ( ! empty( $the_order->get_meta( '_reepay_order' ) ) && $post->post_parent != 0 ) {
+					$output = 'Renewal';
+				} else {
+					$output = 'Regular';
 				}
+
 				break;
 
 			case 'reepay_sub':
@@ -148,18 +183,18 @@ class WC_Reepay_Admin_Frontend {
 			$columns = array_slice( $existing_columns, 0, count( $existing_columns ), true ) +
 			           array(
 				           'reepay_sub' => __( 'Subscription', 'reepay-subscriptions-for-woocommerce' ),
-				           'suborder'   => __( 'Sub Order', 'reepay-subscriptions-for-woocommerce' ),
+				           'order_type' => __( 'Order type', 'reepay-subscriptions-for-woocommerce' ),
 			           )
 			           + array_slice( $existing_columns, count( $existing_columns ), count( $existing_columns ) - 1, true );
 		} else {
 			$existing_columns['reepay_sub'] = __( 'Vendor', 'reepay-subscriptions-for-woocommerce' );
-			$existing_columns['suborder']   = __( 'Sub Order', 'reepay-subscriptions-for-woocommerce' );
+			$existing_columns['order_type'] = __( 'Order type', 'reepay-subscriptions-for-woocommerce' );
 		}
 
 		if ( WC_VERSION > '3.2.6' ) {
 			// Remove seller, suborder column if seller is viewing his own product
 			if ( ! current_user_can( 'manage_woocommerce' ) || ( isset( $_GET['author'] ) && ! empty( $_GET['author'] ) ) ) {
-				unset( $columns['suborder'] );
+				unset( $columns['order_type'] );
 				unset( $columns['reepay_sub'] );
 			}
 
@@ -168,21 +203,21 @@ class WC_Reepay_Admin_Frontend {
 
 		// Remove seller, suborder column if seller is viewing his own product
 		if ( ! current_user_can( 'manage_woocommerce' ) || ( isset( $_GET['author'] ) && ! empty( $_GET['author'] ) ) ) {
-			unset( $existing_columns['suborder'] );
+			unset( $existing_columns['order_type'] );
 			unset( $existing_columns['reepay_sub'] );
 		}
 
 		return $existing_columns;
 	}
 
-	function modify_search_results_order( $orderby, $query ) {
+	/*function modify_search_results_order( $orderby, $query ) {
 		if ( is_admin() && $query->is_main_query() && $query->get( 'post_type' ) === 'shop_order' ) {
 			global $wpdb;
 			$orderby = "CASE WHEN $wpdb->posts.post_parent != 0 THEN $wpdb->posts.post_parent WHEN $wpdb->posts.post_parent = 0 THEN $wpdb->posts.id END desc";
 		}
 
 		return $orderby;
-	}
+	}*/
 
 	function modify_search_results_fields( $orderby, $query ) {
 
