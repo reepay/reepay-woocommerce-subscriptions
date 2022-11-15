@@ -167,8 +167,14 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$total         += floatval( $order_another->get_total() );
 			}
 
-			$total_rows['cart_subtotal']['value'] = wc_price( $total );
-			$total_rows['order_total']['value']   = wc_price( $total );
+			$total_rows['cart_subtotal'] = [
+				'label' => __( 'Subtotal:', 'woocommerce' ),
+				'value' => wc_price( $total )
+			];
+			$total_rows['order_total']= [
+				'label' => __( 'Total:', 'woocommerce' ),
+				'value' => wc_price( $total )
+			];
 		}
 
 		return $total_rows;
