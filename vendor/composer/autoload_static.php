@@ -33,6 +33,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Subscriptions_List' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscriptions_List.php',
         'WC_Reepay_Subscriptions_Table' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscriptions_Table.php',
         'WC_Reepay_Subscriptions_Update' => __DIR__ . '/../..' . '/includes/update/WC_Reepay_Subscriptions_Update.php',
+        'WC_Reepay_Woocommerce_Subscription_Extension' => __DIR__ . '/../..' . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

@@ -32,4 +32,5 @@ return array(
     'WC_Reepay_Subscriptions_List' => $baseDir . '/includes/WC_Reepay_Subscriptions_List.php',
     'WC_Reepay_Subscriptions_Table' => $baseDir . '/includes/WC_Reepay_Subscriptions_Table.php',
     'WC_Reepay_Subscriptions_Update' => $baseDir . '/includes/update/WC_Reepay_Subscriptions_Update.php',
+    'WC_Reepay_Woocommerce_Subscription_Extension' => $baseDir . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
 );
