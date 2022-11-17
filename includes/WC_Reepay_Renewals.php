@@ -18,10 +18,38 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
+		add_action( 'woocommerce_order_status_changed', array( $this, 'status_manual_start_date' ), 10, 4 );
 		add_filter( 'woocommerce_get_formatted_order_total', array(
 			$this,
 			'display_real_total'
 		), 10, 4 );
+	}
+
+	public function status_manual_start_date( $order_id, $this_status_transition_from, $this_status_transition_to, $instance ) {
+		$order          = wc_get_order( $order_id );
+		$payment_method = $order->get_payment_method();
+
+		if ( strpos( $payment_method, 'reepay' ) === false ) {
+			return;
+		}
+
+		if ( 'wc-' . $this_status_transition_to == reepay_s()->settings( '_reepay_manual_start_date_status' ) && WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) && self::is_order_contain_subscription( $order ) ) {
+			$sub_meta = $order->get_meta( '_reepay_subscription_handle' );
+			if ( ! empty( $sub_meta ) ) {
+				$params['next_period_start'] = current_time( 'Y-m-d\TH:i:s' );
+				try {
+					reepay_s()->api()->request( "subscription/{$sub_meta}/change_next_period_start", 'POST', $params );
+				} catch ( Exception $e ) {
+					self::log( [
+						'notice' => $e->getMessage()
+					] );
+					$order->add_order_note( 'Unable to change subscription period. Error from acquire: ' . $e->getMessage() );
+
+					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( 'Unable to change subscription period. Error from acquire: ' . $e->getMessage(), $order->get_id() );
+				}
+
+			}
+		}
 	}
 
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
@@ -260,8 +288,6 @@ class WC_Reepay_Renewals {
 //					'plan_version'    => null,
 					'amount_incl_vat' => wc_prices_include_tax(),
 //					'generate_handle' => null,
-//					'start_date' => null,
-//					'end_date' => null,
 					'grace_duration'  => 172800,
 //					'no_trial' => null,
 //					'no_setup_fee' => null,
@@ -271,6 +297,11 @@ class WC_Reepay_Renewals {
 //					'additional_costs' => null,
 					'signup_method'   => 'source',
 				];
+
+				if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) ) {
+					$sub_data['start_date'] = date( 'Y-m-d\TH:i:s', strtotime( "+1 year" ) );
+				}
+
 
 				if ( ! empty( $addons ) ) {
 					$sub_data['add_ons'] = $addons;
