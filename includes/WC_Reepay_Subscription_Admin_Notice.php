@@ -129,6 +129,14 @@ class WC_Reepay_Subscription_Admin_Notice {
 							'message' => 'Subscription is activated in trial'
 						);
 					}
+
+					if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) && strtotime( $sub['next_period_start'] ) > strtotime( 'now' ) ) {
+						$ret = array(
+							'state'   => 'paid',
+							'message' => 'Subscription is activated in trial'
+						);
+					}
+
 				} catch ( Exception $exception ) {
 					$ret = array(
 						'state'   => 'failed',
