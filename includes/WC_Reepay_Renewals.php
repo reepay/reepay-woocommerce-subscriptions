@@ -674,7 +674,7 @@ class WC_Reepay_Renewals {
 		self::log( [
 			'log' => [
 				'source' => 'WC_Reepay_Renewals::update_subscription_status::order',
-				'$order' => $order
+				'order_id' => $order->get_id()
 			]
 		] );
 
