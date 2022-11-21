@@ -593,6 +593,10 @@ class WC_Reepay_Renewals {
 			]
 		] );
 
+		if ( $invoice_data['state'] == 'failed' || $invoice_data['state'] == 'dunning' ) {
+			$status = 'wc-failed';
+		}
+
 		if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
 			$new_items = [];
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
@@ -673,8 +677,8 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source' => 'WC_Reepay_Renewals::update_subscription_status::order',
-				'$order' => $order
+				'source'   => 'WC_Reepay_Renewals::update_subscription_status::order',
+				'order_id' => $order->get_id()
 			]
 		] );
 

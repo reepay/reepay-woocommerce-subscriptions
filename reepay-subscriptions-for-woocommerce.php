@@ -424,19 +424,6 @@ class WooCommerce_Reepay_Subscriptions {
 				'desc' => __( 'Enable Cancel', 'reepay-subscriptions-for-woocommerce' ),
 				'id'   => '_reepay_enable_cancel'
 			],
-			'_reepay_manual_start_date'              => [
-				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
-				'type' => 'checkbox',
-				'desc' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
-				'id'   => '_reepay_manual_start_date'
-			],
-			'_reepay_manual_start_date_status'       => [
-				'name'    => __( 'Manual start date order status', 'reepay-subscriptions-for-woocommerce' ),
-				'type'    => 'select',
-				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Subscription will start when parent order get changed to this order status ', 'reepay-subscriptions-for-woocommerce' ),
-				'id'      => '_reepay_manual_start_date_status'
-			],
 			'_reepay_cancel_compensation_method'     => [
 				'name'    => __( 'Compensation method for Cancel', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
@@ -450,6 +437,19 @@ class WooCommerce_Reepay_Subscriptions {
 				'options' => wc_get_order_statuses(),
 				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_suborders_default_renew_status'
+			],
+			'_reepay_manual_start_date'              => [
+				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
+				'type' => 'checkbox',
+				'desc' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
+				'id'   => '_reepay_manual_start_date'
+			],
+			'_reepay_manual_start_date_status'       => [
+				'name'    => __( 'Manual start date order status', 'reepay-subscriptions-for-woocommerce' ),
+				'type'    => 'select',
+				'options' => wc_get_order_statuses(),
+				'desc'    => __( 'Subscription will start when parent order get changed to this order status ', 'reepay-subscriptions-for-woocommerce' ),
+				'id'      => '_reepay_manual_start_date_status'
 			],
 			'section_end'                            => [
 				'type' => 'sectionend',
