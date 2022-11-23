@@ -449,7 +449,7 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_manual_start_date'                  => [
 				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
-				'desc' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
+				'desc' => __( 'Enable manual subscription start date.<br> This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Reepay.', 'reepay-subscriptions-for-woocommerce' ),
 				'id'   => '_reepay_manual_start_date'
 			],
 			'_reepay_manual_start_date_status'           => [
