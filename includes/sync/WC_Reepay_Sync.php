@@ -10,6 +10,6 @@ class WC_Reepay_Sync {
 	 * Constructor
 	 */
 	public function __construct() {
-		new WC_Reepay_Sync_Customer();
+		new WC_Reepay_Sync_Customers();
 	}
 }

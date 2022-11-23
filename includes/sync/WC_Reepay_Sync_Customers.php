@@ -5,7 +5,7 @@
  *
  * @since 1.0.4
  */
-class WC_Reepay_Sync_Customer {
+class WC_Reepay_Sync_Customers {
 	/**
 	 * Constructor
 	 */
