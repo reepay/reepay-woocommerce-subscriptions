@@ -603,6 +603,10 @@ class WC_Reepay_Renewals {
 			]
 		] );
 
+		if ( $invoice_data['state'] == 'failed' || $invoice_data['state'] == 'dunning' ) {
+			$status = 'wc-failed';
+		}
+
 		if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
 			$new_items = [];
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
