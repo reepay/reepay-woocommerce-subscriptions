@@ -66,9 +66,9 @@ class WC_Reepay_Renewals {
 						]
 					] );
 
-					$order->add_order_note( 'Unable to change subscription period. Error from acquire: ' . $e->getMessage() );
+					$order->add_order_note( 'Unable to change subscription period to ' . $params['next_period_start'] . '. Error from acquire: ' . $e->getMessage() );
 
-					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( 'Unable to change subscription period. Error from acquire: ' . $e->getMessage(), $order->get_id() );
+					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( 'Unable to change subscription period to ' . $params['next_period_start'] . '. Error from acquire: ' . $e->getMessage(), $order->get_id() );
 				}
 
 			}
