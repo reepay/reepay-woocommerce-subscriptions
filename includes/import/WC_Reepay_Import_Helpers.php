@@ -22,6 +22,18 @@ class WC_Reepay_Import_Helpers {
 			return $user_id;
 		}
 
+		self::import_user_data( $user_id, $customer_data );
+
+		wp_new_user_notification( $user_id, null, 'user' );
+
+		return $user_id;
+	}
+
+	/**
+	 * @param  int    $user_id
+	 * @param  array  $customer_data  https://reference.reepay.com/api/#the-customer-object
+	 */
+	public static function import_user_data( $user_id, $customer_data ) {
 		$meta_to_data = [
 			"first_name" => $customer_data['first_name'] ?? '',
 			"last_name"  => $customer_data['last_name'] ?? '',
@@ -53,14 +65,10 @@ class WC_Reepay_Import_Helpers {
 		foreach ( $meta_to_data as $meta_key => $datum ) {
 			update_user_meta( $user_id, $meta_key, $datum );
 		}
-
-		wp_new_user_notification( $user_id, null, 'user' );
-
-		return $user_id;
 	}
 
 	/**
-	 * @param  int  $user_id
+	 * @param  int                   $user_id
 	 * @param  array<string, mixed>  $card
 	 *
 	 * @return bool|WP_Error
@@ -87,7 +95,9 @@ class WC_Reepay_Import_Helpers {
 
 		$token->save();
 		if ( ! $token->get_id() ) {
-			return new WP_Error( 'Unable to save bank card - ' . $card['masked_card'] . ', ' . $card['customer'] );
+			return new WP_Error( 'Unable to save bank card - '
+			                     . $card['masked_card'] . ', '
+			                     . $card['customer'] );
 		}
 
 		return true;
@@ -149,7 +159,7 @@ class WC_Reepay_Import_Helpers {
 		];
 
 		$order = wc_create_order( [
-			'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? ''
+			'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
 		] );
 
 		//import logic
@@ -169,7 +179,8 @@ class WC_Reepay_Import_Helpers {
 		$order->add_meta_data( '_reepay_state_authorized', 1 );
 
 		$order->add_meta_data( '_reepay_order', $subscription['handle'] );
-		$order->add_meta_data( '_reepay_subscription_handle', $subscription['handle'] );
+		$order->add_meta_data( '_reepay_subscription_handle',
+			$subscription['handle'] );
 		$order->add_meta_data( '_reepay_imported', 1 );
 
 		$order_item = new WC_Order_Item_Product();
