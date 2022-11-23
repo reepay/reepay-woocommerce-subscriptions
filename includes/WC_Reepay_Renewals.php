@@ -23,6 +23,19 @@ class WC_Reepay_Renewals {
 			$this,
 			'display_real_total'
 		), 10, 4 );
+
+		add_filter( 'reepay_settled_order_status', array(
+			$this,
+			'reepay_subscriptions_order_status'
+		), 11, 2 );
+	}
+
+	public function reepay_subscriptions_order_status( $status, $order ) {
+		if ( self::is_order_contain_subscription( $order ) ) {
+			$status = reepay_s()->settings( '_reepay_orders_default_subscription_status' );
+		}
+
+		return $status;
 	}
 
 	public function status_manual_start_date( $order_id, $this_status_transition_from, $this_status_transition_to, $instance ) {
@@ -47,8 +60,8 @@ class WC_Reepay_Renewals {
 				} catch ( Exception $e ) {
 					self::log( [
 						'log' => [
-							'source' => 'WC_Reepay_Renewals::status_manual_start_date',
-							'error' => $e->getMessage(),
+							'source'    => 'WC_Reepay_Renewals::status_manual_start_date',
+							'error'     => $e->getMessage(),
 							'$order_id' => $order_id,
 						]
 					] );
@@ -309,7 +322,7 @@ class WC_Reepay_Renewals {
 				];
 
 				if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) ) {
-					$sub_data['start_date'] = date( 'Y-m-d\TH:i:s', strtotime( "+1 year" ) );
+					$sub_data['start_date'] = date( 'Y-m-d\TH:i:s', strtotime( "+100 years" ) );
 				}
 
 
@@ -687,8 +700,8 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source' => 'WC_Reepay_Renewals::update_subscription_status::order',
-				'order_id' => empty($order) ? 0 : $order->get_id(),
+				'source'   => 'WC_Reepay_Renewals::update_subscription_status::order',
+				'order_id' => empty( $order ) ? 0 : $order->get_id(),
 			]
 		] );
 
