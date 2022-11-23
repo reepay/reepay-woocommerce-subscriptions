@@ -12,7 +12,8 @@ class WC_Reepay_Sync_Customers {
 	public function __construct() {
 		add_action( 'reepay_webhook_customer_created', [ $this, 'created' ] );
 		add_action( 'reepay_webhook_raw_event_customer_changed', [ $this, 'changed' ] );
-		add_action( 'reepay_webhook_raw_event_customer_deleted', [ $this, 'changed' ] );
+		add_action( 'reepay_webhook_raw_event_customer_deleted', [ $this, 'deleted' ] );
+		add_action( 'reepay_webhook_customer_payment_method_added', [ $this, 'payment_method_added' ] );
 	}
 
 	/**
