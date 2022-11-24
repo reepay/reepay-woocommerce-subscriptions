@@ -576,6 +576,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Subscriptions_List();
 		new WC_Reepay_Import();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
+		new WC_Reepay_Sync();
 	}
 }
 
