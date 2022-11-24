@@ -6,14 +6,19 @@
  * @since 1.0.4
  */
 class WC_Reepay_Sync_Customers {
+	public static $events = array(
+		'reepay_webhook_customer_created' => 'created',
+		'reepay_webhook_raw_event_customer_changed' => 'changed',
+		'reepay_webhook_raw_event_customer_deleted' => 'deleted',
+		'reepay_webhook_customer_payment_method_added' => 'payment_method_added',
+	);
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'reepay_webhook_customer_created', [ $this, 'created' ] );
-		add_action( 'reepay_webhook_raw_event_customer_changed', [ $this, 'changed' ] );
-		add_action( 'reepay_webhook_raw_event_customer_deleted', [ $this, 'deleted' ] );
-		add_action( 'reepay_webhook_customer_payment_method_added', [ $this, 'payment_method_added' ] );
+		foreach ( self::$events as $hook => $method) {
+			add_action( $hook, [ $this, $method ] );
+		}
 	}
 
 	/**
@@ -88,8 +93,7 @@ class WC_Reepay_Sync_Customers {
 		$user_id = rp_get_userid_by_handle( $data['customer'] );
 
 		$payment_token = $data['payment_method'];
-		$customer_tokens
-		               = WC_Reepay_Import_Helpers::get_customer_tokens( $user_id );
+		$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user_id );
 
 		if ( in_array( $payment_token, $customer_tokens ) ) {
 			return;
