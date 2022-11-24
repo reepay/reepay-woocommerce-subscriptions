@@ -53,7 +53,7 @@ class WC_Reepay_Renewals {
 			$sub_meta = $order->get_meta( '_reepay_subscription_handle' );
 
 			if ( ! empty( $sub_meta ) ) {
-				$params['next_period_start'] = current_time( 'Y-m-d\TH:i:s' );
+				$params['next_period_start'] = date( 'Y-m-d\TH:i:s', strtotime( current_time( 'Y-m-d\TH:i:s' ) . "+60 seconds" ) );
 
 				try {
 					reepay_s()->api()->request( "subscription/{$sub_meta}/change_next_period_start", 'POST', $params );
