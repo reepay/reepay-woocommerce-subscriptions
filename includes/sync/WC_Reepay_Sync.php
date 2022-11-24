@@ -11,5 +11,6 @@ class WC_Reepay_Sync {
 	 */
 	public function __construct() {
 		new WC_Reepay_Sync_Customers();
+		new WC_Reepay_Sync_Subscriptions();
 	}
 }

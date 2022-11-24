@@ -35,6 +35,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Subscriptions_Update' => __DIR__ . '/../..' . '/includes/update/WC_Reepay_Subscriptions_Update.php',
         'WC_Reepay_Sync' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync.php',
         'WC_Reepay_Sync_Customers' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Customers.php',
+        'WC_Reepay_Sync_Subscriptions' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Subscriptions.php',
         'WC_Reepay_Woocommerce_Subscription_Extension' => __DIR__ . '/../..' . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
     );
 
