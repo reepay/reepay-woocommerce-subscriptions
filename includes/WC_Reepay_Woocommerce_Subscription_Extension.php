@@ -22,7 +22,9 @@ class WC_Reepay_Woocommerce_Subscription_Extension {
 	 * @param  bool  $tax_display  Report or not taxes
 	 */
 	public function clean_order_totals( $total_rows, $order, $tax_display ) {
-		if ( did_action( 'woocommerce_email_before_order_table' ) && wcs_order_contains_subscription( $order, 'any' ) ) {
+		if ( did_action( 'woocommerce_email_before_order_table' ) &&
+		     function_exists('wcs_order_contains_subscription') &&
+		     wcs_order_contains_subscription( $order, 'any' ) ) {
 			unset( $total_rows['cart_subtotal'] );
 			unset( $total_rows['order_total'] );
 		}
