@@ -28,6 +28,20 @@ class WC_Reepay_Renewals {
 			$this,
 			'reepay_subscriptions_order_status'
 		), 11, 2 );
+
+		add_filter( 'show_reepay_metabox', array(
+			$this,
+			'disable_for_sub'
+		), 10, 2 );
+	}
+
+	public function disable_for_sub( $is_able, $order ) {
+
+		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
+			return false;
+		}
+
+		return $is_able;
 	}
 
 	public function reepay_subscriptions_order_status( $status, $order ) {
@@ -413,8 +427,8 @@ class WC_Reepay_Renewals {
 	public function renew_subscription( $data ) {
 		$status = reepay_s()->settings( '_reepay_suborders_default_renew_status' );
 
-		self::update_subscription_status( $data, $status );
-		self::create_child_order( $data, $status );
+		self::update_subscription_status( $data, reepay_s()->settings( '_reepay_orders_default_subscription_status' ) );
+		self::create_child_order( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
 	}
 
 	/**
@@ -647,8 +661,6 @@ class WC_Reepay_Renewals {
 						$new_items[] = $product_item;
 					}
 				}
-
-
 			}
 
 			$items = $new_items;

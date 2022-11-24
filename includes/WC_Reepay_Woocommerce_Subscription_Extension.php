@@ -17,12 +17,12 @@ class WC_Reepay_Woocommerce_Subscription_Extension {
 	/**
 	 * Remove total and subtotal rows from email
 	 *
-	 * @param  array  $total_rows  Total rows to display
-	 * @param  WC_Order  $order  Current order
-	 * @param  bool  $tax_display  Report or not taxes
+	 * @param array $total_rows Total rows to display
+	 * @param WC_Order $order Current order
+	 * @param bool $tax_display Report or not taxes
 	 */
 	public function clean_order_totals( $total_rows, $order, $tax_display ) {
-		if ( did_action( 'woocommerce_email_before_order_table' ) && wcs_order_contains_subscription( $order, 'any' ) ) {
+		if ( did_action( 'woocommerce_email_before_order_table' ) && order_contains_subscription( $order ) ) {
 			unset( $total_rows['cart_subtotal'] );
 			unset( $total_rows['order_total'] );
 		}
