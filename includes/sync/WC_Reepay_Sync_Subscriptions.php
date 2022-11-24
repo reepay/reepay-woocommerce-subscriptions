@@ -32,7 +32,22 @@ class WC_Reepay_Sync_Subscriptions {
 	 */
 	public function created( $data ) {
 		if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $data['subscription'] ) ) {
-			WC_Reepay_Import_Helpers::import_reepay_subscription( $data['subscription'] );
+			try {
+				/**
+				 * @see https://reference.reepay.com/api/#get-subscription
+				 **/
+				$subscription_data = reepay_s()->api()->request( "subscription/{$data['subscription']}" );
+			} catch ( Exception $e ) {
+				reepay_s()->log()->log( [
+					'source'   => 'WC_Reepay_Sync_Subscriptions::created',
+					'message'  => $e->getMessage(),
+					'$data'  => $data,
+				] );
+
+				return;
+			}
+
+			WC_Reepay_Import_Helpers::import_reepay_subscription( $subscription_data );
 		}
 	}
 }
