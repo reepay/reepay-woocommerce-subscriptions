@@ -38,8 +38,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => 'Billed every day',
 		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => 'Billed every %s days',
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month on the first day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'Billed every %s months on the first day of the month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'Billed every %s months',
 
 		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => 'Billed every month',
 		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => 'Billed every %s months',
@@ -171,7 +171,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				'label' => __( 'Subtotal:', 'woocommerce' ),
 				'value' => wc_price( $total )
 			];
-			$total_rows['order_total']= [
+			$total_rows['order_total']   = [
 				'label' => __( 'Total:', 'woocommerce' ),
 				'value' => wc_price( $total )
 			];
@@ -404,13 +404,13 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$data[ $key ] = '';
 			}
 		}
-		$data['settings'] = $this->get_plan_fields_data_template($data);
+		$data['settings'] = $this->get_plan_fields_data_template( $data );
 
 		if ( $data['is_exist'] ) {
-			$data['settings_exist'] = $this->get_plan_fields_data_template($data);;
+			$data['settings_exist'] = $this->get_plan_fields_data_template( $data );;
 		}
 
-		echo $this->get_plan_fields_template($data);
+		echo $this->get_plan_fields_template( $data );
 	}
 
 	/**
@@ -418,7 +418,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 *
 	 * @return false|string
 	 */
-	public function get_plan_fields_data_template($data) {
+	public function get_plan_fields_data_template( $data ) {
 		ob_start();
 		wc_get_template(
 			$this->plan_fields_data_template,
@@ -426,6 +426,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
+
 		return ob_get_clean();
 	}
 
@@ -434,7 +435,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 *
 	 * @return false|string
 	 */
-	public function get_plan_fields_template($data) {
+	public function get_plan_fields_template( $data ) {
 		ob_start();
 		wc_get_template(
 			$this->plan_fields_template,
@@ -442,6 +443,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
+
 		return ob_get_clean();
 	}
 
