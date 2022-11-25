@@ -88,7 +88,7 @@ class WC_Reepay_Renewals {
 			}
 		}
 
-		if ( floatval( $order->get_total() ) != 0 ) {
+		if ( floatval( $order->get_total() ) != 0 && self::is_order_contain_subscription( $order ) ) {
 			$new_total = 0;
 			$order->set_total( $new_total );
 			$order->save();
