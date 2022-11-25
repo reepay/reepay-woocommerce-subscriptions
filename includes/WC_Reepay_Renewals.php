@@ -87,6 +87,12 @@ class WC_Reepay_Renewals {
 
 			}
 		}
+
+		if ( floatval( $order->get_total() ) != 0 ) {
+			$new_total = 0;
+			$order->set_total( $new_total );
+			$order->save();
+		}
 	}
 
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
@@ -425,9 +431,9 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
-		$status = reepay_s()->settings( '_reepay_suborders_default_renew_status' );
+		$status_main = reepay_s()->settings( '_reepay_manual_start_date' ) ? reepay_s()->settings( '_reepay_manual_start_date_status' ) : reepay_s()->settings( '_reepay_orders_default_subscription_status' );
 
-		self::update_subscription_status( $data, reepay_s()->settings( '_reepay_orders_default_subscription_status' ) );
+		self::update_subscription_status( $data, $status_main );
 		self::create_child_order( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
 	}
 
