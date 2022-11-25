@@ -645,9 +645,24 @@ class WC_Reepay_Renewals {
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
 				$is_exist = false;
 				foreach ( $items as $item ) {
-					if ( $item['name'] == $invoice_lines['ordertext'] ) {
-						$is_exist    = true;
-						$new_items[] = $item;
+					if ( $item->is_type( 'line_item' ) ) {
+						$product = $item->get_product();
+						if ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) {
+							if ( $product->get_meta( '_reepay_subscription_name' ) == $invoice_lines['ordertext'] ) {
+								$is_exist    = true;
+								$new_items[] = $item;
+							}
+						} else {
+							if ( $item['name'] == $invoice_lines['ordertext'] ) {
+								$is_exist    = true;
+								$new_items[] = $item;
+							}
+						}
+					} else {
+						if ( $item['name'] == $invoice_lines['ordertext'] ) {
+							$is_exist    = true;
+							$new_items[] = $item;
+						}
 					}
 				}
 
@@ -663,7 +678,7 @@ class WC_Reepay_Renewals {
 						$product_item->set_name( $invoice_lines['ordertext'] );
 						$product_item->set_quantity( $invoice_lines['quantity'] );
 						$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-						$product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+						$product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
 						$new_items[] = $product_item;
 					}
 				}
