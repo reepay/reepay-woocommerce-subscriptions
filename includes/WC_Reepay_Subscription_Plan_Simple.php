@@ -84,8 +84,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 	public static $meta_fields = [
 		'_reepay_subscription_handle',
-		'_reepay_subscription_choose',
-		'_reepay_choose_exist',
 		'_reepay_subscription_price',
 		'_reepay_subscription_name',
 		'_reepay_subscription_schedule_type',
@@ -385,29 +383,21 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 */
 	public function subscription_pricing_fields( $post_id = null, $data = [] ) {
 		global $post;
-		global $pagenow;
 
 		$post_id = $post_id ?: $post->ID;
 
 		$data = ! empty( $data ) ? $data : $this->get_subscription_template_data( $post_id );
 
-		if ( empty( $data['_reepay_subscription_choose'] ) ) {
-			$data['_reepay_subscription_choose'] = 'new';
-		}
-
-		$data['is_exist']                = $data['_reepay_subscription_choose'] != 'new';
 		$data['product_object']          = wc_get_product( $post_id );
-		$data['is_creating_new_product'] = $pagenow === 'post-new.php';
 
 		foreach ( self::$meta_fields as $key ) {
 			if ( ! isset( $data[ $key ] ) ) {
 				$data[ $key ] = '';
 			}
 		}
-		$data['settings'] = $this->get_plan_fields_data_template( $data );
 
-		if ( $data['is_exist'] ) {
-			$data['settings_exist'] = $this->get_plan_fields_data_template( $data );;
+		if ( ! empty( $data['_reepay_subscription_handle'] ) ) {
+			$data['settings_exist'] = $this->get_plan_fields_data_template( $data );
 		}
 
 		echo $this->get_plan_fields_template( $data );
@@ -620,46 +610,19 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 		$request_data = $this->get_meta_from_request();
 
-		if ( ! empty( $request_data['_reepay_subscription_choose'] ) && $request_data['_reepay_subscription_choose'] == 'exist' ) {
-			if ( ! empty( $request_data['_reepay_choose_exist'] ) ) {
-				$this->save_remote_plan( $post_id, $request_data['_reepay_choose_exist'] );
+		$this->save_remote_plan( $post_id, $request_data['_reepay_subscription_handle'] );
 
-				update_post_meta( $post_id, '_reepay_subscription_handle', $request_data['_reepay_choose_exist'] );
-				update_post_meta( $post_id, '_reepay_choose_exist', $request_data['_reepay_choose_exist'] );
-				update_post_meta( $post_id, '_reepay_subscription_choose', $request_data['_reepay_subscription_choose'] );
+		update_post_meta( $post_id, '_reepay_subscription_handle', $request_data['_reepay_subscription_handle'] );
 
-				if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
-					update_post_meta( $post_id, '_regular_price', $request_data['_reepay_subscription_price'] );
-					update_post_meta( $post_id, '_price', $request_data['_reepay_subscription_price'] );
-				}
+		if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
+			update_post_meta( $post_id, '_regular_price', $request_data['_reepay_subscription_price'] );
+			update_post_meta( $post_id, '_price', $request_data['_reepay_subscription_price'] );
+		}
 
-				$title = get_the_title( $post_id );
+		$title = get_the_title( $post_id );
 
-				if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
-					$handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
-					$this->save_meta_from_request( $post_id );
-					if ( ! empty( $handle ) ) {
-						$this->update_plan( $handle, $this->get_params( $post_id ) );
-					}
-				}
-
-			} else {
-				$this->plan_error( __( 'Please choose the plan', 'reepay-subscriptions-for-woocommerce' ) );
-			}
-		} else {
-			if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
-				update_post_meta( $post_id, '_regular_price', $request_data['_reepay_subscription_price'] );
-				update_post_meta( $post_id, '_price', $request_data['_reepay_subscription_price'] );
-			}
-
-			$title = get_the_title( $post_id );
-			if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
-				$this->save_meta_from_request( $post_id );
-				$handle = $this->generate_subscription_handle( $post_id );
-				$this->create_plan( $post_id, $handle, $this->get_params( $post_id ) );
-				update_post_meta( $post_id, '_reepay_choose_exist', $handle );
-				update_post_meta( $post_id, '_reepay_subscription_choose', 'exist' );
-			}
+		if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
+			$this->save_meta_from_request( $post_id );
 		}
 	}
 
@@ -689,20 +652,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 				);
 			}
 		}
-	}
-
-	public function update_plan( $handle, $params ) {
-		try {
-			$params['supersede_mode'] = ! empty( $params['supersede_mode'] ) ? $params['supersede_mode'] : 'scheduled_sub_update';
-
-			$result = reepay_s()->api()->request( "plan/$handle", 'POST', $params );
-
-			return true;
-		} catch ( Exception $e ) {
-			$this->plan_error( $e->getMessage() );
-		}
-
-		return false;
 	}
 
 	public function get_type( $type ) {

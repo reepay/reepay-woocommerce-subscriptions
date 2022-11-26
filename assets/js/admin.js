@@ -363,15 +363,6 @@ jQuery(function ($) {
         }
     }
 
-    function show_update_settings(tab) {
-        var choose = tab.find('[name^="_reepay_subscription_choose"]:checked')
-        if (choose.val() == 'exist') {
-            $('input#reepay-publish').val('Supersede plan');
-            $('.reepay_subscription_supersedes_block').show();
-        }
-
-    }
-
     function show_plan_settings($container) {
         const type = $container.find('#_subscription_schedule_type').val()
         const subs_block = $container.find('.reepay_subscription_pricing');
@@ -394,40 +385,6 @@ jQuery(function ($) {
         } else {
             block.hide();
         }
-    }
-
-
-    function choose_change_settings($select) {
-        const val = $select.val();
-        const $container = $select.parents('.reepay_subscription_choose').parent();
-
-        const $reepay_subscription_settings = $container.find('.reepay_subscription_settings');
-        const $reepay_subscription_choose_exist = $container.find('.reepay_subscription_choose_exist');
-
-        if ('reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val()) {
-            if (val === 'new') {
-                $reepay_subscription_choose_exist.find("input").prop("disabled", true);
-                $reepay_subscription_choose_exist.find("select").prop("disabled", true);
-                $('input#reepay-publish').val('Create plan');
-                $reepay_subscription_settings.show();
-                $reepay_subscription_choose_exist.hide();
-            } else {
-                $reepay_subscription_choose_exist.find("input").prop("disabled", false);
-                $reepay_subscription_choose_exist.find("select").prop("disabled", false);
-                var existing_val = $reepay_subscription_choose_exist.find("select#_subscription_choose_exist").val();
-                if (existing_val == '') {
-                    $reepay_subscription_choose_exist.find(".reepay_subscription_settings_exist").hide();
-                }
-                $reepay_subscription_choose_exist.show();
-                $('input#reepay-publish').val('Choose plan');
-                $('.reepay_subscription_supersedes_block').show();
-                $reepay_subscription_settings.hide();
-
-            }
-
-            $('.reepay_subscription_supersedes_block').hide();
-        }
-
     }
 
     function show_trial_settings($container, elem = false) {
@@ -632,14 +589,6 @@ jQuery(function ($) {
             $('.fee-fields').hide();
         }
 
-        $(tab + ' input').on('change', function () {
-            show_update_settings($tab);
-        })
-
-        $(tab + ' select').on('change', function () {
-            show_update_settings($tab);
-        })
-
         $(tab + ' #_subscription_schedule_type').on('change', function () {
             show_plan_settings($tab);
         }).trigger('change');
@@ -660,14 +609,9 @@ jQuery(function ($) {
             show_fee_settings($tab, $(this));
         }).trigger('change');
 
-        choose_change_settings($tab.find('[name^="_reepay_subscription_choose"]:checked'));
-        $(tab + ' #_reepay_subscription_choose').change(function () {
-            choose_change_settings($(this));
-        });
-
-        $(tab + ' #_subscription_choose_exist').change(function () {
+        $(tab + ' #_reepay_subscription_handle').change(function () {
             const $select = $(this);
-            const $container = $select.parents('.reepay_subscription_choose_exist');
+            const $container = $select.parents('.reepay_subscription_container');
 
             load_plan(
                 $select,

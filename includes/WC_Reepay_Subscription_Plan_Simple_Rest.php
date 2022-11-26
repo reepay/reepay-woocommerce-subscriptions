@@ -46,11 +46,9 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 		try {
 			$plan = reepay_s()->plan( $request['product_id'] );
 			$plan_meta_data                            = $plan->get_remote_plan_meta( $request['handle'] );
-			$plan_meta_data['disabled']                = true;
+			$plan_meta_data['disabled']                = false; //ToDo change to true
 			$plan_meta_data['plans_list']              = reepay_s()->plan()->get_reepay_plans_list() ?: [];
 			$plan_meta_data['domain']                  = 'reepay-subscriptions-for-woocommerce';
-			$plan_meta_data['is_exist']                = true;
-			$plan_meta_data['is_creating_new_product'] = false;
 
 			if ( isset( $request['loop'] ) ) {
 				$plan_meta_data['loop'] = $request['loop'];

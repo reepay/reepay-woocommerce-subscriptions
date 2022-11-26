@@ -241,10 +241,6 @@ p.form-field span.form-field_time-type {
     margin-left: 9px;
 }
 
-.reepay_subscription_supersedes_block {
-    display: none;
-}
-
 .reepay_subscription_variable {
     padding: 5px;
     border: 1px solid #eee;

@@ -75,7 +75,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		return ! empty( $_REQUEST ) &&
 		       ! empty( $_REQUEST['product-type'] ) &&
 		       $_REQUEST['product-type'] == 'reepay_variable_subscriptions' &&
-		       ! empty( $_REQUEST['_reepay_subscription_choose'] );
+		       ! empty( $_REQUEST['_reepay_subscription_handle'] );
 	}
 
 	public function get_meta_from_request() {

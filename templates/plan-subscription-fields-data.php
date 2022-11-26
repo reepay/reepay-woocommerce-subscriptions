@@ -1,5 +1,5 @@
 <?php
-$disabled = '';
+$disabled = ! empty( $disabled ) ? 'disabled' : '';
 ?>
     <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
         <p class="form-field fields-name">
@@ -652,26 +652,26 @@ $disabled = '';
 		?>
     </div>
 
-<?php if ( isset( $is_exist ) && $is_exist ):
-	if ( empty( $_reepay_subscription_supersedes ) ) {
-		$_reepay_subscription_supersedes = 'no_sub_update';
-	} ?>
-    <div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
-        <p class="form-field">
-            <label for="_reepay_subscription_supersedes"><?php echo __( 'Supersede mode', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-			<?php echo __( "Don't schedule subscription update", 'reepay-subscriptions-for-woocommerce' ); ?>
-			<?php echo wc_help_tip( __( 'Using this, existing subscriptions will stay on the current version of the plan', 'reepay-subscriptions-for-woocommerce' ) ); ?>
-            <input type="radio"
-                   id="_reepay_subscription_supersedes" <?php echo esc_attr( $disabled ) ?>
-                   name="_reepay_subscription_supersedes"
-                   value="no_sub_update" <?php echo ! empty( $_reepay_subscription_supersedes ) ? checked( 'no_sub_update', $_reepay_subscription_supersedes, false ) : ''; ?>/>
-			<?php echo __( 'Schedule subscription update', 'reepay-subscriptions-for-woocommerce' ); ?>
-			<?php echo wc_help_tip( __( 'This will update all subscriptions to use the new version after the current billing period', 'reepay-subscriptions-for-woocommerce' ) ); ?>
-            <input type="radio"
-                   id="_reepay_subscription_supersedes" <?php echo esc_attr( $disabled ) ?>
-                   name="_reepay_subscription_supersedes"
-                   value="scheduled_sub_update" <?php echo ! empty( $_reepay_subscription_supersedes ) ? checked( 'scheduled_sub_update', $_reepay_subscription_supersedes, false ) : ''; ?>/>
-        </p>
+<?php
+if ( empty( $_reepay_subscription_supersedes ) ) {
+	$_reepay_subscription_supersedes = 'no_sub_update';
+}
+?>
+<div class="options_group show_if_reepay_subscription reepay_subscription_supersedes_block">
+    <p class="form-field">
+        <label for="_reepay_subscription_supersedes"><?php echo __( 'Supersede mode', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+		<?php echo __( "Don't schedule subscription update", 'reepay-subscriptions-for-woocommerce' ); ?>
+		<?php echo wc_help_tip( __( 'Using this, existing subscriptions will stay on the current version of the plan', 'reepay-subscriptions-for-woocommerce' ) ); ?>
+        <input type="radio"
+               id="_reepay_subscription_supersedes" <?php echo esc_attr( $disabled ) ?>
+               name="_reepay_subscription_supersedes"
+               value="no_sub_update" <?php echo ! empty( $_reepay_subscription_supersedes ) ? checked( 'no_sub_update', $_reepay_subscription_supersedes, false ) : ''; ?>/>
+		<?php echo __( 'Schedule subscription update', 'reepay-subscriptions-for-woocommerce' ); ?>
+		<?php echo wc_help_tip( __( 'This will update all subscriptions to use the new version after the current billing period', 'reepay-subscriptions-for-woocommerce' ) ); ?>
+        <input type="radio"
+               id="_reepay_subscription_supersedes" <?php echo esc_attr( $disabled ) ?>
+               name="_reepay_subscription_supersedes"
+               value="scheduled_sub_update" <?php echo ! empty( $_reepay_subscription_supersedes ) ? checked( 'scheduled_sub_update', $_reepay_subscription_supersedes, false ) : ''; ?>/>
+    </p>
 
-    </div>
-<?php endif; ?>
+</div>
