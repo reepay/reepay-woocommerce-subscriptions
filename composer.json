@@ -13,7 +13,8 @@
     "classmap": [
       "includes",
       "includes/import",
-      "includes/update"
+      "includes/update",
+      "includes/sync"
     ]
   }
 }
