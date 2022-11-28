@@ -67,8 +67,12 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		parent::save_subscription_meta( $post_id );
 	}
 
-	public function generate_subscription_handle( $post_id ) {
-		return 'plan_' . $this->loop . '_' . $post_id;
+	public function get_subscription_handle_from_request() {
+		if ( empty( $_REQUEST['_reepay_subscription_handle'] ) ) {
+			return '';
+		}
+
+		return wc_clean( $_REQUEST['_reepay_subscription_handle'][ $this->loop ] ?? '' );
 	}
 
 	public function is_reepay_product_saving() {
@@ -78,31 +82,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		       ! empty( $_REQUEST['_reepay_subscription_handle'] );
 	}
 
-	public function get_meta_from_request() {
-		$data = [];
-
-		foreach ( self::$meta_fields as $key ) {
-			if ( isset( $_REQUEST[ $key ] ) ) {
-				$data[ $key ] = sanitize_text_field( $_REQUEST[ $key ][ $this->loop ] ) ?? '';
-			}
-		}
-
-		return $data;
-	}
-
-	public function save_meta_from_request( $post_id ) {
-		foreach ( self::$meta_fields as $key ) {
-			if ( isset( $_REQUEST[ $key ] ) ) {
-				update_post_meta(
-					$post_id,
-					$key,
-					is_array( $_REQUEST[ $key ][ $this->loop ] ) ?
-						array_map( 'sanitize_text_field', $_REQUEST[ $key ][ $this->loop ] ) :
-						sanitize_text_field( $_REQUEST[ $key ][ $this->loop ] )
-				);
-			}
-		}
-	}
 
 	/**
 	 * @param int $loop Position in the loop.
