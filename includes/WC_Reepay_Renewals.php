@@ -87,6 +87,12 @@ class WC_Reepay_Renewals {
 
 			}
 		}
+
+		if ( floatval( $order->get_total() ) != 0 && self::is_order_contain_subscription( $order ) ) {
+			$new_total = 0;
+			$order->set_total( $new_total );
+			$order->save();
+		}
 	}
 
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
@@ -425,9 +431,9 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
-		$status = reepay_s()->settings( '_reepay_suborders_default_renew_status' );
+		$status_main = reepay_s()->settings( '_reepay_manual_start_date' ) ? reepay_s()->settings( '_reepay_manual_start_date_status' ) : reepay_s()->settings( '_reepay_orders_default_subscription_status' );
 
-		self::update_subscription_status( $data, reepay_s()->settings( '_reepay_orders_default_subscription_status' ) );
+		self::update_subscription_status( $data, $status_main );
 		self::create_child_order( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
 	}
 
@@ -639,9 +645,24 @@ class WC_Reepay_Renewals {
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
 				$is_exist = false;
 				foreach ( $items as $item ) {
-					if ( $item['name'] == $invoice_lines['ordertext'] ) {
-						$is_exist    = true;
-						$new_items[] = $item;
+					if ( $item->is_type( 'line_item' ) ) {
+						$product = $item->get_product();
+						if ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) {
+							if ( $product->get_meta( '_reepay_subscription_name' ) == $invoice_lines['ordertext'] ) {
+								$is_exist    = true;
+								$new_items[] = $item;
+							}
+						} else {
+							if ( $item['name'] == $invoice_lines['ordertext'] ) {
+								$is_exist    = true;
+								$new_items[] = $item;
+							}
+						}
+					} else {
+						if ( $item['name'] == $invoice_lines['ordertext'] ) {
+							$is_exist    = true;
+							$new_items[] = $item;
+						}
 					}
 				}
 
@@ -657,7 +678,7 @@ class WC_Reepay_Renewals {
 						$product_item->set_name( $invoice_lines['ordertext'] );
 						$product_item->set_quantity( $invoice_lines['quantity'] );
 						$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-						$product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+						$product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
 						$new_items[] = $product_item;
 					}
 				}

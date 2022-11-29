@@ -38,8 +38,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => 'Billed every day',
 		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => 'Billed every %s days',
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'Billed every %s months',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month on the first day of the month',
+		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'Billed every %s months on the first day of the month',
 
 		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => 'Billed every month',
 		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => 'Billed every %s months',

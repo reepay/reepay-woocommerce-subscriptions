@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress eco
 Requires at least: 5.5
 Tested up to: 6.0.2
 Requires PHP: 7.4
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,6 +63,7 @@ Standard Reepay Subscription features:
 3. For correct plugin operation install and activate Reepay Checkout for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.0.6 - Fix child order create
 v 1.0.5 - Fix start time status
 v 1.0.4 - Start time feature
 v 1.0.3 - Addons fixing
