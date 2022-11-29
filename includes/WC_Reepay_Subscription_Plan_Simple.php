@@ -348,9 +348,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		try {
-			$plans = reepay_s()->api()->request( "plan?only_active=true" ) ?: false;
-
-			return $plans;
+			return reepay_s()->api()->request( "plan?only_active=true" ) ?: false;
 		} catch ( Exception $e ) {
 			$this->plan_error( $e->getMessage() );
 		}

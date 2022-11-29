@@ -8,38 +8,31 @@
     <div class="options_group show_if_reepay_subscription">
         <p class="form-field exist-fields">
             <label for="_reepay_subscription_handle">
-				<?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
+		        <?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
             </label>
-			<?php if ( ! empty( $plans_list ) ): ?>
-                <select id="_reepay_subscription_handle"
-                        name="_reepay_subscription_handle"
-                        class="wc_input_subscription_period_interval"
-					<?php if ( isset( $data_plan ) ) : ?>
-                        data-plan='<?php echo esc_html( $data_plan ) ?>'
-					<?php endif; ?>>
 
-                    <option value=""><?php echo __( 'Select plan', 'reepay-subscriptions-for-woocommerce' ); ?></option>
+	        <?php
+	        wc_get_template(
+		        'plan-subscription-plans-select.php',
+		        [
+			        'plans_list' => $plans_list,
+			        'current' => $_reepay_subscription_handle,
+		        ],
+		        '',
+		        reepay_s()->settings( 'plugin_path' ) . 'templates/'
+	        );
+            ?>
 
-					<?php foreach ( $plans_list as $plan ): ?>
-                        <option value="<?php echo esc_attr( $plan['handle'] ) ?>"
-                            <?php selected( $plan['handle'], $_reepay_subscription_handle ) ?>>
-                            <?php echo esc_attr( $plan['name'] ) ?>
-                        </option>
-					<?php endforeach; ?>
-                </select>
-                <button class="button button-primary button-large js-refresh-plans-list" style="margin-left: 5px;">
-	                <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
-                </button>
-                <a class="button button-primary button-large"
-                   style="margin-left: 5px;"
-                   href="https://app.reepay.com/#/rp/config/plans/create"
-                   target="_blank">
-					<?php
-					_e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
-                </a>
-			<?php else: ?>
-				<?php echo __( 'Plans list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
-			<?php endif; ?>
+            <button class="button button-primary button-large js-refresh-plans-list" style="margin-left: 5px;">
+		        <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+            </button>
+            <a class="button button-primary button-large"
+               style="margin-left: 5px;"
+               href="https://app.reepay.com/#/rp/config/plans/create"
+               target="_blank">
+		        <?php
+		        _e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
+            </a>
         </p>
     </div>
     <div class="reepay_subscription_settings_exist">

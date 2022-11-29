@@ -434,8 +434,6 @@ jQuery(function ($) {
     }
 
     function load_plan($select, $container) {
-        console.log($select, $container);
-
         const handle = $select.val();
 
         if (!handle) {
@@ -576,16 +574,54 @@ jQuery(function ($) {
         discount['_reepay_discount_fixed_period_unit'] && $container.find('[name="_reepay_discount_fixed_period_unit"]').val(discount['_reepay_discount_fixed_period_unit']).attr('disabled', disable)
     }
 
-    $('.js-refresh-plans-list').on('click', function () {
-        $('[name^="_reepay_subscription_handle"]')
-            .parents('.options_group')
-            .block({
-                message: null,
-                overlayCSS: {
-                    background: '#fff',
-                    opacity: 0.6
-                }
-            });
+    $('body').on('click', '.js-refresh-plans-list', function (e) {
+        e.preventDefault();
+
+        const $selects = $('[name^="_reepay_subscription_handle"]');
+
+        $.each( $selects, function () {
+            const $select = $(this);
+
+        const $container = $select.parents('.options_group')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
+            const product_id = dataPlan.product_id || window.reepay.product.id
+
+            let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$select.val()}&get_plans=1`;
+
+            if (dataPlan.loop !== undefined) {
+                url += `&loop=${dataPlan.loop}`
+            }
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+
+                    $container.unblock();
+                    $select.html($(response_data.html).html())
+                },
+                error: function (request, status, error) {
+
+                },
+                complete: function () {
+
+                },
+            })
+        } );
     })
 
     function init(tab) {

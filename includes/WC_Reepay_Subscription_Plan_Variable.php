@@ -60,7 +60,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 		return $data;
 	}
-
+	
 	public function save_subscription_meta( $post_id, $i = null ) {
 		$this->loop = $i;
 
