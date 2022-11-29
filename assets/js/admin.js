@@ -576,6 +576,18 @@ jQuery(function ($) {
         discount['_reepay_discount_fixed_period_unit'] && $container.find('[name="_reepay_discount_fixed_period_unit"]').val(discount['_reepay_discount_fixed_period_unit']).attr('disabled', disable)
     }
 
+    $('.js-refresh-plans-list').on('click', function () {
+        $('[name^="_reepay_subscription_handle"]')
+            .parents('.options_group')
+            .block({
+                message: null,
+                overlayCSS: {
+                    background: '#fff',
+                    opacity: 0.6
+                }
+            });
+    })
+
     function init(tab) {
         const $tab = $(tab);
 

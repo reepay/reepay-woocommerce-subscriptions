@@ -27,6 +27,16 @@
                         </option>
 					<?php endforeach; ?>
                 </select>
+                <button class="button button-primary button-large js-refresh-plans-list" style="margin-left: 5px;">
+	                <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+                </button>
+                <a class="button button-primary button-large"
+                   style="margin-left: 5px;"
+                   href="https://app.reepay.com/#/rp/config/plans/create"
+                   target="_blank">
+					<?php
+					_e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
+                </a>
 			<?php else: ?>
 				<?php echo __( 'Plans list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
 			<?php endif; ?>
