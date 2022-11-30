@@ -65,6 +65,13 @@ class WC_Reepay_Import_Helpers {
 		foreach ( $meta_to_data as $meta_key => $datum ) {
 			update_user_meta( $user_id, $meta_key, $datum );
 		}
+
+		wp_update_user([
+			'ID' => $user_id,
+			'user_email' => $customer_data['email'] ?? '',
+			'first_name' => $customer_data['first_name'] ?? '',
+			'last_name' => $customer_data['last_name'] ?? ''
+		]);
 	}
 
 	/**
