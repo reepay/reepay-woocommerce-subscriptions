@@ -385,14 +385,16 @@ jQuery(function ($) {
         if (elem) {
             val = elem;
         } else {
-            val = $container.find('#_subscription_fee');
+            val = $container.find('#_subscription_fee:checked');
         }
 
-        var block = val.closest('.reepay_subscription_fee').find('.fee-fields')
         if (val.is(':checked')) {
-            block.show();
-        } else {
-            block.hide();
+            var block = val.closest('.reepay_subscription_fee').find('.fee-fields')
+            if (val.val() === 'yes') {
+                block.show();
+            } else {
+                block.hide();
+            }
         }
     }
 
@@ -626,7 +628,7 @@ jQuery(function ($) {
 
         show_settings();
 
-        if ($tab.find('#_subscription_fee').is(':checked')) {
+        if ($tab.find('#_subscription_fee:checked').val() === 'yes') {
             $('.fee-fields').show();
         } else {
             $('.fee-fields').hide();

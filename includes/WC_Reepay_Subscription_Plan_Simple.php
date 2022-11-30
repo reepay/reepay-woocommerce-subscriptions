@@ -152,7 +152,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$fee     = $product->get_meta( '_reepay_subscription_fee' );
 				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
 					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
-					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
+					if (!empty($amount)) {
+                        WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
+                    }
 				}
 			}
 		}
