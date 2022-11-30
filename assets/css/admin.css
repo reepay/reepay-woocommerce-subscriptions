@@ -186,6 +186,10 @@
     width: 100%;
 }
 
+[for="_subscription_fee"] {
+    width: 100%;
+}
+
 .reepay-subscriptions-page .column-status {
     width: 8%;
 }

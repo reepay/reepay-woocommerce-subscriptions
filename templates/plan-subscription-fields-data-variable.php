@@ -594,11 +594,16 @@ $disabled = '';
 
 <?php $fee = ! empty( $_reepay_subscription_fee ) ? $_reepay_subscription_fee : [] ?>
     <div class="options_group reepay_subscription_fee">
-        <p class="form-field">
+        <p class="form-field form-row">
             <label for="_subscription_fee"><?php echo __( 'Include setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <input type="checkbox" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
+            <?php echo __('Yes') ?>
+            <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_fee[<?php echo esc_attr( $loop ) ?>][enabled]"
                    value="yes" <?php echo ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ? 'checked' : '' ?> />
+            <?php echo __('No') ?>
+            <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
+                   name="_reepay_subscription_fee[<?php echo esc_attr( $loop ) ?>][enabled]"
+                   value="no" <?php echo empty( $fee['enabled'] ) || $fee['enabled'] != 'yes' ? 'checked' : '' ?> />
         </p>
 
         <p class="form-field fee-fields form-row hidden">

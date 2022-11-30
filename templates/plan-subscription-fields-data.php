@@ -589,11 +589,17 @@ $disabled = '';
 
 <?php $fee = ! empty( $_reepay_subscription_fee ) ? $_reepay_subscription_fee : [] ?>
     <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
+
         <p class="form-field">
             <label for="_subscription_fee"><?php echo __( 'Include setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <input type="checkbox" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
+            <?php echo __('Yes') ?>
+            <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_fee[enabled]"
                    value="yes" <?php echo ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ? 'checked' : '' ?> />
+            <?php echo __('No') ?>
+            <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
+                   name="_reepay_subscription_fee[enabled]"
+                   value="no" <?php echo empty( $fee['enabled'] ) || $fee['enabled'] != 'yes' ? 'checked' : '' ?> />
         </p>
 
         <p class="form-field fee-fields hidden">
@@ -609,7 +615,7 @@ $disabled = '';
                    placeholder="<?php echo esc_attr( 'Text' ); ?>"
                    value="<?php echo ! empty( $fee['text'] ) ? esc_attr( $fee['text'] ) : '' ?>"/>
             <select id="_subscription_fee_handling" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[handling]"
-                    class="wc_input_subscription_period_interval">
+                    class="wc_input_subscription_period_interval">ё
                 <option value="first" <?php echo ! empty( $fee['handling'] ) ? selected( 'first', $fee['handling'], false ) : '' ?>><?php echo __( 'Include setup fee as order line on the first scheduled invoice', 'reepay-subscriptions-for-woocommerce' ); ?></option>
                 <option value="separate" <?php echo ! empty( $fee['handling'] ) ? selected( 'separate', $fee['handling'], false ) : '' ?>><?php echo __( 'Create a separate invoice for the setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></option>
                 <option value="separate_conditional" <?php echo ! empty( $fee['handling'] ) ? selected( 'separate_conditional', $fee['handling'], false ) : '' ?>><?php echo __( 'Create a separate invoice for the setup fee, if the first invoice is not created in conjunction with the creation', 'reepay-subscriptions-for-woocommerce' ); ?></option>
