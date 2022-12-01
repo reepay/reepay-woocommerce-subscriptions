@@ -4,8 +4,8 @@
  * @var String $_reepay_subscription_handle
  */
 ?>
-<div class="reepay_subscription_container">
-    <div class="options_group show_if_reepay_subscription">
+<div class="reepay_subscription_container show_if_reepay_subscription">
+    <div class="options_group">
         <p class="form-field exist-fields">
             <label for="_reepay_subscription_handle">
 		        <?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
