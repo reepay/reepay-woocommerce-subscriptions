@@ -34,7 +34,7 @@ $disabled = ! empty( $disabled ) ? 'disabled' : '';
                     name="_reepay_subscription_schedule_type[<?php echo esc_attr( $loop ) ?>]"
                     class="wc_input_subscription_period_interval">
 				<?php foreach ( WC_Reepay_Subscription_Plan_Simple::$schedule_types as $value => $label ) { ?>
-                    <option value="<?php echo esc_attr( $value ); ?>" <?php echo ! empty( $_reepay_subscription_schedule_type ) ? selected( $value, $_reepay_subscription_schedule_type, false ) : '' ?>><?php esc_html_e( $label, 'reepay-subscriptions-for-woocommerce' ); ?></option>
+                    <option value="<?php echo esc_attr( $value ); ?>" <?php echo ! empty( $_reepay_subscription_schedule_type ) ? selected( $value, $_reepay_subscription_schedule_type, false ) : '' ?>><?php esc_html( $label ); ?></option>
 				<?php } ?>
             </select>
         </p>

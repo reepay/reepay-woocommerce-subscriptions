@@ -13,73 +13,39 @@ class WC_Reepay_Subscription_Plan_Simple {
 	const TYPE_WEEKLY_FIXED_DAY = 'weekly_fixedday';
 	const TYPE_MANUAL = 'manual';
 
-	public static $schedule_types = [
-		self::TYPE_DAILY            => 'Day(s)',
-		self::TYPE_MONTH_START_DATE => 'Month(s)',
-		self::TYPE_MONTH_FIXED_DAY  => 'Fixed day of month',
-		self::TYPE_MONTH_LAST_DAY   => 'Last day of month',
-		self::TYPE_PRIMO            => 'Quarterly Primo',
-		self::TYPE_ULTIMO           => 'Quarterly Ultimo',
-		self::TYPE_HALF_YEARLY      => 'Half-yearly',
-		self::TYPE_START_DATE_12    => 'Yearly',
-		self::TYPE_WEEKLY_FIXED_DAY => 'Fixed day of week',
-		self::TYPE_MANUAL           => 'Manual',
-	];
+	public static $schedule_types = [];
 
-	public static $trial = [
-		''          => 'No Trial',
-		'7days'     => '7 days',
-		'14days'    => '14 days',
-		'1month'    => '1 month',
-		'customize' => 'Customize',
-	];
+	public static $trial = [];
 
-	public static $types_info = [
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => 'Billed every day',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => 'Billed every %s days',
+	public static $types_info = [];
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month on the first day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'Billed every %s months on the first day of the month',
+	public static $types_info_short = [];
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => 'Billed every month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => 'Billed every %s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => 'Billed every month on the last day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => 'Billed every %s months on the last day of the month',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, April, July, October',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => 'Billed every %s months, on the last day of the month. The billing is fixed to these months: January, April, July, October',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, July',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => 'Billed every Week',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => 'Billed every %s Weeks',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => 'Manual',
-	];
-
-	public static $types_info_short = [
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => 'Day',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => '%s days',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => 'Month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => 'Month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => '%s months',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => '%s months',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => '%s months',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => 'Week',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => '%s Weeks',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => 'Manual',
+	public static $field_titles = [
+		'_reepay_subscription_handle' => '',
+		'_reepay_subscription_price',
+		'_reepay_subscription_name',
+		'_reepay_subscription_schedule_type',
+		'_reepay_subscription_daily',
+		'_reepay_subscription_month_startdate',
+		'_reepay_subscription_month_fixedday',
+		'_reepay_subscription_month_lastday',
+		'_reepay_subscription_primo',
+		'_reepay_subscription_ultimo',
+		'_reepay_subscription_half_yearly',
+		'_reepay_subscription_month_startdate_12',
+		'_reepay_subscription_weekly_fixedday',
+		'_reepay_subscription_renewal_reminder',
+		'_reepay_subscription_default_quantity',
+		'_reepay_subscription_contract_periods',
+		'_reepay_subscription_contract_periods_full',
+		'_reepay_subscription_notice_period',
+		'_reepay_subscription_notice_period_start',
+		'_reepay_subscription_billing_cycles',
+		'_reepay_subscription_supersedes',
+		'_reepay_subscription_billing_cycles_period',
+		'_reepay_subscription_trial',
+		'_reepay_subscription_fee',
 	];
 
 	public static $meta_fields = [
@@ -141,41 +107,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		add_action( 'woocommerce_cart_calculate_fees', [ $this, 'add_setup_fee' ] );
 
 		$this->register_actions();
-	}
-
-	public function add_setup_fee() {
-		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
-				$product = $cart_item['data'];
-				$fee     = $product->get_meta( '_reepay_subscription_fee' );
-				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
-					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
-					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
-				}
-			}
-		}
-	}
-
-	public function rework_total( $total_rows, $order, $tax_display ) {
-		$another_orders = get_post_meta( $order->get_id(), '_reepay_another_orders', true );
-		if ( ! empty( $another_orders ) ) {
-			$total = 0;
-			foreach ( $another_orders as $order_id ) {
-				$order_another = wc_get_order( $order_id );
-				$total         += floatval( $order_another->get_total() );
-			}
-
-			$total_rows['cart_subtotal'] = [
-				'label' => __( 'Subtotal:', 'woocommerce' ),
-				'value' => wc_price( $total )
-			];
-			$total_rows['order_total']   = [
-				'label' => __( 'Total:', 'woocommerce' ),
-				'value' => wc_price( $total )
-			];
-		}
-
-		return $total_rows;
+		$this->set_text_properties();
 	}
 
 	protected function register_actions() {
@@ -185,6 +117,77 @@ class WC_Reepay_Subscription_Plan_Simple {
 		add_action( 'save_post', [ $this, 'save_subscription_meta' ], 11 );
 		add_filter( 'woocommerce_cart_item_name', [ $this, 'checkout_subscription_info' ], 10, 3 );
 		add_action( 'woocommerce_before_order_itemmeta', [ $this, 'admin_order_subscription_info' ], 10, 3 );
+	}
+
+	protected function set_text_properties() {
+		self::$schedule_types = [
+			self::TYPE_DAILY            => __( 'Day(s)', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MONTH_START_DATE => __( 'Month(s)', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MONTH_FIXED_DAY  => __( 'Fixed day of month', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MONTH_LAST_DAY   => __( 'Last day of month', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_PRIMO            => __( 'Quarterly Primo', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_ULTIMO           => __( 'Quarterly Ultimo', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_HALF_YEARLY      => __( 'Half-yearly', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_START_DATE_12    => __( 'Yearly', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_WEEKLY_FIXED_DAY => __( 'Fixed day of week', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MANUAL           => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$trial = [
+			''          => __( 'No Trial', 'reepay-subscriptions-for-woocommerce' ),
+			'7days'     => __( '7 days', 'reepay-subscriptions-for-woocommerce' ),
+			'14days'    => __( '14 days', 'reepay-subscriptions-for-woocommerce' ),
+			'1month'    => __( '1 month', 'reepay-subscriptions-for-woocommerce' ),
+			'customize' => __( 'Customize', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$types_info = [
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => __( 'Billed every day', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => __( 'Billed every %s days', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => __( 'Billed every month on the first day of the month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => __( 'Billed every %s months on the first day of the month', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => __( 'Billed every month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => __( 'Billed every %s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => __( 'Billed every month on the last day of the month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => __( 'Billed every %s months on the last day of the month', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => __( 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, April, July, October', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => __( 'Billed every %s months, on the last day of the month. The billing is fixed to these months: January, April, July, October', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => __( 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, July', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => __( 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => __( 'Billed every Week', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( 'Billed every %s Weeks', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$types_info_short = [
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => __( 'Day', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => __( '%s days', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => __( 'Month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => __( 'Month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => __( 'Month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => __( 'Week', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( '%s Weeks', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
 	}
 
 	public function checkout_subscription_info( $name, $cart_item, $cart_item_key ) {
@@ -733,7 +736,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$ret      = '';
 			if ( ! empty( $type_str ) ) {
 				$ret = sprintf(
-					__( $type_str, 'reepay-subscriptions-for-woocommerce' ),
+					$type_str,
 					$interval
 				);
 			}
@@ -793,6 +796,41 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		return $ret;
+	}
+
+	public function add_setup_fee() {
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			if ( WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
+				$product = $cart_item['data'];
+				$fee     = $product->get_meta( '_reepay_subscription_fee' );
+				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
+					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
+					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
+				}
+			}
+		}
+	}
+
+	public function rework_total( $total_rows, $order, $tax_display ) {
+		$another_orders = get_post_meta( $order->get_id(), '_reepay_another_orders', true );
+		if ( ! empty( $another_orders ) ) {
+			$total = 0;
+			foreach ( $another_orders as $order_id ) {
+				$order_another = wc_get_order( $order_id );
+				$total         += floatval( $order_another->get_total() );
+			}
+
+			$total_rows['cart_subtotal'] = [
+				'label' => __( 'Subtotal:', 'woocommerce' ),
+				'value' => wc_price( $total )
+			];
+			$total_rows['order_total']   = [
+				'label' => __( 'Total:', 'woocommerce' ),
+				'value' => wc_price( $total )
+			];
+		}
+
+		return $total_rows;
 	}
 
 	protected function plan_error( $message ) {
