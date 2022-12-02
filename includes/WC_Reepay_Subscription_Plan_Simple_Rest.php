@@ -43,10 +43,10 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 *
 	 */
 	public function get_item( $request ) {
-		if ( empty( $request['get_plans'] ) ) {
-			return $this->get_plan_info( $request );
+		if ( !empty( $request['get_list'] ) ) {
+			return $this->get_list( $request );
 		} else {
-			return $this->get_plans( $request );
+			return $this->get_info( $request );
 		}
 	}
 
@@ -59,7 +59,7 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 * @throws Exception
 	 *
 	 */
-	public function get_plans( $request ) {
+	public function get_list( $request ) {
 		try {
 			ob_start();
 
@@ -76,7 +76,6 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'
 			);
-
 
 			return new WP_REST_Response( [
 				'success' => true,
@@ -102,7 +101,7 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 * @throws Exception
 	 *
 	 */
-	public function get_plan_info( $request ) {
+	public function get_info( $request ) {
 		try {
 			$plan = reepay_s()->plan( $request['product_id'] );
 			$plan_meta_data                            = $plan->get_remote_plan_meta( $request['handle'] );

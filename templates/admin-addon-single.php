@@ -46,6 +46,17 @@ global $post;
                             <option value="<?php echo esc_attr( $addon_rem['handle'] ) ?>" <?php ! empty( $addon['exist'] ) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'] ) : '' ?>><?php echo esc_attr( $addon_rem['name'] ) ?></option>
 						<?php endforeach; ?>
                     </select>
+
+                    <button class="button button-primary button-large js-refresh-addons-list">
+						<?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+                    </button>
+                    <a class="button button-primary button-large"
+                       style="margin-left: 5px;"
+                       href="https://app.reepay.com/#/rp/config/addons/create"
+                       target="_blank">
+						<?php
+						_e( 'Create new addon', 'reepay-subscriptions-for-woocommerce' ) ?>
+                    </a>
 				<?php else: ?>
 					<?php echo __( 'Add-ons list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
 				<?php endif; ?>

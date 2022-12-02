@@ -242,7 +242,7 @@ class WC_Reepay_Subscription_Addons {
 
 		$plan_handle = get_post_meta( $product->get_id(), '_reepay_subscription_handle', true );
 
-		$addons_list = $this->get_reepay_addons_list( $plan_handle, true );
+		$addons_list = self::get_reepay_addons_list( $plan_handle, true );
 		wc_get_template(
 			'admin-addons-panel.php',
 			[
@@ -260,7 +260,7 @@ class WC_Reepay_Subscription_Addons {
 	 *
 	 * @return mixed
 	 */
-	public function get_reepay_addons_list( $plan_handle = false, $drop_cache = false ) {
+	public static function get_reepay_addons_list( $plan_handle = false, $drop_cache = false ) {
 		$addons_list = $drop_cache ? null : get_option( 'reepay_s_addons_list' );
 
 		if ( ! empty( $addons_list ) ) {

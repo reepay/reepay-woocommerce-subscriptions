@@ -38,7 +38,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 		$options['']    = __( 'Choose add-on', 'reepay-subscriptions-for-woocommerce' );
 		$options['new'] = __( 'New add-on', 'reepay-subscriptions-for-woocommerce' );
 
-		$addons_list = $this->get_reepay_addons_list();
+		$addons_list = self::get_reepay_addons_list();
 		if ( ! empty( $addons_list["content"] ) ) {
 			foreach ( $addons_list["content"] as $addon ) {
 				if ( $addon['all_plans'] ) {

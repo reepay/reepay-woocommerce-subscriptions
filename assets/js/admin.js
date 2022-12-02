@@ -79,6 +79,47 @@ jQuery(function ($) {
         }
     });
 
+    $body.on('click', '.js-refresh-addons-list', function (e) {
+        e.preventDefault();
+
+        const $selects = $('[name^="addon_choose_exist"]');
+
+        $.each( $selects, function () {
+            const $select = $(this);
+
+            const $container = $select.parents('.addon_name')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            let url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+
+                    $select.html(response_data.html);
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
 
     $body.on('woocommerce_variations_added', function () {
         init();
@@ -499,7 +540,7 @@ jQuery(function ($) {
             const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
             const product_id = dataPlan.product_id || window.reepay.product.id
 
-            let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$select.val()}&get_plans=1`;
+            let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$select.val()}&get_list=1`;
 
             if (dataPlan.loop !== undefined) {
                 url += `&loop=${dataPlan.loop}`
@@ -516,14 +557,13 @@ jQuery(function ($) {
                         return;
                     }
 
-                    $container.unblock();
                     $select.html($(response_data.html).html())
                 },
                 error: function (request, status, error) {
-
+                    alert('Request error. Try again')
                 },
                 complete: function () {
-
+                    $container.unblock();
                 },
             })
         } );
