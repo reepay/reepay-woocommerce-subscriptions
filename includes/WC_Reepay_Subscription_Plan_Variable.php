@@ -5,8 +5,6 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 	public $plan_fields_template = 'plan-subscription-fields-variable.php';
 
-	public $plan_fields_data_template = 'plan-subscription-fields-data-variable.php';
-
 	public $loop = 0;
 
 	public function create_subscription_product_class() {

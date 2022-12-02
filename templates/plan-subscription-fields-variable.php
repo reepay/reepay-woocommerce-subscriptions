@@ -12,7 +12,7 @@
 
     <div class="reepay_subscription_container">
         <div class="options_group">
-            <p class="form-field exist-fields">
+            <p class="form-field" style="display:block;">
                 <label for="_reepay_subscription_handle">
 		            <?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
                 </label>
@@ -30,12 +30,12 @@
 		            reepay_s()->settings( 'plugin_path' ) . 'templates/'
 	            );
 	            ?>
-
-                <button class="button button-primary button-large js-refresh-plans-list" style="margin-left: 5px;">
+                <br>
+                <button class="button button-primary button-large js-refresh-plans-list">
 				    <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
                 </button>
                 <a class="button button-primary button-large"
-                   style="margin-left: 5px;"
+                   style="margin-left: 5px;margin-top: 5px;"
                    href="https://app.reepay.com/#/rp/config/plans/create"
                    target="_blank">
 				    <?php

@@ -12,6 +12,11 @@
     vertical-align: baseline;
 }
 
+.variable_pricing .form-field {
+    display: flex;
+    flex-direction: column;
+}
+
 #reepay_subscription_publish_btn.reepay_subscription_publish_btn p.form-field {
     padding-left: 4px !important;
 }

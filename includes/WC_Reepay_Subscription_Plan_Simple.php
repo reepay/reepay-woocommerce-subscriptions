@@ -21,32 +21,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 	public static $types_info_short = [];
 
-	public static $field_titles = [
-		'_reepay_subscription_handle' => '',
-		'_reepay_subscription_price',
-		'_reepay_subscription_name',
-		'_reepay_subscription_schedule_type',
-		'_reepay_subscription_daily',
-		'_reepay_subscription_month_startdate',
-		'_reepay_subscription_month_fixedday',
-		'_reepay_subscription_month_lastday',
-		'_reepay_subscription_primo',
-		'_reepay_subscription_ultimo',
-		'_reepay_subscription_half_yearly',
-		'_reepay_subscription_month_startdate_12',
-		'_reepay_subscription_weekly_fixedday',
-		'_reepay_subscription_renewal_reminder',
-		'_reepay_subscription_default_quantity',
-		'_reepay_subscription_contract_periods',
-		'_reepay_subscription_contract_periods_full',
-		'_reepay_subscription_notice_period',
-		'_reepay_subscription_notice_period_start',
-		'_reepay_subscription_billing_cycles',
-		'_reepay_subscription_supersedes',
-		'_reepay_subscription_billing_cycles_period',
-		'_reepay_subscription_trial',
-		'_reepay_subscription_fee',
-	];
+	public static $bill_types = [];
+
+	public static $proration_types = [];
+
+	public static $number_to_week_day = [];
 
 	public static $meta_fields = [
 		'_reepay_subscription_handle',
@@ -187,6 +166,28 @@ class WC_Reepay_Subscription_Plan_Simple {
 			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( '%s Weeks', 'reepay-subscriptions-for-woocommerce' ),
 
 			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$bill_types = [
+			'bill_prorated'    => __( 'Bill prorated (Default)', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_full'        => __( 'Bill for full period)', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_zero_amount' => __( 'Bill a zero amount', 'reepay-subscriptions-for-woocommerce' ),
+			'no_bill'          => __( 'Do not consider the partial period a billing period', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$proration_types = [
+			'full_day' =>	__( 'Full day proration', 'reepay-subscriptions-for-woocommerce' ),
+			'by_minute' =>	__( 'By the minute proration', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$number_to_week_day = [
+			1 => __( 'Monday', 'reepay-subscriptions-for-woocommerce' ),
+			2 => __( 'Tuesday', 'reepay-subscriptions-for-woocommerce' ),
+			3 => __( 'Wednesday', 'reepay-subscriptions-for-woocommerce' ),
+			4 => __( 'Thursday', 'reepay-subscriptions-for-woocommerce' ),
+			5 => __( 'Friday', 'reepay-subscriptions-for-woocommerce' ),
+			6 => __( 'Saturday', 'reepay-subscriptions-for-woocommerce' ),
+			7 => __( 'Sunday', 'reepay-subscriptions-for-woocommerce' ),
 		];
 	}
 
@@ -574,7 +575,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 			$plan_meta['_reepay_subscription_schedule_type'] = $type;
 		}
-
 
 		if ( ! empty( $plan_data['interval_length'] ) ) {
 			$plan_meta['_reepay_subscription_daily']           = $plan_data['interval_length'];
