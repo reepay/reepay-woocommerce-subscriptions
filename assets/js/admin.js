@@ -1,8 +1,20 @@
 jQuery(function ($) {
-    let tab;
-
     const $body = $('body');
     const $selectProductType = $('select#product-type');
+    
+    function getReepaySelectedTab( selectedType = '' ) {
+        const type = selectedType || $selectProductType.val();
+
+        if ('reepay_simple_subscriptions' === type || 'reepay_variable_subscriptions' === type) {
+            if ('reepay_simple_subscriptions' === type) {
+                return '#general_product_data';
+            } else if ('reepay_variable_subscriptions' === type) {
+                return '#variable_product_options';
+            }
+        }
+        
+        return false;
+    }
 
     if ($('.woocommerce_product_addon').length > 0) {
         $('.save-addons-button').show();
@@ -12,13 +24,17 @@ jQuery(function ($) {
         init('#variable_product_options');
     });
 
-    $body.on('woocommerce-product-type-change', function () {
+    $body.on('woocommerce-product-type-change', function (e, type) {
+        $('.show_if_reepay_subscription').toggle(!!getReepaySelectedTab(type))
+
         if ('reepay_simple_subscriptions' === $selectProductType.val()) {
             init('#general_product_data')
         } else if ('reepay_variable_subscriptions' === $selectProductType.val()) {
             init('#variable_product_options')
         }
     });
+
+    $('.show_if_reepay_subscription').toggle(!!getReepaySelectedTab())
 
     $body.on('init_tooltips', function () {
         $('.addon-shipping-new').closest('tr').addClass('hidden');
@@ -63,9 +79,97 @@ jQuery(function ($) {
         }
     });
 
+    $body.on('click', '.js-refresh-addons-list', function (e) {
+        e.preventDefault();
+
+        const $selects = $('[name^="addon_choose_exist"]');
+
+        $.each( $selects, function () {
+            const $select = $(this);
+
+            const $container = $select.parents('.addon_name')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            let url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+
+                    $select.html(response_data.html);
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
+
+    $('[name$="reepay_shipping_addon"]')
+        .parents('fieldset')
+        .append($('<button class="button button-primary button-large js-refresh-addons-shipping-list">Refresh list</button>'))
+        .append($('<a class="button button-primary button-large" style="margin-left: 5px;" href="https://app.reepay.com/#/rp/config/addons/create" target="_blank">Create new addon</a>'))
+
+    $body.on('click', '.js-refresh-addons-shipping-list', function (e) {
+        e.preventDefault();
+
+        const $selects = $('[name$="reepay_shipping_addon"]');
+
+        $.each( $selects, function () {
+            const $select = $(this);
+
+            const $container = $select.parents('tr')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            let url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+
+                    $select.html(response_data.html);
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
 
     $body.on('woocommerce_variations_added', function () {
-        init('#variable_product_options');
+        init();
     });
 
     $('#variable_product_options').on('reload', function () {
@@ -303,41 +407,7 @@ jQuery(function ($) {
 
     }
 
-    /*if (('.wp-list-table').length) {
-        init_table();
-    }
-
-    function init_table() {
-        $('tr.sub-order').hide();
-        $('a.show-sub-orders').on('click', function (e) {
-            e.preventDefault();
-
-            var $self = $(this),
-                el = $('tr.' + $self.data('class'));
-
-            if (el.is(':hidden')) {
-                el.show();
-                $self.text($self.data('hide'));
-            } else {
-                el.hide();
-                $self.text($self.data('show'));
-            }
-        });
-
-        $('button.toggle-sub-orders').on('click', function (e) {
-            e.preventDefault();
-
-            $('tr.sub-order').toggle();
-        });
-    }*/
-
     function show_settings() {
-        if ('reepay_simple_subscriptions' === $selectProductType.val() || 'reepay_variable_subscriptions' === $selectProductType.val()) {
-            $('.show_if_reepay_subscription').show();
-        } else {
-            $('.show_if_reepay_subscription').hide();
-        }
-
         const $variablePricing = $('.woocommerce_variation .variable_pricing');
 
         if ('reepay_variable_subscriptions' === $selectProductType.val() ||
@@ -385,14 +455,16 @@ jQuery(function ($) {
         if (elem) {
             val = elem;
         } else {
-            val = $container.find('#_subscription_fee');
+            val = $container.find('#_subscription_fee:checked');
         }
 
-        var block = val.closest('.reepay_subscription_fee').find('.fee-fields')
         if (val.is(':checked')) {
-            block.show();
-        } else {
-            block.hide();
+            var block = val.closest('.reepay_subscription_fee').find('.fee-fields')
+            if (val.val() === 'yes') {
+                block.show();
+            } else {
+                block.hide();
+            }
         }
     }
 
@@ -477,8 +549,6 @@ jQuery(function ($) {
     }
 
     function load_plan($select, $container) {
-        console.log($select, $container);
-
         const handle = $select.val();
 
         if (!handle) {
@@ -515,13 +585,6 @@ jQuery(function ($) {
                 }
 
                 $container.html(`<div style="width: 100%">${response_data.html}</div>`)
-
-                show_plan_settings($container);
-                show_trial_settings($container);
-                show_notice_settings($container);
-                show_contract_settings($container);
-                show_fee_settings($container);
-
                 $submitBtn.show();
             },
             error: function (request, status, error) {
@@ -539,6 +602,15 @@ jQuery(function ($) {
         }
 
         $container.html('')
+        const $select = $('[name="_reepay_discount_use_existing_coupon_id"]')
+            .parent()
+            .block({
+                message: null,
+                overlayCSS: {
+                    background: '#fff',
+                    opacity: 0.6
+                }
+            });
 
         $.ajax({
             url: window.reepay.rest_urls.get_coupon + `?handle=${handle}`,
@@ -559,7 +631,7 @@ jQuery(function ($) {
 
             },
             complete: function () {
-
+                $select.unblock();
             },
         })
     }
@@ -576,8 +648,6 @@ jQuery(function ($) {
                 }
 
                 let discount = response_data.discount
-
-                console.log(discount)
 
                 discount_set_data(discount, $container)
 
@@ -619,73 +689,113 @@ jQuery(function ($) {
         discount['_reepay_discount_fixed_period_unit'] && $container.find('[name="_reepay_discount_fixed_period_unit"]').val(discount['_reepay_discount_fixed_period_unit']).attr('disabled', disable)
     }
 
-    function init(tab) {
-        const $tab = $(tab);
+    $body.on('click', '.js-refresh-plans-list', function (e) {
+        e.preventDefault();
 
-        //$(`a[href="${tab}"]`).click()
+        const $selects = $('[name^="_reepay_subscription_handle"]');
 
-        show_settings();
+        $.each( $selects, function () {
+            const $select = $(this);
 
-        if ($tab.find('#_subscription_fee').is(':checked')) {
+        if ($tab.find('#_subscription_fee:checked').val() === 'yes') {
             $('.fee-fields').show();
         } else {
             $('.fee-fields').hide();
         }
 
-        $(tab + ' input').on('change', function () {
-            show_update_settings($tab);
-        })
+            const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
+            const product_id = dataPlan.product_id || window.reepay.product.id
 
-        $(tab + ' select').on('change', function () {
-            show_update_settings($tab);
-        })
+            let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$select.val()}&get_list=1`;
 
-        $(tab + ' #_subscription_schedule_type').on('change', function () {
-            show_plan_settings($tab);
-        }).trigger('change');
+            if (dataPlan.loop !== undefined) {
+                url += `&loop=${dataPlan.loop}`
+            }
 
-        $(tab + ' #_subscription_trial').on('change', function () {
-            show_trial_settings($tab, $(this));
-        }).trigger('change');
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
 
-        $(tab + ' #_subscription_notice_period').on('change', function () {
-            show_notice_settings($tab);
-        }).trigger('change');
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
 
-        $(tab + ' #_subscription_contract_periods').on('change', function () {
-            show_contract_settings($tab);
-        }).trigger('change');
+                    $select.html($(response_data.html).html())
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
 
-        $(tab + ' #_subscription_fee').on('change', function () {
-            show_fee_settings($tab, $(this));
-        }).trigger('change');
+    $body.on('click', '.js-refresh-coupons-list', function (e) {
+        e.preventDefault();
 
-        choose_change_settings($tab.find('[name^="_reepay_subscription_choose"]:checked'));
-        $(tab + ' #_reepay_subscription_choose').change(function () {
-            choose_change_settings($(this));
-        });
+        const $selects = $('[name="_reepay_discount_use_existing_coupon_id"]');
 
-        $(tab + ' #_subscription_choose_exist').change(function () {
+        $.each( $selects, function () {
             const $select = $(this);
-            const $container = $select.parents('.reepay_subscription_choose_exist');
+
+            const $container = $select.parents('.form-field')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            let url = `${window.reepay.rest_urls.get_coupon}?get_list=1`;
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+                    console.log($select, response_data.html);
+                    $select.html(response_data.html)
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
+
+    function init() {
+        const tab = getReepaySelectedTab();
+
+        if (!tab) {
+            return;
+        }
+
+        show_settings();
+
+        $(tab + ' #_reepay_subscription_handle').change(function () {
+            const $select = $(this);
+            const $container = $select.parents('.reepay_subscription_container');
 
             load_plan(
                 $select,
                 $container.find('.reepay_subscription_settings_exist')
             );
         })
-
-        billing_cycles_settings($tab.find('input[type=radio][name=_reepay_subscription_billing_cycles]:checked'));
-        $(tab + ' input[type=radio][name=_reepay_subscription_billing_cycles]').change(function () {
-            billing_cycles_settings($(this));
-        });
     }
 
-    if ('reepay_simple_subscriptions' === $selectProductType.val()) {
-        tab = '#general_product_data';
-    } else if ('reepay_variable_subscriptions' === $selectProductType.val()) {
-        tab = '#variable_product_options';
-    }
-
-    init(tab);
+    init();
 });

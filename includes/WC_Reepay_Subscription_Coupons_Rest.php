@@ -7,15 +7,48 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 	}
 
 	/**
-	 * Retrieves one item from the collection.
+	 * Get all reepay coupons
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @throws Exception
-	 * @since 4.7.0
+	 *
 	 */
-	public function get_item( $request ) {
+	public function get_list( $request ) {
+		try {
+			$html = '<option value="">' . __( 'Select coupon', 'reepay-subscriptions-for-woocommerce' ) . '</option>';
+			$addons = WC_Reepay_Discounts_And_Coupons::get_coupons();
+
+			foreach ( $addons ?? [] as $addon ) {
+				$html .= '<option value="' . $addon['handle'] . '">' . esc_attr( $addon['code'] ) . '</option>';
+			}
+
+			return new WP_REST_Response( [
+				'success' => true,
+				'html'    => $html,
+			] );
+		} catch ( Exception $e ) {
+			reepay_s()->log()->log( [
+				'source'  => 'WC_Reepay_Subscription_Plan_Simple_Rest::get_item',
+				'message' => 'Getting plan error',
+				'handle'  => $request['handle']
+			], 'error' );
+
+			return new WP_Error( 400, $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Get reepay coupon info by handle
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 * @throws Exception
+	 *
+	 */
+	public function get_info( $request ) {
 		try {
 			$plans = WC_Reepay_Subscription_Plan_Simple::get_plans_wc();
 
