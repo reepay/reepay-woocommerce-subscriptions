@@ -89,43 +89,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$this->set_text_properties();
 	}
 
-	public function add_setup_fee() {
-		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
-				$product = $cart_item['data'];
-				$fee     = $product->get_meta( '_reepay_subscription_fee' );
-				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
-					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
-					if (!empty($amount)) {
-                        WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
-                    }
-				}
-			}
-		}
-	}
-
-	public function rework_total( $total_rows, $order, $tax_display ) {
-		$another_orders = get_post_meta( $order->get_id(), '_reepay_another_orders', true );
-		if ( ! empty( $another_orders ) ) {
-			$total = 0;
-			foreach ( $another_orders as $order_id ) {
-				$order_another = wc_get_order( $order_id );
-				$total         += floatval( $order_another->get_total() );
-			}
-
-			$total_rows['cart_subtotal'] = [
-				'label' => __( 'Subtotal:', 'woocommerce' ),
-				'value' => wc_price( $total )
-			];
-			$total_rows['order_total']   = [
-				'label' => __( 'Total:', 'woocommerce' ),
-				'value' => wc_price( $total )
-			];
-		}
-
-		return $total_rows;
-	}
-
 	protected function register_actions() {
 		add_action( "woocommerce_reepay_simple_subscriptions_add_to_cart", [ $this, 'add_to_cart' ] );
 		add_action( 'woocommerce_product_options_general_product_data', [ $this, 'subscription_pricing_fields' ] );

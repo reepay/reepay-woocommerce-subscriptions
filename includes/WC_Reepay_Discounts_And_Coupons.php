@@ -85,13 +85,11 @@ class WC_Reepay_Discounts_And_Coupons {
 		$name = get_post_meta( $coupon->get_id(), '_reepay_discount_name', true );
 
 
-		$paramsCoupon = [
+		return [
 			"name"           => $name,
 			"all_plans"      => empty( $apply_plans ),
 			"eligible_plans" => $apply_plans,
 		];
-
-		return $paramsCoupon;
 	}
 
 	static function get_existing_discount( $handle ) {
@@ -302,22 +300,21 @@ class WC_Reepay_Discounts_And_Coupons {
 			return;
 		}
 
-		$data         = $_REQUEST;
-		$use_existing = false;
-		if ( $_REQUEST['use_existing_coupon'] === 'true' ) {
-			$couponData = static::get_existing_coupon( sanitize_text_field( $_REQUEST['_reepay_discount_use_existing_coupon_id'] ) );
-			update_post_meta( $post_id, '_reepay_coupon_handle', $couponData['coupon_handle'] );
-			update_post_meta( $post_id, '_reepay_discount_handle', $couponData['discount_handle'] );
-			update_post_meta( $post_id, '_reepay_coupon_code_real', $couponData['code'] );
-			$data         = array_merge( $data, $couponData );
-			$use_existing = true;
-		}
+		$data = $_REQUEST;
+
+		$couponData = static::get_existing_coupon( sanitize_text_field( $_REQUEST['_reepay_discount_use_existing_coupon_id'] ) );
+
+		update_post_meta( $post_id, '_reepay_coupon_handle', $couponData['coupon_handle'] );
+		update_post_meta( $post_id, '_reepay_discount_handle', $couponData['discount_handle'] );
+		update_post_meta( $post_id, '_reepay_coupon_code_real', $couponData['code'] );
+
+		$data         = array_merge( $data, $couponData );
+
 
 		if ( $_REQUEST['use_existing_discount'] === 'true' ) {
 			$discountData = static::get_existing_discount( sanitize_text_field( $_REQUEST['_reepay_discount_use_existing_discount_id'] ) );
 			update_post_meta( $post_id, '_reepay_discount_handle', $discountData['discount_handle'] );
 			$data         = array_merge( $data, $discountData );
-			$use_existing = true;
 		}
 
 		$data['_reepay_discount_name'] = sanitize_text_field( $_REQUEST['_reepay_discount_name'] );
@@ -334,57 +331,44 @@ class WC_Reepay_Discounts_And_Coupons {
 			}
 		}
 
-		$discountHandle = get_post_meta( $post_id, '_reepay_discount_handle', true );
-		$couponHandle   = get_post_meta( $post_id, '_reepay_coupon_handle', true );
 		$duration       = sanitize_text_field( $data['_reepay_discount_duration'] ?? 'forever' );
 
-		$is_update = false;
-
-		if ( ! empty( $couponHandle ) ) {
-			$is_update = true;
+		if ( $duration === 'fixed_number' ) {
+			$coupon->set_usage_limit( intval( $data['_reepay_discount_fixed_count'] ) );
 		}
 
-		if ( ! $is_update || $use_existing ) {
-			if ( $duration === 'fixed_number' ) {
-				$coupon->set_usage_limit( intval( $data['_reepay_discount_fixed_count'] ) );
+		if ( $duration === 'limited_time' ) {
+			$length = intval( $data['_reepay_discount_fixed_period'] );
+			$units  = sanitize_text_field( $data['_reepay_discount_fixed_period_unit'] );
+			$date   = new DateTime();
+			if ( $units === 'months' ) {
+				$date->modify( "+$length months" );
 			}
 
-			if ( $duration === 'limited_time' ) {
-				$length = intval( $data['_reepay_discount_fixed_period'] );
-				$units  = sanitize_text_field( $data['_reepay_discount_fixed_period_unit'] );
-				$date   = new DateTime();
-				if ( $units === 'months' ) {
-					$date->modify( "+$length months" );
-				}
-
-				if ( $units === 'days' ) {
-					$date->modify( "+$length days" );
-				}
-				$coupon->set_date_expires( $date->getTimestamp() );
+			if ( $units === 'days' ) {
+				$date->modify( "+$length days" );
 			}
+			$coupon->set_date_expires( $date->getTimestamp() );
+		}
 
-			if ( ! empty( $data['_reepay_discount_amount'] ) ) {
-				$coupon->set_amount( floatval( $data['_reepay_discount_amount'] ) );
-			}
-
+		if ( ! empty( $data['_reepay_discount_amount'] ) ) {
+			$coupon->set_amount( floatval( $data['_reepay_discount_amount'] ) );
 		}
 
 
-		if ( empty( $discountHandle ) ) {
-			$discount       = $this->create_discount( $coupon, $data );
-			$discountHandle = $discount['handle'];
-		} else {
-			$this->update_discount( $coupon );
-		}
-
-		if ( empty( $couponHandle ) && ! empty( $discountHandle ) ) {
-			$this->create_coupon( $coupon, $discountHandle, $data );
-		} else if ( ! empty( $couponHandle ) ) {
-			$this->update_coupon( $coupon );
-		}
+//		if ( empty( $discountHandle ) ) {
+//			$discount       = $this->create_discount( $coupon, $data );
+//		} else {
+//			$this->update_discount( $coupon );
+//		}
+//
+//		if ( empty( $couponHandle ) && ! empty( $discountHandle ) ) {
+//			$this->create_coupon( $coupon, $discountHandle, $data );
+//		} else if ( ! empty( $couponHandle ) ) {
+//			$this->update_coupon( $coupon );
+//		}
 
 		$coupon->save();
-
 	}
 
 	function is_coupon_applied_for_plans( $coupon, WC_Product $product ) {
