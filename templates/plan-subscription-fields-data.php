@@ -12,7 +12,7 @@
 	<?php if ( $_reepay_subscription_schedule_type === WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY ) : ?>
         <p class="form-field">
             <label for="#"><?php _e( 'Charge every', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php _e( 'Day', 'reepay-subscriptions-for-woocommerce' ) ?></span>
+            <span><?php echo ! empty( $_reepay_subscription_daily ) ? $_reepay_subscription_daily . ' ' . __( 'Days', 'reepay-subscriptions-for-woocommerce' ) : __( 'Day', 'reepay-subscriptions-for-woocommerce' ) ?></span>
         </p>
 	<?php endif; ?>
 
@@ -239,15 +239,17 @@
 </div>
 
 <?php $fee = ! empty( $_reepay_subscription_fee ) ? $_reepay_subscription_fee : [] ?>
+
+<?php if ( false ): ?>
     <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
 
         <p class="form-field">
             <label for="_subscription_fee"><?php echo __( 'Include setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <?php echo __('Yes') ?>
+			<?php echo __( 'Yes' ) ?>
             <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_fee[enabled]"
                    value="yes" <?php echo ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ? 'checked' : '' ?> />
-            <?php echo __('No') ?>
+			<?php echo __( 'No' ) ?>
             <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
                    name="_reepay_subscription_fee[enabled]"
                    value="no" <?php echo empty( $fee['enabled'] ) || $fee['enabled'] != 'yes' ? 'checked' : '' ?> />
@@ -274,7 +276,8 @@
         </span>
         </p>
     </div>
-<?php endif; ?>
+<?php endif ?>
+
 
 <?php if ( ! empty( $_reepay_subscription_fee ) ) : ?>
     <div class="options_group reepay_subscription_fee show_if_reepay_subscription">

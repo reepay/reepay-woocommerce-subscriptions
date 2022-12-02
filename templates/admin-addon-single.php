@@ -14,8 +14,8 @@ global $post;
 ?>
 <div class="woocommerce_product_addon wc-metabox closed">
     <h3>
-        <button type="button"
-                class="remove_addon button"><?php _e( 'Remove', 'reepay-subscriptions-for-woocommerce' ); ?></button>
+        <!--<button type="button"
+                class="remove_addon button"><?php /*_e( 'Remove', 'reepay-subscriptions-for-woocommerce' ); */ ?></button>-->
 
         <div class="handlediv" title="<?php _e( 'Click to toggle', 'reepay-subscriptions-for-woocommerce' ); ?>"></div>
         <strong><?php _e( 'Add-on', 'reepay-subscriptions-for-woocommerce' ); ?>: <span
@@ -48,7 +48,7 @@ global $post;
                     </select>
 
                     <button class="button button-primary button-large js-refresh-addons-list">
-						<?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+						<?php _e( 'Refresh list', 'reepay-subscriptions-for-woocommerce' ) ?>
                     </button>
                     <a class="button button-primary button-large"
                        style="margin-left: 5px;"

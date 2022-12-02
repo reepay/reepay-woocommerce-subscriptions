@@ -8,38 +8,38 @@
 ?>
 
 <div class="reepay_subscription_variable show_if_reepay_subscription">
-    <h6 style="padding:0;margin: 0;font-size:18px;"><?php _e('Reepay plan options', 'reepay-subscriptions-for-woocommerce' ) ?></h6>
+    <h6 style="padding:0;margin: 0;font-size:18px;"><?php _e( 'Reepay plan options', 'reepay-subscriptions-for-woocommerce' ) ?></h6>
 
     <div class="reepay_subscription_container">
-        <div class="options_group">
+        <div class="options_group choose-plan-variable">
             <p class="form-field" style="display:block;">
                 <label for="_reepay_subscription_handle">
-		            <?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
+					<?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
                 </label>
 
-	            <?php
-	            wc_get_template(
-		            'plan-subscription-plans-select.php',
-		            [
-			            'plans_list' => $plans_list,
-			            'current' => $_reepay_subscription_handle,
-                        'loop' => $loop,
-			            'data_plan' => $data_plan
-		            ],
-		            '',
-		            reepay_s()->settings( 'plugin_path' ) . 'templates/'
-	            );
-	            ?>
+				<?php
+				wc_get_template(
+					'plan-subscription-plans-select.php',
+					[
+						'plans_list' => $plans_list,
+						'current'    => $_reepay_subscription_handle,
+						'loop'       => $loop,
+						'data_plan'  => $data_plan
+					],
+					'',
+					reepay_s()->settings( 'plugin_path' ) . 'templates/'
+				);
+				?>
                 <br>
                 <button class="button button-primary button-large js-refresh-plans-list">
-				    <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+					<?php _e( 'Refresh list', 'reepay-subscriptions-for-woocommerce' ) ?>
                 </button>
                 <a class="button button-primary button-large"
                    style="margin-left: 5px;margin-top: 5px;"
                    href="https://app.reepay.com/#/rp/config/plans/create"
                    target="_blank">
-				    <?php
-				    _e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
+					<?php
+					_e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
                 </a>
             </p>
         </div>
