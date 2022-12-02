@@ -435,30 +435,12 @@ class WC_Reepay_Subscription_Addons {
 			for ( $i = 0; $i < sizeof( $_POST['product_addon_name'] ); $i ++ ) {
 				$data = [];
 
-				if ( $_POST['_reepay_addon_choose'][ $i ] == 'exist' && ! empty( $_POST['addon_choose_exist'][ $i ] ) ) {
+				if ( ! empty( $_POST['addon_choose_exist'][ $i ] ) ) {
 					$data = $this->get_reepay_addon_data( sanitize_text_field( $_POST['addon_choose_exist'][ $i ] ) );
 					$this->add_plan_to_addon( $post_id, sanitize_text_field( $_POST['addon_choose_exist'][ $i ] ) );
-					$data['choose']   = sanitize_text_field( $_POST['_reepay_addon_choose'][ $i ] );
+					$data['choose']   = sanitize_text_field( 'exist' );
 					$data['position'] = intval( $_POST['product_addon_position'][ $i ] );
 					$data['avai']     = sanitize_text_field( $_POST['_reepay_addon_avai'][ $i ] );
-				} else {
-					if ( ! isset( $_POST['product_addon_name'][ $i ] ) || ( '' == $_POST['product_addon_name'][ $i ] ) ) {
-						continue;
-					}
-
-					$data['name']        = sanitize_text_field( $_POST['product_addon_name'][ $i ] );
-					$data['description'] = wp_kses_post( $_POST['product_addon_description'][ $i ] );
-					$data['type']        = ! empty( $_POST['product_addon_type'][ $i ] ) ? sanitize_text_field( $_POST['product_addon_type'][ $i ] ) : '';
-					$data['position']    = sanitize_text_field( $_POST['product_addon_position'][ $i ] );
-					$data['avai']        = sanitize_text_field( $_POST['_reepay_addon_avai'][ $i ] );
-					$data['amount']      = wc_format_decimal( stripslashes( $_POST['product_addon_amount'][ $i ] ) );
-					$data['vat']         = WC_Reepay_Subscription_Plan_Simple::get_vat( $post_id );
-					$data['vat_type']    = wc_prices_include_tax();
-					$data['handle']      = sanitize_text_field( $_POST['product_addon_handle'][ $i ] );
-					$data['choose']      = sanitize_text_field( $_POST['_reepay_addon_choose'][ $i ] );
-					$data['exist']       = sanitize_text_field( $_POST['addon_choose_exist'][ $i ] );
-
-					$data = $this->save_to_reepay( $data, $post_id, $i );
 				}
 
 

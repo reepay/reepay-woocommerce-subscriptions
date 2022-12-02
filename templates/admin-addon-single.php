@@ -35,37 +35,7 @@ global $post;
 
 
     <table class="wc-metabox-content">
-        <tr>
-            <td class="addon_name">
-                <p class="form-row choose-radio">
-                    <label for="_reepay_addon_choose"><?php echo __( 'Creation type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-                    &nbsp&nbsp<?php echo __( 'Create new add-on', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
-                    <input type="radio" id="_reepay_addon_choose"
-                           name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
-                           value="new" <?php checked( 'new', esc_attr( $addon['choose'] ) ); ?>>
-                    &nbsp&nbsp<?php echo __( 'Choose existing add-on', 'reepay-subscriptions-for-woocommerce' ); ?>
-                    &nbsp
-                    <input type="radio" id="_reepay_addon_choose"
-                           name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
-                           value="exist" <?php checked( 'exist', esc_attr( $addon['choose'] ) ); ?>>
-                </p>
-            </td>
-        </tr>
-        <tbody class="new-addon <?php echo $addon['choose'] == 'exist' ? 'hidden' : '' ?>">
-		<?php
-		wc_get_template(
-			'admin-addon-single-data.php',
-			[
-				'addon'  => $addon,
-				'loop'   => $loop,
-				'domain' => 'reepay-subscriptions-for-woocommerce',
-			],
-			'',
-			reepay_s()->settings( 'plugin_path' ) . 'templates/'
-		);
-		?>
-        </tbody>
-        <tbody class="exist <?php echo $addon['choose'] == 'new' ? 'hidden' : '' ?>">
+        <tbody class="exist">
         <tr>
             <td class="addon_name" style="width: 100%">
 				<?php if ( ! empty( $addons_list ) ): ?>
