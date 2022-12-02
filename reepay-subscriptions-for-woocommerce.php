@@ -319,6 +319,20 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function settings_tab() {
+        $page = $_GET['page'] ?? '';
+        $tab = $_GET['tab'] ?? '';
+	    ?>
+        <ul class="subsubsub">
+            <li><a href="<?php echo admin_url('admin.php?page=wc-settings&tab=reepay_subscriptions') ?>"
+                   class="<?php echo $tab === 'reepay_subscriptions' ? 'current' : '' ?>">General</a> |
+            </li>
+            <li>
+                <a href="<?php echo admin_url('tools.php?page=reepay_import') ?>"
+                   class="<?php echo $page === 'reepay_import' ? 'current' : '' ?>">Import tools</a> |
+            </li>
+        </ul>
+        <br class="clear">
+        <?php
 		woocommerce_admin_fields( static::get_settings() );
 	}
 
