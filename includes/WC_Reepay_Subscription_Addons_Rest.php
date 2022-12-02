@@ -7,7 +7,7 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	}
 
 	/**
-	 * Get all reepay plans
+	 * Get all reepay addons
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -40,7 +40,7 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	}
 
 	/**
-	 * Get reepay info by handle
+	 * Get reepay addon info by handle
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *

@@ -93,7 +93,7 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get reepay info by handle
+	 * Get reepay plan info by handle
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
