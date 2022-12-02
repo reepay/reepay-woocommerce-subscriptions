@@ -121,6 +121,53 @@ jQuery(function ($) {
         } );
     })
 
+    $('[name$="reepay_shipping_addon"]')
+        .parents('fieldset')
+        .append($('<button class="button button-primary button-large js-refresh-addons-shipping-list">Refresh list</button>'))
+        .append($('<a class="button button-primary button-large" style="margin-left: 5px;" href="https://app.reepay.com/#/rp/config/addons/create" target="_blank">Create new addon</a>'))
+
+    $body.on('click', '.js-refresh-addons-shipping-list', function (e) {
+        e.preventDefault();
+
+        const $selects = $('[name$="reepay_shipping_addon"]');
+
+        $.each( $selects, function () {
+            const $select = $(this);
+
+            const $container = $select.parents('tr')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            let url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+
+                    $select.html(response_data.html);
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
+
     $body.on('woocommerce_variations_added', function () {
         init();
     });
