@@ -22,8 +22,8 @@
 		        reepay_s()->settings( 'plugin_path' ) . 'templates/'
 	        );
             ?>
-            <br>
-            <button class="button button-primary button-large js-refresh-plans-list">
+
+            <button class="button button-primary button-large js-refresh-plans-list" style="margin-left: 5px;">
 		        <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
             </button>
             <a class="button button-primary button-large"
