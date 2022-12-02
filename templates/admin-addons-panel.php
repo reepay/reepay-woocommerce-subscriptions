@@ -51,20 +51,6 @@
         const $addons_tab = $('#product_addons_data');
 
         $addons_tab
-            .on('click', '#_reepay_subscription_choose', function () {
-                const addon = $(this).closest('.woocommerce_product_addon');
-                const table = addon.find('table.wc-metabox-content')
-                if ($(this).val() === 'new') {
-                    table.find('tbody.exist').addClass('hidden');
-                    table.find('tbody.new-addon').removeClass('hidden');
-                    addon.find('.product_addon_type').attr('disabled', false)
-                } else {
-                    table.find('tbody.exist').removeClass('hidden');
-                    table.find('tbody.new-addon').addClass('hidden');
-                    addon.find('.product_addon_type').attr('disabled', 'disabled')
-                }
-                $('.active_if_apply_to_custom input').attr('disabled', false)
-            })
             .on('click', '.add_new_addon', function () {
                 const $new_addon = $('.woocommerce_product_addons .woocommerce_product_addon');
 

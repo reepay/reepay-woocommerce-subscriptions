@@ -13,79 +13,22 @@ class WC_Reepay_Subscription_Plan_Simple {
 	const TYPE_WEEKLY_FIXED_DAY = 'weekly_fixedday';
 	const TYPE_MANUAL = 'manual';
 
-	public static $schedule_types = [
-		self::TYPE_DAILY            => 'Day(s)',
-		self::TYPE_MONTH_START_DATE => 'Month(s)',
-		self::TYPE_MONTH_FIXED_DAY  => 'Fixed day of month',
-		self::TYPE_MONTH_LAST_DAY   => 'Last day of month',
-		self::TYPE_PRIMO            => 'Quarterly Primo',
-		self::TYPE_ULTIMO           => 'Quarterly Ultimo',
-		self::TYPE_HALF_YEARLY      => 'Half-yearly',
-		self::TYPE_START_DATE_12    => 'Yearly',
-		self::TYPE_WEEKLY_FIXED_DAY => 'Fixed day of week',
-		self::TYPE_MANUAL           => 'Manual',
-	];
+	public static $schedule_types = [];
 
-	public static $trial = [
-		''          => 'No Trial',
-		'7days'     => '7 days',
-		'14days'    => '14 days',
-		'1month'    => '1 month',
-		'customize' => 'Customize',
-	];
+	public static $trial = [];
 
-	public static $types_info = [
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => 'Billed every day',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => 'Billed every %s days',
+	public static $types_info = [];
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Billed every month on the first day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => 'Billed every %s months on the first day of the month',
+	public static $types_info_short = [];
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => 'Billed every month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => 'Billed every %s months',
+	public static $bill_types = [];
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => 'Billed every month on the last day of the month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => 'Billed every %s months on the last day of the month',
+	public static $proration_types = [];
 
-		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, April, July, October',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => 'Billed every %s months, on the last day of the month. The billing is fixed to these months: January, April, July, October',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, July',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => 'Billed every Week',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => 'Billed every %s Weeks',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => 'Manual',
-	];
-
-	public static $types_info_short = [
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => 'Day',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => '%s days',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => 'Month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => 'Month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => 'Month',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => '%s months',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => '%s months',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => '%s months',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => '%s months',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => 'Week',
-		WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => '%s Weeks',
-
-		WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => 'Manual',
-	];
+	public static $number_to_week_day = [];
 
 	public static $meta_fields = [
 		'_reepay_subscription_handle',
-		'_reepay_subscription_choose',
-		'_reepay_choose_exist',
 		'_reepay_subscription_price',
 		'_reepay_subscription_name',
 		'_reepay_subscription_schedule_type',
@@ -143,6 +86,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		add_action( 'woocommerce_cart_calculate_fees', [ $this, 'add_setup_fee' ] );
 
 		$this->register_actions();
+		$this->set_text_properties();
 	}
 
 	public function add_setup_fee() {
@@ -189,6 +133,99 @@ class WC_Reepay_Subscription_Plan_Simple {
 		add_action( 'save_post', [ $this, 'save_subscription_meta' ], 11 );
 		add_filter( 'woocommerce_cart_item_name', [ $this, 'checkout_subscription_info' ], 10, 3 );
 		add_action( 'woocommerce_before_order_itemmeta', [ $this, 'admin_order_subscription_info' ], 10, 3 );
+	}
+
+	protected function set_text_properties() {
+		self::$schedule_types = [
+			self::TYPE_DAILY            => __( 'Day(s)', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MONTH_START_DATE => __( 'Month(s)', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MONTH_FIXED_DAY  => __( 'Fixed day of month', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MONTH_LAST_DAY   => __( 'Last day of month', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_PRIMO            => __( 'Quarterly Primo', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_ULTIMO           => __( 'Quarterly Ultimo', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_HALF_YEARLY      => __( 'Half-yearly', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_START_DATE_12    => __( 'Yearly', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_WEEKLY_FIXED_DAY => __( 'Fixed day of week', 'reepay-subscriptions-for-woocommerce' ),
+			self::TYPE_MANUAL           => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$trial = [
+			''          => __( 'No Trial', 'reepay-subscriptions-for-woocommerce' ),
+			'7days'     => __( '7 days', 'reepay-subscriptions-for-woocommerce' ),
+			'14days'    => __( '14 days', 'reepay-subscriptions-for-woocommerce' ),
+			'1month'    => __( '1 month', 'reepay-subscriptions-for-woocommerce' ),
+			'customize' => __( 'Customize', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$types_info = [
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => __( 'Billed every day', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => __( 'Billed every %s days', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => __( 'Billed every month on the first day of the month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => __( 'Billed every %s months on the first day of the month', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => __( 'Billed every month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => __( 'Billed every %s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => __( 'Billed every month on the last day of the month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => __( 'Billed every %s months on the last day of the month', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => __( 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, April, July, October', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => __( 'Billed every %s months, on the last day of the month. The billing is fixed to these months: January, April, July, October', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => __( 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January, July', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => __( 'Billed every %s months, on the first day of the month. The billing is fixed to these months: January', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => __( 'Billed every Week', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( 'Billed every %s Weeks', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$types_info_short = [
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => __( 'Day', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => __( '%s days', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => __( 'Month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => __( 'Month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY               => __( 'Month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_LAST_DAY . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_PRIMO . '_multiple'         => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_ULTIMO . '_multiple'        => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_HALF_YEARLY . '_multiple'   => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_START_DATE_12 . '_multiple' => __( '%s months', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => __( 'Week', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( '%s Weeks', 'reepay-subscriptions-for-woocommerce' ),
+
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$bill_types = [
+			'bill_prorated'    => __( 'Bill prorated (Default)', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_full'        => __( 'Bill for full period)', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_zero_amount' => __( 'Bill a zero amount', 'reepay-subscriptions-for-woocommerce' ),
+			'no_bill'          => __( 'Do not consider the partial period a billing period', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$proration_types = [
+			'full_day' =>	__( 'Full day proration', 'reepay-subscriptions-for-woocommerce' ),
+			'by_minute' =>	__( 'By the minute proration', 'reepay-subscriptions-for-woocommerce' ),
+		];
+
+		self::$number_to_week_day = [
+			1 => __( 'Monday', 'reepay-subscriptions-for-woocommerce' ),
+			2 => __( 'Tuesday', 'reepay-subscriptions-for-woocommerce' ),
+			3 => __( 'Wednesday', 'reepay-subscriptions-for-woocommerce' ),
+			4 => __( 'Thursday', 'reepay-subscriptions-for-woocommerce' ),
+			5 => __( 'Friday', 'reepay-subscriptions-for-woocommerce' ),
+			6 => __( 'Saturday', 'reepay-subscriptions-for-woocommerce' ),
+			7 => __( 'Sunday', 'reepay-subscriptions-for-woocommerce' ),
+		];
 	}
 
 	public function checkout_subscription_info( $name, $cart_item, $cart_item_key ) {
@@ -352,9 +389,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		try {
-			$plans = reepay_s()->api()->request( "plan?only_active=true" ) ?: false;
-
-			return $plans;
+			return reepay_s()->api()->request( "plan?only_active=true" ) ?: false;
 		} catch ( Exception $e ) {
 			$this->plan_error( $e->getMessage() );
 		}
@@ -371,6 +406,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$data = [
 			'post_id'    => $post_id,
 			'plans_list' => $this->get_reepay_plans_list() ?: [],
+			'disabled'   => true,
 			'domain'     => 'reepay-subscriptions-for-woocommerce',
 		];
 
@@ -387,29 +423,21 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 */
 	public function subscription_pricing_fields( $post_id = null, $data = [] ) {
 		global $post;
-		global $pagenow;
 
 		$post_id = $post_id ?: $post->ID;
 
 		$data = ! empty( $data ) ? $data : $this->get_subscription_template_data( $post_id );
 
-		if ( empty( $data['_reepay_subscription_choose'] ) ) {
-			$data['_reepay_subscription_choose'] = 'new';
-		}
-
-		$data['is_exist']                = $data['_reepay_subscription_choose'] != 'new';
 		$data['product_object']          = wc_get_product( $post_id );
-		$data['is_creating_new_product'] = $pagenow === 'post-new.php';
 
 		foreach ( self::$meta_fields as $key ) {
 			if ( ! isset( $data[ $key ] ) ) {
 				$data[ $key ] = '';
 			}
 		}
-		$data['settings'] = $this->get_plan_fields_data_template( $data );
 
-		if ( $data['is_exist'] ) {
-			$data['settings_exist'] = $this->get_plan_fields_data_template( $data );;
+		if ( ! empty( $data['_reepay_subscription_handle'] ) ) {
+			$data['settings_exist'] = $this->get_plan_fields_data_template( $data );
 		}
 
 		echo $this->get_plan_fields_template( $data );
@@ -453,7 +481,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$data = $this->get_remote_plan_meta( $handle );
 
 		if ( empty( $data ) ) {
-			return;
+			return false;
 		}
 
 		foreach ( self::$meta_fields as $key ) {
@@ -463,6 +491,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 				update_post_meta( $post_id, $key, $data[ $key ] );
 			}
 		}
+
+		return $data;
 	}
 
 	/**
@@ -479,6 +509,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 			return [];
 		}
+
+		$plan_meta['_reepay_subscription_handle'] = $handle;
 
 		$plan_meta['_regular_price'] = $plan_data['amount'] / 100;
 		$plan_meta['_price']         = $plan_data['amount'] / 100;
@@ -581,7 +613,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$plan_meta['_reepay_subscription_schedule_type'] = $type;
 		}
 
-
 		if ( ! empty( $plan_data['interval_length'] ) ) {
 			$plan_meta['_reepay_subscription_daily']           = $plan_data['interval_length'];
 			$plan_meta['_reepay_subscription_month_startdate'] = $plan_data['interval_length'];
@@ -616,239 +647,39 @@ class WC_Reepay_Subscription_Plan_Simple {
 	}
 
 	public function save_subscription_meta( $post_id ) {
-		if ( ! $this->is_reepay_product_saving() ) {
+		$title = get_the_title( $post_id );
+
+		if ( ! $this->is_reepay_product_saving()
+		     || empty( $title )
+		     || strpos( $title, 'AUTO-DRAFT' ) !== false
+		) {
 			return;
 		}
 
-		$request_data = $this->get_meta_from_request();
+		$plan_handle = $this->get_subscription_handle_from_request();
 
-		if ( ! empty( $request_data['_reepay_subscription_choose'] ) && $request_data['_reepay_subscription_choose'] == 'exist' ) {
-			if ( ! empty( $request_data['_reepay_choose_exist'] ) ) {
-				$this->save_remote_plan( $post_id, $request_data['_reepay_choose_exist'] );
-
-				update_post_meta( $post_id, '_reepay_subscription_handle', $request_data['_reepay_choose_exist'] );
-				update_post_meta( $post_id, '_reepay_choose_exist', $request_data['_reepay_choose_exist'] );
-				update_post_meta( $post_id, '_reepay_subscription_choose', $request_data['_reepay_subscription_choose'] );
-
-				if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
-					update_post_meta( $post_id, '_regular_price', $request_data['_reepay_subscription_price'] );
-					update_post_meta( $post_id, '_price', $request_data['_reepay_subscription_price'] );
-				}
-
-				$title = get_the_title( $post_id );
-
-				if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
-					$handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
-					$this->save_meta_from_request( $post_id );
-					if ( ! empty( $handle ) ) {
-						$this->update_plan( $handle, $this->get_params( $post_id ) );
-					}
-				}
-
-			} else {
-				$this->plan_error( __( 'Please choose the plan', 'reepay-subscriptions-for-woocommerce' ) );
-			}
-		} else {
-			if ( ! empty( $request_data['_reepay_subscription_price'] ) ) {
-				update_post_meta( $post_id, '_regular_price', $request_data['_reepay_subscription_price'] );
-				update_post_meta( $post_id, '_price', $request_data['_reepay_subscription_price'] );
-			}
-
-			$title = get_the_title( $post_id );
-			if ( ! empty( $title ) && strpos( $title, 'AUTO-DRAFT' ) === false ) {
-				$this->save_meta_from_request( $post_id );
-				$handle = $this->generate_subscription_handle( $post_id );
-				$this->create_plan( $post_id, $handle, $this->get_params( $post_id ) );
-				update_post_meta( $post_id, '_reepay_choose_exist', $handle );
-				update_post_meta( $post_id, '_reepay_subscription_choose', 'exist' );
-			}
+		if ( empty( $plan_handle ) ) {
+			return;
 		}
+
+		$plan_data = $this->save_remote_plan( $post_id, $plan_handle );
+
+		if ( empty( $plan_data ) ) {
+			return;
+		}
+
+		if ( ! empty( $plan_data['_reepay_subscription_price'] ) ) {
+			update_post_meta( $post_id, '_regular_price', $plan_data['_reepay_subscription_price'] );
+			update_post_meta( $post_id, '_price', $plan_data['_reepay_subscription_price'] );
+		}
+	}
+
+	public function get_subscription_handle_from_request() {
+		return wc_clean( $_REQUEST['_reepay_subscription_handle'] ?? '' );
 	}
 
 	public function is_reepay_product_saving() {
 		return ! empty( $_REQUEST ) && ! empty( $_REQUEST['product-type'] ) && $_REQUEST['product-type'] == 'reepay_simple_subscriptions';
-	}
-
-	public function get_meta_from_request() {
-		$data = [];
-
-		foreach ( self::$meta_fields as $key ) {
-			if ( isset( $_REQUEST[ $key ] ) ) {
-				$data[ $key ] = wc_clean( $_REQUEST[ $key ] );
-			}
-		}
-
-		return $data;
-	}
-
-	public function save_meta_from_request( $post_id ) {
-		foreach ( self::$meta_fields as $key ) {
-			if ( isset( $_REQUEST[ $key ] ) ) {
-				update_post_meta(
-					$post_id,
-					$key,
-					is_array( $_REQUEST[ $key ] ) ? array_map( 'sanitize_text_field', $_REQUEST[ $key ] ) : sanitize_text_field( $_REQUEST[ $key ] )
-				);
-			}
-		}
-	}
-
-	public function update_plan( $handle, $params ) {
-		try {
-			$params['supersede_mode'] = ! empty( $params['supersede_mode'] ) ? $params['supersede_mode'] : 'scheduled_sub_update';
-
-			$result = reepay_s()->api()->request( "plan/$handle", 'POST', $params );
-
-			return true;
-		} catch ( Exception $e ) {
-			$this->plan_error( $e->getMessage() );
-		}
-
-		return false;
-	}
-
-	public function get_type( $type ) {
-		if ( $type == 'primo' || $type == 'ultimo' || $type == 'half_yearly' || $type == 'month_startdate_12' ) {
-			return 'month_fixedday';
-		}
-
-		return $type;
-	}
-
-	public function generate_subscription_handle( $post_id ) {
-		return 'plan_' . $post_id . '-' . time();
-	}
-
-	public function get_params( $post_id ) {
-		$handle = $this->generate_subscription_handle( $post_id );
-		$params = $this->get_default_params( $post_id );
-
-		$type      = get_post_meta( $post_id, '_reepay_subscription_schedule_type', true );
-		$type_data = get_post_meta( $post_id, '_reepay_subscription_' . $type, true );
-
-		$params['amount']         = floatval( get_post_meta( $post_id, '_reepay_subscription_price', true ) ) * 100;
-		$params['handle']         = $handle;
-		$params['supersede_mode'] = get_post_meta( $post_id, '_reepay_subscription_supersedes', true );
-		$params['quantity']       = intval( get_post_meta( $post_id, '_reepay_subscription_default_quantity', true ) );
-		$params['schedule_type']  = $this->get_type( $type );
-		//$params['fixed_life_time_unit'] = ''; //@todo Уточнить что за поле в админке
-		//$params['fixed_life_time_length'] = ''; //@todo Уточнить что за поле в админке
-		//$params['fixed_trial_days'] = ''; //@todo Уточнить что за поле в админке
-
-		$billing_cycles = get_post_meta( $post_id, '_reepay_subscription_billing_cycles', true );
-		if ( $billing_cycles == 'true' ) {
-			$params['fixed_count'] = intval( get_post_meta( $post_id, '_reepay_subscription_billing_cycles_period', true ) );
-		}
-
-		$trial = get_post_meta( $post_id, '_reepay_subscription_trial', true );
-		if ( ! empty( $trial['type'] ) ) {
-			if ( $trial['type'] == 'customize' ) {
-				$params['trial_interval_unit']   = $trial['unit'];
-				$params['trial_interval_length'] = intval( $trial['length'] );
-			} else {
-				if ( $trial['type'] == '7days' ) {
-					$params['trial_interval_unit']   = 'days';
-					$params['trial_interval_length'] = 7;
-				} elseif ( $trial['type'] == '14days' ) {
-					$params['trial_interval_unit']   = 'days';
-					$params['trial_interval_length'] = 14;
-				} elseif ( $trial['type'] == '1month' ) {
-					$params['trial_interval_unit']   = 'months';
-					$params['trial_interval_length'] = 1;
-				}
-			}
-		}
-
-		$params['amount_incl_vat'] = wc_prices_include_tax();
-
-		$fixation_periods = get_post_meta( $post_id, '_reepay_subscription_contract_periods', true );
-		if ( $fixation_periods ) {
-			$params['fixation_periods']      = intval( $fixation_periods );
-			$fixation_periods_full           = get_post_meta( $post_id, '_reepay_subscription_contract_periods_full', true );
-			$params['fixation_periods_full'] = boolval( $fixation_periods_full );
-		}
-
-		$notice_periods = get_post_meta( $post_id, '_reepay_subscription_notice_period', true );
-		if ( $notice_periods ) {
-			$params['notice_periods']               = intval( $notice_periods );
-			$notice_period_start                    = get_post_meta( $post_id, '_subscription_notice_period_start', true );
-			$params['notice_periods_after_current'] = boolval( $notice_period_start );
-		}
-
-		if ( $type == 'month_fixedday' || $type == 'weekly_fixedday' ) {
-			$params['schedule_fixed_day'] = intval( $type_data['day'] );
-		} elseif ( $type == 'primo' || $type == 'half_yearly' || $type == 'month_startdate_12' ) {
-			$params['schedule_fixed_day'] = 1;
-		} elseif ( $type == 'ultimo' ) {
-			$params['schedule_fixed_day'] = 28;
-		}
-
-		if ( $length = intval( self::get_interval( $post_id, $type, $type_data ) ) ) {
-			$params['interval_length'] = $length;
-		}
-
-		return $params;
-	}
-
-	public function create_plan( $post_id, $handle, $params ) {
-		try {
-			$result = reepay_s()->api()->request( 'plan', 'POST', $params );
-			update_post_meta( $post_id, '_reepay_subscription_handle', $handle );
-
-			return true;
-		} catch ( Exception $e ) {
-			$this->plan_error( $e->getMessage() );
-		}
-
-		return false;
-	}
-
-	public function get_default_params( $post_id ) {
-		$request_data = $this->get_meta_from_request();
-
-		$type      = get_post_meta( $post_id, '_reepay_subscription_schedule_type', true );
-		$type_data = get_post_meta( $post_id, '_reepay_subscription_' . $type, true );
-
-		$params = [
-			'name'        => $request_data['_reepay_subscription_name'],
-			'description' => get_post_field( 'post_content', $post_id ),
-			//'fixed_trial_days' => '', //@todo Уточнить что за поле в админке
-		];
-
-		if ( ! empty( $request_data['_reepay_subscription_renewal_reminder'] ) ) {
-			$params['renewal_reminder_email_days'] = intval( $request_data['_reepay_subscription_renewal_reminder'] );
-		}
-
-		if ( ! empty( $request_data['_reepay_subscription_trial'] ) && ! empty( $request_data['_reepay_subscription_trial']['reminder'] ) && ! empty( $request_data['_reepay_subscription_trial']['type'] ) ) {
-			$params['trial_reminder_email_days'] = intval( $request_data['_reepay_subscription_trial']['reminder'] );
-		}
-
-		if ( is_array( $type_data ) && ! empty( $type_data['period'] ) ) {
-			$params['partial_period_handling'] = $type_data['period'];
-		}
-
-		if ( ! empty( $request_data['_reepay_subscription_fee'] ) ) {
-			$fee                          = $request_data['_reepay_subscription_fee'];
-			$params['setup_fee']          = ! empty( $fee['amount'] ) ? floatval( $fee['amount'] ) * 100 : 0;
-			$params['setup_fee_text']     = ! empty( $fee['text'] ) ? $fee['text'] : '';
-			$params['setup_fee_handling'] = ! empty( $fee['handling'] ) ? $fee['handling'] : '';
-		}
-
-		if ( ! empty( $type_data['proration'] ) ) {
-			if ( $type_data['proration'] == 'full_day' ) {
-				$params['partial_proration_days'] = true;
-			} else {
-				$params['partial_proration_days'] = false;
-			}
-		}
-
-		if ( ! empty( $type_data['proration_minimum'] ) ) {
-			$params['minimum_prorated_amount'] = floatval( $type_data['proration_minimum'] );
-		}
-
-		$params['vat'] = self::get_vat( $post_id );
-
-		return $params;
 	}
 
 	public static function get_vat( $post_id ) {
@@ -942,7 +773,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$ret      = '';
 			if ( ! empty( $type_str ) ) {
 				$ret = sprintf(
-					__( $type_str, 'reepay-subscriptions-for-woocommerce' ),
+					$type_str,
 					$interval
 				);
 			}
@@ -1002,6 +833,41 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		return $ret;
+	}
+
+	public function add_setup_fee() {
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			if ( WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
+				$product = $cart_item['data'];
+				$fee     = $product->get_meta( '_reepay_subscription_fee' );
+				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
+					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
+					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
+				}
+			}
+		}
+	}
+
+	public function rework_total( $total_rows, $order, $tax_display ) {
+		$another_orders = get_post_meta( $order->get_id(), '_reepay_another_orders', true );
+		if ( ! empty( $another_orders ) ) {
+			$total = 0;
+			foreach ( $another_orders as $order_id ) {
+				$order_another = wc_get_order( $order_id );
+				$total         += floatval( $order_another->get_total() );
+			}
+
+			$total_rows['cart_subtotal'] = [
+				'label' => __( 'Subtotal:', 'woocommerce' ),
+				'value' => wc_price( $total )
+			];
+			$total_rows['order_total']   = [
+				'label' => __( 'Total:', 'woocommerce' ),
+				'value' => wc_price( $total )
+			];
+		}
+
+		return $total_rows;
 	}
 
 	protected function plan_error( $message ) {

@@ -8,28 +8,38 @@
 ?>
 <div class="show_if_reepay hidden">
 	<?php if ( ! $is_update ): ?>
-        <p class="form-field">
+        <p class="form-field" style="display: none">
             <label for="use_existing_coupon"><?php echo __( 'Coupon creation type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 			<?php echo __( 'Create new coupon', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input type="radio"
                    id="use_existing_coupon"
                    name="use_existing_coupon"
-                   value="false" checked/>
+                   value="false" />
             &nbsp&nbsp
 			<?php echo __( 'Use existing coupon', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input
-                    type="radio" id="use_existing_coupon"
+                    type="radio" id="use_existing_coupon" checked
                     name="use_existing_coupon"
                     value="true"/>
         </p>
         <div class="show_if_use_existing_coupon">
-            <p class="form-field">
+            <p class="form-field" style="display: flex">
                 <select name="_reepay_discount_use_existing_coupon_id" id="coupon_id" class="short">
                     <option value="">Select coupon</option>
 					<?php foreach ( $coupons as $coupon ): ?>
                         <option value="<?php echo esc_attr( $coupon['handle'] ) ?>"><?php echo esc_attr( $coupon['code'] ) ?></option>
 					<?php endforeach; ?>
                 </select>
+                <button class="button button-primary button-large js-refresh-coupons-list" style="margin-left: 5px;">
+		            <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+                </button>
+                <a class="button button-primary button-large"
+                   style="margin-left: 5px;"
+                       href="https://app.reepay.com/#/rp/config/discounts/create"
+                   target="_blank">
+		            <?php
+		            _e( 'Create new coupon', 'reepay-subscriptions-for-woocommerce' ) ?>
+                </a>
 				<?php if ( empty( $coupons ) ):
 					_e( 'No coupons found', 'reepay-subscriptions-for-woocommerce' );
 				endif; ?>
