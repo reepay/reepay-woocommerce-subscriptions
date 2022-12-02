@@ -88,10 +88,21 @@ class WC_Reepay_Import_Menu {
 	}
 
 	function import_page_callback() {
+        $page = $_GET['page'] ?? '';
+        $tab = $_GET['tab'] ?? '';
 		?>
         <div class="wrap">
             <h1><?php echo get_admin_page_title() ?></h1>
             <form method="post" action="options.php">
+                <ul class="subsubsub">
+                    <li><a href="http://reepay3.test/wp-admin/admin.php?page=wc-settings&tab=reepay_subscriptions"
+                           class="<?php echo $tab === 'reepay_subscriptions' ? 'current' : '' ?>">General</a> |
+                    </li>
+                    <li>
+                        <a href="http://reepay3.test/wp-admin/tools.php?page=reepay_import"
+                           class="<?php echo $page === 'reepay_import' ? 'current' : '' ?>">Import tools</a> |
+                    </li>
+                </ul>
 				<?php
 				settings_fields( 'reepay_import_settings' ); // settings group name
 				do_settings_sections( 'reepay_import' ); // just a page slug
