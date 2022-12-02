@@ -430,9 +430,9 @@ class WC_Reepay_Subscription_Addons {
 	 */
 	protected function get_posted_product_addons( $post_id ) {
 		$product_addons = [];
-		if ( isset( $_POST['product_addon_name'] ) ) {
+		if ( isset( $_POST['addon_choose_exist'] ) ) {
 
-			for ( $i = 0; $i < sizeof( $_POST['product_addon_name'] ); $i ++ ) {
+			for ( $i = 0; $i < sizeof( $_POST['addon_choose_exist'] ); $i ++ ) {
 				$data = [];
 
 				if ( ! empty( $_POST['addon_choose_exist'][ $i ] ) ) {
