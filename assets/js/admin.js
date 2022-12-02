@@ -487,6 +487,15 @@ jQuery(function ($) {
         }
 
         $container.html('')
+        const $select = $('[name="_reepay_discount_use_existing_coupon_id"]')
+            .parent()
+            .block({
+                message: null,
+                overlayCSS: {
+                    background: '#fff',
+                    opacity: 0.6
+                }
+            });
 
         $.ajax({
             url: window.reepay.rest_urls.get_coupon + `?handle=${handle}`,
@@ -507,7 +516,7 @@ jQuery(function ($) {
 
             },
             complete: function () {
-
+                $select.unblock();
             },
         })
     }
@@ -524,8 +533,6 @@ jQuery(function ($) {
                 }
 
                 let discount = response_data.discount
-
-                console.log(discount)
 
                 discount_set_data(discount, $container)
 
@@ -575,7 +582,7 @@ jQuery(function ($) {
         $.each( $selects, function () {
             const $select = $(this);
 
-        const $container = $select.parents('.options_group')
+            const $container = $select.parents('.options_group')
                 .block({
                     message: null,
                     overlayCSS: {
@@ -605,6 +612,48 @@ jQuery(function ($) {
                     }
 
                     $select.html($(response_data.html).html())
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+                    $container.unblock();
+                },
+            })
+        } );
+    })
+
+    $body.on('click', '.js-refresh-coupons-list', function (e) {
+        e.preventDefault();
+
+        const $selects = $('[name="_reepay_discount_use_existing_coupon_id"]');
+
+        $.each( $selects, function () {
+            const $select = $(this);
+
+            const $container = $select.parents('.form-field')
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
+            let url = `${window.reepay.rest_urls.get_coupon}?get_list=1`;
+
+            $.ajax({
+                url,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response_data) {
+                    if (!response_data.success) {
+                        return;
+                    }
+                    console.log($select, response_data.html);
+                    $select.html(response_data.html)
                 },
                 error: function (request, status, error) {
                     alert('Request error. Try again')
