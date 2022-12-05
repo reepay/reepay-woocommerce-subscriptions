@@ -43,10 +43,12 @@
             <span><?php echo $month_data['month'] ?></span>
             <span><?php _e( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
-        <p class="form-field">
-            <label for="#"><?php _e( 'On this day of the month', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php echo $month_data['day'] ?></span>
-        </p>
+		<?php if ( ! empty( $month_data['day'] ) ) : ?>
+            <p class="form-field">
+                <label for="#"><?php _e( 'On this day of the month', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+                <span><?php echo $month_data['day'] ?></span>
+            </p>
+        <?php endif; ?>
         <p class="form-field">
             <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $month_data['period'] ?? '' ] ?? '' ?></span>
