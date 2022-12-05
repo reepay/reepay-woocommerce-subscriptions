@@ -313,6 +313,7 @@ class WC_Reepay_Renewals {
 
 			$addons = array_merge( self::get_shipping_addons( $order ), self::get_plan_addons( $order_item ) ?: [] );
 
+
 			$new_subscription = null;
 			try {
 				/**
@@ -347,7 +348,7 @@ class WC_Reepay_Renewals {
 
 
 				if ( ! empty( $addons ) ) {
-					$sub_data['add_ons'] = $addons;
+					$sub_data['add_ons'] = array_unique( $addons );
 				}
 
 				if ( $main_order->get_id() !== $order->get_id() ) {
