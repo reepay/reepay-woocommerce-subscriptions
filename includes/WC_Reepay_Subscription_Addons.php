@@ -33,9 +33,9 @@ class WC_Reepay_Subscription_Addons {
 			$addons_info = [];
 
 			foreach ( $values['addons'] as $addon ) {
-			    /**
-                 * @see https://reference.reepay.com/api/#the-add-on-object
-                 */
+				/**
+				 * @see https://reference.reepay.com/api/#the-add-on-object
+				 */
 				$result = reepay_s()->api()->request( "add_on/{$addon['handle']}" );
 
 				$addons_info_item = [
@@ -53,8 +53,8 @@ class WC_Reepay_Subscription_Addons {
 				$key   = $addon['name'];
 				$price = $addon['amount'];
 				if ( ! empty( $addon['quantity'] ) && apply_filters( 'woocommerce_addons_add_price_to_name', '__return_true' ) ) {
-					$key   .= ' x' . $addon['quantity'];
-					$price = $price * intval( $addon['quantity'] );
+					$key                          .= ' x' . $addon['quantity'];
+					$price                        = $price * intval( $addon['quantity'] );
 					$addons_info_item['quantity'] = intval( $addon['quantity'] );
 				}
 
@@ -242,7 +242,7 @@ class WC_Reepay_Subscription_Addons {
 
 		$plan_handle = get_post_meta( $product->get_id(), '_reepay_subscription_handle', true );
 
-		$addons_list = $this->get_reepay_addons_list( $plan_handle, true );
+		$addons_list = self::get_reepay_addons_list( $plan_handle, true );
 		wc_get_template(
 			'admin-addons-panel.php',
 			[
@@ -260,7 +260,7 @@ class WC_Reepay_Subscription_Addons {
 	 *
 	 * @return mixed
 	 */
-	public function get_reepay_addons_list( $plan_handle = false, $drop_cache = false ) {
+	public static function get_reepay_addons_list( $plan_handle = false, $drop_cache = false ) {
 		$addons_list = $drop_cache ? null : get_option( 'reepay_s_addons_list' );
 
 		if ( ! empty( $addons_list ) ) {
@@ -269,7 +269,9 @@ class WC_Reepay_Subscription_Addons {
 
 		try {
 			$addons_list = reepay_s()->api()->request( "add_on?size=100" );
-
+			/*echo '<pre>';
+			var_dump( $addons_list );
+			exit;*/
 			if ( ! empty( $addons_list['content'] ) ) {
 				foreach ( $addons_list['content'] as $i => $addon ) {
 					if ( ! $addon['all_plans'] && ( ! empty( $plan_handle ) && ! in_array( $plan_handle, $addon['eligible_plans'] ) ) ) {
@@ -328,26 +330,28 @@ class WC_Reepay_Subscription_Addons {
 	}
 
 	public function save_to_reepay( $product_addon, $post_id, $i ) {
-	    $product = wc_get_product( $post_id );
+		$product = wc_get_product( $post_id );
 
 		if ( $product->is_type( 'reepay_simple_subscriptions' ) ) {
-		    $plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
+			$plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
 
 			if ( empty( $plan_handle ) ) {
 				WC_Reepay_Subscription_Admin_Notice::add_notice( 'Wrong plan_handle. Order - #' . $post_id );
+
 				return [];
 			}
 
 			$plan_handles = [ $plan_handle ];
 		} elseif ( $product->is_type( 'reepay_variable_subscriptions' ) ) {
-			$plan_handles = [];
+			$plan_handles   = [];
 			$children_posts = $product->get_children();
 
 			foreach ( $children_posts as $children_post ) {
-			    $plan_handle = get_post_meta( $children_post, '_reepay_subscription_handle', true );
+				$plan_handle = get_post_meta( $children_post, '_reepay_subscription_handle', true );
 
 				if ( empty( $plan_handle ) ) {
 					WC_Reepay_Subscription_Admin_Notice::add_notice( 'Wrong plan_handle. Variation - #' . $children_post );
+
 					return [];
 				}
 
@@ -389,36 +393,44 @@ class WC_Reepay_Subscription_Addons {
 
 	public function add_plan_to_addon( $post_id, $handle ) {
 
-		$plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
-
 		$product = wc_get_product( $post_id );
 
-		try {
-			$result = reepay_s()->api()->request( "add_on/" . $handle );
-			if ( ! $result['all_plans'] ) {
 
-				if ( $product->is_type( 'reepay_variable_subscriptions' ) ) {
-					$variations = $product->get_available_variations();
-					if ( ! empty( $variations ) ) {
-						$plan_handle = [];
-						foreach ( $variations as $loop => $variation ) {
-							$plan_handle                = 'plan_' . $loop . '_' . $variation['variation_id'];
+		if ( $product->is_type( 'reepay_simple_subscriptions' ) ) {
+			$plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
+
+
+			$plan_handles = [ $plan_handle ];
+		} elseif ( $product->is_type( 'reepay_variable_subscriptions' ) ) {
+			$plan_handles   = [];
+			$children_posts = $product->get_children();
+
+			foreach ( $children_posts as $children_post ) {
+				$plan_handle = get_post_meta( $children_post, '_reepay_subscription_handle', true );
+
+				$plan_handles[] = $plan_handle;
+			}
+		}
+
+
+		if ( ! empty( $plan_handles ) ) {
+			foreach ( $plan_handles as $plan_handle ) {
+				try {
+					$result = reepay_s()->api()->request( "add_on/" . $handle );
+					if ( ! $result['all_plans'] ) {
+						if ( empty( $result['eligible_plans'] ) ) {
+							$result['eligible_plans'] = [ $plan_handle ];
+						} elseif ( ! in_array( $plan_handle, $result['eligible_plans'] ) ) {
 							$result['eligible_plans'][] = $plan_handle;
 						}
+
+						reepay_s()->api()->request( "add_on/$handle", 'PUT', $result );
 					}
-				} else {
-					if ( empty( $result['eligible_plans'] ) ) {
-						$result['eligible_plans'] = [ $plan_handle ];
-					} elseif ( ! in_array( $result['eligible_plans'], $plan_handle ) ) {
-						$result['eligible_plans'][] = $plan_handle;
-					}
+
+				} catch ( Exception $e ) {
+					WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
 				}
-
-				reepay_s()->api()->request( "add_on/$handle", 'PUT', $result );
 			}
-
-		} catch ( Exception $e ) {
-			WC_Reepay_Subscription_Admin_Notice::add_notice( $e->getMessage() );
 		}
 
 	}
@@ -430,35 +442,20 @@ class WC_Reepay_Subscription_Addons {
 	 */
 	protected function get_posted_product_addons( $post_id ) {
 		$product_addons = [];
-		if ( isset( $_POST['product_addon_name'] ) ) {
+		if ( isset( $_POST['addon_choose_exist'] ) ) {
 
-			for ( $i = 0; $i < sizeof( $_POST['product_addon_name'] ); $i ++ ) {
+			for ( $i = 0; $i < sizeof( $_POST['addon_choose_exist'] ); $i ++ ) {
 				$data = [];
 
-				if ( $_POST['_reepay_addon_choose'][ $i ] == 'exist' && ! empty( $_POST['addon_choose_exist'][ $i ] ) ) {
+				if ( ! empty( $_POST['addon_choose_exist'][ $i ] ) ) {
 					$data = $this->get_reepay_addon_data( sanitize_text_field( $_POST['addon_choose_exist'][ $i ] ) );
 					$this->add_plan_to_addon( $post_id, sanitize_text_field( $_POST['addon_choose_exist'][ $i ] ) );
-					$data['choose']   = sanitize_text_field( $_POST['_reepay_addon_choose'][ $i ] );
+					$data['choose']   = sanitize_text_field( 'exist' );
 					$data['position'] = intval( $_POST['product_addon_position'][ $i ] );
-					$data['avai']     = sanitize_text_field( $_POST['_reepay_addon_avai'][ $i ] );
-				} else {
-					if ( ! isset( $_POST['product_addon_name'][ $i ] ) || ( '' == $_POST['product_addon_name'][ $i ] ) ) {
-						continue;
+					if ( ! empty( $_POST['_reepay_addon_avai'] ) ) {
+						$data['avai'] = sanitize_text_field( $_POST['_reepay_addon_avai'][ $i ] );
 					}
 
-					$data['name']        = sanitize_text_field( $_POST['product_addon_name'][ $i ] );
-					$data['description'] = wp_kses_post( $_POST['product_addon_description'][ $i ] );
-					$data['type']        = ! empty( $_POST['product_addon_type'][ $i ] ) ? sanitize_text_field( $_POST['product_addon_type'][ $i ] ) : '';
-					$data['position']    = sanitize_text_field( $_POST['product_addon_position'][ $i ] );
-					$data['avai']        = sanitize_text_field( $_POST['_reepay_addon_avai'][ $i ] );
-					$data['amount']      = wc_format_decimal( stripslashes( $_POST['product_addon_amount'][ $i ] ) );
-					$data['vat']         = WC_Reepay_Subscription_Plan_Simple::get_vat( $post_id );
-					$data['vat_type']    = wc_prices_include_tax();
-					$data['handle']      = sanitize_text_field( $_POST['product_addon_handle'][ $i ] );
-					$data['choose']      = sanitize_text_field( $_POST['_reepay_addon_choose'][ $i ] );
-					$data['exist']       = sanitize_text_field( $_POST['addon_choose_exist'][ $i ] );
-
-					$data = $this->save_to_reepay( $data, $post_id, $i );
 				}
 
 

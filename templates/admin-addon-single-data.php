@@ -6,11 +6,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( empty( $addon['choose'] ) ) {
-	$addon['choose'] = 'new';
+	$addon['choose'] = 'exist';
 }
 
 if ( empty( $addon['disabled'] ) ) {
-	$addon['disabled'] = false;
+	$addon['disabled'] = true;
 }
 
 global $post;

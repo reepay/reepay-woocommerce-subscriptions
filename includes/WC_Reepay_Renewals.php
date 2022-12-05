@@ -313,6 +313,7 @@ class WC_Reepay_Renewals {
 
 			$addons = array_merge( self::get_shipping_addons( $order ), self::get_plan_addons( $order_item ) ?: [] );
 
+
 			$new_subscription = null;
 			try {
 				/**
@@ -347,7 +348,7 @@ class WC_Reepay_Renewals {
 
 
 				if ( ! empty( $addons ) ) {
-					$sub_data['add_ons'] = $addons;
+					$sub_data['add_ons'] = array_unique( $addons );
 				}
 
 				if ( $main_order->get_id() !== $order->get_id() ) {
@@ -647,7 +648,7 @@ class WC_Reepay_Renewals {
 				foreach ( $items as $item ) {
 					if ( $item->is_type( 'line_item' ) ) {
 						$product = $item->get_product();
-						if ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) {
+						if ( $product && ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) ) {
 							if ( $product->get_meta( '_reepay_subscription_name' ) == $invoice_lines['ordertext'] ) {
 								$is_exist    = true;
 								$new_items[] = $item;

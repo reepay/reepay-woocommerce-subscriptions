@@ -133,7 +133,7 @@ class WC_Reepay_Subscription_API {
 				if ( ! empty( $body->message ) ) {
 					$error .= ' - ' . $body->message;
 				}
-				throw new Exception( sprintf( __( 'API Error (request): %s. HTTP Code: %s', 'reepay-subscriptions-for-woocommerce' ), $error, $http_code ) );
+				throw new Exception( sprintf( __( 'API Error (request): %s. HTTP Code: %s. Endpoint: %s', 'reepay-subscriptions-for-woocommerce' ), $error, $http_code, $url ) );
 			default:
 				if ( $this->debug ) {
 					throw new Exception( $body );

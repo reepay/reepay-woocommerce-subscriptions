@@ -12,6 +12,11 @@
     vertical-align: baseline;
 }
 
+.variable_pricing .form-field {
+    display: flex;
+    flex-direction: column;
+}
+
 #reepay_subscription_publish_btn.reepay_subscription_publish_btn p.form-field {
     padding-left: 4px !important;
 }
@@ -186,6 +191,10 @@
     width: 100%;
 }
 
+[for="_subscription_fee"] {
+    width: 100%;
+}
+
 .reepay-subscriptions-page .column-status {
     width: 8%;
 }
@@ -241,10 +250,6 @@ p.form-field span.form-field_time-type {
     margin-left: 9px;
 }
 
-.reepay_subscription_supersedes_block {
-    display: none;
-}
-
 .reepay_subscription_variable {
     padding: 5px;
     border: 1px solid #eee;
@@ -253,4 +258,34 @@ p.form-field span.form-field_time-type {
 .reepay_subscription_settings_exist.variable .options_group {
     border-top: 1px solid #fff;
     border-bottom: 1px solid #eee;
+}
+
+.addon_name select {
+    margin-bottom: 10px !important;
+}
+
+.choose-plan-variable .form-field {
+    display: flex !important;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+}
+
+.choose-plan-variable .form-field label, .choose-plan-variable .form-field select {
+    margin-right: 10px;
+}
+
+.choose-plan-variable .form-field a {
+    margin-top: 0 !important;
+}
+
+.reepay_subscription_variable .reepay_subscription_fee .form-field {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.reepay_subscription_variable .reepay_subscription_publish_btn .form-field {
+    flex-direction: row;
 }

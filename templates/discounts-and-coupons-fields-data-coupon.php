@@ -12,6 +12,7 @@
             value="<?php echo esc_attr( $meta['_reepay_discount_name'][0] ?? '' ) ?>"
             class="reepay-required"
             required
+	    <?php echo $is_update ? 'disabled="disabled"' : '' ?>
     />
 </p>
 <!--End Name -->

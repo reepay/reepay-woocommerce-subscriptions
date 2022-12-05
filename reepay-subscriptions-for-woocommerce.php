@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.6
+ * Version: 1.0.7
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -161,6 +161,18 @@ class WooCommerce_Reepay_Subscriptions {
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 		add_action( 'admin_init', [ $this, 'reepay_admin_notices' ] );
 		add_action( 'init', [ $this, 'init' ] );
+
+		if ( ! has_action( 'woocommerce_admin_field_hr' ) ) {
+			add_action( 'woocommerce_admin_field_hr', [ $this, 'hr_field' ] );
+		}
+
+	}
+
+	public function hr_field() {
+		?>
+        <tr valign="top" class="" style="border-top: 1px solid #c3c4c7">
+        </tr>
+		<?php
 	}
 
 	public static function install() {
@@ -319,6 +331,20 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function settings_tab() {
+        $page = $_GET['page'] ?? '';
+        $tab = $_GET['tab'] ?? '';
+	    ?>
+        <ul class="subsubsub">
+            <li><a href="<?php echo admin_url('admin.php?page=wc-settings&tab=reepay_subscriptions') ?>"
+                   class="<?php echo $tab === 'reepay_subscriptions' ? 'current' : '' ?>">General</a> |
+            </li>
+            <li>
+                <a href="<?php echo admin_url('tools.php?page=reepay_import') ?>"
+                   class="<?php echo $page === 'reepay_import' ? 'current' : '' ?>">Import tools</a> |
+            </li>
+        </ul>
+        <br class="clear">
+        <?php
 		woocommerce_admin_fields( static::get_settings() );
 	}
 
@@ -367,6 +393,10 @@ class WooCommerce_Reepay_Subscriptions {
 				'type' => 'checkbox',
 				'desc' => __( 'Enable API logging. Logs can be seen in WooCommerce > Status > Logs', reepay_s()->settings( 'domain' ) ),
 				'id'   => '_reepay_debug'
+			],
+			'hr_subscriptions'                           => [
+				'type' => 'hr',
+				'id'   => 'hr_subscriptions',
 			],
 			/*'api_private_key'                        => [
 				'name' => __( 'Private Key Live', 'reepay-subscriptions-for-woocommerce' ),
@@ -439,12 +469,20 @@ class WooCommerce_Reepay_Subscriptions {
 				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_orders_default_subscription_status'
 			],
+			'hr_suborders'                               => [
+				'type' => 'hr',
+				'id'   => 'hr_suborders',
+			],
 			'_reepay_suborders_default_renew_status'     => [
 				'name'    => __( 'Suborders default status after renew', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
 				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_suborders_default_renew_status'
+			],
+			'hr_date'                                    => [
+				'type' => 'hr',
+				'id'   => 'hr_date',
 			],
 			'_reepay_manual_start_date'                  => [
 				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
@@ -577,6 +615,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Import();
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
+		new WC_Reepay_Sync();
 	}
 }
 

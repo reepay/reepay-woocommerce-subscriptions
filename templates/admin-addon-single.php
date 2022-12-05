@@ -14,8 +14,8 @@ global $post;
 ?>
 <div class="woocommerce_product_addon wc-metabox closed">
     <h3>
-        <button type="button"
-                class="remove_addon button"><?php _e( 'Remove', 'reepay-subscriptions-for-woocommerce' ); ?></button>
+        <!--<button type="button"
+                class="remove_addon button"><?php /*_e( 'Remove', 'reepay-subscriptions-for-woocommerce' ); */ ?></button>-->
 
         <div class="handlediv" title="<?php _e( 'Click to toggle', 'reepay-subscriptions-for-woocommerce' ); ?>"></div>
         <strong><?php _e( 'Add-on', 'reepay-subscriptions-for-woocommerce' ); ?>: <span
@@ -35,47 +35,28 @@ global $post;
 
 
     <table class="wc-metabox-content">
-        <tr>
-            <td class="addon_name">
-                <p class="form-row choose-radio">
-                    <label for="_reepay_subscription_choose"><?php echo __( 'Creation type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-                    &nbsp&nbsp<?php echo __( 'Create new add-on', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
-                    <input type="radio" id="_reepay_subscription_choose"
-                           name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
-                           value="new" <?php checked( 'new', esc_attr( $addon['choose'] ) ); ?>>
-                    &nbsp&nbsp<?php echo __( 'Choose existing add-on', 'reepay-subscriptions-for-woocommerce' ); ?>
-                    &nbsp
-                    <input type="radio" id="_reepay_subscription_choose"
-                           name="_reepay_addon_choose[<?php echo esc_attr( $loop ); ?>]"
-                           value="exist" <?php checked( 'exist', esc_attr( $addon['choose'] ) ); ?>>
-                </p>
-            </td>
-        </tr>
-        <tbody class="new-addon <?php echo $addon['choose'] == 'exist' ? 'hidden' : '' ?>">
-		<?php
-		wc_get_template(
-			'admin-addon-single-data.php',
-			[
-				'addon'  => $addon,
-				'loop'   => $loop,
-				'domain' => 'reepay-subscriptions-for-woocommerce',
-			],
-			'',
-			reepay_s()->settings( 'plugin_path' ) . 'templates/'
-		);
-		?>
-        </tbody>
-        <tbody class="exist <?php echo $addon['choose'] == 'new' ? 'hidden' : '' ?>">
+        <tbody class="exist">
         <tr>
             <td class="addon_name" style="width: 100%">
 				<?php if ( ! empty( $addons_list ) ): ?>
-                    <select id="_subscription_choose_exist" name="addon_choose_exist[<?php echo $loop; ?>]"
+                    <select name="addon_choose_exist[<?php echo $loop; ?>]"
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">
                         <option value=""><?php echo __( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ); ?></option>
 						<?php foreach ( $addons_list as $addon_rem ): ?>
                             <option value="<?php echo esc_attr( $addon_rem['handle'] ) ?>" <?php ! empty( $addon['exist'] ) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'] ) : '' ?>><?php echo esc_attr( $addon_rem['name'] ) ?></option>
 						<?php endforeach; ?>
                     </select>
+
+                    <button class="button button-primary button-large js-refresh-addons-list">
+						<?php _e( 'Refresh list', 'reepay-subscriptions-for-woocommerce' ) ?>
+                    </button>
+                    <a class="button button-primary button-large"
+                       style="margin-left: 5px;"
+                       href="https://app.reepay.com/#/rp/config/addons/create"
+                       target="_blank">
+						<?php
+						_e( 'Create new addon', 'reepay-subscriptions-for-woocommerce' ) ?>
+                    </a>
 				<?php else: ?>
 					<?php echo __( 'Add-ons list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
 				<?php endif; ?>

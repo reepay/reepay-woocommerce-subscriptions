@@ -23,10 +23,11 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 			"args"                => array(
 				"handle" => array(
 					"type"              => "string",
-					"required"          => true,
-					"validate_callback" => function ( $param, $request, $key ) {
-						return ! empty( $param );
-					},
+					"required"          => false,
+				),
+				"product_id" => array(
+					"type"              => "string",
+					"required"          => false,
 				),
 			)
 		] );
@@ -39,18 +40,74 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @throws Exception
-	 * @since 4.7.0
 	 *
 	 */
 	public function get_item( $request ) {
+		if ( !empty( $request['get_list'] ) ) {
+			return $this->get_list( $request );
+		} else {
+			return $this->get_info( $request );
+		}
+	}
+
+	/**
+	 * Get all reepay plans
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 * @throws Exception
+	 *
+	 */
+	public function get_list( $request ) {
+		try {
+			ob_start();
+
+			wc_get_template(
+				'plan-subscription-plans-select.php', [
+					'plans_list' => reepay_s()->plan( $request['product_id'] ?? 0 )->get_reepay_plans_list(),
+					'current'    => $request['handle'],
+					'loop'       => $request['loop'] ?? '',
+					'data_plan'  => json_encode( [
+						'product_id' => $request['product_id'] ?? 0,
+						'loop'       => $request['loop'] ?? '',
+					] ),
+				],
+				'',
+				reepay_s()->settings( 'plugin_path' ) . 'templates/'
+			);
+
+			return new WP_REST_Response( [
+				'success' => true,
+				'html'    => ob_get_clean(),
+			] );
+		} catch ( Exception $e ) {
+			reepay_s()->log()->log( [
+				'source'  => 'WC_Reepay_Subscription_Plan_Simple_Rest::get_item',
+				'message' => 'Getting plan error',
+				'handle'  => $request['handle']
+			], 'error' );
+
+			return new WP_Error( 400, $e->getMessage() );
+		}
+	}
+
+	/**
+	 * Get reepay plan info by handle
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 *
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 * @throws Exception
+	 *
+	 */
+	public function get_info( $request ) {
 		try {
 			$plan = reepay_s()->plan( $request['product_id'] );
 			$plan_meta_data                            = $plan->get_remote_plan_meta( $request['handle'] );
 			$plan_meta_data['disabled']                = true;
 			$plan_meta_data['plans_list']              = reepay_s()->plan()->get_reepay_plans_list() ?: [];
 			$plan_meta_data['domain']                  = 'reepay-subscriptions-for-woocommerce';
-			$plan_meta_data['is_exist']                = true;
-			$plan_meta_data['is_creating_new_product'] = false;
 
 			if ( isset( $request['loop'] ) ) {
 				$plan_meta_data['loop'] = $request['loop'];
