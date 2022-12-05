@@ -137,6 +137,13 @@ class WC_Reepay_Subscription_Admin_Notice {
 						);
 					}
 
+					if ( ! empty( $sub ) && $sub['state'] == 'active' ) {
+						$ret = array(
+							'state'   => 'paid',
+							'message' => 'Order has been paid'
+						);
+					}
+
 				} catch ( Exception $exception ) {
 					$ret = array(
 						'state'   => 'failed',
