@@ -252,7 +252,9 @@ p.form-field span.form-field_time-type {
 
 .reepay_subscription_variable {
     padding: 5px;
-    border: 1px solid #eee;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #c3c4c7;
 }
 
 .reepay_subscription_settings_exist.variable .options_group {
@@ -288,4 +290,8 @@ p.form-field span.form-field_time-type {
 
 .reepay_subscription_variable .reepay_subscription_publish_btn .form-field {
     flex-direction: row;
+}
+
+#_reepay_subscription_handle {
+    max-width: 30%;
 }

@@ -794,6 +794,7 @@ jQuery(function ($) {
                 $select,
                 $container.find('.reepay_subscription_settings_exist')
             );
+            $('.reepay_subscription_publish_btn').show()
         })
     }
 

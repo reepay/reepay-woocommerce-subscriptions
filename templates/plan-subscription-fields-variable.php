@@ -8,7 +8,6 @@
 ?>
 
 <div class="reepay_subscription_variable show_if_reepay_subscription">
-    <h6 style="padding:0;margin: 0;font-size:18px;"><?php _e( 'Reepay plan options', 'reepay-subscriptions-for-woocommerce' ) ?></h6>
 
     <div class="reepay_subscription_container">
         <div class="options_group choose-plan-variable">
@@ -49,7 +48,7 @@
     </div>
 
     <div id="reepay_subscription_publish_btn"
-         class="options_group reepay_subscription_publish_btn">
+         class="options_group reepay_subscription_publish_btn <?= empty( $_reepay_subscription_handle ) ? 'hidden' : '' ?>">
         <p class="form-field">
             <input type="submit" name="save" id="reepay-publish" class="button button-primary button-large"
                    value="<?php _e( 'Save plan to variation', 'reepay-subscriptions-for-woocommerce' ) ?>">
