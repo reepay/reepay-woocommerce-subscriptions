@@ -409,6 +409,7 @@ jQuery(function ($) {
 
     function show_settings() {
         const $variablePricing = $('.woocommerce_variation .variable_pricing');
+        $('[name*="_reepay_subscription_handle"]').select2();
 
         if ('reepay_variable_subscriptions' === $selectProductType.val() ||
             'variable' === $selectProductType.val()) {

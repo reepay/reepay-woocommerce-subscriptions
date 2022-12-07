@@ -5,7 +5,7 @@ $loop = isset($loop) ? "[$loop]" : '';
 
 <select id="_reepay_subscription_handle"
         name="_reepay_subscription_handle<?php echo $loop ?>"
-        class="wc_input_subscription_period_interval"
+        class="wc_input_subscription_period_interval select2"
 	<?php if ( isset( $data_plan ) ) : ?>
 		data-plan='<?php echo esc_html( $data_plan ) ?>'
 	<?php endif; ?>>
