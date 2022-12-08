@@ -23,11 +23,11 @@
 	        );
             ?>
 
-            <button class="button button-primary button-large js-refresh-plans-list" style="margin-left: 5px;">
+            <button class="button button-primary button-large js-refresh-plans-list">
 		        <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
             </button>
+
             <a class="button button-primary button-large"
-               style="margin-left: 5px;"
                href="https://app.reepay.com/#/rp/config/plans/create"
                target="_blank">
 		        <?php
