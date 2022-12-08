@@ -14,7 +14,7 @@
             <input type="radio"
                    id="use_existing_coupon"
                    name="use_existing_coupon"
-                   value="false" />
+                   value="false"/>
             &nbsp&nbsp
 			<?php echo __( 'Use existing coupon', 'reepay-subscriptions-for-woocommerce' ); ?> &nbsp
             <input
@@ -31,14 +31,14 @@
 					<?php endforeach; ?>
                 </select>
                 <button class="button button-primary button-large js-refresh-coupons-list" style="margin-left: 5px;">
-		            <?php _e( 'Refresh list',  'reepay-subscriptions-for-woocommerce' ) ?>
+					<?php _e( 'Refresh list', 'reepay-subscriptions-for-woocommerce' ) ?>
                 </button>
                 <a class="button button-primary button-large"
                    style="margin-left: 5px;"
-                       href="https://app.reepay.com/#/rp/config/discounts/create"
+                   href="https://app.reepay.com/#/rp/config/coupons/create"
                    target="_blank">
-		            <?php
-		            _e( 'Create new coupon', 'reepay-subscriptions-for-woocommerce' ) ?>
+					<?php
+					_e( 'Create new coupon', 'reepay-subscriptions-for-woocommerce' ) ?>
                 </a>
 				<?php if ( empty( $coupons ) ):
 					_e( 'No coupons found', 'reepay-subscriptions-for-woocommerce' );
