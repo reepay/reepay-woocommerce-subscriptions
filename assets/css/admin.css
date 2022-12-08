@@ -12,11 +12,6 @@
     vertical-align: baseline;
 }
 
-.variable_pricing .form-field {
-    display: flex;
-    flex-direction: column;
-}
-
 #reepay_subscription_publish_btn.reepay_subscription_publish_btn p.form-field {
     padding-left: 4px !important;
 }
@@ -294,4 +289,19 @@ p.form-field span.form-field_time-type {
 .reepay_subscription_container .select2-container {
     width: 100% !important;
     margin-bottom: 12px;
+}
+
+.reepay_subscription_variable .form-field {
+    padding: 5px 20px 5px 162px!important;
+}
+
+.reepay_subscription_variable .form-field label {
+    float: left;
+    width: 150px;
+    padding: 0;
+    margin: 0 0 0 -150px;
+}
+
+.reepay_subscription_variable .form-field select.short {
+    width: 50%;
 }
