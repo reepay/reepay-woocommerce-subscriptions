@@ -50,7 +50,7 @@
             </p>
         <?php endif; ?>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $month_data['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -85,7 +85,7 @@
             <span><?php _e( 'Jan, Apr, Jul, Oct', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $quarter_data['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -112,7 +112,7 @@
             <span><?php _e( 'Jan, Jul', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $_reepay_subscription_half_yearly['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -139,7 +139,7 @@
             <span><?php _e( 'Jan', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $_reepay_subscription_month_startdate_12['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -164,7 +164,7 @@
             <span> <?php echo WC_Reepay_Subscription_Plan_Simple::$number_to_week_day[ intval( $weekly_fixedday['day'] ?? '0' ) ] ?? '' ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $_reepay_subscription_weekly_fixedday['period'] ?? '' ] ?? '' ?></span>
         </p>
 
