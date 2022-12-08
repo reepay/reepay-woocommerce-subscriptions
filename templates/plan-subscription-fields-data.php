@@ -81,7 +81,7 @@
             <span><?php _e( '3rd Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Fixed Months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Fixed months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php _e( 'Jan, Apr, Jul, Oct', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
@@ -108,7 +108,7 @@
             <span><?php _e( '1st', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Fixed Months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Fixed months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php _e( 'Jan, Jul', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
@@ -135,7 +135,7 @@
             <span><?php _e( '1st', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Fixed Months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Fixed months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php _e( 'Jan', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
