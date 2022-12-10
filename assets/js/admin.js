@@ -558,7 +558,17 @@ jQuery(function ($) {
 
         $container
             .show()
-            .html('<span class="spinner is-active" style="margin:0;float:unset"></span>');
+            .html('');
+
+        $select
+            .parent()
+            .block({
+            message: null,
+            overlayCSS: {
+                background: '#fff',
+                opacity: 0.6
+            }
+        });
 
         const $submitBtn = $container
             .parents('.variable_pricing')
@@ -585,14 +595,23 @@ jQuery(function ($) {
                     return;
                 }
 
-                $container.html(`<div style="width: 100%">${response_data.html}</div>`)
+                $container
+                    .html(`<div style="width: 100%">${response_data.html}</div>`)
+                    .find('.woocommerce-help-tip')
+                    .tipTip({
+                        'attribute': 'data-tip',
+                        'fadeIn': 50,
+                        'fadeOut': 50,
+                        'delay': 200
+                    });
+
                 $submitBtn.show();
             },
             error: function (request, status, error) {
 
             },
             complete: function () {
-
+                $select.parent().unblock();
             },
         })
     }
@@ -704,6 +723,16 @@ jQuery(function ($) {
                 $('.fee-fields').hide();
             }
 
+            $select
+                .parent()
+                .block({
+                    message: null,
+                    overlayCSS: {
+                        background: '#fff',
+                        opacity: 0.6
+                    }
+                });
+
             const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
             const product_id = dataPlan.product_id || window.reepay.product.id
 
@@ -730,7 +759,7 @@ jQuery(function ($) {
                     alert('Request error. Try again')
                 },
                 complete: function () {
-                    //$container.unblock();
+                    $select.parent().unblock();
                 },
             })
         });
