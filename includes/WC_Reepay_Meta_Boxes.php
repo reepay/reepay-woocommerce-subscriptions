@@ -4,6 +4,12 @@
  * Class WC_Reepay_Meta_Boxes
  */
 class WC_Reepay_Meta_Boxes {
+
+	/**
+	 * @var string
+	 */
+	private $dashboard_url = 'https://app.reepay.com/#/rp/';
+
 	/**
 	 * WC_Reepay_Meta_Boxes constructor.
 	 */
@@ -32,14 +38,18 @@ class WC_Reepay_Meta_Boxes {
 			return;
 		}
 
-		add_meta_box(
-			'reepay_checkout_customer',
-			__( 'Customer' ),
-			array( $this, 'generate_meta_box_content_customer' ),
-			'shop_order',
-			'side',
-			'high'
-		);
+		if ( ! empty( get_post_meta( $post->ID, '_reepay_customer', true ) ) ) {
+			add_meta_box(
+				'reepay_checkout_customer',
+				__( 'Customer' ),
+				array( $this, 'generate_meta_box_content_customer' ),
+				'shop_order',
+				'side',
+				'high'
+			);
+		}
+
+
 
 		add_meta_box(
 			'reepay_checkout_invoice',
@@ -67,7 +77,19 @@ class WC_Reepay_Meta_Boxes {
 	 * @param array $args additional arguments sent to add_meta_box function
 	 */
 	public function generate_meta_box_content_customer( $post, $args ) {
-		
+		$template_args = [
+			'email' => get_post_meta($post->ID, '_billing_email', true),
+			'handle' => get_post_meta($post->ID, '_reepay_customer', true)
+		];
+
+		$template_args['link'] = $this->dashboard_url . 'customers/customers/customer/' . $template_args['handle'];
+
+		wc_get_template(
+			'meta-boxes/customer.php',
+			$template_args,
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
 	}
 
 	/**
