@@ -2,6 +2,9 @@ jQuery(function ($) {
     const $body = $('body');
     const $selectProductType = $('select#product-type');
 
+    var linksToMenu = $('a[href="admin.php?page=reepay-subscriptions-for-woocommerce"]');
+    linksToMenu.attr("href", "https://app.reepay.com/#/rp/subscriptions")
+
     function getReepaySelectedTab(selectedType = '') {
         const type = selectedType || $selectProductType.val();
 
