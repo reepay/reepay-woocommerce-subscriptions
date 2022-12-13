@@ -49,8 +49,6 @@ class WC_Reepay_Meta_Boxes {
 			);
 		}
 
-
-
 		add_meta_box(
 			'reepay_checkout_invoice',
 			__( 'Invoice' ),
@@ -109,6 +107,26 @@ class WC_Reepay_Meta_Boxes {
 	 * @param array $args additional arguments sent to add_meta_box function
 	 */
 	public function generate_meta_box_content_subscription( $post, $args ) {
+		$template_args = [
+			'handle' => get_post_meta($post->ID, '_reepay_subscription_handle', true),
+			'plan' => get_post_meta($post->ID, '_reepay_subscription_plan', true)
+		];
 
+		if ( empty( $template_args['plan'] ) ) {
+			try {
+				$subscription = reepay_s()->api()->request( "subscription/{$template_args['handle']}");
+				$template_args['plan'] = $subscription['plan'];
+				update_post_meta( $post->ID, '_reepay_subscription_plan', $subscription['plan'] );
+			} catch (Exception $e) {}
+		}
+
+		$template_args['link'] = $this->dashboard_url . 'subscriptions/subscription/' . $template_args['handle'];
+
+		wc_get_template(
+			'meta-boxes/plan.php',
+			$template_args,
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
 	}
 }
