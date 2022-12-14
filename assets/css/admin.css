@@ -289,3 +289,15 @@ p.form-field span.form-field_time-type {
 .reepay_subscription_variable .reepay_subscription_publish_btn .form-field {
     flex-direction: row;
 }
+.order_action_reepay_subscriotions .reepay-admin-section-li {
+    display: flex;
+    border-bottom: 1px solid gray;
+}
+
+.order_action_reepay_subscriotions .reepay-balance__amount,
+.order_action_reepay_subscriotions .reepay-balance__label {
+    padding-left: 0;
+    padding-right: 0;
+    background-color: unset;
+    color: black;
+}

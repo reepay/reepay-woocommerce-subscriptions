@@ -97,7 +97,43 @@ class WC_Reepay_Meta_Boxes {
 	 * @param array $args additional arguments sent to add_meta_box function
 	 */
 	public function generate_meta_box_content_invoice( $post, $args ) {
+		$order = wc_get_order( $post );
 
+		if ( ! $order ) {
+			return;
+		}
+
+		$payment_method = $order->get_payment_method();
+
+		if ( ! in_array( $payment_method, WC_ReepayCheckout::PAYMENT_METHODS ) ) {
+			return;
+		}
+
+		$gateway = rp_get_payment_method( $order );
+
+		if ( empty( $gateway ) ) {
+			return;
+		}
+
+		$order_data = $gateway->api->get_invoice_data( $order );
+
+		if ( is_wp_error( $order_data ) ) {
+			return;
+		}
+
+		wc_get_template(
+			'meta-boxes/invoice.php',
+			[
+				'gateway'            => $gateway,
+				'order'              => $order,
+				'order_id'           => $order->get_order_number(),
+				'order_data'         => $order_data,
+				'order_is_cancelled' => $order->get_meta( '_reepay_order_cancelled' ) === '1' && 'cancelled' != $order_data['state'],
+				'link' => $this->dashboard_url . 'payments/invoices/invoice/' . $order_data['handle']
+			],
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
 	}
 
 	/**
