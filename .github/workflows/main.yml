@@ -1,4 +1,24 @@
-on: push
+on:
+  pull_request:
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
+  pull_request_review:
+    types:
+      - submitted
+  check_suite:
+    types:
+      - completed
+  status: {}
+  push:
+    branches:
+      - dev
 name: 🚀 Deploy website on push
 jobs:
   web-deploy:
