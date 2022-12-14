@@ -1,4 +1,16 @@
 on:
+  pull_request:
+    branches:
+      - dev
+    types:
+      - labeled
+      - unlabeled
+      - synchronize
+      - opened
+      - edited
+      - ready_for_review
+      - reopened
+      - unlocked
   push:
     branches:
       - dev
