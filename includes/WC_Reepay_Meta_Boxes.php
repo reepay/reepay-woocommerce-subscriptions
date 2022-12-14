@@ -58,14 +58,16 @@ class WC_Reepay_Meta_Boxes {
 			'high'
 		);
 
-		add_meta_box(
-			'reepay_checkout_subscription',
-			__( 'Subscription' ),
-			array( $this, 'generate_meta_box_content_subscription' ),
-			'shop_order',
-			'side',
-			'high'
-		);
+		if ( ! empty( get_post_meta( $post->ID, '_reepay_subscription_handle', true ) ) ) {
+			add_meta_box(
+				'reepay_checkout_subscription',
+				__( 'Subscription' ),
+				array( $this, 'generate_meta_box_content_subscription' ),
+				'shop_order',
+				'side',
+				'high'
+			);
+		}
 	}
 
 	/**
