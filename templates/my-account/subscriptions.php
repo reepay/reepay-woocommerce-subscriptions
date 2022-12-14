@@ -5,6 +5,8 @@ $user_payment_methods = wc_get_customer_saved_methods_list( get_current_user_id(
 
 $user_payment_methods2 = [];
 
+return; //DEV
+
 foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
 	$user_payment_methods2[] = WC_Payment_Tokens::get( $user_payment_method['method']['id'] );
 }
