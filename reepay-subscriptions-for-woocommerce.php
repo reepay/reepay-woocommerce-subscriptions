@@ -377,7 +377,7 @@ class WooCommerce_Reepay_Subscriptions {
 
 		$settings = [
 			'section_title'                              => [
-				'name' => __( 'Reepay Subscription Settings', 'reepay-subscriptions-for-woocommerce' ),
+				'name' => __( 'Reepay Subscription', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'title',
 				'desc' => '',
 				'id'   => 'reepay_section_title'
@@ -446,7 +446,7 @@ class WooCommerce_Reepay_Subscriptions {
 				'name'    => __( 'Compensation method for On Hold', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => static::$compensation_methods,
-				'desc'    => __( 'Compensation method for on_hold', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Compensation method when setting a subscription to On Hold.', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_on_hold_compensation_method'
 			],
 			'_reepay_enable_cancel'                      => [
@@ -459,7 +459,7 @@ class WooCommerce_Reepay_Subscriptions {
 				'name'    => __( 'Compensation method for Cancel', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => static::$compensation_methods,
-				'desc'    => __( 'Compensation method for cancel', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Compensation method when cancelling a subscription.', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_cancel_compensation_method'
 			],
 			'hr_suborders'                               => [
@@ -467,17 +467,17 @@ class WooCommerce_Reepay_Subscriptions {
 				'id'   => 'hr_suborders',
 			],
 			'_reepay_orders_default_subscription_status' => [
-				'name'    => __( 'Subscription order default status after create', 'reepay-subscriptions-for-woocommerce' ),
+				'name'    => __( 'Subscription order default status after creation', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Setting to control witch status the Reepay subscription order in WooCommerce gets.', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_orders_default_subscription_status'
 			],
 			'_reepay_suborders_default_renew_status'     => [
-				'name'    => __( 'Suborders default status after renew', 'reepay-subscriptions-for-woocommerce' ),
+				'name'    => __( 'Renewal order default status after creation', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Setting to control witch status the Reepay renewal order in WooCommerce gets.', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_suborders_default_renew_status'
 			],
 			'hr_date'                                    => [
@@ -487,14 +487,14 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_manual_start_date'                  => [
 				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
-				'desc' => __( 'Enable manual subscription start date. <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Reepay.</p>', 'reepay-subscriptions-for-woocommerce' ),
+				'desc' => __( 'Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Reepay.</p>', 'reepay-subscriptions-for-woocommerce' ),
 				'id'   => '_reepay_manual_start_date'
 			],
 			'_reepay_manual_start_date_status'           => [
 				'name'    => __( 'Manual start date order status', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Subscription will start when parent order get changed to this order status ', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Subscription will start when parent order get changed to this order status.', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_manual_start_date_status'
 			],
 			'section_end'                                => [
