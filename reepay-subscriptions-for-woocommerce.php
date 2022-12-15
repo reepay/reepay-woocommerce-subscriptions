@@ -331,20 +331,20 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function settings_tab() {
-        $page = $_GET['page'] ?? '';
-        $tab = $_GET['tab'] ?? '';
-	    ?>
+		$page = $_GET['page'] ?? '';
+		$tab  = $_GET['tab'] ?? '';
+		?>
         <ul class="subsubsub">
-            <li><a href="<?php echo admin_url('admin.php?page=wc-settings&tab=reepay_subscriptions') ?>"
+            <li><a href="<?php echo admin_url( 'admin.php?page=wc-settings&tab=reepay_subscriptions' ) ?>"
                    class="<?php echo $tab === 'reepay_subscriptions' ? 'current' : '' ?>">General</a> |
             </li>
             <li>
-                <a href="<?php echo admin_url('tools.php?page=reepay_import') ?>"
+                <a href="<?php echo admin_url( 'tools.php?page=reepay_import' ) ?>"
                    class="<?php echo $page === 'reepay_import' ? 'current' : '' ?>">Import tools</a> |
             </li>
         </ul>
         <br class="clear">
-        <?php
+		<?php
 		woocommerce_admin_fields( static::get_settings() );
 	}
 
@@ -462,16 +462,16 @@ class WooCommerce_Reepay_Subscriptions {
 				'desc'    => __( 'Compensation method for cancel', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_cancel_compensation_method'
 			],
+			'hr_suborders'                               => [
+				'type' => 'hr',
+				'id'   => 'hr_suborders',
+			],
 			'_reepay_orders_default_subscription_status' => [
 				'name'    => __( 'Subscription order default status after create', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
 				'desc'    => __( 'Setting to control witch status the woocommerce order gets, when it is created based on a Reepay invoice', 'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_orders_default_subscription_status'
-			],
-			'hr_suborders'                               => [
-				'type' => 'hr',
-				'id'   => 'hr_suborders',
 			],
 			'_reepay_suborders_default_renew_status'     => [
 				'name'    => __( 'Suborders default status after renew', 'reepay-subscriptions-for-woocommerce' ),
