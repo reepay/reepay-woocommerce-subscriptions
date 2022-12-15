@@ -1,7 +1,12 @@
 jQuery(function ($) {
     const $body = $('body');
-    const $selectProductType = $('select#product-type');
 
+    const $invoiceMetaBox = $('#reepay_checkout_invoice');
+    if($invoiceMetaBox.find('.inside').html().trim() === '') {
+        $invoiceMetaBox.hide()
+    }
+
+    const $selectProductType = $('select#product-type');
     function getReepaySelectedTab(selectedType = '') {
         const type = selectedType || $selectProductType.val();
 
