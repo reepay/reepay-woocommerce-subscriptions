@@ -22,8 +22,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     <li class="reepay-admin-section-li-header-small">
 		<?php echo __( 'State', 'reepay-subscriptions-for-woocommerce' ) ?>
     </li>
-    <li class="reepay-admin-section-li-small">
-	    <?php echo $order_data['state']; ?>
+    <li class="reepay-admin-section-li-small reepay-invoice-status reepay-invoice-status-<?php echo $order_data['state']; ?> ">
+	    <?php echo ucfirst( $order_data['state'] ); ?>
     </li>
 	<?php if ( $order_is_cancelled ): ?>
         <li class="reepay-admin-section-li-small">
