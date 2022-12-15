@@ -816,7 +816,7 @@ jQuery(function ($) {
 
         show_settings();
 
-        $(tab + ' #_reepay_subscription_handle').change(function () {
+        $(tab + ' [name^="_reepay_subscription_handle"]').change(function () {
             const $select = $(this);
             const $container = $select.parents('.reepay_subscription_container');
 
