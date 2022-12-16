@@ -12,11 +12,6 @@
     vertical-align: baseline;
 }
 
-.variable_pricing .form-field {
-    display: flex;
-    flex-direction: column;
-}
-
 #reepay_subscription_publish_btn.reepay_subscription_publish_btn p.form-field {
     padding-left: 4px !important;
 }
@@ -35,7 +30,8 @@
     padding: 0 !important;
 }
 
-.global-addons-form td label {
+.global-addons-form td label,
+.woocommerce_product_addons td label {
     margin: 0;
     width: auto;
 }
@@ -251,9 +247,7 @@ p.form-field span.form-field_time-type {
 
 .reepay_subscription_variable {
     padding: 5px;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: #c3c4c7;
+    border: 1px solid #eee;
 }
 
 .reepay_subscription_settings_exist.variable .options_group {
@@ -293,4 +287,64 @@ p.form-field span.form-field_time-type {
 
 #_reepay_subscription_handle {
     max-width: 30%;
+}
+.order_action_reepay_subscriotions .reepay-admin-section-li {
+    display: flex;
+    border-bottom: 1px solid gray;
+}
+
+.order_action_reepay_subscriotions .reepay-balance__amount,
+.order_action_reepay_subscriotions .reepay-balance__label {
+    padding-left: 0;
+    padding-right: 0;
+    background-color: unset;
+    color: black;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-created {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-pending {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-dunning {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-settled {
+    color: green;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-cancelled {
+    color: red;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-authorized {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-failed {
+    color: red;
+}
+
+.reepay_subscription_container .select2-container {
+    width: 100% !important;
+    margin-bottom: 12px;
+}
+
+.reepay_subscription_variable .form-field {
+    padding: 5px 20px 5px 162px!important;
+}
+
+.reepay_subscription_variable .form-field label {
+    float: left;
+    width: 150px;
+    padding: 0;
+    margin: 0 0 0 -150px;
+}
+
+.reepay_subscription_variable .form-field select.short {
+    width: 50%;
 }

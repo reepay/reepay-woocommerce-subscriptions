@@ -152,7 +152,12 @@ class WC_Reepay_Admin_Frontend {
 				break;
 
 			case 'reepay_sub':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle', true );
+				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+
+				if ( empty( $handle ) && ! empty( $the_order->get_parent_id() )) {
+					$handle = get_post_meta( $the_order->get_parent_id(), '_reepay_subscription_handle', true );
+				}
+
 				if ( ! empty( $handle ) ) {
 					$admin_page = 'https://app.reepay.com/#/rp/';
 

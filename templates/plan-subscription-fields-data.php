@@ -1,11 +1,11 @@
 <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
     <p class="form-field">
-        <label for="#"><?php _e( 'Subscription pricing (kr)', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-        <span><?php echo ! empty( $_reepay_subscription_price ) ? esc_attr( wc_format_localized_price( $_reepay_subscription_price ) ) : 0 ?></span>
+        <label for="#"><?php _e( 'Price', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <span><?php echo ( ! empty( $_reepay_subscription_price ) ? esc_attr( $_reepay_subscription_price ) : 0 ) . ' ' . $_reepay_subscription_currency ?></span>
     </p>
 
     <p class="form-field">
-        <label for="#"><?php _e( 'Schedule Type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <label for="#"><?php _e( 'Schedule type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
         <span><?php echo WC_Reepay_Subscription_Plan_Simple::$schedule_types[ $_reepay_subscription_schedule_type ?? '' ] ?? 'undefined' ?></span>
     </p>
 
@@ -50,7 +50,7 @@
             </p>
         <?php endif; ?>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $month_data['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -81,11 +81,11 @@
             <span><?php _e( '3rd Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Fixed Months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Fixed months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php _e( 'Jan, Apr, Jul, Oct', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $quarter_data['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -108,11 +108,11 @@
             <span><?php _e( '1st', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Fixed Months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Fixed months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php _e( 'Jan, Jul', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $_reepay_subscription_half_yearly['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -135,11 +135,11 @@
             <span><?php _e( '1st', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Fixed Months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Fixed months:', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php _e( 'Jan', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $_reepay_subscription_month_startdate_12['period'] ?? '' ] ?? '' ?></span>
         </p>
         <p class="form-field">
@@ -164,7 +164,7 @@
             <span> <?php echo WC_Reepay_Subscription_Plan_Simple::$number_to_week_day[ intval( $weekly_fixedday['day'] ?? '0' ) ] ?? '' ?></span>
         </p>
         <p class="form-field">
-            <label for="#"><?php _e( 'Partial Period Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $_reepay_subscription_weekly_fixedday['period'] ?? '' ] ?? '' ?></span>
         </p>
 
@@ -181,7 +181,7 @@
 	<?php endif; ?>
 
     <p class="form-field">
-        <label for="#"><?php _e( 'Default Quantity', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <label for="#"><?php _e( 'Default quantity', 'reepay-subscriptions-for-woocommerce' ); ?></label>
         <span>
             <?php echo ! empty( $_reepay_subscription_default_quantity ) ? esc_attr( $_reepay_subscription_default_quantity ) : '1' ?>
             <?php echo wc_help_tip( __( 'Default quantity to use when creating a new subscription. Also used as the quantity on hosted pages.', 'reepay-subscriptions-for-woocommerce' ) ); ?>
@@ -198,22 +198,10 @@
 
 <div class="options_group show_if_reepay_subscription">
     <p class="form-field">
-        <label for="#"><?php _e( 'Minimum Contract Period', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <label for="#"><?php _e( 'Minimum contract period', 'reepay-subscriptions-for-woocommerce' ); ?></label>
         <span>
             <?php echo ! empty( $_reepay_subscription_contract_periods ) ? esc_attr( $_reepay_subscription_contract_periods ) : 0 ?>
             <?php echo wc_help_tip( __( 'Periods are relative to the billing frequency. If you have chosen to bill every month, a period is one month.', 'reepay-subscriptions-for-woocommerce' ) ); ?>
-        </span>
-    </p>
-    <p class="form-field">
-        <label for="#"></label>
-        <span>
-            <?php
-            if ( $_reepay_subscription_contract_periods_full === 'true' ) {
-	            _e( 'When the first period starts', 'reepay-subscriptions-for-woocommerce' );
-            } else {
-	            _e( 'When the subscription is created', 'reepay-subscriptions-for-woocommerce' );
-            }
-            ?>
         </span>
     </p>
 </div>
@@ -227,7 +215,7 @@
         </span>
     </p>
     <p class="form-field">
-        <label for="#"></label>
+        <label for="#"><?php _e( 'Notice period start', 'reepay-subscriptions-for-woocommerce' ); ?></label>
         <span>
 	        <?php
 	        if ( $_reepay_subscription_notice_period_start === 'true' ) {
@@ -258,7 +246,7 @@
         </p>
 
         <p class="form-field fee-fields hidden">
-            <label for="_subscription_fee_amount"><?php echo __( 'Setup Fee (kr)', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+            <label for="_subscription_fee_amount"><?php echo __( 'Setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
             <span class="wrap">
             <input type="number" min="0"
                    id="_subscription_fee_amount" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[amount]"
@@ -285,15 +273,19 @@
     <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
         <p class="form-field">
             <label for="#"><?php _e( 'Include setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php echo ! empty( $_reepay_subscription_fee['enabled'] ) && $_reepay_subscription_fee['enabled'] == 'yes' ? 'active' : 'disabled' ?></span>
+            <span><?php echo ! empty( $_reepay_subscription_fee['enabled'] ) && $_reepay_subscription_fee['enabled'] == 'yes' ? 'Active' : 'Disabled' ?></span>
         </p>
 		<?php if ( ! empty( $_reepay_subscription_fee['enabled'] ) ) : ?>
             <p class="form-field">
-                <label for="#"><?php _e( 'Setup Fee (kr)', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-                <span><?php echo ! empty( $_reepay_subscription_fee['amount'] ) ? esc_attr( $_reepay_subscription_fee['amount'] ) : 0 ?></span>
-                <br>
+                <label for="#"><?php _e( 'Setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+                <span><?php echo ( ! empty( $_reepay_subscription_fee['amount'] ) ? esc_attr( $_reepay_subscription_fee['amount'] ) : 0 ) . ' ' . $_reepay_subscription_currency ?></span>
+            </p>
+            <p class="form-field">
+                <label for="#"><?php _e( 'Text', 'reepay-subscriptions-for-woocommerce' ); ?></label>
                 <span><?php echo ! empty( $_reepay_subscription_fee['text'] ) ? esc_attr( $_reepay_subscription_fee['text'] ) : '' ?></span>
-                <br>
+            </p>
+            <p class="form-field">
+                <label for="#"><?php _e( 'Handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
                 <span>
                     <?php if ( 'first' === $_reepay_subscription_fee['handling'] ) {
 	                    _e( 'Include setup fee as order line on the first scheduled invoice', 'reepay-subscriptions-for-woocommerce' );
@@ -306,6 +298,23 @@
             </p>
 		<?php endif; ?>
     </div>
+<?php endif; ?>
+
+<?php if ( ! empty( $_reepay_subscription_trial ) && ! empty( $_reepay_subscription_trial['type'] ) ) : ?>
+<div class="options_group reepay_subscription_fee show_if_reepay_subscription">
+    <p class="form-field">
+        <label for="#"><?php _e( 'Trial period', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <span>
+            <?php
+            if ( $_reepay_subscription_trial['type'] != 'customize' ) {
+	           echo WC_Reepay_Subscription_Plan_Simple::$trial[ $_reepay_subscription_trial['type'] ];
+            } else {
+	           echo $_reepay_subscription_trial['length'] . ' ' . $_reepay_subscription_trial['unit'];
+            }
+            ?>
+        </span>
+    </p>
+</div>
 <?php endif; ?>
 
 <div class="options_group show_if_reepay_subscription">

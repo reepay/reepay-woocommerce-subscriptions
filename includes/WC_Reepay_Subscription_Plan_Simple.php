@@ -52,6 +52,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		'_reepay_subscription_billing_cycles_period',
 		'_reepay_subscription_trial',
 		'_reepay_subscription_fee',
+		'_reepay_subscription_currency',
 	];
 
 	/**
@@ -605,6 +606,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$type_data['day']                                  = ! empty( $plan_data['schedule_fixed_day'] ) ? $plan_data['schedule_fixed_day'] : '';
 			$plan_meta['_reepay_subscription_weekly_fixedday'] = $type_data;
 		}
+
+
+		$plan_meta['_reepay_subscription_currency'] = ! empty( $plan_meta['currency'] ) ? $plan_meta['currency'] : get_woocommerce_currency();
 
 		return $plan_meta;
 	}
