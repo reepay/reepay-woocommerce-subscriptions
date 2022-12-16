@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.7
+ * Version: 1.0.8
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -615,7 +615,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Import();
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
-		new WC_Reepay_Sync();
+		new WC_Reepay_Meta_Boxes();
 	}
 }
 

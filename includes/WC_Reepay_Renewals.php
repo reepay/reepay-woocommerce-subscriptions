@@ -40,7 +40,7 @@ class WC_Reepay_Renewals {
                return true;
            }
            return $contains;
-        });
+        }, 10, 2);
 	}
 
     /**
@@ -52,7 +52,8 @@ class WC_Reepay_Renewals {
 	        $order = wc_get_order($order);
         }
         foreach ($order->get_items() as $item) {
-            if ($item->is_type(['reepay_simple_subscriptions', 'reepay_variable_subscriptions'])) {
+            $product = $item->get_product();
+            if ($product->is_type(['reepay_simple_subscriptions', 'reepay_variable_subscriptions'])) {
                 return true;
             };
         }
