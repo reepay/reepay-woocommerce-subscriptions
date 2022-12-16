@@ -251,9 +251,7 @@ p.form-field span.form-field_time-type {
 
 .reepay_subscription_variable {
     padding: 5px;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
-    border-bottom-color: #c3c4c7;
+    border: 1px solid #eee;
 }
 
 .reepay_subscription_settings_exist.variable .options_group {
@@ -293,4 +291,44 @@ p.form-field span.form-field_time-type {
 
 #_reepay_subscription_handle {
     max-width: 30%;
+}
+.order_action_reepay_subscriotions .reepay-admin-section-li {
+    display: flex;
+    border-bottom: 1px solid gray;
+}
+
+.order_action_reepay_subscriotions .reepay-balance__amount,
+.order_action_reepay_subscriotions .reepay-balance__label {
+    padding-left: 0;
+    padding-right: 0;
+    background-color: unset;
+    color: black;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-created {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-pending {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-dunning {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-settled {
+    color: green;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-cancelled {
+    color: red;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-authorized {
+    color: #abab00;
+}
+
+.reepay-admin-section-li-small.reepay-invoice-status-failed {
+    color: red;
 }

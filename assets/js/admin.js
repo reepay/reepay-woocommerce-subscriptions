@@ -1,5 +1,11 @@
 jQuery(function ($) {
     const $body = $('body');
+
+    const $invoiceMetaBox = $('#reepay_checkout_invoice');
+    if($invoiceMetaBox.find('.inside').html().trim() === '') {
+        $invoiceMetaBox.hide()
+    }
+
     const $selectProductType = $('select#product-type');
 
     var linksToMenu = $('a[href="admin.php?page=reepay-subscriptions-for-woocommerce"]');
@@ -797,7 +803,6 @@ jQuery(function ($) {
                 $select,
                 $container.find('.reepay_subscription_settings_exist')
             );
-            $('.reepay_subscription_publish_btn').show()
         })
     }
 
