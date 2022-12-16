@@ -118,9 +118,20 @@
                     return
                 }
 
-                const $container = $this.parents('.wc-metabox-content').find('.js-exist-addon-data');
+                $this
+                    .parent()
+                    .block({
+                        message: null,
+                        overlayCSS: {
+                            background: '#fff',
+                            opacity: 0.6
+                        }
+                    });
 
-                $container.html('');
+                const $container = $this
+                    .parents('.wc-metabox-content')
+                    .find('.js-exist-addon-data')
+                    .html('');
 
                 $.ajax({
                     url: '<?php echo get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . '?product_id=' . ( intval( $_GET['post'] ?? 0) ) ?>' + `&handle=${handle}`,
@@ -139,7 +150,7 @@
 
                     },
                     complete: function () {
-
+                        $this.parent().unblock();
                     },
                 })
             });
