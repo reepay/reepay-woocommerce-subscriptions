@@ -1,24 +1,9 @@
 <?php
 /** @var Array $args */
 
-$user_payment_methods = wc_get_customer_saved_methods_list( get_current_user_id() );
-
-$user_payment_methods2 = [];
-
-return; //DEV
-
-foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
-	$user_payment_methods2[] = WC_Payment_Tokens::get( $user_payment_method['method']['id'] );
-}
-
 ?>
 <?php foreach ( $args['subscriptions'] as $subscription ): ?>
-	<?php
-	$plan                        = $args['plans'][ $subscription['plan'] ];
-	$is_expired                  = $subscription['state'] === 'expired';
-	$subscription_payment_method = $subscription['payment_methods'][0] ?? [];
-	?>
-    <h1><?php echo esc_attr( $plan['name'] ) ?></h1>
+    <h1><?php echo esc_attr( $subscription['plan']['name'] ) ?></h1>
     <table>
         <tbody>
         <tr>
@@ -57,21 +42,21 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
         <tr>
             <td><?php _e( 'Total Amount (Incl. VAT)', 'reepay-subscriptions-for-woocommerce' ); ?>:</td>
             <td>
-				<?php echo number_format( esc_attr( $plan['amount'] ) / 100, 2 ) ?> <?php echo esc_attr( $plan['currency'] ) ?>
+				<?php echo number_format( esc_attr( $subscription['plan']['amount'] ) / 100, 2 ) ?> <?php echo esc_attr( $subscription['plan']['currency'] ) ?>
                 / <?php echo $subscription['formatted_schedule'] ?>
             </td>
         </tr>
         <tr>
             <td><?php _e( 'Billing Cycle', 'reepay-subscriptions-for-woocommerce' ); ?>:</td>
             <td>
-				<?php if ( ! empty( $plan['fixed_count'] ) ): ?>
-					<?php _e( '1 out of', 'reepay-subscriptions-for-woocommerce' ); ?><?php echo esc_attr( $plan['fixed_count'] ) ?>
+				<?php if ( ! empty( $subscription['plan']['fixed_count'] ) ): ?>
+					<?php _e( '1 out of', 'reepay-subscriptions-for-woocommerce' ); ?><?php echo esc_attr( $subscription['plan']['fixed_count'] ) ?>
 				<?php else: ?>
 					<?php _e( 'Forever Until Canceled', 'reepay-subscriptions-for-woocommerce' ); ?>
 				<?php endif; ?>
             </td>
         </tr>
-		<?php if ( ! $is_expired ): ?>
+		<?php if ( ! $subscription['is_expired'] ): ?>
 			<?php if ( reepay_s()->settings( '_reepay_enable_on_hold' ) || reepay_s()->settings( '_reepay_enable_cancel' ) ): ?>
                 <tr>
                     <td><?php _e( 'Actions:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
@@ -105,11 +90,11 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
                 <td><?php _e( 'Payment methods:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
                 <td></td>
             </tr>
-			<?php foreach ( $user_payment_methods2 ?? [] as $payment_method ): ?>
+			<?php foreach ( $args['user_payment_methods_reepay'] ?? [] as $payment_method ): ?>
                 <tr>
                     <td><?php echo $payment_method->get_masked_card() ?><?php echo $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></td>
                     <td>
-						<?php if ( $payment_method->get_token() === $subscription_payment_method['id'] ): ?>
+						<?php if ( $payment_method->get_token() === $subscription['payment_method']['id'] ): ?>
 							<?php _e( 'Current', 'reepay-subscriptions-for-woocommerce' ); ?>
 						<?php else: ?>
                             <a href="?change_payment_method=<?php echo __( $subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"

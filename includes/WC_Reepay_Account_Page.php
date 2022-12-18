@@ -257,11 +257,14 @@ class WC_Reepay_Account_Page {
 				$payment_methods = reepay_s()->api()->request( "subscription/" . $subscription['handle'] . "/pm" );
 				set_transient( $subscription['handle'] . '_payment_methods', $payment_methods );
 			}
+
 			$plan               = WC_Reepay_Subscription_Plan_Simple::wc_get_plan( $subscription['plan'] );
+
 			$subscriptionsArr[] = [
 				'state'                          => $subscription['state'],
 				'handle'                         => $subscription['handle'],
 				'is_cancelled'                   => $subscription['is_cancelled'],
+				'is_expired'                     => 'expired' === $subscription['state'],
 				'renewing'                       => $subscription['renewing'],
 				'first_period_start'             => $subscription['first_period_start'],
 				'formatted_first_period_start'   => $this->format_date( $subscription['first_period_start'] ),
@@ -274,23 +277,32 @@ class WC_Reepay_Account_Page {
 				'formatted_status'               => $this->get_status( $subscription ),
 				'formatted_schedule'             => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $plan ),
 				'payment_methods'                => $payment_methods,
-				'plan'                           => $subscription['plan']
+				'payment_method'                 => $payment_methods[0] ?? [],
+				'plan'                           => $plans[ $subscription['plan'] ] ?? [],
 			];
 		}
+
 		$previous_token = get_transient( $next_page_token . '_previous_token' );
 		if ( $previous_token === false ) {
 			set_transient( $subsResult['next_page_token'] . '_previous_token', $next_page_token );
 			$previous_token = '';
 		}
+
+		$user_payment_methods = wc_get_customer_saved_methods_list( get_current_user_id() );
+		$user_payment_methods_reepay = [];
+
+		foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
+			$user_payment_methods_reepay[] = WC_Payment_Tokens::get( $user_payment_method['method']['id'] );
+		}
+
 		wc_get_template(
-			'my-account/subscriptions.php',
-			[
-				'subscriptions'   => $subscriptionsArr,
-				'plans'           => $plans,
-				'domain'          => 'reepay-subscriptions-for-woocommerce',
-				'current_token'   => $next_page_token,
-				'previous_token'  => $previous_token,
-				'next_page_token' => $subsResult['next_page_token'] ?? ''
+			'my-account/subscriptions.php', [
+				'subscriptions'               => $subscriptionsArr,
+				'user_payment_methods_reepay' => $user_payment_methods_reepay,
+				'domain'                      => 'reepay-subscriptions-for-woocommerce',
+				'current_token'               => $next_page_token,
+				'previous_token'              => $previous_token,
+				'next_page_token'             => $subsResult['next_page_token'] ?? '',
 			],
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
