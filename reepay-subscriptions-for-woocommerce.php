@@ -161,6 +161,7 @@ class WooCommerce_Reepay_Subscriptions {
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 		add_action( 'admin_init', [ $this, 'reepay_admin_notices' ] );
 		add_action( 'init', [ $this, 'init' ] );
+		add_filter( 'woocommerce_locate_template', [ $this, 'override_woo_templates' ], 1, 3 );
 
 		if ( ! has_action( 'woocommerce_admin_field_hr' ) ) {
 			add_action( 'woocommerce_admin_field_hr', [ $this, 'hr_field' ] );
@@ -616,6 +617,26 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Sync();
+	}
+
+
+	public function override_woo_templates( $template, $template_name, $template_path ) {
+		$plugin_path = reepay_s()->settings( 'plugin_path' ) . 'templates/woocommerce/';
+
+		if ( file_exists( $plugin_path . $template_name ) ) {
+			$theme_template = locate_template( array(
+				$template_path . $template_name,
+				$template_name,
+			) );
+
+			if ( empty( $theme_template ) ) {
+				return $plugin_path . $template_name;
+			} else {
+				return $theme_template;
+			}
+		}
+
+		return $template;
 	}
 }
 
