@@ -352,29 +352,6 @@ class WC_Reepay_Account_Page {
 		return $subscription['state'];
 	}
 
-	public function get_formatted_schedule_type( $plan ) {
-		if ( $plan['schedule_type'] === 'manual' ) {
-			return 'Manual';
-		}
-		if ( $plan['schedule_type'] === 'daily' ) {
-			return 'Every day';
-		}
-		if ( $plan['schedule_type'] === 'weekly_fixedday' ) {
-			return 'Weekly fixedday';
-		}
-		if ( $plan['schedule_type'] === 'month_startdate' ) {
-			return 'Month startdate';
-		}
-		if ( $plan['schedule_type'] === 'month_fixedday' ) {
-			return 'Month fixedday';
-		}
-		if ( $plan['schedule_type'] === 'month_lastday' ) {
-			return 'Month lastdate';
-		}
-
-		return $plan['schedule_type'];
-	}
-
 	function format_date( $dateStr ) {
 		if ( ! empty( $dateStr ) ) {
 			return ( new DateTime( $dateStr ) )->format( 'd M Y' );
