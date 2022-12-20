@@ -27,30 +27,64 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</thead>
 
 	<tbody>
-	<?php /** @var WC_Subscription $subscription */ ?>
+	<?php /** @var WC_Subscription|array $subscription */ ?>
 	<?php foreach ( $subscriptions as $subscription_id => $subscription ) : ?>
-		<tr class="order woocommerce-orders-table__row woocommerce-orders-table__row--status-<?php echo esc_attr( $subscription->get_status() ); ?>">
-			<td class="subscription-id order-number woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-id woocommerce-orders-table__cell-order-number" data-title="<?php esc_attr_e( 'ID', 'woocommerce-subscriptions' ); ?>">
-				<a href="<?php echo esc_url( $subscription->get_view_order_url() ); ?>"><?php echo esc_html( sprintf( _x( '#%s', 'hash before order number', 'woocommerce-subscriptions' ), $subscription->get_order_number() ) ); ?></a>
-				<?php do_action( 'woocommerce_my_subscriptions_after_subscription_id', $subscription ); ?>
-			</td>
-			<td class="subscription-status order-status woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-status woocommerce-orders-table__cell-order-status" data-title="<?php esc_attr_e( 'Status', 'woocommerce-subscriptions' ); ?>">
-				<?php echo esc_attr( wcs_get_subscription_status_name( $subscription->get_status() ) ); ?>
-			</td>
-			<td class="subscription-next-payment order-date woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-next-payment woocommerce-orders-table__cell-order-date" data-title="<?php echo esc_attr_x( 'Next Payment', 'table heading', 'woocommerce-subscriptions' ); ?>">
-				<?php echo esc_attr( $subscription->get_date_to_display( 'next_payment' ) ); ?>
-				<?php if ( ! $subscription->is_manual() && $subscription->has_status( 'active' ) && $subscription->get_time( 'next_payment' ) > 0 ) : ?>
-				<br/><small><?php echo esc_attr( $subscription->get_payment_method_to_display( 'customer' ) ); ?></small>
-				<?php endif; ?>
-			</td>
-			<td class="subscription-total order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-total woocommerce-orders-table__cell-order-total" data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'woocommerce-subscriptions' ); ?>">
-				<?php echo wp_kses_post( $subscription->get_formatted_order_total() ); ?>
-			</td>
-			<td class="subscription-actions order-actions woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-actions woocommerce-orders-table__cell-order-actions">
-				<a href="<?php echo esc_url( $subscription->get_view_order_url() ) ?>" class="woocommerce-button button view"><?php echo esc_html_x( 'View', 'view a subscription', 'woocommerce-subscriptions' ); ?></a>
-				<?php do_action( 'woocommerce_my_subscriptions_actions', $subscription ); ?>
-			</td>
-		</tr>
+		<?php if ( is_a( $subscription, 'WC_Subscription' ) ) : ?>
+            <tr class="order woocommerce-orders-table__row woocommerce-orders-table__row--status-<?php echo esc_attr( $subscription->get_status() ); ?>">
+                <td class="subscription-id order-number woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-id woocommerce-orders-table__cell-order-number" data-title="<?php esc_attr_e( 'ID', 'woocommerce-subscriptions' ); ?>">
+                    <a href="<?php echo esc_url( $subscription->get_view_order_url() ); ?>"><?php echo esc_html( sprintf( _x( '#%s', 'hash before order number', 'woocommerce-subscriptions' ), $subscription->get_order_number() ) ); ?></a>
+					<?php do_action( 'woocommerce_my_subscriptions_after_subscription_id', $subscription ); ?>
+                </td>
+                <td class="subscription-status order-status woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-status woocommerce-orders-table__cell-order-status" data-title="<?php esc_attr_e( 'Status', 'woocommerce-subscriptions' ); ?>">
+					<?php echo esc_attr( wcs_get_subscription_status_name( $subscription->get_status() ) ); ?>
+                </td>
+                <td class="subscription-next-payment order-date woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-next-payment woocommerce-orders-table__cell-order-date" data-title="<?php echo esc_attr_x( 'Next Payment', 'table heading', 'woocommerce-subscriptions' ); ?>">
+					<?php echo esc_attr( $subscription->get_date_to_display( 'next_payment' ) ); ?>
+					<?php if ( ! $subscription->is_manual() && $subscription->has_status( 'active' ) && $subscription->get_time( 'next_payment' ) > 0 ) : ?>
+                        <br/><small><?php echo esc_attr( $subscription->get_payment_method_to_display( 'customer' ) ); ?></small>
+					<?php endif; ?>
+                </td>
+                <td class="subscription-total order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-total woocommerce-orders-table__cell-order-total" data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'woocommerce-subscriptions' ); ?>">
+					<?php echo wp_kses_post( $subscription->get_formatted_order_total() ); ?>
+                </td>
+                <td class="subscription-actions order-actions woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-actions woocommerce-orders-table__cell-order-actions">
+                    <a href="<?php echo esc_url( $subscription->get_view_order_url() ) ?>" class="woocommerce-button button view"><?php echo esc_html_x( 'View', 'view a subscription', 'woocommerce-subscriptions' ); ?></a>
+					<?php do_action( 'woocommerce_my_subscriptions_actions', $subscription ); ?>
+                </td>
+            </tr>
+		<?php elseif ( is_a( $subscription, 'WC_Order' ) )  :
+			try {
+				$reepay_subscription = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) );
+				$plan                = reepay_s()->api()->request( "plan/" . $reepay_subscription['plan'] . "/current" );
+			} catch (Exception $e) {
+				continue;
+			}
+
+			$order_item = current( $subscription->get_items( 'line_item' ) );
+			$billing_type = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $order_item->get_product(), true );
+
+			$link = wc_get_endpoint_url( 'view-subscription', $subscription->get_id(), wc_get_page_permalink( 'myaccount' ) );
+			?>
+            <tr class="order woocommerce-orders-table__row woocommerce-orders-table__row--status-<?php echo esc_attr( $subscription->get_status() ); ?>">
+                <td class="subscription-id order-number woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-id woocommerce-orders-table__cell-order-number" data-title="<?php esc_attr_e( 'ID', 'woocommerce-subscriptions' ); ?>">
+                    <a href="<?php echo esc_url( $link ); ?>"><?php echo esc_html( sprintf( _x( '#%s', 'hash before order number', 'woocommerce-subscriptions' ), $subscription->get_order_number() ) ); ?></a>
+					<?php do_action( 'woocommerce_my_subscriptions_after_subscription_id', $subscription ); ?>
+                </td>
+                <td class="subscription-status order-status woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-status woocommerce-orders-table__cell-order-status" data-title="<?php esc_attr_e( 'Status', 'woocommerce-subscriptions' ); ?>">
+	                <?php echo esc_attr( ucfirst( $subscription->get_status() ) ); ?>
+                </td>
+                <td class="subscription-next-payment order-date woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-next-payment woocommerce-orders-table__cell-order-date" data-title="<?php echo esc_attr_x( 'Next Payment', 'table heading', 'woocommerce-subscriptions' ); ?>">
+                    -
+                </td>
+                <td class="subscription-total order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-total woocommerce-orders-table__cell-order-total" data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'woocommerce-subscriptions' ); ?>">
+	                <?php echo number_format( esc_attr( $plan['amount'] ) / 100, 2 ) ?> <?php echo esc_attr( $plan['currency'] ) ?> / <?php echo $billing_type ?>
+                </td>
+                <td class="subscription-actions order-actions woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-actions woocommerce-orders-table__cell-order-actions">
+                    <a href="<?php echo esc_url( $link ) ?>" class="woocommerce-button button view"><?php echo esc_html_x( 'View', 'view a subscription', 'woocommerce-subscriptions' ); ?></a>
+					<?php do_action( 'woocommerce_my_subscriptions_actions', $subscription ); ?>
+                </td>
+            </tr>
+        <?php endif; ?>
 	<?php endforeach; ?>
 	</tbody>
 

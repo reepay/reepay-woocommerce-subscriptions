@@ -6,6 +6,10 @@
  * @since 1.0.0
  */
 class WC_Reepay_Account_Page {
+	/**
+	 * @var bool
+	 */
+	public $add_reepay_subscriptions_to_woo_subscriptions = true;
 
 	/**
 	 * Constructor
@@ -13,7 +17,9 @@ class WC_Reepay_Account_Page {
 	public function __construct() {
 		add_action( 'init', [ $this, 'init' ] );
 		add_action( 'template_redirect', [ $this, 'check_action' ] );
-		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ] );
+		add_filter( 'wcs_get_users_subscriptions', [ $this, 'add_reepay_subscriptions_to_woo_subscriptions_table' ], 2, 10 );
+		add_filter( 'wcs_get_subscription', [ $this, 'view_reepay_subscription_like_woo' ], 2, 10 );
+		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
 		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
 
@@ -100,7 +106,7 @@ class WC_Reepay_Account_Page {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
 
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -126,7 +132,7 @@ class WC_Reepay_Account_Page {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
 
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -160,7 +166,7 @@ class WC_Reepay_Account_Page {
 			}
 
 
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -182,7 +188,7 @@ class WC_Reepay_Account_Page {
 			} else {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -211,7 +217,7 @@ class WC_Reepay_Account_Page {
 			} else {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 	}
@@ -226,7 +232,40 @@ class WC_Reepay_Account_Page {
 		return __( "Subscriptions", 'reepay-subscriptions-for-woocommerce' );
 	}
 
+	/**
+	 * @param WC_Subscription[]|array $subscriptions
+	 * @param int $user_id
+	 *
+	 * @return WC_Subscription[]|array
+	 */
+	public function add_reepay_subscriptions_to_woo_subscriptions_table( $subscriptions, $user_id ) {
+		if ( ! $this->add_reepay_subscriptions_to_woo_subscriptions ) {
+			return $subscriptions;
+		}
+
+		$params['size'] = 100;
+		$params['page'] = 1;
+		$params['sort'] = 'created';
+
+		$reepay_subscriptions = wc_get_orders( [
+			'limit' => - 1,
+			'meta_key' => '_reepay_subscription_handle',
+			'meta_compare' => 'EXISTS'
+		] );
+
+		$subscriptions = array_merge( $reepay_subscriptions, $subscriptions );
+		usort( $subscriptions, function ( $sub1, $sub2 ) {
+			return $sub2->get_date_created()->getTimestamp() - $sub1->get_date_created()->getTimestamp();
+		} );
+
+		return $subscriptions;
+	}
+
 	public function subscriptions_endpoint( $next_page_token = '' ) {
+		if ( class_exists( 'WC_Subscriptions' ) ) {
+			$this->add_reepay_subscriptions_to_woo_subscriptions = true;
+			return;
+		}
 
 		$customer = 'customer-' . get_current_user_id();
 
@@ -235,7 +274,7 @@ class WC_Reepay_Account_Page {
 			'customer' => $customer,
 		];
 
-		if ( ! empty( $next_page_token ) ) {
+		if ( ! empty( $next_page_token ) && strlen( $next_page_token ) >= 10) {
 			$subscriptionsParams['next_page_token'] = $next_page_token;
 		}
 
@@ -310,15 +349,21 @@ class WC_Reepay_Account_Page {
 	}
 
 	public function add_subscriptions_menu_item( $menu_items ) {
-		$returnArr = [];
+		if ( ! empty( ( 'subscriptions' ) ) ) {
+			return $menu_items;
+		}
+
+		$menu_items_updated = [];
+
 		foreach ( $menu_items as $key => $menu_item ) {
-			$returnArr[ $key ] = $menu_item;
-			if ( $key === 'orders' ) {
-				$returnArr["subscriptions"] = $this->get_title();
+			$menu_items_updated[ $key ] = $menu_item;
+
+			if ( 'orders' === $key ) {
+				$menu_items_updated['subscriptions'] = $this->get_title();
 			}
 		}
 
-		return $returnArr;
+		return $menu_items_updated;
 	}
 
 	function get_status( $subscription ) {
@@ -357,4 +402,24 @@ class WC_Reepay_Account_Page {
 			return ( new DateTime( $dateStr ) )->format( 'd M Y' );
 		}
 	}
+
+	/**
+	 * @param WC_Subscription|false $subscription
+	 */
+	public function view_reepay_subscription_like_woo( $subscription ) {
+		global $wp;
+
+		if ( ! did_action( 'woocommerce_account_content' ) || ! empty( $subscription ) ) {
+			return $subscription;
+		}
+
+		$order_id = $wp->query_vars['view-subscription'] ?? '';
+
+		if( empty( $order_id ) ) {
+			return $subscription;
+		}
+
+		return wc_get_order( $order_id );
+	}
+
 }

@@ -1,0 +1,148 @@
+<?php
+/**
+ * Subscription details table
+ *
+ * @author  Prospress
+ * @package WooCommerce_Subscription/Templates
+ * @since 2.2.19
+ * @version 2.6.5
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
+
+$user_payment_methods = wc_get_customer_saved_methods_list( get_current_user_id() );
+$user_payment_methods_reepay = [];
+
+foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
+	$user_payment_methods_reepay[] = WC_Payment_Tokens::get( $user_payment_method['method']['id'] );
+}
+
+?>
+<table class="shop_table subscription_details">
+    <tbody>
+    <tr>
+        <td><?php esc_html_e( 'Status', 'woocommerce-subscriptions' ); ?></td>
+        <td><?php echo esc_html( wcs_get_subscription_status_name( $subscription->get_status() ) ); ?></td>
+    </tr>
+	<?php do_action( 'wcs_subscription_details_table_before_dates', $subscription ); ?>
+	<?php do_action( 'wcs_subscription_details_table_after_dates', $subscription ); ?>
+	<?php if ( WCS_My_Account_Auto_Renew_Toggle::can_user_toggle_auto_renewal( $subscription ) ) : ?>
+        <tr>
+            <td><?php esc_html_e( 'Auto renew', 'woocommerce-subscriptions' ); ?></td>
+            <td>
+                <div class="wcs-auto-renew-toggle">
+					<?php
+
+					$toggle_classes = array( 'subscription-auto-renew-toggle', 'subscription-auto-renew-toggle--hidden' );
+
+					if ( $subscription->is_manual() ) {
+						$toggle_label     = __( 'Enable auto renew', 'woocommerce-subscriptions' );
+						$toggle_classes[] = 'subscription-auto-renew-toggle--off';
+
+						if ( WCS_Staging::is_duplicate_site() ) {
+							$toggle_classes[] = 'subscription-auto-renew-toggle--disabled';
+						}
+					} else {
+						$toggle_label     = __( 'Disable auto renew', 'woocommerce-subscriptions' );
+						$toggle_classes[] = 'subscription-auto-renew-toggle--on';
+					}?>
+                    <a href="#" class="<?php echo esc_attr( implode( ' ' , $toggle_classes ) ); ?>" aria-label="<?php echo esc_attr( $toggle_label ) ?>"><i class="subscription-auto-renew-toggle__i" aria-hidden="true"></i></a>
+					<?php if ( WCS_Staging::is_duplicate_site() ) : ?>
+                        <small class="subscription-auto-renew-toggle-disabled-note"><?php echo esc_html__( 'Using the auto-renewal toggle is disabled while in staging mode.', 'woocommerce-subscriptions' ); ?></small>
+					<?php endif; ?>
+                </div>
+            </td>
+        </tr>
+	<?php endif; ?>
+	<?php do_action( 'wcs_subscription_details_table_before_payment_method', $subscription ); ?>
+	<?php do_action( 'woocommerce_subscription_before_actions', $subscription ); ?>
+	<?php do_action( 'woocommerce_subscription_after_actions', $subscription ); ?>
+
+	<?php
+	try {
+		$reepay_subscription = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) );
+		$payment_methods = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) . "/pm" );
+	} catch (Exception $e) {
+		$reepay_subscription = false;
+	}
+
+	if ( ! empty( $reepay_subscription ) && empty( $reepay_subscription['is_expired'] ) ): ?>
+		<?php if ( reepay_s()->settings( '_reepay_enable_on_hold' ) || reepay_s()->settings( '_reepay_enable_cancel' ) ): ?>
+            <tr>
+                <td><?php _e( 'Actions:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
+                <td>
+					<?php if ( $reepay_subscription['state'] === 'on_hold' ): ?>
+                        <a href="?reactivate=<?php echo esc_attr( $reepay_subscription['handle'] ) ?>"
+                           class="button"><?php _e( 'Reactivate', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+					<?php else: ?>
+						<?php if ( reepay_s()->settings( '_reepay_enable_on_hold' ) ): ?>
+                            <a href="?put_on_hold=<?php echo esc_attr( $reepay_subscription['handle'] ) ?>"
+                               class="button"><?php _e( 'Put on hold', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+						<?php endif; ?>
+					<?php endif; ?>
+
+					<?php if ( $reepay_subscription['state'] !== 'on_hold' ): ?>
+						<?php if ( $reepay_subscription['is_cancelled'] === true ): ?>
+                            <a href="?uncancel_subscription=<?php echo esc_attr( $reepay_subscription['handle'] ) ?>"
+                               class="button"><?php _e( 'Uncancel', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+						<?php else: ?>
+							<?php if ( reepay_s()->settings( '_reepay_enable_cancel' ) ): ?>
+                                <a href="?cancel_subscription=<?php echo esc_attr( $reepay_subscription['handle'] ) ?>"
+                                   class="button"><?php _e( 'Cancel Subscription', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+							<?php endif; ?>
+						<?php endif; ?>
+					<?php endif; ?>
+                </td>
+            </tr>
+		<?php endif; ?>
+
+        <tr>
+            <td><?php _e( 'Payment methods:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
+            <td></td>
+        </tr>
+		<?php foreach ( $user_payment_methods_reepay ?? [] as $payment_method ): ?>
+            <tr>
+                <td><?php echo $payment_method->get_masked_card() ?><?php echo $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></td>
+                <td>
+					<?php if ( $payment_method->get_token() === $payment_methods[0]['id'] ): ?>
+						<?php _e( 'Current', 'reepay-subscriptions-for-woocommerce' ); ?>
+					<?php else: ?>
+                        <a href="?change_payment_method=<?php echo __( $reepay_subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"
+                           class="button"><?php _e( 'Change', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+					<?php endif; ?>
+                </td>
+            </tr>
+
+		<?php endforeach; ?>
+        <tr>
+            <td></td>
+            <td>
+                <a href="<?php echo wc_get_endpoint_url( 'add-payment-method' ) . '?reepay_subscription=' . esc_attr( $reepay_subscription['handle'] ) ?>"
+                   class="button"><?php _e( 'Add payment method', 'reepay-subscriptions-for-woocommerce' ); ?></a></td>
+        </tr>
+	<?php endif; ?>
+    </tbody>
+    </tbody>
+</table>
+
+<?php if ( $notes = $subscription->get_customer_order_notes() ) : ?>
+    <h2><?php esc_html_e( 'Subscription updates', 'woocommerce-subscriptions' ); ?></h2>
+    <ol class="woocommerce-OrderUpdates commentlist notes">
+		<?php foreach ( $notes as $note ) : ?>
+            <li class="woocommerce-OrderUpdate comment note">
+                <div class="woocommerce-OrderUpdate-inner comment_container">
+                    <div class="woocommerce-OrderUpdate-text comment-text">
+                        <p class="woocommerce-OrderUpdate-meta meta"><?php echo esc_html( date_i18n( _x( 'l jS \o\f F Y, h:ia', 'date on subscription updates list. Will be localized', 'woocommerce-subscriptions' ), wcs_date_to_time( $note->comment_date ) ) ); ?></p>
+                        <div class="woocommerce-OrderUpdate-description description">
+							<?php echo wp_kses_post( wpautop( wptexturize( $note->comment_content ) ) ); ?>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </li>
+		<?php endforeach; ?>
+    </ol>
+<?php endif; ?>
