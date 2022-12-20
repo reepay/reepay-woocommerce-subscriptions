@@ -19,6 +19,8 @@ class WC_Reepay_Account_Page {
 		add_action( 'template_redirect', [ $this, 'check_action' ] );
 		add_filter( 'wcs_get_users_subscriptions', [ $this, 'add_reepay_subscriptions_to_woo_subscriptions_table' ], 2, 10 );
 		add_filter( 'wcs_get_subscription', [ $this, 'view_reepay_subscription_like_woo' ], 2, 10 );
+		add_filter( 'woocommerce_account_orders_columns', [ $this, 'add_column_to_account_orders' ], 2, 10 );
+		add_filter( 'woocommerce_my_account_my_orders_column_order_type', [ $this, 'add_order_type_to_account_orders' ], 2, 10 );
 		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
 		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
@@ -422,4 +424,35 @@ class WC_Reepay_Account_Page {
 		return wc_get_order( $order_id );
 	}
 
+	/**
+	 * @param array $columns
+	 */
+	public function add_column_to_account_orders( $columns ) {
+		$columns['order_type'] = 'Order type';
+
+		return $columns;
+	}
+
+	/**
+	 * @param WC_Order $order
+	 */
+	public function add_order_type_to_account_orders( $order ) {
+		$type = '';
+
+		if( $order->get_meta('_reepay_subscription_handle') ) {
+			$type = 'Reepay subscription';
+		} elseif ( class_exists( 'WC_Subscriptions_Product' ) ) {
+			$product = current($order->get_items())->get_product();
+			
+			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+				$type = 'Subscription';
+			} else {
+				$type = 'Order';
+			}
+		} else {
+			$type = 'Order';
+		}
+
+		echo '<span>' . $type . '</span>';
+	}
 }
