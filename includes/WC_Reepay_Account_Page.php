@@ -23,6 +23,8 @@ class WC_Reepay_Account_Page {
 		add_filter( 'woocommerce_my_account_my_orders_column_order_type', [ $this, 'add_order_type_to_account_orders' ], 2, 10 );
 		add_filter( 'woocommerce_get_formatted_order_total', [ $this, 'show_zero_order_total_on_account_orders' ], 1, 10 );
 		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
+		add_action( 'woocommerce_account_view-subscription_endpoint', [ $this, 'subscription_endpoint' ], 5, 1 );
+		add_filter( 'woocommerce_get_query_vars', array( $this, 'add_subscription_query_var' ) );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
 		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
 
@@ -264,12 +266,32 @@ class WC_Reepay_Account_Page {
 		return $subscriptions;
 	}
 
-	public function subscriptions_endpoint( $next_page_token = '' ) {
+	public function subscriptions_endpoint( $current_page = 1 ) {
 		if ( class_exists( 'WC_Subscriptions' ) ) {
 			$this->add_reepay_subscriptions_to_woo_subscriptions = true;
 			return;
 		}
 
+		$all_subscriptions = apply_filters( 'wcs_get_users_subscriptions', [], get_current_user_id() );
+		$current_page      = empty( $current_page ) ? 1 : absint( $current_page );
+		$posts_per_page    = get_option( 'posts_per_page' );
+		$max_num_pages     = ceil( count( $all_subscriptions ) / $posts_per_page );
+		$subscriptions     = array_slice( $all_subscriptions, ( $current_page - 1 ) * $posts_per_page, $posts_per_page );
+
+
+		wc_get_template(
+			'myaccount/my-subscriptions.php',
+			array(
+				'subscriptions' => $subscriptions,
+				'current_page'  => $current_page,
+				'max_num_pages' => $max_num_pages,
+				'paginate'      => true,
+			),
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+
+		return;
 		$customer = 'customer-' . get_current_user_id();
 
 		$subscriptionsParams = [
@@ -465,5 +487,31 @@ class WC_Reepay_Account_Page {
 		}
 
 		return wc_price(0);
+	}
+
+	public function subscription_endpoint() {
+		$subscription = apply_filters( 'wcs_get_subscription', false );
+
+		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {
+			echo '<div class="woocommerce-error">' . esc_html__( 'Invalid Subscription.', 'woocommerce-subscriptions' ) . ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' . esc_html__( 'My Account', 'woocommerce-subscriptions' ) . '</a>' . '</div>';
+			return;
+		}
+
+		wc_get_template(
+			'myaccount/view-subscription.php',
+			compact( 'subscription' ),
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+	}
+
+	public function add_subscription_query_var( $query_vars ) {
+		if ( ! in_array( 'view-subscription', $query_vars ) ) {
+			return array_merge( $query_vars, [
+				'view-subscription' => '',
+			] );
+		}
+
+		return $query_vars;
 	}
 }

@@ -21,7 +21,12 @@ wc_print_notices();
  * @since 2.2.19
  */
 do_action( 'woocommerce_subscription_details_table', $subscription );
-
+wc_get_template(
+        'myaccount/subscription-details.php',
+    array( 'subscription' => $subscription ),
+    '',
+	reepay_s()->settings( 'plugin_path' ) . 'templates/'
+);
 /**
  * Gets subscription totals table template
  * @param WC_Subscription $subscription A subscription object

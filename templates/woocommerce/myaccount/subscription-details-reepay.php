@@ -24,38 +24,10 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
     <tbody>
     <tr>
         <td><?php esc_html_e( 'Status', 'woocommerce-subscriptions' ); ?></td>
-        <td><?php echo esc_html( wcs_get_subscription_status_name( $subscription->get_status() ) ); ?></td>
+        <td><?php echo esc_html( ucfirst( $subscription->get_status() ) ); ?></td>
     </tr>
 	<?php do_action( 'wcs_subscription_details_table_before_dates', $subscription ); ?>
 	<?php do_action( 'wcs_subscription_details_table_after_dates', $subscription ); ?>
-	<?php if ( WCS_My_Account_Auto_Renew_Toggle::can_user_toggle_auto_renewal( $subscription ) ) : ?>
-        <tr>
-            <td><?php esc_html_e( 'Auto renew', 'woocommerce-subscriptions' ); ?></td>
-            <td>
-                <div class="wcs-auto-renew-toggle">
-					<?php
-
-					$toggle_classes = array( 'subscription-auto-renew-toggle', 'subscription-auto-renew-toggle--hidden' );
-
-					if ( $subscription->is_manual() ) {
-						$toggle_label     = __( 'Enable auto renew', 'woocommerce-subscriptions' );
-						$toggle_classes[] = 'subscription-auto-renew-toggle--off';
-
-						if ( WCS_Staging::is_duplicate_site() ) {
-							$toggle_classes[] = 'subscription-auto-renew-toggle--disabled';
-						}
-					} else {
-						$toggle_label     = __( 'Disable auto renew', 'woocommerce-subscriptions' );
-						$toggle_classes[] = 'subscription-auto-renew-toggle--on';
-					}?>
-                    <a href="#" class="<?php echo esc_attr( implode( ' ' , $toggle_classes ) ); ?>" aria-label="<?php echo esc_attr( $toggle_label ) ?>"><i class="subscription-auto-renew-toggle__i" aria-hidden="true"></i></a>
-					<?php if ( WCS_Staging::is_duplicate_site() ) : ?>
-                        <small class="subscription-auto-renew-toggle-disabled-note"><?php echo esc_html__( 'Using the auto-renewal toggle is disabled while in staging mode.', 'woocommerce-subscriptions' ); ?></small>
-					<?php endif; ?>
-                </div>
-            </td>
-        </tr>
-	<?php endif; ?>
 	<?php do_action( 'wcs_subscription_details_table_before_payment_method', $subscription ); ?>
 	<?php do_action( 'woocommerce_subscription_before_actions', $subscription ); ?>
 	<?php do_action( 'woocommerce_subscription_after_actions', $subscription ); ?>
