@@ -352,7 +352,7 @@ class WC_Reepay_Account_Page {
 	}
 
 	public function add_subscriptions_menu_item( $menu_items ) {
-		if ( ! empty( ( 'subscriptions' ) ) ) {
+		if ( ! empty( $menu_items['subscriptions'] ) ) {
 			return $menu_items;
 		}
 
