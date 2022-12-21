@@ -21,6 +21,7 @@ class WC_Reepay_Account_Page {
 		add_filter( 'wcs_get_subscription', [ $this, 'view_reepay_subscription_like_woo' ], 2, 10 );
 		add_filter( 'woocommerce_account_orders_columns', [ $this, 'add_column_to_account_orders' ], 2, 10 );
 		add_filter( 'woocommerce_my_account_my_orders_column_order_type', [ $this, 'add_order_type_to_account_orders' ], 2, 10 );
+		add_filter( 'woocommerce_get_formatted_order_total', [ $this, 'show_zero_order_total_on_account_orders' ], 1, 10 );
 		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
 		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
@@ -454,5 +455,15 @@ class WC_Reepay_Account_Page {
 		}
 
 		echo '<span>' . $type . '</span>';
+	}
+
+	public function show_zero_order_total_on_account_orders() {
+		global $wp;
+
+		if ( ! isset( $wp->query_vars['orders'] ) ) {
+			return;
+		}
+
+		return wc_price(0);
 	}
 }
