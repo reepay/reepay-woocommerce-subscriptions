@@ -21,12 +21,14 @@ wc_print_notices();
  * @since 2.2.19
  */
 do_action( 'woocommerce_subscription_details_table', $subscription );
-wc_get_template(
-        'myaccount/subscription-details.php',
-    array( 'subscription' => $subscription ),
-    '',
-	reepay_s()->settings( 'plugin_path' ) . 'templates/'
-);
+if ( ! class_exists( 'WC_Subscriptions' ) ) {
+	wc_get_template(
+		'myaccount/subscription-details.php',
+		array( 'subscription' => $subscription ),
+		'',
+		reepay_s()->settings( 'plugin_path' ) . 'templates/'
+	);
+}
 /**
  * Gets subscription totals table template
  * @param WC_Subscription $subscription A subscription object
@@ -36,16 +38,6 @@ do_action( 'woocommerce_subscription_totals_table', $subscription );
 
 if ( is_a( $subscription, 'WC_Subscription' ) ) {
 	do_action( 'woocommerce_subscription_details_after_subscription_table', $subscription );
-} else if ( is_a( $subscription, 'WC_Order' ) && false ) {
-	wc_get_template(
-		'myaccount/related-orders.php',
-		array(
-			'subscription_orders' => $subscription->get_children(),
-			'subscription'        => $subscription,
-		),
-		'',
-		WC_Subscriptions_Core_Plugin::instance()->get_subscriptions_core_directory( 'templates/' )
-	);
 }
 
 wc_get_template( 'order/order-details-customer.php', array( 'order' => $subscription ) );

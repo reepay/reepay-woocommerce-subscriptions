@@ -490,6 +490,10 @@ class WC_Reepay_Account_Page {
 	}
 
 	public function subscription_endpoint() {
+		if ( class_exists( 'WC_Subscriptions' ) ) {
+			return;
+		}
+
 		$subscription = apply_filters( 'wcs_get_subscription', false );
 
 		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {

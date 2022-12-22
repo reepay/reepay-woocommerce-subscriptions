@@ -98,23 +98,3 @@ foreach ( $user_payment_methods['reepay'] ?? [] as $user_payment_method ) {
     </tbody>
     </tbody>
 </table>
-
-<?php if ( $notes = $subscription->get_customer_order_notes() ) : ?>
-    <h2><?php esc_html_e( 'Subscription updates', 'woocommerce-subscriptions' ); ?></h2>
-    <ol class="woocommerce-OrderUpdates commentlist notes">
-		<?php foreach ( $notes as $note ) : ?>
-            <li class="woocommerce-OrderUpdate comment note">
-                <div class="woocommerce-OrderUpdate-inner comment_container">
-                    <div class="woocommerce-OrderUpdate-text comment-text">
-                        <p class="woocommerce-OrderUpdate-meta meta"><?php echo esc_html( date_i18n( _x( 'l jS \o\f F Y, h:ia', 'date on subscription updates list. Will be localized', 'woocommerce-subscriptions' ), wcs_date_to_time( $note->comment_date ) ) ); ?></p>
-                        <div class="woocommerce-OrderUpdate-description description">
-							<?php echo wp_kses_post( wpautop( wptexturize( $note->comment_content ) ) ); ?>
-                        </div>
-                        <div class="clear"></div>
-                    </div>
-                    <div class="clear"></div>
-                </div>
-            </li>
-		<?php endforeach; ?>
-    </ol>
-<?php endif; ?>
