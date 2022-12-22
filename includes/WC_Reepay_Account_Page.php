@@ -24,9 +24,8 @@ class WC_Reepay_Account_Page {
 		add_filter( 'woocommerce_get_formatted_order_total', [ $this, 'show_zero_order_total_on_account_orders' ], 1, 10 );
 		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
 		add_action( 'woocommerce_account_view-subscription_endpoint', [ $this, 'subscription_endpoint' ], 5, 1 );
-		add_filter( 'woocommerce_get_query_vars', array( $this, 'add_subscription_query_var' ) );
+		add_filter( 'woocommerce_get_query_vars', array( $this, 'add_subscription_query_vars' ) );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
-		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
 
 		add_filter( 'woocommerce_reepay_payment_accept_url', [ $this, 'add_subscription_arg' ] );
 		add_filter( 'woocommerce_reepay_payment_cancel_url', [ $this, 'add_subscription_arg' ] );
@@ -227,14 +226,6 @@ class WC_Reepay_Account_Page {
 		}
 	}
 
-	public function subscriptions_query_vars( $endpoints ) {
-		$endpoints['subscriptions'] = 'subscriptions';
-		$endpoints['subscriptions']               = get_option( 'woocommerce_myaccount_subscriptions_endpoint', 'subscriptions' );
-		$endpoints['subscription-payment-method'] = get_option( 'woocommerce_myaccount_subscription_payment_method_endpoint', 'subscription-payment-method' );
-		
-		return $endpoints;
-	}
-
 	public function get_title() {
 		return __( "Subscriptions", 'reepay-subscriptions-for-woocommerce' );
 	}
@@ -431,12 +422,10 @@ class WC_Reepay_Account_Page {
 		);
 	}
 
-	public function add_subscription_query_var( $query_vars ) {
-		if ( ! in_array( 'view-subscription', $query_vars ) ) {
-			return array_merge( $query_vars, [
-				'view-subscription' => '',
-			] );
-		}
+	public function add_subscription_query_vars ( $query_vars ) {
+		$query_vars['subscriptions']               = get_option( 'woocommerce_myaccount_subscriptions_endpoint', 'subscriptions' );
+		$query_vars['subscription-payment-method'] = get_option( 'woocommerce_myaccount_subscription_payment_method_endpoint', 'subscription-payment-method' );
+		$query_vars['view-subscription']           = get_option( 'woocommerce_myaccount_view_subscription_endpoint', 'view-subscription' );
 
 		return $query_vars;
 	}
