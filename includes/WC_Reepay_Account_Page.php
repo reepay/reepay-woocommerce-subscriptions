@@ -414,6 +414,8 @@ class WC_Reepay_Account_Page {
 			return;
 		}
 
+		$subscription = apply_filters( 'wcs_get_subscription', false );
+
 		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {
 			echo '<div class="woocommerce-error">' . esc_html__( 'Invalid Subscription.', 'woocommerce-subscriptions' ) . ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' . esc_html__( 'My Account', 'woocommerce-subscriptions' ) . '</a>' . '</div>';
 			return;
