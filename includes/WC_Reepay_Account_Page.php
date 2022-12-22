@@ -255,7 +255,8 @@ class WC_Reepay_Account_Page {
 		$reepay_subscriptions = wc_get_orders( [
 			'limit' => - 1,
 			'meta_key' => '_reepay_subscription_handle',
-			'meta_compare' => 'EXISTS'
+			'meta_compare' => 'EXISTS',
+			'customer_id' => $user_id
 		] );
 
 		$subscriptions = array_merge( $reepay_subscriptions, $subscriptions );
@@ -493,8 +494,6 @@ class WC_Reepay_Account_Page {
 		if ( class_exists( 'WC_Subscriptions' ) ) {
 			return;
 		}
-
-		$subscription = apply_filters( 'wcs_get_subscription', false );
 
 		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {
 			echo '<div class="woocommerce-error">' . esc_html__( 'Invalid Subscription.', 'woocommerce-subscriptions' ) . ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' . esc_html__( 'My Account', 'woocommerce-subscriptions' ) . '</a>' . '</div>';
