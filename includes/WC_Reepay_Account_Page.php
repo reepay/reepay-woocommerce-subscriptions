@@ -229,7 +229,9 @@ class WC_Reepay_Account_Page {
 
 	public function subscriptions_query_vars( $endpoints ) {
 		$endpoints['subscriptions'] = 'subscriptions';
-
+		$endpoints['subscriptions']               = get_option( 'woocommerce_myaccount_subscriptions_endpoint', 'subscriptions' );
+		$endpoints['subscription-payment-method'] = get_option( 'woocommerce_myaccount_subscription_payment_method_endpoint', 'subscription-payment-method' );
+		
 		return $endpoints;
 	}
 
