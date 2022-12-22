@@ -392,11 +392,11 @@ class WC_Reepay_Account_Page {
 		echo '<span>' . $type . '</span>';
 	}
 
-	public function show_zero_order_total_on_account_orders() {
+	public function show_zero_order_total_on_account_orders( $formatted_total ) {
 		global $wp;
 
 		if ( ! isset( $wp->query_vars['orders'] ) ) {
-			return;
+			return $formatted_total;
 		}
 
 		return wc_price(0);
