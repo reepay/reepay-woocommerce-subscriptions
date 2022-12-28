@@ -3,7 +3,7 @@
         'name' => 'reepay/reepay-subscriptions-for-woocommerce',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'f77bfc8d3fde97678993387857b3e5f45301ec24',
+        'reference' => 'be9b69cd1482058b894a685d4a2ec2076e872b85',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'reepay/reepay-subscriptions-for-woocommerce' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'f77bfc8d3fde97678993387857b3e5f45301ec24',
+            'reference' => 'be9b69cd1482058b894a685d4a2ec2076e872b85',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
