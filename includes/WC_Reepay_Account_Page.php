@@ -6,6 +6,10 @@
  * @since 1.0.0
  */
 class WC_Reepay_Account_Page {
+	/**
+	 * @var bool
+	 */
+	public $add_reepay_subscriptions_to_woo_subscriptions = true;
 
 	/**
 	 * Constructor
@@ -13,9 +17,16 @@ class WC_Reepay_Account_Page {
 	public function __construct() {
 		add_action( 'init', [ $this, 'init' ] );
 		add_action( 'template_redirect', [ $this, 'check_action' ] );
-		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ] );
+		add_filter( 'wcs_get_users_subscriptions', [ $this, 'add_reepay_subscriptions_to_woo_subscriptions_table' ], 2, 10 );
+		add_filter( 'wcs_get_subscription', [ $this, 'view_reepay_subscription_like_woo' ], 2, 10 );
+		add_filter( 'woocommerce_account_orders_columns', [ $this, 'add_column_to_account_orders' ], 2, 10 );
+		add_filter( 'woocommerce_my_account_my_orders_column_order_type', [ $this, 'add_order_type_to_account_orders' ], 2, 10 );
+		add_filter( 'woocommerce_get_formatted_order_total', [ $this, 'show_zero_order_total_on_account_orders' ], 1, 10 );
+		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
+		add_action( 'woocommerce_account_view-subscription_endpoint', [ $this, 'subscription_endpoint' ], 5, 1 );
+		add_filter( 'query_vars', array( $this, 'add_subscription_query_vars' ) );
+		add_filter( 'woocommerce_get_query_vars', array( $this, 'add_subscription_query_vars' ) );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
-		add_filter( 'woocommerce_get_query_vars', [ $this, 'subscriptions_query_vars' ], 0 );
 
 		add_filter( 'woocommerce_reepay_payment_accept_url', [ $this, 'add_subscription_arg' ] );
 		add_filter( 'woocommerce_reepay_payment_cancel_url', [ $this, 'add_subscription_arg' ] );
@@ -54,25 +65,11 @@ class WC_Reepay_Account_Page {
 
 	public function rewrite_endpoint() {
 		add_rewrite_endpoint( 'subscriptions', EP_ROOT | EP_PAGES );
-	}
 
-	/**
-	 * Verify subscription belongs to customer
-	 *
-	 * @param $handle
-	 *
-	 * @return mixed|WC_Order|null
-	 */
-	public function get_customer_subscription_by_handle( $handle ) {
-		$order = wc_get_orders( [
-				'meta_key'   => '_reepay_subscription_handle',
-				'meta_value' => $handle,
-			] )[0] ?? null;
-		if ( $order && $order->get_customer_id() === get_current_user_id() ) {
-			return $order;
+		if ( get_transient( 'woocommerce_reepay_subscriptions_activated' ) ) {
+			flush_rewrite_rules();
+			delete_transient( 'woocommerce_reepay_subscriptions_activated' );
 		}
-
-		return null;
 	}
 
 	public function check_action() {
@@ -100,7 +97,7 @@ class WC_Reepay_Account_Page {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
 
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -126,7 +123,7 @@ class WC_Reepay_Account_Page {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
 
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -160,7 +157,7 @@ class WC_Reepay_Account_Page {
 			}
 
 
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -182,7 +179,7 @@ class WC_Reepay_Account_Page {
 			} else {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
 
@@ -211,102 +208,87 @@ class WC_Reepay_Account_Page {
 			} else {
 				wc_add_notice( 'Permission denied', 'error' );
 			}
-			wp_redirect( wc_get_endpoint_url( 'subscriptions' ) );
+			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
-	}
-
-	public function subscriptions_query_vars( $endpoints ) {
-		$endpoints['subscriptions'] = 'subscriptions';
-
-		return $endpoints;
 	}
 
 	public function get_title() {
 		return __( "Subscriptions", 'reepay-subscriptions-for-woocommerce' );
 	}
 
-	public function subscriptions_endpoint( $next_page_token = '' ) {
-
-		$customer = 'customer-' . get_current_user_id();
-
-		$subscriptionsParams = [
-			'size'     => 10,
-			'customer' => $customer,
-		];
-
-		if ( ! empty( $next_page_token ) ) {
-			$subscriptionsParams['next_page_token'] = $next_page_token;
+	/**
+	 * @param WC_Subscription[]|array $subscriptions
+	 * @param int $user_id
+	 *
+	 * @return WC_Subscription[]|array
+	 */
+	public function add_reepay_subscriptions_to_woo_subscriptions_table( $subscriptions, $user_id ) {
+		if ( ! $this->add_reepay_subscriptions_to_woo_subscriptions ) {
+			return $subscriptions;
 		}
 
-		$subsResult = reepay_s()->api()->request( "list/subscription?" . http_build_query( $subscriptionsParams ) );
-		$planResult = reepay_s()->api()->request( "plan" );
-		$plans      = [];
+		$params['size'] = 100;
+		$params['page'] = 1;
+		$params['sort'] = 'created';
 
-		foreach ( $planResult as $item ) {
-			$plans[ $item['handle'] ] = $item;
+		$reepay_subscriptions = wc_get_orders( [
+			'limit' => - 1,
+			'meta_key' => '_reepay_subscription_handle',
+			'meta_compare' => 'EXISTS',
+			'customer_id' => $user_id
+		] );
+
+		$subscriptions = array_merge( $reepay_subscriptions, $subscriptions );
+		usort( $subscriptions, function ( $sub1, $sub2 ) {
+			return $sub2->get_date_created()->getTimestamp() - $sub1->get_date_created()->getTimestamp();
+		} );
+
+		return $subscriptions;
+	}
+
+	public function subscriptions_endpoint( $current_page = 1 ) {
+		if ( class_exists( 'WC_Subscriptions' ) ) {
+			$this->add_reepay_subscriptions_to_woo_subscriptions = true;
+			return;
 		}
 
-		$subscriptions = $subsResult['content'];
+		$all_subscriptions = apply_filters( 'wcs_get_users_subscriptions', [], get_current_user_id() );
+		$current_page      = empty( $current_page ) ? 1 : absint( $current_page );
+		$posts_per_page    = get_option( 'posts_per_page' );
+		$max_num_pages     = ceil( count( $all_subscriptions ) / $posts_per_page );
+		$subscriptions     = array_slice( $all_subscriptions, ( $current_page - 1 ) * $posts_per_page, $posts_per_page );
 
-		$subscriptionsArr = [];
 
-		foreach ( $subscriptions as $subscription ) {
-			$payment_methods = get_transient( $subscription['handle'] . '_payment_methods' );
-			if ( ! $payment_methods ) {
-				$payment_methods = reepay_s()->api()->request( "subscription/" . $subscription['handle'] . "/pm" );
-				set_transient( $subscription['handle'] . '_payment_methods', $payment_methods );
-			}
-			$plan               = WC_Reepay_Subscription_Plan_Simple::wc_get_plan( $subscription['plan'] );
-			$subscriptionsArr[] = [
-				'state'                          => $subscription['state'],
-				'handle'                         => $subscription['handle'],
-				'is_cancelled'                   => $subscription['is_cancelled'],
-				'renewing'                       => $subscription['renewing'],
-				'first_period_start'             => $subscription['first_period_start'],
-				'formatted_first_period_start'   => $this->format_date( $subscription['first_period_start'] ),
-				'current_period_start'           => $subscription['current_period_start'] ?? null,
-				'formatted_current_period_start' => $this->format_date( $subscription['current_period_start'] ?? null ),
-				'next_period_start'              => $subscription['next_period_start'] ?? null,
-				'formatted_next_period_start'    => $this->format_date( $subscription['next_period_start'] ?? null ),
-				'expired_date'                   => $subscription['expired_date'] ?? null,
-				'formatted_expired_date'         => $this->format_date( $subscription['expired_date'] ?? null ),
-				'formatted_status'               => $this->get_status( $subscription ),
-				'formatted_schedule'             => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $plan ),
-				'payment_methods'                => $payment_methods,
-				'plan'                           => $subscription['plan']
-			];
-		}
-		$previous_token = get_transient( $next_page_token . '_previous_token' );
-		if ( $previous_token === false ) {
-			set_transient( $subsResult['next_page_token'] . '_previous_token', $next_page_token );
-			$previous_token = '';
-		}
 		wc_get_template(
-			'my-account/subscriptions.php',
-			[
-				'subscriptions'   => $subscriptionsArr,
-				'plans'           => $plans,
-				'domain'          => 'reepay-subscriptions-for-woocommerce',
-				'current_token'   => $next_page_token,
-				'previous_token'  => $previous_token,
-				'next_page_token' => $subsResult['next_page_token'] ?? ''
-			],
+			'myaccount/my-subscriptions.php',
+			array(
+				'subscriptions' => $subscriptions,
+				'current_page'  => $current_page,
+				'max_num_pages' => $max_num_pages,
+				'paginate'      => true,
+			),
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
 	}
 
 	public function add_subscriptions_menu_item( $menu_items ) {
-		$returnArr = [];
+		if ( ! empty( $menu_items['subscriptions'] ) ) {
+			return $menu_items;
+		}
+
+		$menu_items_updated = [];
+
 		foreach ( $menu_items as $key => $menu_item ) {
-			$returnArr[ $key ] = $menu_item;
-			if ( $key === 'orders' ) {
-				$returnArr["subscriptions"] = $this->get_title();
+			$menu_items_updated[ $key ] = $menu_item;
+
+			if ( 'orders' === $key ) {
+				$menu_items_updated['subscriptions'] = $this->get_title();
 			}
 		}
 
-		return $returnArr;
+		return $menu_items_updated;
 	}
 
 	function get_status( $subscription ) {
@@ -340,32 +322,98 @@ class WC_Reepay_Account_Page {
 		return $subscription['state'];
 	}
 
-	public function get_formatted_schedule_type( $plan ) {
-		if ( $plan['schedule_type'] === 'manual' ) {
-			return 'Manual';
-		}
-		if ( $plan['schedule_type'] === 'daily' ) {
-			return 'Every day';
-		}
-		if ( $plan['schedule_type'] === 'weekly_fixedday' ) {
-			return 'Weekly fixedday';
-		}
-		if ( $plan['schedule_type'] === 'month_startdate' ) {
-			return 'Month startdate';
-		}
-		if ( $plan['schedule_type'] === 'month_fixedday' ) {
-			return 'Month fixedday';
-		}
-		if ( $plan['schedule_type'] === 'month_lastday' ) {
-			return 'Month lastdate';
-		}
-
-		return $plan['schedule_type'];
-	}
-
 	function format_date( $dateStr ) {
 		if ( ! empty( $dateStr ) ) {
 			return ( new DateTime( $dateStr ) )->format( 'd M Y' );
 		}
+	}
+
+	/**
+	 * @param WC_Subscription|false $subscription
+	 */
+	public function view_reepay_subscription_like_woo( $subscription ) {
+		global $wp;
+
+		if ( ! did_action( 'woocommerce_account_content' ) || ! empty( $subscription ) ) {
+			return $subscription;
+		}
+
+		$order_id = $wp->query_vars['view-subscription'] ?? '';
+
+		if( empty( $order_id ) ) {
+			return $subscription;
+		}
+
+		return wc_get_order( $order_id );
+	}
+
+	/**
+	 * @param array $columns
+	 */
+	public function add_column_to_account_orders( $columns ) {
+		$columns['order_type'] = 'Order type';
+
+		return $columns;
+	}
+
+	/**
+	 * @param WC_Order $order
+	 */
+	public function add_order_type_to_account_orders( $order ) {
+		$type = '';
+
+		if( $order->get_meta('_reepay_subscription_handle') ) {
+			$type = 'Reepay subscription';
+		} elseif ( class_exists( 'WC_Subscriptions_Product' ) ) {
+			$product = current($order->get_items())->get_product();
+			
+			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+				$type = 'Subscription';
+			} else {
+				$type = 'Order';
+			}
+		} else {
+			$type = 'Order';
+		}
+
+		echo '<span>' . $type . '</span>';
+	}
+
+	public function show_zero_order_total_on_account_orders( $formatted_total ) {
+		global $wp;
+
+		if ( ! isset( $wp->query_vars['orders'] ) ) {
+			return $formatted_total;
+		}
+
+		return wc_price(0);
+	}
+
+	public function subscription_endpoint() {
+		if ( class_exists( 'WC_Subscriptions' ) ) {
+			return;
+		}
+
+		$subscription = apply_filters( 'wcs_get_subscription', false );
+
+		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {
+			echo '<div class="woocommerce-error">' . esc_html__( 'Invalid Subscription.', 'woocommerce-subscriptions' ) . ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' . esc_html__( 'My Account', 'woocommerce-subscriptions' ) . '</a>' . '</div>';
+			return;
+		}
+
+		wc_get_template(
+			'myaccount/view-subscription.php',
+			compact( 'subscription' ),
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+	}
+
+	public function add_subscription_query_vars ( $query_vars ) {
+		$query_vars['view-subscription']           = get_option( 'woocommerce_myaccount_view_subscription_endpoint', 'view-subscription' );
+		$query_vars['subscriptions']               = get_option( 'woocommerce_myaccount_subscriptions_endpoint', 'subscriptions' );
+		$query_vars['subscription-payment-method'] = get_option( 'woocommerce_myaccount_subscription_payment_method_endpoint', 'subscription-payment-method' );
+
+		return $query_vars;
 	}
 }
