@@ -322,12 +322,6 @@ class WC_Reepay_Account_Page {
 		return $subscription['state'];
 	}
 
-	function format_date( $dateStr ) {
-		if ( ! empty( $dateStr ) ) {
-			return ( new DateTime( $dateStr ) )->format( 'd M Y' );
-		}
-	}
-
 	/**
 	 * @param WC_Subscription|false $subscription
 	 */
