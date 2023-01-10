@@ -19,9 +19,9 @@ class WC_Reepay_Import_Menu {
 	/**
 	 * WC_Reepay_Import_Menu constructor.
 	 *
-	 * @param  string  $option_name
-	 * @param  string  $menu_slug
-	 * @param  array<string>  $import_objects
+	 * @param string $option_name
+	 * @param string $menu_slug
+	 * @param array<string> $import_objects
 	 */
 	public function __construct( $option_name, $menu_slug, $import_objects ) {
 		$this->option_name    = $option_name;
@@ -88,18 +88,18 @@ class WC_Reepay_Import_Menu {
 	}
 
 	function import_page_callback() {
-        $page = $_GET['page'] ?? '';
-        $tab = $_GET['tab'] ?? '';
+		$page = $_GET['page'] ?? '';
+		$tab  = $_GET['tab'] ?? '';
 		?>
         <div class="wrap">
             <h1><?php echo get_admin_page_title() ?></h1>
             <form method="post" action="options.php">
                 <ul class="subsubsub">
-                    <li><a href="http://reepay3.test/wp-admin/admin.php?page=wc-settings&tab=reepay_subscriptions"
+                    <li><a href="<?php echo get_admin_url() ?>admin.php?page=wc-settings&tab=reepay_subscriptions"
                            class="<?php echo $tab === 'reepay_subscriptions' ? 'current' : '' ?>">General</a> |
                     </li>
                     <li>
-                        <a href="http://reepay3.test/wp-admin/tools.php?page=reepay_import"
+                        <a href="<?php echo get_admin_url() ?>tools.php?page=reepay_import"
                            class="<?php echo $page === 'reepay_import' ? 'current' : '' ?>">Import tools</a> |
                     </li>
                 </ul>
