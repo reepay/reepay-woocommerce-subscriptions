@@ -17,11 +17,20 @@ class WC_Reepay_Account_Page {
 	public function __construct() {
 		add_action( 'init', [ $this, 'init' ] );
 		add_action( 'template_redirect', [ $this, 'check_action' ] );
-		add_filter( 'wcs_get_users_subscriptions', [ $this, 'add_reepay_subscriptions_to_woo_subscriptions_table' ], 2, 10 );
+		add_filter( 'wcs_get_users_subscriptions', [
+			$this,
+			'add_reepay_subscriptions_to_woo_subscriptions_table'
+		], 2, 10 );
 		add_filter( 'wcs_get_subscription', [ $this, 'view_reepay_subscription_like_woo' ], 2, 10 );
 		add_filter( 'woocommerce_account_orders_columns', [ $this, 'add_column_to_account_orders' ], 2, 10 );
-		add_filter( 'woocommerce_my_account_my_orders_column_order_type', [ $this, 'add_order_type_to_account_orders' ], 2, 10 );
-		add_filter( 'woocommerce_get_formatted_order_total', [ $this, 'show_zero_order_total_on_account_orders' ], 1, 10 );
+		add_filter( 'woocommerce_my_account_my_orders_column_order_type', [
+			$this,
+			'add_order_type_to_account_orders'
+		], 2, 10 );
+		add_filter( 'woocommerce_get_formatted_order_total', [
+			$this,
+			'show_zero_order_total_on_account_orders'
+		], 1, 10 );
 		add_action( 'woocommerce_account_subscriptions_endpoint', [ $this, 'subscriptions_endpoint' ], 5, 1 );
 		add_action( 'woocommerce_account_view-subscription_endpoint', [ $this, 'subscription_endpoint' ], 5, 1 );
 		add_filter( 'query_vars', array( $this, 'add_subscription_query_vars' ) );
@@ -182,8 +191,9 @@ class WC_Reepay_Account_Page {
 			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
 		}
+		
 
-		if ( ! empty( $_GET['change_payment_method'] ) ) {
+		if ( ! empty( $_GET['change_payment_method'] ) && ! empty( $_GET['token_id'] ) ) {
 			$handle   = sanitize_text_field( $_GET['change_payment_method'] );
 			$token_id = intval( $_GET['token_id'] );
 			$token    = WC_Payment_Tokens::get( $token_id );
@@ -233,10 +243,10 @@ class WC_Reepay_Account_Page {
 		$params['sort'] = 'created';
 
 		$reepay_subscriptions = wc_get_orders( [
-			'limit' => - 1,
-			'meta_key' => '_reepay_subscription_handle',
+			'limit'        => - 1,
+			'meta_key'     => '_reepay_subscription_handle',
 			'meta_compare' => 'EXISTS',
-			'customer_id' => $user_id
+			'customer_id'  => $user_id
 		] );
 
 		$subscriptions = array_merge( $reepay_subscriptions, $subscriptions );
@@ -250,6 +260,7 @@ class WC_Reepay_Account_Page {
 	public function subscriptions_endpoint( $current_page = 1 ) {
 		if ( class_exists( 'WC_Subscriptions' ) ) {
 			$this->add_reepay_subscriptions_to_woo_subscriptions = true;
+
 			return;
 		}
 
@@ -322,12 +333,6 @@ class WC_Reepay_Account_Page {
 		return $subscription['state'];
 	}
 
-	function format_date( $dateStr ) {
-		if ( ! empty( $dateStr ) ) {
-			return ( new DateTime( $dateStr ) )->format( 'd M Y' );
-		}
-	}
-
 	/**
 	 * @param WC_Subscription|false $subscription
 	 */
@@ -340,7 +345,7 @@ class WC_Reepay_Account_Page {
 
 		$order_id = $wp->query_vars['view-subscription'] ?? '';
 
-		if( empty( $order_id ) ) {
+		if ( empty( $order_id ) ) {
 			return $subscription;
 		}
 
@@ -362,11 +367,11 @@ class WC_Reepay_Account_Page {
 	public function add_order_type_to_account_orders( $order ) {
 		$type = '';
 
-		if( $order->get_meta('_reepay_subscription_handle') ) {
+		if ( $order->get_meta( '_reepay_subscription_handle' ) ) {
 			$type = 'Reepay subscription';
 		} elseif ( class_exists( 'WC_Subscriptions_Product' ) ) {
-			$product = current($order->get_items())->get_product();
-			
+			$product = current( $order->get_items() )->get_product();
+
 			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
 				$type = 'Subscription';
 			} else {
@@ -386,7 +391,7 @@ class WC_Reepay_Account_Page {
 			return $formatted_total;
 		}
 
-		return wc_price(0);
+		return wc_price( 0 );
 	}
 
 	public function subscription_endpoint() {
@@ -398,6 +403,7 @@ class WC_Reepay_Account_Page {
 
 		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {
 			echo '<div class="woocommerce-error">' . esc_html__( 'Invalid Subscription.', 'woocommerce-subscriptions' ) . ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' . esc_html__( 'My Account', 'woocommerce-subscriptions' ) . '</a>' . '</div>';
+
 			return;
 		}
 
@@ -409,7 +415,7 @@ class WC_Reepay_Account_Page {
 		);
 	}
 
-	public function add_subscription_query_vars ( $query_vars ) {
+	public function add_subscription_query_vars( $query_vars ) {
 		$query_vars['view-subscription']           = get_option( 'woocommerce_myaccount_view_subscription_endpoint', 'view-subscription' );
 		$query_vars['subscriptions']               = get_option( 'woocommerce_myaccount_subscriptions_endpoint', 'subscriptions' );
 		$query_vars['subscription-payment-method'] = get_option( 'woocommerce_myaccount_subscription_payment_method_endpoint', 'subscription-payment-method' );
