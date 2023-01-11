@@ -53,13 +53,6 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </td>
             </tr>
 		<?php elseif ( is_a( $subscription, 'WC_Order' ) )  :
-			try {
-				$reepay_subscription = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) );
-				$plan                = reepay_s()->api()->request( "plan/" . $reepay_subscription['plan'] . "/current" );
-			} catch (Exception $e) {
-				continue;
-			}
-
 			$order_item = current( $subscription->get_items( 'line_item' ) );
 			$billing_type = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $order_item->get_product(), true );
 
@@ -77,7 +70,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                     -
                 </td>
                 <td class="subscription-total order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-total woocommerce-orders-table__cell-order-total" data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'woocommerce-subscriptions' ); ?>">
-	                <?php echo number_format( esc_attr( $plan['amount'] ) / 100, 2 ) ?> <?php echo esc_attr( $plan['currency'] ) ?> / <?php echo $billing_type ?>
+	                <?php echo $subscription->get_formatted_order_total() ?><?php echo ! empty( $billing_type ) ? ' / ' . $billing_type : '' ?>
                 </td>
                 <td class="subscription-actions order-actions woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-actions woocommerce-orders-table__cell-order-actions">
                     <a href="<?php echo esc_url( $link ) ?>" class="woocommerce-button button view"><?php echo esc_html_x( 'View', 'view a subscription', 'woocommerce-subscriptions' ); ?></a>
