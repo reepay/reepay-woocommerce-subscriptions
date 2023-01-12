@@ -15,7 +15,6 @@ class WC_Reepay_Admin_Frontend {
 		add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
 
-		//add_filter( 'posts_orderby', [ $this, 'modify_search_results_order' ], 10, 2 );
 		add_action( 'pre_get_posts', [ $this, 'add_invoice_to_search' ], 10, 1 );
 		add_filter( 'posts_fields', [ $this, 'modify_search_results_fields' ], 10, 2 );
 		add_filter( 'woocommerce_order_number', [ $this, 'modify_order_id' ], 10, 2 );
@@ -49,8 +48,6 @@ class WC_Reepay_Admin_Frontend {
 
 			$query->set( 'meta_query', $meta_query );
 		}
-
-		return;
 	}
 
 	public function modify_order_id( $id, $order ) {
@@ -182,47 +179,21 @@ class WC_Reepay_Admin_Frontend {
 	 * @return array
 	 */
 	public function admin_shop_order_edit_columns( $existing_columns ) {
-		if ( WC_VERSION > '3.2.6' ) {
-			unset( $existing_columns['wc_actions'] );
-
-			$columns = array_slice( $existing_columns, 0, count( $existing_columns ), true ) +
-			           array(
-				           'reepay_sub' => __( 'Subscription', 'reepay-subscriptions-for-woocommerce' ),
-				           'order_type' => __( 'Order type', 'reepay-subscriptions-for-woocommerce' ),
-			           )
-			           + array_slice( $existing_columns, count( $existing_columns ), count( $existing_columns ) - 1, true );
-		} else {
-			$existing_columns['reepay_sub'] = __( 'Vendor', 'reepay-subscriptions-for-woocommerce' );
-			$existing_columns['order_type'] = __( 'Order type', 'reepay-subscriptions-for-woocommerce' );
-		}
-
-		if ( WC_VERSION > '3.2.6' ) {
-			// Remove seller, suborder column if seller is viewing his own product
-			if ( ! current_user_can( 'manage_woocommerce' ) || ( isset( $_GET['author'] ) && ! empty( $_GET['author'] ) ) ) {
-				unset( $columns['order_type'] );
-				unset( $columns['reepay_sub'] );
-			}
-
-			return $columns;
-		}
+		$columns = array_slice( $existing_columns, 0, count( $existing_columns ) - 1, true ) +
+		           array(
+			           'reepay_sub' => __( 'Subscription', 'reepay-subscriptions-for-woocommerce' ),
+			           'order_type' => __( 'Order type', 'reepay-subscriptions-for-woocommerce' ),
+		           )
+		           + array_slice( $existing_columns, count( $existing_columns ) - 1, count( $existing_columns ), true );
 
 		// Remove seller, suborder column if seller is viewing his own product
 		if ( ! current_user_can( 'manage_woocommerce' ) || ( isset( $_GET['author'] ) && ! empty( $_GET['author'] ) ) ) {
-			unset( $existing_columns['order_type'] );
-			unset( $existing_columns['reepay_sub'] );
+			unset( $columns['order_type'] );
+			unset( $columns['reepay_sub'] );
 		}
 
-		return $existing_columns;
+		return $columns;
 	}
-
-	/*function modify_search_results_order( $orderby, $query ) {
-		if ( is_admin() && $query->is_main_query() && $query->get( 'post_type' ) === 'shop_order' ) {
-			global $wpdb;
-			$orderby = "CASE WHEN $wpdb->posts.post_parent != 0 THEN $wpdb->posts.post_parent WHEN $wpdb->posts.post_parent = 0 THEN $wpdb->posts.id END desc";
-		}
-
-		return $orderby;
-	}*/
 
 	function modify_search_results_fields( $orderby, $query ) {
 
