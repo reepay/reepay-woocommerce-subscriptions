@@ -15,7 +15,6 @@ class WC_Reepay_Admin_Frontend {
 		add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
 
-		add_action( 'pre_get_posts', [ $this, 'add_invoice_to_search' ], 10, 1 );
 		add_filter( 'posts_fields', [ $this, 'modify_search_results_fields' ], 10, 2 );
 		add_filter( 'woocommerce_order_number', [ $this, 'modify_order_id' ], 10, 2 );
 
@@ -23,38 +22,6 @@ class WC_Reepay_Admin_Frontend {
 			$this,
 			'reepay_show_extra_order_fields'
 		) );
-	}
-
-	public function add_invoice_to_search( $query ) {
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		global $pagenow;
-
-		if ( 'edit.php' === $pagenow && 'shop_order' === $query->query['post_type'] && isset( $query->query['s'] ) ) {
-			$s = str_replace( '#', '', $query->query['s'] );
-
-			$invoice_search_meta_query = array(
-				'key'     => '_reepay_order',
-				'value'   => "%$s%",
-				'compare' => 'LIKE',
-			);
-
-			$meta_query = $query->get( 'meta_query' );
-
-			if ( empty( $meta_query ) ) {
-				$meta_query = $invoice_search_meta_query;
-			} else {
-				$meta_query = array(
-					'relation' => 'OR',
-					$meta_query,
-					$invoice_search_meta_query,
-				);
-			}
-
-			$query->set( 'meta_query', $meta_query );
-		}
 	}
 
 	public function modify_order_id( $id, $order ) {
