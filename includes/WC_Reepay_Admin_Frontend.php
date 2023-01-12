@@ -26,7 +26,6 @@ class WC_Reepay_Admin_Frontend {
 	}
 
 	public function add_invoice_to_search( $query ) {
-
 		if ( ! is_admin() ) {
 			return;
 		}
@@ -34,17 +33,25 @@ class WC_Reepay_Admin_Frontend {
 		global $pagenow;
 
 		if ( 'edit.php' === $pagenow && 'shop_order' === $query->query['post_type'] && isset( $query->query['s'] ) ) {
-			$s          = str_replace( '#', '', $query->query['s'] );
-			$meta_query = array(
-				array(
-					'key'     => '_reepay_order',
-					'value'   => $s,
-					'compare' => 'LIKE'
-				)
+			$s = str_replace( '#', '', $query->query['s'] );
+
+			$invoice_search_meta_query = array(
+				'key'     => '_reepay_order',
+				'value'   => "%$s%",
+				'compare' => 'LIKE',
 			);
 
-			unset( $query->query['s'] );
-			unset( $query->query_vars['s'] );
+			$meta_query = $query->get( 'meta_query' );
+
+			if ( empty( $meta_query ) ) {
+				$meta_query = $invoice_search_meta_query;
+			} else {
+				$meta_query = array(
+					'relation' => 'OR',
+					$meta_query,
+					$invoice_search_meta_query,
+				);
+			}
 
 			$query->set( 'meta_query', $meta_query );
 		}
