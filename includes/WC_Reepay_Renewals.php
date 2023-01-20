@@ -142,9 +142,11 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
+		$is_started = $order->get_meta( '_reepay_subscription_period_started' );
+
 		if ( 'wc-' . $this_status_transition_to == reepay_s()->settings( '_reepay_manual_start_date_status' ) &&
 		     reepay_s()->settings( '_reepay_manual_start_date' ) &&
-		     self::is_order_contain_subscription( $order ) ) {
+		     self::is_order_contain_subscription( $order ) && empty( $is_started ) ) {
 
 			$sub_meta = $order->get_meta( '_reepay_subscription_handle' );
 
@@ -153,6 +155,7 @@ class WC_Reepay_Renewals {
 
 				try {
 					reepay_s()->api()->request( "subscription/{$sub_meta}/change_next_period_start", 'POST', $params );
+					update_post_meta( $order_id, '_reepay_subscription_period_started', true );
 				} catch ( Exception $e ) {
 					self::log( [
 						'log' => [
@@ -213,9 +216,10 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source' => 'WC_Reepay_Renewals::create_subscription',
-				'error'  => 'Subscription create request',
-				'data'   => $data
+				'source'   => 'WC_Reepay_Renewals::create_subscription',
+				'error'    => 'Subscription create request',
+				'data'     => $data,
+				'order_id' => $order->get_id()
 			],
 		] );
 
@@ -230,6 +234,22 @@ class WC_Reepay_Renewals {
 			] );
 
 			return;
+		}
+
+		$child_order = $this->get_child_order( $order, $data['invoice'] );
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::child_order',
+				'error'  => '',
+				'data'   => $child_order
+			],
+		] );
+
+		if ( ! empty( $child_order ) && $child_order->post_status == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
+			$order_child_obj = wc_get_order( $child_order->ID );
+			$order_child_obj->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
+			$order_child_obj->save();
 		}
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
@@ -635,6 +655,23 @@ class WC_Reepay_Renewals {
 
 			return $orders[0] ?? false;
 		}
+	}
+
+	public function get_child_order( $parent_order, $invoice ) {
+		$query = new WP_Query( [
+			'post_parent'    => $parent_order->get_id(),
+			'post_type'      => 'shop_order',
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+			'meta_query'     => [
+				[
+					'key'   => '_reepay_order',
+					'value' => $invoice,
+				]
+			]
+		] );
+
+		return ! empty( $query->posts ) ? $query->posts[0] : false;
 	}
 
 	/**
