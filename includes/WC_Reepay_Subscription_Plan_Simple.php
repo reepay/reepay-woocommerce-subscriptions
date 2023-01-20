@@ -734,9 +734,17 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$type_data = $product->get_meta( '_reepay_subscription_' . $type );
 			$interval  = self::get_interval( $product->get_id(), $type, $type_data );
 			$types_arr = self::$types_info;
-			
-			if ( $type == self::TYPE_MONTH_FIXED_DAY && $type_data['day'] == 1 ) {
-				$types_arr[ $type ] .= ' on the first day of the month';
+
+			if ( $type == self::TYPE_MONTH_FIXED_DAY ) {
+				$types_arr[ $type ] = 'Billed every ' . $type_data['month'] . ' month on ' . $type_data['day'] . ' day of the month';
+			}
+
+			if ( $type == self::TYPE_MONTH_LAST_DAY ) {
+				$types_arr[ $type ] = 'Billed every ' . $type_data['month'] . ' month on the last day of the month';
+			}
+
+			if ( $type == self::TYPE_MONTH_START_DATE ) {
+				$types_arr[ $type ] = ' Every ' . $type_data . ' month on this day';
 			}
 
 			$types_info = $is_short ? self::$types_info_short : $types_arr;
