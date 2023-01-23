@@ -125,8 +125,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY               => __( 'Billed every day', 'reepay-subscriptions-for-woocommerce' ),
 			WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY . '_multiple' => __( 'Billed every %s days', 'reepay-subscriptions-for-woocommerce' ),
 
-			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => __( 'Billed every month on the first day of the month', 'reepay-subscriptions-for-woocommerce' ),
-			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => __( 'Billed every %s months on the first day of the month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE               => __( 'Billed every month', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_START_DATE . '_multiple' => __( 'Billed every %s months', 'reepay-subscriptions-for-woocommerce' ),
 
 			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY               => __( 'Billed every month', 'reepay-subscriptions-for-woocommerce' ),
 			WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY . '_multiple' => __( 'Billed every %s months', 'reepay-subscriptions-for-woocommerce' ),
@@ -177,8 +177,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 		];
 
 		self::$proration_types = [
-			'full_day' =>	__( 'Full day proration', 'reepay-subscriptions-for-woocommerce' ),
-			'by_minute' =>	__( 'By the minute proration', 'reepay-subscriptions-for-woocommerce' ),
+			'full_day'  => __( 'Full day proration', 'reepay-subscriptions-for-woocommerce' ),
+			'by_minute' => __( 'By the minute proration', 'reepay-subscriptions-for-woocommerce' ),
 		];
 
 		self::$number_to_week_day = [
@@ -392,7 +392,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 		$data = ! empty( $data ) ? $data : $this->get_subscription_template_data( $post_id );
 
-		$data['product_object']          = wc_get_product( $post_id );
+		$data['product_object'] = wc_get_product( $post_id );
 
 		foreach ( self::$meta_fields as $key ) {
 			if ( ! isset( $data[ $key ] ) ) {
@@ -733,8 +733,21 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$type      = $product->get_meta( '_reepay_subscription_schedule_type' );
 			$type_data = $product->get_meta( '_reepay_subscription_' . $type );
 			$interval  = self::get_interval( $product->get_id(), $type, $type_data );
+			$types_arr = self::$types_info;
 
-			$types_info = $is_short ? self::$types_info_short : self::$types_info;
+			if ( $type == self::TYPE_MONTH_FIXED_DAY ) {
+				$types_arr[ $type ] = 'Billed every ' . $type_data['month'] . ' month on ' . $type_data['day'] . ' day of the month';
+			}
+
+			if ( $type == self::TYPE_MONTH_LAST_DAY ) {
+				$types_arr[ $type ] = 'Billed every ' . $type_data['month'] . ' month on the last day of the month';
+			}
+
+			if ( $type == self::TYPE_MONTH_START_DATE ) {
+				$types_arr[ $type ] = ' Every ' . $type_data . ' month on this day';
+			}
+
+			$types_info = $is_short ? self::$types_info_short : $types_arr;
 
 			$type_str = $types_info[ $interval > 1 ? $type . '_multiple' : $type ] ?? $types_info[ $type ] ?? '';
 			$ret      = '';
