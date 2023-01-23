@@ -32,6 +32,10 @@ class WC_Reepay_Sync_Subscriptions {
 	 *     ] $data
 	 */
 	public function created( $data ) {
+		//If the order is created on the current site, then we wait for the end of its creation
+		//Prevent orders duplication
+		sleep(5);
+
 		if ( WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $data['subscription'] ) ) {
 			return;
 		}

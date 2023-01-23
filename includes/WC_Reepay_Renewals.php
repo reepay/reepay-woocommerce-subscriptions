@@ -219,7 +219,7 @@ class WC_Reepay_Renewals {
 				'source'   => 'WC_Reepay_Renewals::create_subscription',
 				'error'    => 'Subscription create request',
 				'data'     => $data,
-				'order_id' => $order->get_id()
+				'order_id' => empty($order) ? 'false' : $order->get_id()
 			],
 		] );
 
@@ -635,26 +635,30 @@ class WC_Reepay_Renewals {
 	/**
 	 * @param string $handle
 	 *
-	 * @return bool|WC_Order|WC_Order_Refund
+	 * @return WC_Order|false
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		$orders = wc_get_orders( [
-			'limit'      => 1,
-			'meta_key'   => '_reepay_order',
-			'meta_value' => $handle
-		] );
+		$orders = wc_get_orders(
+			[
+				'limit'      => 1,
+				'meta_key'   => '_reepay_order',
+				'meta_value' => $handle,
+			]
+		);
 
-		if ( ! empty( $orders[0] ) ) {
-			return $orders[0];
-		} else {
-			$orders = wc_get_orders( [
+		if ( ! empty( $orders ) ) {
+			return current( $orders );
+		}
+
+		$orders = wc_get_orders(
+			[
 				'limit'      => 1,
 				'meta_key'   => '_reepay_subscription_handle',
-				'meta_value' => $handle
-			] );
+				'meta_value' => $handle,
+			]
+		);
 
-			return $orders[0] ?? false;
-		}
+		return current( $orders );
 	}
 
 	public function get_child_order( $parent_order, $invoice ) {
