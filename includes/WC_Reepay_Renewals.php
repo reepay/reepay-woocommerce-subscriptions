@@ -19,7 +19,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
 		add_action( 'woocommerce_order_status_changed', array( $this, 'status_manual_start_date' ), 10, 4 );
-        add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
+		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
 		add_filter( 'woocommerce_get_formatted_order_total', array(
 			$this,
 			'display_real_total'
@@ -35,80 +35,84 @@ class WC_Reepay_Renewals {
 			'disable_for_sub'
 		), 10, 2 );
 
-        add_filter('order_contains_reepay_subscription', function($contains, $order) {
-           if ($this->reepay_order_contains_subscription($order)) {
-               return true;
-           }
-           return $contains;
-        }, 10, 2);
+		add_filter( 'order_contains_reepay_subscription', function ( $contains, $order ) {
+			if ( $this->reepay_order_contains_subscription( $order ) ) {
+				return true;
+			}
+
+			return $contains;
+		}, 10, 2 );
 	}
 
-    /**
-     * @param WC_Order|integer $order
-     * @return bool
-     */
-	function reepay_order_contains_subscription($order) {
-	    if (is_int($order)) {
-	        $order = wc_get_order($order);
-        }
-        foreach ($order->get_items() as $item) {
-            $product = $item->get_product();
-            if ($product->is_type(['reepay_simple_subscriptions', 'reepay_variable_subscriptions'])) {
-                return true;
-            };
-        }
-        return false;
-    }
+	/**
+	 * @param WC_Order|integer $order
+	 *
+	 * @return bool
+	 */
+	function reepay_order_contains_subscription( $order ) {
+		if ( is_int( $order ) ) {
+			$order = wc_get_order( $order );
+		}
+		foreach ( $order->get_items() as $item ) {
+			$product = $item->get_product();
+			if ( $product->is_type( [ 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ] ) ) {
+				return true;
+			};
+		}
+
+		return false;
+	}
 
 	function reepay_cart_subscription_count() {
-	    $count = 0;
-        if (!empty(WC()->cart->cart_contents)) {
-            foreach (WC()->cart->cart_contents as $cart_item) {
-                /**
-                 * @var WC_Product $product
-                 */
-                $product = $cart_item['data'];
-                if ($product->is_type('reepay_simple_subscriptions', 'reepay_variable_subscriptions')) {
-                    $count += $cart_item['quantity'];
-                }
-            }
-        }
-        return $count;
-    }
+		$count = 0;
+		if ( ! empty( WC()->cart->cart_contents ) ) {
+			foreach ( WC()->cart->cart_contents as $cart_item ) {
+				/**
+				 * @var WC_Product $product
+				 */
+				$product = $cart_item['data'];
+				if ( $product->is_type( 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ) ) {
+					$count += $cart_item['quantity'];
+				}
+			}
+		}
 
-    /**
-     * Display the gateways which support subscriptions if manual payments are not allowed.
-     *
-     * @since 1.0
-     */
-    public function get_available_payment_gateways( $available_gateways ) {
-        if ( is_wc_endpoint_url( 'order-pay' ) ) {
-            return $available_gateways;
-        }
+		return $count;
+	}
 
-        $subscriptions_in_cart = $this->reepay_cart_subscription_count();
+	/**
+	 * Display the gateways which support subscriptions if manual payments are not allowed.
+	 *
+	 * @since 1.0
+	 */
+	public function get_available_payment_gateways( $available_gateways ) {
+		if ( is_wc_endpoint_url( 'order-pay' ) ) {
+			return $available_gateways;
+		}
 
-        //filter reepay type subscriptions
-        if ( empty($subscriptions_in_cart) && ( ! isset( $_GET['order_id'] ) || ! $this->reepay_order_contains_subscription( $_GET['order_id'] ) ) ) {
-            return $available_gateways;
-        }
+		$subscriptions_in_cart = $this->reepay_cart_subscription_count();
 
-        foreach ( $available_gateways as $gateway_id => $gateway ) {
+		//filter reepay type subscriptions
+		if ( empty( $subscriptions_in_cart ) && ( ! isset( $_GET['order_id'] ) || ! $this->reepay_order_contains_subscription( $_GET['order_id'] ) ) ) {
+			return $available_gateways;
+		}
 
-            $supports_subscriptions = $gateway->supports( 'subscriptions' );
+		foreach ( $available_gateways as $gateway_id => $gateway ) {
 
-            // Remove the payment gateway if there are multiple subscriptions in the cart and this gateway either doesn't support multiple subscriptions or isn't manual (all manual gateways support multiple subscriptions)
-            if ( $subscriptions_in_cart > 1 && $gateway->supports( 'multiple_subscriptions' ) !== true && $supports_subscriptions ) {
-                unset( $available_gateways[ $gateway_id ] );
+			$supports_subscriptions = $gateway->supports( 'subscriptions' );
 
-                // If there is just the one subscription the cart, remove the payment gateway if manual renewals are disabled and this gateway doesn't support automatic payments
-            } elseif ( ! $supports_subscriptions ) {
-                unset( $available_gateways[ $gateway_id ] );
-            }
-        }
+			// Remove the payment gateway if there are multiple subscriptions in the cart and this gateway either doesn't support multiple subscriptions or isn't manual (all manual gateways support multiple subscriptions)
+			if ( $subscriptions_in_cart > 1 && $gateway->supports( 'multiple_subscriptions' ) !== true && $supports_subscriptions ) {
+				unset( $available_gateways[ $gateway_id ] );
 
-        return $available_gateways;
-    }
+				// If there is just the one subscription the cart, remove the payment gateway if manual renewals are disabled and this gateway doesn't support automatic payments
+			} elseif ( ! $supports_subscriptions ) {
+				unset( $available_gateways[ $gateway_id ] );
+			}
+		}
+
+		return $available_gateways;
+	}
 
 	public function disable_for_sub( $is_able, $order ) {
 
@@ -120,9 +124,12 @@ class WC_Reepay_Renewals {
 	}
 
 	public function reepay_subscriptions_order_status( $status, $order ) {
-		if ( self::is_order_contain_subscription( $order ) ) {
+		if ( reepay_s()->settings( '_reepay_manual_start_date' ) && 'wc-' . $order->get_status() == reepay_s()->settings( '_reepay_manual_start_date_status' ) ) {
+			$status = reepay_s()->settings( '_reepay_manual_start_date_status' );
+		} elseif ( self::is_order_contain_subscription( $order ) ) {
 			$status = reepay_s()->settings( '_reepay_orders_default_subscription_status' );
 		}
+
 
 		return $status;
 	}
@@ -135,9 +142,11 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
+		$is_started = $order->get_meta( '_reepay_subscription_period_started' );
+
 		if ( 'wc-' . $this_status_transition_to == reepay_s()->settings( '_reepay_manual_start_date_status' ) &&
 		     reepay_s()->settings( '_reepay_manual_start_date' ) &&
-		     self::is_order_contain_subscription( $order ) ) {
+		     self::is_order_contain_subscription( $order ) && empty( $is_started ) ) {
 
 			$sub_meta = $order->get_meta( '_reepay_subscription_handle' );
 
@@ -146,6 +155,7 @@ class WC_Reepay_Renewals {
 
 				try {
 					reepay_s()->api()->request( "subscription/{$sub_meta}/change_next_period_start", 'POST', $params );
+					update_post_meta( $order_id, '_reepay_subscription_period_started', true );
 				} catch ( Exception $e ) {
 					self::log( [
 						'log' => [
@@ -206,9 +216,10 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source' => 'WC_Reepay_Renewals::create_subscription',
-				'error'  => 'Subscription create request',
-				'data'   => $data
+				'source'   => 'WC_Reepay_Renewals::create_subscription',
+				'error'    => 'Subscription create request',
+				'data'     => $data,
+				'order_id' => empty($order) ? 'false' : $order->get_id()
 			],
 		] );
 
@@ -223,6 +234,22 @@ class WC_Reepay_Renewals {
 			] );
 
 			return;
+		}
+
+		$child_order = $this->get_child_order( $order, $data['invoice'] );
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::child_order',
+				'error'  => '',
+				'data'   => $child_order
+			],
+		] );
+
+		if ( ! empty( $child_order ) && $child_order->post_status == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
+			$order_child_obj = wc_get_order( $child_order->ID );
+			$order_child_obj->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
+			$order_child_obj->save();
 		}
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
@@ -608,26 +635,47 @@ class WC_Reepay_Renewals {
 	/**
 	 * @param string $handle
 	 *
-	 * @return bool|WC_Order|WC_Order_Refund
+	 * @return WC_Order|false
 	 */
 	public static function get_order_by_subscription_handle( $handle ) {
-		$orders = wc_get_orders( [
-			'limit'      => 1,
-			'meta_key'   => '_reepay_order',
-			'meta_value' => $handle
-		] );
+		$orders = wc_get_orders(
+			[
+				'limit'      => 1,
+				'meta_key'   => '_reepay_order',
+				'meta_value' => $handle,
+			]
+		);
 
-		if ( ! empty( $orders[0] ) ) {
-			return $orders[0];
-		} else {
-			$orders = wc_get_orders( [
+		if ( ! empty( $orders ) ) {
+			return current( $orders );
+		}
+
+		$orders = wc_get_orders(
+			[
 				'limit'      => 1,
 				'meta_key'   => '_reepay_subscription_handle',
-				'meta_value' => $handle
-			] );
+				'meta_value' => $handle,
+			]
+		);
 
-			return $orders[0] ?? false;
-		}
+		return current( $orders );
+	}
+
+	public function get_child_order( $parent_order, $invoice ) {
+		$query = new WP_Query( [
+			'post_parent'    => $parent_order->get_id(),
+			'post_type'      => 'shop_order',
+			'post_status'    => 'any',
+			'posts_per_page' => - 1,
+			'meta_query'     => [
+				[
+					'key'   => '_reepay_order',
+					'value' => $invoice,
+				]
+			]
+		] );
+
+		return ! empty( $query->posts ) ? $query->posts[0] : false;
 	}
 
 	/**
