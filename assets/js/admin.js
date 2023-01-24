@@ -2,7 +2,8 @@ jQuery(function ($) {
     const $body = $('body');
 
     const $invoiceMetaBox = $('#reepay_checkout_invoice');
-    if($invoiceMetaBox.find('.inside').html().trim() === '') {
+
+    if ($invoiceMetaBox.length && $invoiceMetaBox.find('.inside').html().trim() === '') {
         $invoiceMetaBox.hide()
     }
 
