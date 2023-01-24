@@ -18,7 +18,8 @@ class WC_Reepay_Memberships_Integrations {
 			$this->fake_woo_subscription_activation();
 			
 			add_filter( 'woocommerce_is_subscription', [ $this, 'add_reepay_subscriptions_type' ], 100, 3 );
-//		    add_filter( 'wc_memberships_plan_grants_access_while_subscription_active', [ $this, 'grant_access_to_memberships' ], 100, 3 );
+//			add_filter( 'wc_memberships_grant_access_from_new_purchase', [ $this, 'maybe_grant_access_from_new_subscription' ]);
+//		    add_filter( 'wc_memberships_plan_grants_access_while_subscription_active', [ $this, 'grant_access_to_memberships' ], 100, 3 ); //will be removed
 			add_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'access_granting_purchased_product_id' ] );
 		}
 	}
@@ -53,6 +54,7 @@ class WC_Reepay_Memberships_Integrations {
 	}
 
 	/**
+	 *
 	 * @see wc_memberships_get_order_access_granting_product_ids
 	 *
 	 * @param int|int[] $product_ids Product id or array of product ids that grant access (may be non unique)
@@ -69,48 +71,39 @@ class WC_Reepay_Memberships_Integrations {
 		return $product_ids;
 	}
 
-	/**
-	 * Filter whether a plan grants access to a membership while subscription is active.
-	 *
-	 * @param  bool  $grants_access  Default: true.
-	 * @param  int   $plan_id        Membership Plan ID.
-	 *
-	 * @return bool
-	 */
-	public function grant_access_to_memberships( $grants_access, $plan_id ) {
-		if ( $grants_access ) {
-			return $grants_access;
-		}
-
-		/** @var WC_Memberships_Membership_Plan $membership_plan */
-		$membership_plan = wc_memberships_get_membership_plan( $plan_id );
-
-		if ( 'purchase' !== $membership_plan->get_access_method() ) {
-			return $grants_access;
-		}
-
-		$plan_products = $membership_plan->get_products();
-		$user_memberships = wc_memberships_get_user_membership( $user_id, $this->id );
-
-		foreach ( $plan_products as $product ) {
-			if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
-				continue;
-			}
-
-			/**
-			 * TODO Get orders with $product and check their status via
-			 * @see WC_Reepay_Subscription_Plan_Simple::is_subscription_active
-			 *
-			 * Who is current user?
-			 */
-
-			wc_get_orders(
-
-			);
-		}
-
-		return $grants_access;
-	}
+//	/**
+//	 * @deprecated
+//	 *
+//	 * Filter whether a plan grants access to a membership while subscription is active.
+//	 *
+//	 * @param  bool  $grants_access  Default: true.
+//	 * @param  int   $plan_id        Membership Plan ID.
+//	 *
+//	 * @return bool
+//	 */
+//	public function grant_access_to_memberships( $grants_access, $plan_id ) {
+//		if ( $grants_access ) {
+//			return $grants_access;
+//		}
+//
+//		/** @var WC_Memberships_Membership_Plan $membership_plan */
+//		$membership_plan = wc_memberships_get_membership_plan( $plan_id );
+//
+//		if ( 'purchase' !== $membership_plan->get_access_method() ) {
+//			return $grants_access;
+//		}
+//
+//		$plan_products = $membership_plan->get_products();
+//		$user_memberships = wc_memberships_get_user_membership( $user_id, $this->id );
+//
+//		foreach ( $plan_products as $product ) {
+//			if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
+//				continue;
+//			}
+//		}
+//
+//		return $grants_access;
+//	}
 }
 
 if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' ) &&
