@@ -1,6 +1,10 @@
 jQuery(function ($) {
     const $body = $('body');
 
+    var linksToMenu = $('a[href="admin.php?page=reepay-subscriptions-for-woocommerce"]');
+    linksToMenu.attr("href", "https://app.reepay.com/#/rp/subscriptions")
+    linksToMenu.attr("target", "_blank")
+
     const $invoiceMetaBox = $('#reepay_checkout_invoice');
 
     if ($invoiceMetaBox.length && $invoiceMetaBox.find('.inside').html().trim() === '') {
@@ -8,9 +12,6 @@ jQuery(function ($) {
     }
 
     const $selectProductType = $('select#product-type');
-
-    var linksToMenu = $('a[href="admin.php?page=reepay-subscriptions-for-woocommerce"]');
-    linksToMenu.attr("href", "https://app.reepay.com/#/rp/subscriptions")
 
     function getReepaySelectedTab(selectedType = '') {
         const type = selectedType || $selectProductType.val();
@@ -573,12 +574,12 @@ jQuery(function ($) {
         $select
             .parent()
             .block({
-            message: null,
-            overlayCSS: {
-                background: '#fff',
-                opacity: 0.6
-            }
-        });
+                message: null,
+                overlayCSS: {
+                    background: '#fff',
+                    opacity: 0.6
+                }
+            });
 
         const $submitBtn = $container
             .parents('.variable_pricing')
