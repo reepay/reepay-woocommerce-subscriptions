@@ -16,11 +16,8 @@ class WC_Reepay_Memberships_Integrations {
 	public function __construct() {
 		if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' ) ) {
 			$this->fake_woo_subscription_activation();
-			
-			add_filter( 'woocommerce_is_subscription', [ $this, 'add_reepay_subscriptions_type' ], 100, 3 );
-//			add_filter( 'wc_memberships_grant_access_from_new_purchase', [ $this, 'maybe_grant_access_from_new_subscription' ]);
-//		    add_filter( 'wc_memberships_plan_grants_access_while_subscription_active', [ $this, 'grant_access_to_memberships' ], 100, 3 ); //will be removed
-			add_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'access_granting_purchased_product_id' ] );
+
+//			add_action( 'wc_memberships_grant_membership_access_from_purchase', array( $this, 'save_reepay_subscription_data' ), 10, 2 );
 		}
 	}
 
@@ -38,77 +35,97 @@ class WC_Reepay_Memberships_Integrations {
 	}
 
 	/**
-	 * @param  bool        $is_subscription
-	 * @param  int         $product_id
-	 * @param  WC_Product  $product
+	 * Saves related subscription data when a membership access is granted via a purchase.
+	 *
+	 * Sets the start date if it has an installment plan.
+	 * Sets the end date to match subscription end date.
+	 *
+	 * @see WC_Memberships_Membership_Plan::grant_access_from_purchase - action fires at the end of this function
+	 * @see WC_Memberships_Integration_Subscriptions_Membership_Plans::save_subscription_data - action in Woo Mems
+	 *
+	 * @param WC_Memberships_Membership_Plan $plan
+	 * @param array $args [
+	 * 			'user_id'            => int
+	 * 		    'product_id'         => int,
+	 * 		    'order_id'           => int,
+	 * 		    'user_membership_id' => int,
+	 * ]
 	 */
-	public function add_reepay_subscriptions_type( $is_subscription, $product_id, $product ) {
-		return $is_subscription || WC_Reepay_Checkout::is_reepay_product( $product );
-	}
+//	public function save_reepay_subscription_data( $plan, $args ) {
+//		$product     = wc_get_product( $args['product_id'] );
+//		$integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
+//
+//		__log(['!r1!', $plan, $args]);
+//		__log(['!r11!', !empty($product), !empty($integration), WC_Reepay_Checkout::is_reepay_product( $product ),
+//			      $this->has_membership_plan_reepay_subscription( $plan )]);
+//
+//		if (    $product
+//		        && $integration
+//		        && WC_Reepay_Checkout::is_reepay_product( $product )
+//		        && $this->has_membership_plan_reepay_subscription( $plan ) ) {
+//
+//			$order = wc_get_order($args['order_id']);
+//			$reepay_subscription_id = get_post_meta( $args['product_id'], '_reepay_subscription_handle', true );
+//			__log(['!r2!', $reepay_subscription_id]);
+//			$reepay_subscription = reepay_s()->api()->request("subscription/$reepay_subscription_id");
+//			__log(['!r22!', $reepay_subscription]);
+//			$subscription_membership = new WC_Memberships_Integration_Subscriptions_User_Membership( $args['user_membership_id'] );
+//
+//			$subscription_membership->set_subscription_id( $order->get_id() );
+//
+//			$subscription_plan = new WC_Memberships_Integration_Subscriptions_Membership_Plan( $subscription_membership->get_plan_id() );
+//			__log(['!r3!', $subscription_membership->has_installment_plan(), $subscription_plan->get_access_start_date( 'mysql' )]);
+//			// adjust the start date for installment plans (might not be now for fixed date plans)
+//			if ( $subscription_membership->has_installment_plan() ) {
+//				$subscription_membership->set_start_date( $subscription_plan->get_access_start_date( 'mysql' ) );
+//			}
+//
+//			// end date: subscription length (unlimited or fixed by the subscription product)
+//			if ( 'subscription' === $subscription_plan->get_access_length_type() &&
+//			     apply_filters( 'wc_memberships_plan_grants_access_while_subscription_active', true, $plan->get_id() ) ) {
+//				//ToDo get from reepay_subscription
+////				$membership_end_date = $integration->get_subscription_event_date( $subscription, 'end' );
+//
+//				// end date: likely an installment plan, so it could be relative to the start date or be on a fixed date
+//			} else {
+//				$membership_end_date = $subscription_plan->get_expiration_date( current_time( 'mysql', true ), $args );
+//			}
+//
+//			__log('!r4!', $subscription_plan->get_access_length_type(), $membership_end_date );
+//
+//			// set the determined end date for the subscription membership
+//			$subscription_membership->set_end_date( $membership_end_date );
+//
+//			// maybe update the trial end date
+////				if ( $trial_end_date = $integration->get_subscription_event_date( $subscription, 'trial_end' ) ) {
+////					$subscription_membership->set_free_trial_end_date( $trial_end_date );
+////				}
+//
+//			__log('!r5!');
+//		}
+//	}
 
 	/**
+	 * @param  WC_Memberships_Membership_Plan  $plan
 	 *
+	 * @return bool
 	 */
-	public function get_active_reepay_subscription_order_products() {
-
-	}
-
-	/**
-	 *
-	 * @see wc_memberships_get_order_access_granting_product_ids
-	 *
-	 * @param int|int[] $product_ids Product id or array of product ids that grant access (may be non unique)
-	 * @param int[] $access_granting_product_ids Array of product ids that can grant access to this plan
-	 * @param \WC_Memberships_Membership_Plan $plan Membership plan access will be granted to
-	 */
-	public function access_granting_purchased_product_id( $product_ids, $access_granting_product_ids, $plan ) {
-		if ( ! is_array( $product_ids ) ) {
-			$product_ids = [ $product_ids ];
+	public function has_membership_plan_reepay_subscription( $plan ) {
+		foreach ( $plan->get_product_ids() as $product_id ) {
+			if ( WC_Reepay_Checkout::is_reepay_product( $product_id ) ) {
+				return true;
+			}
 		}
 
-
-
-		return $product_ids;
+		return false;
 	}
-
-//	/**
-//	 * @deprecated
-//	 *
-//	 * Filter whether a plan grants access to a membership while subscription is active.
-//	 *
-//	 * @param  bool  $grants_access  Default: true.
-//	 * @param  int   $plan_id        Membership Plan ID.
-//	 *
-//	 * @return bool
-//	 */
-//	public function grant_access_to_memberships( $grants_access, $plan_id ) {
-//		if ( $grants_access ) {
-//			return $grants_access;
-//		}
-//
-//		/** @var WC_Memberships_Membership_Plan $membership_plan */
-//		$membership_plan = wc_memberships_get_membership_plan( $plan_id );
-//
-//		if ( 'purchase' !== $membership_plan->get_access_method() ) {
-//			return $grants_access;
-//		}
-//
-//		$plan_products = $membership_plan->get_products();
-//		$user_memberships = wc_memberships_get_user_membership( $user_id, $this->id );
-//
-//		foreach ( $plan_products as $product ) {
-//			if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
-//				continue;
-//			}
-//		}
-//
-//		return $grants_access;
-//	}
 }
 
 if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' ) &&
      ! class_exists( 'WC_Subscription' ) ) {
 	class WC_Subscription {
-
+		public $fake = true;
+		public function __construct($x) {
+		}
 	}
 }
