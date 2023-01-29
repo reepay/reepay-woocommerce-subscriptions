@@ -65,12 +65,12 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 
 					$access_granting_product_ids = wc_memberships_get_order_access_granting_product_ids( $plan, $order, $order_items );
 
-					foreach ( $access_granting_product_ids as $product_id ) {
+					foreach ( $access_granting_product_ids as $product_id ) { //TODO remove this loop
 						if ( ! $plan->has_product( $product_id ) ) {
 							continue;
 						}
 
-						if (  ) {
+						if ( WC_Reepay_Renewals::is_order_subscription_active( $order ) ) {
 							$plan->grant_access_from_purchase( $user_id, $product_id, $order->get_id() );
 						}
 					}

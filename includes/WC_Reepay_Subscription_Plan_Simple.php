@@ -850,44 +850,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 		return $total_rows;
 	}
 
-	/**
-	 * @param  mixed  $order
-	 */
-	public function is_subscription_active( $order ) {
-		$order = wc_get_product( $order );
-
-		if ( empty( $order ) ) {
-			return false;
-		}
-
-		$transient_name = 'reepay_subscription_status_' . $order->get_id();
-
-		$maybe_is_actibe = get_transient( $transient_name );
-
-		if ( ! empty( $maybe_is_actibe ) ) {
-			return $maybe_is_actibe === '1';
-		}
-
-		$handle = $order->get_meta( '_reepay_subscription_handle' );
-
-		if ( empty( $handle ) ) {
-			return false;
-		}
-
-		try {
-			$subscription = reepay_s()->api()->request( "subscription/$handle" );
-		} catch (Exception $e) {
-			return false;
-		}
-
-		$is_active = $subscription['state'] === 'active';
-
-		set_transient($transient_name, $is_active ? '1' : '0', HOUR_IN_SECONDS);
-
-		return $is_active;
-	}
-
-
 	protected function plan_error( $message ) {
 		if ( is_ajax() ) {
 			WC_Admin_Meta_Boxes::add_error( $message );
