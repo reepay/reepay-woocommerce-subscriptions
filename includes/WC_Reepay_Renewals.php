@@ -398,13 +398,11 @@ class WC_Reepay_Renewals {
 				continue;
 			}
 
-
 			if ( floatval( $order->get_total() ) != 0 ) {
 				update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
 				$new_total = 0;
 				$order->set_total( $new_total );
 			}
-
 
 			$order_items = $order->get_items();
 			$order_item  = reset( $order_items );
@@ -414,7 +412,6 @@ class WC_Reepay_Renewals {
 			$handle = $order->get_id() . '_' . $product->get_id();
 
 			$addons = array_merge( self::get_shipping_addons( $order ), self::get_plan_addons( $order_item ) ?: [] );
-
 
 			$new_subscription = null;
 			try {
@@ -517,6 +514,8 @@ class WC_Reepay_Renewals {
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
 		}
+
+		do_action('reepay_subscriptions_orders_created', $orders);
 	}
 
 

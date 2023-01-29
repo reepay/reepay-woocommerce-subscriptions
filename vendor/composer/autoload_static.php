@@ -18,7 +18,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Import' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import.php',
         'WC_Reepay_Import_Helpers' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import_Helpers.php',
         'WC_Reepay_Import_Menu' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import_Menu.php',
-        'WC_Reepay_Memberships_Integrations' => __DIR__ . '/../..' . '/includes/WC_Reepay_Memberships_Integrations.php',
+        'WC_Reepay_Memberships_Integrations' => __DIR__ . '/../..' . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
         'WC_Reepay_Meta_Boxes' => __DIR__ . '/../..' . '/includes/WC_Reepay_Meta_Boxes.php',
         'WC_Reepay_Renewals' => __DIR__ . '/../..' . '/includes/WC_Reepay_Renewals.php',
         'WC_Reepay_Statistics' => __DIR__ . '/../..' . '/includes/WC_Reepay_Statistics.php',
@@ -39,6 +39,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Sync_Customers' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Customers.php',
         'WC_Reepay_Sync_Subscriptions' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Subscriptions.php',
         'WC_Reepay_Woocommerce_Subscription_Extension' => __DIR__ . '/../..' . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
+        'WC_Subscription' => __DIR__ . '/../..' . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

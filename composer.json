@@ -13,6 +13,7 @@
     "classmap": [
       "includes",
       "includes/import",
+      "includes/memberships",
       "includes/update",
       "includes/sync"
     ]
