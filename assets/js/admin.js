@@ -720,6 +720,31 @@ jQuery(function ($) {
         discount['_reepay_discount_fixed_period_unit'] && $container.find('[name="_reepay_discount_fixed_period_unit"]').val(discount['_reepay_discount_fixed_period_unit']).attr('disabled', disable)
     }
 
+    $body.on('change', '[name^="_reepay_subscription_handle"]', function (e) {
+
+        //const dataPlan = JSON.parse($(this).attr('data-plan') || '{}');
+        const product_id = window.reepay.product.id
+        let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$(this).val()}&get_info=1`;
+
+        $.ajax({
+            url,
+            method: 'GET',
+            beforeSend: function (xhr) {
+
+            },
+            success: function (response_data) {
+                if (!response_data.success) {
+                    return;
+                }
+
+                $('.reepay_subscription_settings_exist').html(response_data.html);
+            },
+            error: function (request, status, error) {
+                alert('Request error. Try again')
+            },
+        })
+    });
+
     $body.on('click', '.js-refresh-plans-list', function (e) {
         e.preventDefault();
 
