@@ -393,6 +393,7 @@ class WC_Reepay_Renewals {
 
 		$main_order->calculate_totals();
 
+		$created_reepay_orders = [];
 		foreach ( $orders as $order ) {
 			if ( ! self::is_order_contain_subscription( $order ) ) {
 				continue;
@@ -513,9 +514,11 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
+
+			$created_reepay_orders[] = $order->get_id();
 		}
 
-		do_action('reepay_subscriptions_orders_created', $orders);
+		do_action('reepay_subscriptions_orders_created', $created_reepay_orders);
 	}
 
 

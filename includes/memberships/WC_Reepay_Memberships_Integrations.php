@@ -19,7 +19,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				$this->fake_woo_subscription_activation();
 
 				add_filter( 'woocommerce_is_subscription', [ $this, 'add_reepay_subscriptions_type' ], 100, 3 );
-				
+
 				add_action( 'reepay_subscriptions_orders_created', [ $this, 'maybe_activate_membership' ] );
 
 				add_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'disable_default_membership_activation_for_reepay_products' ], 100, 3 );
@@ -71,7 +71,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 			}
 
 			foreach ( $orders as $order ) {
-				$order = wc_get_order( $order );
+				$order = wc_get_order($order);
 
 				__log(
 					[
@@ -80,7 +80,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 					]
 				);
 
-				if ( empty( $order ) ) {
+				if ( empty( $order ) || ! WC_Reepay_Renewals::is_order_contain_subscription( $order )) {
 					continue;
 				}
 
@@ -213,5 +213,17 @@ if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' )
 ) {
 	class WC_Subscription extends WC_Order {
 		public $fake = true;
+	}
+}
+
+if(!function_exists('__log')) {
+	function __log($data, ...$more_data) {
+		if($more_data) {
+			$data = [
+				'$data' => $data,
+				'$more_data' => $more_data
+			];
+		}
+		error_log( print_r( $data, true ) );
 	}
 }
