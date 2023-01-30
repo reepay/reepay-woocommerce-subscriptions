@@ -219,7 +219,7 @@ class WC_Reepay_Renewals {
 				'source'   => 'WC_Reepay_Renewals::create_subscription',
 				'error'    => 'Subscription create request',
 				'data'     => $data,
-				'order_id' => empty($order) ? 'false' : $order->get_id()
+				'order_id' => empty( $order ) ? 'false' : $order->get_id()
 			],
 		] );
 
@@ -973,6 +973,7 @@ class WC_Reepay_Renewals {
 			'_reepay_state_authorized',
 			'_reepay_token_id',
 			'_reepay_token',
+			'_reepay_customer',
 		];
 
 		foreach ( $fields_to_copy as $field_name ) {

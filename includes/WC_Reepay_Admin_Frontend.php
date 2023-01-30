@@ -17,11 +17,6 @@ class WC_Reepay_Admin_Frontend {
 
 		add_filter( 'posts_fields', [ $this, 'modify_search_results_fields' ], 10, 2 );
 		add_filter( 'woocommerce_order_number', [ $this, 'modify_order_id' ], 10, 2 );
-
-		add_action( 'woocommerce_admin_order_data_after_billing_address', array(
-			$this,
-			'reepay_show_extra_order_fields'
-		) );
 	}
 
 	public function modify_order_id( $id, $order ) {
@@ -33,15 +28,6 @@ class WC_Reepay_Admin_Frontend {
 		}
 
 		return $id;
-	}
-
-	public function reepay_show_extra_order_fields( $order ) {
-
-		echo '<p>
-            <a class="button refund-items" role="button" href="https://app.reepay.com/#/rp/customers/customers/customer/customer-' . $order->get_customer_id() . '" target="_blank">
-            ' . __( 'See customer', 'reepay-subscriptions-for-woocommerce' ) . '
-            </a>
-        </p>';
 	}
 
 	/**
@@ -125,7 +111,7 @@ class WC_Reepay_Admin_Frontend {
 			case 'reepay_sub':
 				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
 
-				if ( empty( $handle ) && ! empty( $the_order->get_parent_id() )) {
+				if ( empty( $handle ) && ! empty( $the_order->get_parent_id() ) ) {
 					$handle = get_post_meta( $the_order->get_parent_id(), '_reepay_subscription_handle', true );
 				}
 
