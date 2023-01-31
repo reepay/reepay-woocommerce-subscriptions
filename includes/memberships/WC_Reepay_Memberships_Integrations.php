@@ -19,16 +19,18 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				$this->fake_woo_subscription_activation();
 
 				add_filter( 'woocommerce_is_subscription', [ $this, 'add_reepay_subscriptions_type' ], 100, 3 );
-				
+
 				add_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'disable_default_membership_activation_for_reepay_products' ], 100, 3 );
 				add_filter( 'wc_memberships_grant_access_from_new_purchase', [ $this, 'disable_default_membership_activation_for_reepay_products_new_purchase' ], 100, 2 );
 
 				add_action( 'reepay_subscriptions_orders_created', [ $this, 'activate_memberships' ] );
+
 				add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_membership' ] );
 				add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_membership' ] );
 				add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_membership' ] );
 				add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_membership' ] );
-				add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_membership' ] );
+				add_action( 'reepay_webhook_raw_event_subscription_expired', [ $this, 'cancel_membership' ] );
+				add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'renew_membership' ] );
 			}
 		}
 
@@ -148,6 +150,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 						}
 
 						$order->add_meta_data( '_reepay_membership_id', $created_membership_id, true );
+						$order->save();
 					}
 				}
 			}
@@ -167,14 +170,18 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		 * ] $data
 		 */
 		public function renew_membership( $data ) {
-			[ 'membership' => $membership ] = self::get_membership_info( $data['subscription'] );
+			[ 'membership' => $membership, 'subscription' => $subscription  ] = self::get_membership_info( $data['subscription'] );
 
 			if ( is_null( $membership ) ) {
 				return;
 			}
 
 			$membership->activate_membership();
-			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
+			update_post_meta(
+				$membership->get_id(),
+				'_end_date',
+				strtotime( $subscription['end_date'] ?? $subscription['next_period_start'] ) ?: ''
+			);
 		}
 
 		/**
@@ -191,14 +198,13 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		 * ] $data
 		 */
 		public function hold_membership( $data ) {
-			[ 'membership' => $membership ] = self::get_membership_info( $data['subscription'] );
+			[ 'membership' => $membership, 'subscription' => $subscription  ] = self::get_membership_info( $data['subscription'] );
 
 			if ( is_null( $membership ) ) {
 				return;
 			}
 
 			$membership->pause_membership();
-			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
 		}
 
 		/**
@@ -215,38 +221,13 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		 * ] $data
 		 */
 		public function cancel_membership( $data ) {
-			[ 'membership' => $membership ] = self::get_membership_info( $data['subscription'] );
-
-			if ( is_null( $membership ) ) {
-				return;
-			}
-
-			$membership->cancel_membership();
-			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
-		}
-
-		/**
-		 *
-		 * @param array[
-		 *     'id' => string
-		 *     'timestamp' => string
-		 *     'signature' => string
-		 *     'invoice' => string
-		 *     'subscription' => string
-		 *     'customer' => string
-		 *     'event_type' => string
-		 *     'event_id' => string
-		 * ] $data
-		 */
-		public function uncancel_membership( $data ) {
 			[ 'membership' => $membership, 'subscription' => $subscription ] = self::get_membership_info( $data['subscription'] );
 
 			if ( is_null( $membership ) ) {
 				return;
 			}
 
-			$membership->activate_membership();
-			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
+			$membership->cancel_membership();
 		}
 
 		/**

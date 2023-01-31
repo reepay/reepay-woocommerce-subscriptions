@@ -666,7 +666,7 @@ class WC_Reepay_Renewals {
 	 * @param  mixed  $order
 	 */
 	public static function is_order_subscription_active( $order ) {
-		$order = wc_get_product( $order );
+		$order = wc_get_order( $order );
 
 		if ( empty( $order ) ) {
 			return false;
