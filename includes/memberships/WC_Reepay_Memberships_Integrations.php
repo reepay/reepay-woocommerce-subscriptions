@@ -19,11 +19,16 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				$this->fake_woo_subscription_activation();
 
 				add_filter( 'woocommerce_is_subscription', [ $this, 'add_reepay_subscriptions_type' ], 100, 3 );
-
-				add_action( 'reepay_subscriptions_orders_created', [ $this, 'maybe_activate_membership' ] );
-
+				
 				add_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'disable_default_membership_activation_for_reepay_products' ], 100, 3 );
 				add_filter( 'wc_memberships_grant_access_from_new_purchase', [ $this, 'disable_default_membership_activation_for_reepay_products_new_purchase' ], 100, 2 );
+
+				add_action( 'reepay_subscriptions_orders_created', [ $this, 'activate_memberships' ] );
+				add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_membership' ] );
+				add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_membership' ] );
+				add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_membership' ] );
+				add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_membership' ] );
+				add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_membership' ] );
 			}
 		}
 
@@ -51,117 +56,6 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 			}
 
 			return $is_subscription;
-		}
-
-		/**
-		 * @see WC_Memberships_Membership_Plans::grant_access_to_membership_from_order as example of memberships activation
-		 *
-		 * @param  WC_Order[]  $orders orders with one reepay subscription in each one
-		 */
-		public function maybe_activate_membership( $orders ) {
-			$membership_plans = wc_memberships()->get_plans_instance()->get_membership_plans();
-			__log(
-				[
-					'source' => 'maybe_activate_membership !1!',
-					$membership_plans
-				]
-			);
-			if ( empty( $membership_plans ) ) {
-				return;
-			}
-
-			foreach ( $orders as $order ) {
-				$order = wc_get_order($order);
-
-				__log(
-					[
-						'source' => 'maybe_activate_membership !2!',
-						$order
-					]
-				);
-
-				if ( empty( $order ) || ! WC_Reepay_Renewals::is_order_contain_subscription( $order )) {
-					continue;
-				}
-
-				$order_items = $order->get_items();
-				$user_id     = $order->get_user_id();
-
-				__log(
-					[
-						'source' => 'maybe_activate_membership !3!',
-						$order_items,
-						$user_id
-					]
-				);
-
-				if ( empty( $order_items ) || empty( $user_id ) ) {
-					continue;
-				}
-
-				foreach ( $membership_plans as $plan ) {
-					__log(
-						[
-							'source' => 'maybe_activate_membership !4!',
-							$plan
-						]
-					);
-					if ( ! $plan->has_products() ) {
-						continue;
-					}
-
-					remove_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'disable_default_membership_activation_for_reepay_products' ], 100 );
-					$access_granting_product_ids = wc_memberships_get_order_access_granting_product_ids( $plan, $order, $order_items );
-					__log(
-						[
-							'source' => 'maybe_activate_membership !5!',
-							$access_granting_product_ids
-						]
-					);
-					foreach ( $access_granting_product_ids as $product_id ) { //TODO remove this loop
-						__log(
-							[
-								'source' => 'maybe_activate_membership !6!',
-								$product_id
-							]
-						);
-						if ( ! $plan->has_product( $product_id ) ) {
-							continue;
-						}
-						__log(
-							[
-								'source' => 'maybe_activate_membership !7!',
-								$product_id,
-								WC_Reepay_Renewals::is_order_subscription_active( $order )
-							]
-						);
-						if ( WC_Reepay_Renewals::is_order_subscription_active( $order ) ) {
-							$res = $plan->grant_access_from_purchase( $user_id, $product_id, $order->get_id() );
-							__log(
-								[
-									'source' => 'maybe_activate_membership !8!',
-									$res ? 'true' : 'false'
-								]
-							);
-						}
-					}
-				}
-			}
-		}
-
-		/**
-		 * @param  WC_Memberships_Membership_Plan  $plan
-		 *
-		 * @return bool
-		 */
-		public function has_membership_plan_reepay_subscription( $plan ) {
-			foreach ( $plan->get_product_ids() as $product_id ) {
-				if ( WC_Reepay_Checkout::is_reepay_product( $product_id ) ) {
-					return true;
-				}
-			}
-
-			return false;
 		}
 
 		/**
@@ -204,6 +98,205 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 
 			return $grant_access;
 		}
+
+		/**
+		 * @see WC_Memberships_Membership_Plans::grant_access_to_membership_from_order as example of memberships activation
+		 *
+		 * @param  WC_Order[]  $orders orders with one reepay subscription in each one
+		 */
+		public function activate_memberships( $orders ) {
+			remove_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'disable_default_membership_activation_for_reepay_products' ], 100 );
+
+			$membership_plans = wc_memberships()->get_plans_instance()->get_membership_plans();
+
+			if ( empty( $membership_plans ) ) {
+				return;
+			}
+
+			foreach ( $orders as $order ) {
+				$order = wc_get_order($order);
+
+				if ( empty( $order ) ||
+				     ! WC_Reepay_Renewals::is_order_contain_subscription( $order ) ||
+				     ! WC_Reepay_Renewals::is_order_subscription_active( $order ) ) {
+					continue;
+				}
+
+				$order_items = $order->get_items();
+				$user_id     = $order->get_user_id();
+
+				if ( empty( $order_items ) || empty( $user_id ) ) {
+					continue;
+				}
+
+				foreach ( $membership_plans as $plan ) {
+					if ( ! $plan->has_products() ) {
+						continue;
+					}
+
+					$access_granting_product_ids = wc_memberships_get_order_access_granting_product_ids( $plan, $order, $order_items );
+
+					foreach ( $access_granting_product_ids as $product_id ) {
+						if ( ! $plan->has_product( $product_id ) ) {
+							continue;
+						}
+
+						$created_membership_id = $plan->grant_access_from_purchase( $user_id, $product_id, $order->get_id() );
+
+						if ( is_null( $created_membership_id ) ) {
+							continue;
+						}
+
+						$order->add_meta_data( '_reepay_membership_id', $created_membership_id, true );
+					}
+				}
+			}
+		}
+
+		/**
+		 *
+		 * @param array[
+		 *     'id' => string
+		 *     'timestamp' => string
+		 *     'signature' => string
+		 *     'invoice' => string
+		 *     'subscription' => string
+		 *     'customer' => string
+		 *     'event_type' => string
+		 *     'event_id' => string
+		 * ] $data
+		 */
+		public function renew_membership( $data ) {
+			[ 'membership' => $membership ] = self::get_membership_info( $data['subscription'] );
+
+			if ( is_null( $membership ) ) {
+				return;
+			}
+
+			$membership->activate_membership();
+			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
+		}
+
+		/**
+		 *
+		 * @param array[
+		 *     'id' => string
+		 *     'timestamp' => string
+		 *     'signature' => string
+		 *     'invoice' => string
+		 *     'subscription' => string
+		 *     'customer' => string
+		 *     'event_type' => string
+		 *     'event_id' => string
+		 * ] $data
+		 */
+		public function hold_membership( $data ) {
+			[ 'membership' => $membership ] = self::get_membership_info( $data['subscription'] );
+
+			if ( is_null( $membership ) ) {
+				return;
+			}
+
+			$membership->pause_membership();
+			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
+		}
+
+		/**
+		 *
+		 * @param array[
+		 *     'id' => string
+		 *     'timestamp' => string
+		 *     'signature' => string
+		 *     'invoice' => string
+		 *     'subscription' => string
+		 *     'customer' => string
+		 *     'event_type' => string
+		 *     'event_id' => string
+		 * ] $data
+		 */
+		public function cancel_membership( $data ) {
+			[ 'membership' => $membership ] = self::get_membership_info( $data['subscription'] );
+
+			if ( is_null( $membership ) ) {
+				return;
+			}
+
+			$membership->cancel_membership();
+			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
+		}
+
+		/**
+		 *
+		 * @param array[
+		 *     'id' => string
+		 *     'timestamp' => string
+		 *     'signature' => string
+		 *     'invoice' => string
+		 *     'subscription' => string
+		 *     'customer' => string
+		 *     'event_type' => string
+		 *     'event_id' => string
+		 * ] $data
+		 */
+		public function uncancel_membership( $data ) {
+			[ 'membership' => $membership, 'subscription' => $subscription ] = self::get_membership_info( $data['subscription'] );
+
+			if ( is_null( $membership ) ) {
+				return;
+			}
+
+			$membership->activate_membership();
+			update_post_meta( $membership->get_id(), '_end_data', strtotime( $subscription['end_date'] ?? '') ?: '' );
+		}
+
+		/**
+		 * @param  string  $handle
+		 *
+		 * @return array[
+		 *     'order' => WC_Order|null
+		 *     'membership' => WC_Memberships_User_Membership|null
+		 *     'subscription' => array|null @see https://reference.reepay.com/api/#the-subscription-object
+		 * ]
+		 */
+		public static function get_membership_info( $handle ) {
+			$data = [
+				'order'        => null,
+				'membership'   => null,
+				'subscription' => null,
+			];
+
+			$data['order'] = WC_Reepay_Renewals::get_order_by_subscription_handle( $handle );
+
+			if ( empty( $data['order'] ) ) {
+				return $data;
+			}
+
+			$membership_id = $data['order']->get_meta( '_reepay_membership_id' );
+
+			if ( empty( $membership_id ) ) {
+				return null;
+			}
+
+			$data['membership'] =  wc_memberships_get_user_membership( $membership_id );
+
+			if ( is_null( $data['membership'] ) ) {
+				return $data;
+			}
+
+			$handle = $data['order']->get_meta( '_reepay_subscription_handle' );
+
+			if ( empty( $handle ) ) {
+				return $data;
+			}
+
+			try {
+				$data['subscription'] = reepay_s()->api()->request( "subscription/$handle" );
+			} catch (Exception $e) {
+				return $data;
+			}
+
+			return $data;
+		}
 	}
 }
 
@@ -213,17 +306,5 @@ if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' )
 ) {
 	class WC_Subscription extends WC_Order {
 		public $fake = true;
-	}
-}
-
-if(!function_exists('__log')) {
-	function __log($data, ...$more_data) {
-		if($more_data) {
-			$data = [
-				'$data' => $data,
-				'$more_data' => $more_data
-			];
-		}
-		error_log( print_r( $data, true ) );
 	}
 }
