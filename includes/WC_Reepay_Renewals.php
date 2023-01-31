@@ -246,10 +246,9 @@ class WC_Reepay_Renewals {
 			],
 		] );
 
-		if ( ! empty( $child_order ) && $child_order->post_status == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
-			$order_child_obj = wc_get_order( $child_order->ID );
-			$order_child_obj->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
-			$order_child_obj->save();
+		if ( ! empty( $child_order ) && $child_order->get_status() == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
+			$child_order->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
+			$child_order->save();
 		}
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
@@ -288,7 +287,7 @@ class WC_Reepay_Renewals {
 	}
 
 	public static function is_order_contain_subscription( $order ) {
-		foreach ( $order->get_items() as $item_key => $item_values ) {
+		foreach ( $order->get_items() as $item_values ) {
 			$product = $item_values->get_product();
 
 			//Imported subscriptions are empty
@@ -700,6 +699,12 @@ class WC_Reepay_Renewals {
 		return $is_active;
 	}
 
+	/**
+	 * @param WC_Order $parent_order
+	 * @param string $invoice
+	 *
+	 * @return WC_Order|false
+	 */
 	public function get_child_order( $parent_order, $invoice ) {
 		$query = new WP_Query( [
 			'post_parent'    => $parent_order->get_id(),
@@ -714,7 +719,7 @@ class WC_Reepay_Renewals {
 			]
 		] );
 
-		return ! empty( $query->posts ) ? $query->posts[0] : false;
+		return ! empty( $query->posts ) ? wc_get_order( $query->posts[0] ) : false;
 	}
 
 	/**
