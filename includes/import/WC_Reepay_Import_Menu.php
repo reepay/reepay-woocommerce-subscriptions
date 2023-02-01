@@ -69,14 +69,15 @@ class WC_Reepay_Import_Menu {
 	}
 
 	function print_checkbox( $args ) {
-		$value = get_option( 'reepay_import' )[ $args['option_name'] ] ?? '';
-		?>
-        <label>
-            <input type="checkbox"
-                   name="reepay_import[<?php echo $args['option_name'] ?>]"
-				<?php checked( $value, 'yes' ) ?> />
-        </label>
-		<?php
+		wc_get_template(
+			'import/checkbox.php',
+			array(
+				'args' => $args,
+                'value' => get_option( 'reepay_import' )[ $args['option_name'] ] ?? ''
+			),
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
 	}
 
 	function import_sanitize_checkbox( $args ) {
@@ -88,28 +89,11 @@ class WC_Reepay_Import_Menu {
 	}
 
 	function import_page_callback() {
-		$page = $_GET['page'] ?? '';
-		$tab  = $_GET['tab'] ?? '';
-		?>
-        <div class="wrap">
-            <h1><?php echo get_admin_page_title() ?></h1>
-            <form method="post" action="options.php">
-                <ul class="subsubsub">
-                    <li><a href="<?php echo get_admin_url() ?>admin.php?page=wc-settings&tab=reepay_subscriptions"
-                           class="<?php echo $tab === 'reepay_subscriptions' ? 'current' : '' ?>">General</a> |
-                    </li>
-                    <li>
-                        <a href="<?php echo get_admin_url() ?>tools.php?page=reepay_import"
-                           class="<?php echo $page === 'reepay_import' ? 'current' : '' ?>">Import tools</a> |
-                    </li>
-                </ul>
-				<?php
-				settings_fields( 'reepay_import_settings' ); // settings group name
-				do_settings_sections( 'reepay_import' ); // just a page slug
-				submit_button( 'Save and import' );
-				?>
-            </form>
-        </div>
-		<?php
+		wc_get_template(
+			'import/page.php',
+			array(),
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
 	}
 }
