@@ -622,7 +622,6 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Import();
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
-		new WC_Reepay_Meta_Boxes();
 	}
 
 
