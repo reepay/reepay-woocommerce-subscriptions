@@ -72,10 +72,9 @@ class WC_Reepay_Import {
 
 	public function process_import( $args, $option ) {
 		if ( $option == $this->option_name ) {
-			__log('!1!', $args, $option);
-			foreach ( $this->import_objects as $object ) {
-				if ( ! empty( $args[ $object ] ) && 'yes' == $args[ $object ] ) {
-					$res = false && call_user_func( [ $this, "process_import_$object" ] );
+			foreach ( array_keys( $this->import_objects ) as $object ) {
+				if ( ! empty( $args[ $object ] ) ) {
+					$res = call_user_func( [ $this, "process_import_$object", $args[$object] ] );
 
 					if ( is_wp_error( $res ) ) {
 						$this->log(
@@ -98,7 +97,7 @@ class WC_Reepay_Import {
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function process_import_customers( $token = '' ) {
+	public function process_import_customers( $options = array(), $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -142,14 +141,14 @@ class WC_Reepay_Import {
 			}
 
 			if ( ! empty( $customers_data['next_page_token'] ) ) {
-				return $this->process_import_customers( $customers_data['next_page_token'] );
+				return $this->process_import_customers( $options, $customers_data['next_page_token'] );
 			}
 		}
 
 		return true;
 	}
 
-	public function process_import_cards() {
+	public function process_import_cards( $options = array() ) {
 		$users = get_users( [ 'fields' => [ 'ID' ] ] );
 
 		foreach ( $users as $user ) {
@@ -200,7 +199,7 @@ class WC_Reepay_Import {
 	 * @return bool|WP_Error
 	 * @throws WC_Data_Exception
 	 */
-	public function process_import_subscriptions( $token = '' ) {
+	public function process_import_subscriptions( $options = array(),  $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -237,7 +236,7 @@ class WC_Reepay_Import {
 			}
 
 			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
-				return $this->process_import_subscriptions( $subscriptions_data['next_page_token'] );
+				return $this->process_import_subscriptions( $options,  $subscriptions_data['next_page_token'] );
 			}
 		}
 
