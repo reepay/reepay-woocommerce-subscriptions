@@ -1,27 +1,20 @@
 jQuery(function ($) {
-    const $table = $('.form-table');
+    const $formTables = $('.form-table');
 
-    $table.on('change', '.reepay-import__row--main input', function () {
+    $formTables.on('change', '.reepay-import__row--main input', function () {
         const $this = $(this);
-        let $tr = $this.parents('tr').next();
+        const $formTable = $this.parents('.form-table');
 
-        do {
-            $tr.toggle(this.checked);
-            const $checkbox = $tr.find('input');
+        $formTable.find('.reepay-import__row--sub')
+            .toggle(this.checked)
+            .find('input')
+            .prop('checked', false)
+            .filter('input[name$="[all]"]')
+            .prop('checked', this.checked);
 
-            if (this.checked) {
-                if ($checkbox.attr('name').includes('[all]')) {
-                    $checkbox.prop('checked', true);
-                }
-            } else {
-                $checkbox.prop('checked', false);
-            }
-
-            $tr = $tr.next();
-        } while ($tr.length)
     }).find('.reepay-import__row--main input').trigger('change');
 
-    $table.on('change', '.reepay-import__row--sub input', function () {
+    $formTables.on('change', '.reepay-import__row--sub input', function () {
         const $this = $(this);
         const $formTable = $this.parents('.form-table');
 
