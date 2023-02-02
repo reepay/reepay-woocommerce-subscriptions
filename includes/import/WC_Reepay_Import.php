@@ -12,9 +12,35 @@ class WC_Reepay_Import {
 	public $menu_slug = 'reepay_import';
 
 	/**
-	 * @var string[]
+	 * @var array
 	 */
-	public $import_objects = [ 'customers', 'cards', 'subscriptions' ];
+	public $import_objects = [
+		'users' => [
+			'input_type' => 'radio',
+			'options' => [
+				'all' => 'All',
+				'with_active_subscription' => 'Only customers with active subscriptions'
+			]
+		],
+		'cards' => [
+			'input_type' => 'radio',
+			'options' => [
+				'all' => 'All',
+				'active' => 'Only active cards'
+			]
+		],
+		'subscriptions' => [
+			'input_type' => 'checkbox',
+			'options' => [
+				'all' => 'All',
+				'active' => 'Active',
+				'on_hold' => 'On hold',
+				'dunning' => 'Dunning',
+				'canceled' => 'Cancelled',
+				'expired' => 'Expired'
+			]
+		]
+	];
 
 	/**
 	 * @var string[]
@@ -32,7 +58,7 @@ class WC_Reepay_Import {
 	public function __construct() {
 		session_start();
 
-		new WC_Reepay_Import_Menu( $this->option_name, $this->menu_slug, $this->import_objects );
+		new WC_Reepay_Import_Menu( $this->option_name, $this->import_objects );
 
 		/*
 		 * Start import with saving import settings
@@ -46,9 +72,10 @@ class WC_Reepay_Import {
 
 	public function process_import( $args, $option ) {
 		if ( $option == $this->option_name ) {
+			__log('!1!', $args, $option);
 			foreach ( $this->import_objects as $object ) {
 				if ( ! empty( $args[ $object ] ) && 'yes' == $args[ $object ] ) {
-					$res = call_user_func( [ $this, "process_import_$object" ] );
+					$res = false && call_user_func( [ $this, "process_import_$object" ] );
 
 					if ( is_wp_error( $res ) ) {
 						$this->log(
@@ -115,7 +142,7 @@ class WC_Reepay_Import {
 			}
 
 			if ( ! empty( $customers_data['next_page_token'] ) ) {
-				return $this->process_import_customers();
+				return $this->process_import_customers( $customers_data['next_page_token'] );
 			}
 		}
 

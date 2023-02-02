@@ -7,7 +7,7 @@
 			</li>
 			<li>
 				<a href="<?php echo get_admin_url() ?>tools.php?page=reepay_import"
-				   class="current">Import tools</a> |
+				   class="current">Import tools</a>
 			</li>
 		</ul>
 		<?php
