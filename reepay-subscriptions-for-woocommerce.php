@@ -575,13 +575,15 @@ class WooCommerce_Reepay_Subscriptions {
 	public function admin_enqueue_scripts() {
 		$product = wc_get_product();
 
-		wp_enqueue_script( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/js/admin.js', [ 'jquery' ], $this->settings( 'version' ), true );
-
-		if ( isset( $_GET['page'] ) && 'reepay_import' === $_GET['page'] ) {
+		if (  WC_Reepay_Import_Menu::is_current_page() ) {
 			wp_enqueue_script( 'admin-reepay-subscription-import', $this->settings( 'plugin_url' ) . 'assets/js/admin_import.js', [ 'jquery' ], $this->settings( 'version' ), true );
+
+			wp_localize_script( 'admin-reepay-subscription-import', WC_Reepay_Import_AJAX::$js_object_name, WC_Reepay_Import_AJAX::get_localize_data() );
 		}
 
 		wp_enqueue_style( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/css/admin.css' );
+
+		wp_enqueue_script( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/js/admin.js', [ 'jquery', 'jquery-blockui' ], $this->settings( 'version' ), true );
 		wp_localize_script( 'admin-reepay-subscription', 'reepay', [
 			'amountPercentageLabel' => __( 'Percentage', reepay_s()->settings( 'domain' ) ),
 			'product'               => [

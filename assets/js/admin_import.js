@@ -1,4 +1,10 @@
 jQuery(function ($) {
+    if(!window.reepayImport) {
+        return;
+    }
+
+    const config = window.reepayImport;
+
     const $formTables = $('.form-table');
 
     $formTables.on('change', '.reepay-import__row--main input', function () {
@@ -39,4 +45,38 @@ jQuery(function ($) {
             }
         }
     });
+
+    $('.js-reepay-import-form').on('submit', function (e) {
+        e.preventDefault();
+
+        const $this = $(this);
+
+        $this.block();
+
+        $.ajax({
+            url: config.urls.get_items,
+            data: $this.serialize(),
+            method: 'GET',
+            beforeSend: function (xhr) {
+
+            },
+            success: function (response_data) {
+                console.log(response_data)
+            },
+            error: function (request, status, error) {
+                alert('Request error. Try again')
+            },
+            complete: function () {
+                $this.unblock();
+            },
+        })
+    })
+
+    $.blockUI.defaults = $.extend($.blockUI.defaults, {
+        message: null,
+        overlayCSS: {
+            background: '#fff',
+            opacity: 0.6
+        }
+    })
 });

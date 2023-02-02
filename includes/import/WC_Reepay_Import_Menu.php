@@ -14,7 +14,7 @@ class WC_Reepay_Import_Menu {
 	/**
 	 * @var string
 	 */
-	public $menu_slug = 'reepay_import';
+	public static $menu_slug = 'reepay_import';
 
 	/**
 	 * WC_Reepay_Import_Menu constructor.
@@ -36,7 +36,7 @@ class WC_Reepay_Import_Menu {
 			'Reepay Import',
 			'Reepay Import',
 			'manage_options',
-			$this->menu_slug,
+			self::$menu_slug,
 			[ $this, 'print_import_page' ],
 			0
 		);
@@ -50,14 +50,14 @@ class WC_Reepay_Import_Menu {
 				"import_section_$object",
 				'',
 				'',
-				$this->menu_slug
+				self::$menu_slug
 			);
 
 			add_settings_field(
 				"import_$object",
 				"Import $object",
 				[ $this, 'print_checkbox' ],
-				$this->menu_slug,
+				self::$menu_slug,
 				"import_section_$object",
 				[
 					'option_name' => [ $object ],
@@ -70,7 +70,7 @@ class WC_Reepay_Import_Menu {
 					"import_{$object}_{$option}",
 					$option_label,
 					[ $this, 'print_checkbox' ],
-					$this->menu_slug,
+					self::$menu_slug,
 					"import_section_$object",
 					[
 						'option_name' => [ $object, $option ],
@@ -119,5 +119,9 @@ class WC_Reepay_Import_Menu {
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
 	}
-
+	
+	public static function is_current_page() {
+		return isset( $_GET['page'] ) && self::$menu_slug === $_GET['page'];
+	}
+	
 }

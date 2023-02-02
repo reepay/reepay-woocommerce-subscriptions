@@ -42,7 +42,7 @@ class WC_Reepay_Import_AJAX {
 			$urls[ $action ] = add_query_arg(
 				[
 					'nonce'  => $nonce,
-					'action' => $action,
+					'action' => self::$ajax_prefix . '_' .$action,
 				],
 				$ajax_url
 			);
@@ -54,5 +54,6 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	public function get_items() {
+		wp_send_json_success();
 	}
 }
