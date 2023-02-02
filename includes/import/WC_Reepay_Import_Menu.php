@@ -84,11 +84,13 @@ class WC_Reepay_Import_Menu {
 	function import_sanitize_checkbox( $args ) {
 		foreach ( $args as &$arg ) {
 			if ( is_array( $arg ) ) {
-				$this->import_sanitize_checkbox( $arg );
+				$arg = array_keys( $arg );
+
+				if ( in_array( 'all', $arg ) ) {
+					$arg = [ 'all' ];
+				}
 			} else {
-				$arg = [
-					'all' => 'on' === $arg ? 'yes' : 'no'
-				];
+				$arg = [ 'all' ];
 			}
 		}
 
