@@ -48,11 +48,6 @@ class WC_Reepay_Import {
 	public $notices = [];
 
 	/**
-	 * @var string
-	 */
-	public $session_notices_key = 'reepay_import_notices';
-
-	/**
 	 * Constructor
 	 */
 	public function __construct() {
@@ -60,45 +55,14 @@ class WC_Reepay_Import {
 
 		new WC_Reepay_Import_Menu( $this->option_name, $this->import_objects );
 		new WC_Reepay_Import_AJAX();
-
-		/*
-		 * Start import with saving import settings
-		 * Use pre_update for the case when the options have not changed
-		 * Also use filter as action, but don't forget to return the value
-		 */
-//		add_filter( 'pre_update_option', [ $this, 'process_import' ], 10, 2 );
-
-//		add_action( 'admin_notices', [ $this, 'add_notices' ] );
 	}
-
-//	public function process_import( $args, $option ) {
-//		if ( $option == $this->option_name ) {
-//			foreach ( array_keys( $this->import_objects ) as $object ) {
-//				if ( ! empty( $args[ $object ] ) ) {
-//					$res = call_user_func( [ $this, "process_import_$object", $args[$object] ] );
-//
-//					if ( is_wp_error( $res ) ) {
-//						$this->log(
-//							"WC_Reepay_Import::process_import::process_import_$object",
-//							$res,
-//							"Error with $object import: " . $res->get_error_message()
-//						);
-//					}
-//				}
-//			}
-//
-//			$_SESSION[ $this->session_notices_key ] = $this->notices;
-//		}
-//
-//		return $args;
-//	}
 
 	/**
 	 * @param  string  $token
 	 *
 	 * @return bool|WP_Error
 	 */
-	public function process_import_customers( $options = array(), $token = '' ) {
+	public static function process_import_customers( $options = array(), $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -126,30 +90,18 @@ class WC_Reepay_Import {
 
 				if ( false === get_user_by( 'id', $wp_user_id ) ) {
 					$wp_user_id = WC_Reepay_Import_Helpers::create_woo_customer( $customer );
-
-					if ( is_wp_error( $wp_user_id ) ) {
-						/** @var WP_Error $wp_user_id */
-
-						$name = $customer['email'] ?? $customer['handle'];
-
-						$this->log(
-							"WC_Reepay_Import::process_import_customers",
-							$wp_user_id,
-							"Error with creating wp user - {$name}. " . $wp_user_id->get_error_message()
-						);
-					}
 				}
 			}
 
 			if ( ! empty( $customers_data['next_page_token'] ) ) {
-				return $this->process_import_customers( $options, $customers_data['next_page_token'] );
+				return self::process_import_customers( $options, $customers_data['next_page_token'] );
 			}
 		}
 
 		return true;
 	}
 
-	public function process_import_cards( $options = array() ) {
+	public static function process_import_cards( $options = array() ) {
 		$users = get_users( [ 'fields' => [ 'ID' ] ] );
 
 		foreach ( $users as $user ) {
@@ -176,14 +128,6 @@ class WC_Reepay_Import {
 					}
 
 					$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $user->ID, $card );
-
-					if ( is_wp_error( $card_added ) ) {
-						$this->log(
-							"WC_Reepay_Import::process_import_cards",
-							$card_added,
-							"Error with import customer's card - " . $user->user_email
-						);
-					}
 				}
 
 			} catch ( Exception $e ) {
@@ -200,7 +144,7 @@ class WC_Reepay_Import {
 	 * @return bool|WP_Error
 	 * @throws WC_Data_Exception
 	 */
-	public function process_import_subscriptions( $options = array(),  $token = '' ) {
+	public static function process_import_subscriptions( $options = array(),  $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -225,46 +169,14 @@ class WC_Reepay_Import {
 			foreach ( $subscriptions as $subscription ) {
 				if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] ) ) {
 					$imported = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscription );
-
-					if ( is_wp_error( $imported ) ) {
-						$this->log(
-							"WC_Reepay_Import::process_import_subscriptions",
-							$imported,
-							"Error with import subscription - " . $subscription['handle']
-						);
-					}
 				}
 			}
 
 			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
-				return $this->process_import_subscriptions( $options,  $subscriptions_data['next_page_token'] );
+				return self::process_import_subscriptions( $options,  $subscriptions_data['next_page_token'] );
 			}
 		}
 
 		return true;
-	}
-
-	/**
-	 * @param  string  $source
-	 * @param  WP_Error  $error
-	 * @param  string  $notice
-	 */
-	function log( $source, $error, $notice = null ) {
-		reepay_s()->log()->log( [
-			'source'  => $source,
-			'message' => $error->get_error_messages()
-		] );
-
-		if ( ! empty( $notice ) ) {
-			$this->notices[] = $notice;
-		}
-	}
-
-	function add_notices() {
-		foreach ( $_SESSION[ $this->session_notices_key ] ?? [] as $message ) {
-			printf( '<div class="notice notice-error"><p>%1$s</p></div>', esc_html( $message ) );
-		}
-
-		$_SESSION[ $this->session_notices_key ] = [];
 	}
 }
