@@ -59,38 +59,39 @@ class WC_Reepay_Import {
 		session_start();
 
 		new WC_Reepay_Import_Menu( $this->option_name, $this->import_objects );
+		new WC_Reepay_Import_AJAX();
 
 		/*
 		 * Start import with saving import settings
 		 * Use pre_update for the case when the options have not changed
 		 * Also use filter as action, but don't forget to return the value
 		 */
-		add_filter( 'pre_update_option', [ $this, 'process_import' ], 10, 2 );
+//		add_filter( 'pre_update_option', [ $this, 'process_import' ], 10, 2 );
 
-		add_action( 'admin_notices', [ $this, 'add_notices' ] );
+//		add_action( 'admin_notices', [ $this, 'add_notices' ] );
 	}
 
-	public function process_import( $args, $option ) {
-		if ( $option == $this->option_name ) {
-			foreach ( array_keys( $this->import_objects ) as $object ) {
-				if ( ! empty( $args[ $object ] ) ) {
-					$res = call_user_func( [ $this, "process_import_$object", $args[$object] ] );
-
-					if ( is_wp_error( $res ) ) {
-						$this->log(
-							"WC_Reepay_Import::process_import::process_import_$object",
-							$res,
-							"Error with $object import: " . $res->get_error_message()
-						);
-					}
-				}
-			}
-
-			$_SESSION[ $this->session_notices_key ] = $this->notices;
-		}
-
-		return $args;
-	}
+//	public function process_import( $args, $option ) {
+//		if ( $option == $this->option_name ) {
+//			foreach ( array_keys( $this->import_objects ) as $object ) {
+//				if ( ! empty( $args[ $object ] ) ) {
+//					$res = call_user_func( [ $this, "process_import_$object", $args[$object] ] );
+//
+//					if ( is_wp_error( $res ) ) {
+//						$this->log(
+//							"WC_Reepay_Import::process_import::process_import_$object",
+//							$res,
+//							"Error with $object import: " . $res->get_error_message()
+//						);
+//					}
+//				}
+//			}
+//
+//			$_SESSION[ $this->session_notices_key ] = $this->notices;
+//		}
+//
+//		return $args;
+//	}
 
 	/**
 	 * @param  string  $token
