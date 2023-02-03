@@ -20,7 +20,8 @@ class WC_Reepay_Import_AJAX {
 	 * @var array action to function
 	 */
 	public static $actions = [
-		'get_items' => 'get_items',
+		'get_objects' => 'get_objects',
+		'save_objects' => 'save_objects'
 	];
 
 	/**
@@ -53,7 +54,7 @@ class WC_Reepay_Import_AJAX {
 		];
 	}
 
-	public function get_items() {
+	public function get_objects() {
 		$res = [];
 		$objects_to_import = $this->get_object_to_import();
 
@@ -84,5 +85,17 @@ class WC_Reepay_Import_AJAX {
 		}
 
 		return $data;
+	}
+
+	public function chech_nonce() {
+		if ( ! check_ajax_referer( self::$ajax_prefix, 'nonce', false ) ) {
+			wp_send_json_error(
+				[
+					'error' => 'User verification error. Reload page and try again'
+				]
+			);
+		}
+
+		return true;
 	}
 }

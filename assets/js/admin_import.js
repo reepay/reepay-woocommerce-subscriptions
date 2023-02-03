@@ -73,14 +73,18 @@ jQuery(function ($) {
         $this.block();
 
         $.ajax({
-            url: config.urls.get_items,
+            url: config.urls.get_objects,
             data: $this.serialize(),
             method: 'GET',
             beforeSend: function (xhr) {
 
             },
             success: function (response) {
-                showImportTables(response.data)
+                if(response.success) {
+                    showImportTables(response.data)
+                } else {
+                    alert(response.data.error);
+                }
             },
             error: function (request, status, error) {
                 alert('Request error. Try again')
@@ -155,11 +159,15 @@ jQuery(function ($) {
         $dataTableContainer.html('');
 
         Object.entries(data).forEach(([objectType, data]) => {
-            $dataTableContainer.append(tableTemplates[objectType]({
-                type: objectType,
-                title: objectType.charAt(0).toUpperCase() + objectType.slice(1),
-                rows: data
-            }))
+            if(tableTemplates[objectType]) {
+                $dataTableContainer.append(tableTemplates[objectType]({
+                    type: objectType,
+                    title: objectType.charAt(0).toUpperCase() + objectType.slice(1),
+                    rows: data
+                }))
+            } else {
+                console.warn('Wrong object type in tables render', objectType);
+            }
         })
     }
 
