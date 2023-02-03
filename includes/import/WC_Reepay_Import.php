@@ -75,14 +75,7 @@ class WC_Reepay_Import {
 
 		$only_with_active_subscription = in_array( 'with_active_subscription', $options );
 
-		$customers_to_import = [
-			'all'                          => [],
-			'types' => [
-				'exists'                       => [],
-				'import'                       => [],
-				'without_active_subscriptions' => [],
-			]
-		];
+		$customers_to_import = [];
 
 		$customers_data['next_page_token'] = true;
 		while ( ! empty( $customers_data['next_page_token'] ) ) {
@@ -99,25 +92,15 @@ class WC_Reepay_Import {
 				break;
 			}
 
-			$customers = $customers_data['content'];
-
-			foreach ( $customers as $customer ) {
-				$customers_to_import['all'][ $customer['handle'] ] = $customer;
-
-				if ( 0 === $customer['active_subscriptions'] ) {
-					$customers_to_import['types']['without_active_subscriptions'][] = $customer['handle'];
-
-					if ( $only_with_active_subscription ) {
-						continue;
-					}
+			foreach ( $customers_data['content'] as $customer ) {
+				if ( $only_with_active_subscription && 0 === $customer['active_subscriptions'] ) {
+					continue;
 				}
 
 				$wp_user_id = rp_get_userid_by_handle( $customer['handle'] );
 
 				if ( false === get_user_by( 'id', $wp_user_id ) ) {
-					$customers_to_import['types']['import'][] = $customer['handle'];
-				} else {
-					$customers_to_import['types']['exists'][] = $customer['handle'];
+					$customers_to_import[ $customer['handle'] ] = $customer;
 				}
 			}
 		}

@@ -74,7 +74,7 @@ class WC_Reepay_Import_Menu {
 		);
 
 		wc_get_template(
-			'import/data_table.php',
+			'import/data-table-customers.php',
 			array(),
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'

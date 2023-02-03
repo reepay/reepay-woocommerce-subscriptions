@@ -17,7 +17,9 @@ jQuery(function ($) {
 
     const $viewImportForm = $('.js-reepay-import-form-view');
     const $dataTableContainer = $viewImportForm.find('.js-reepay-import-table-container');
-    const tableTemplate = _.template($('#tmpl-reepay-subscriptions-import-data-table').html());
+    const tableTemplates = {
+        'customers': _.template($('#tmpl-reepay-subscriptions-import-data-table-customers').html())
+    };
 
     showImportTables();
 
@@ -89,7 +91,7 @@ jQuery(function ($) {
         })
     })
 
-    $viewImportForm.on('click', 'input[name="submit"]', function (e) {
+    $viewImportForm.on('click', 'p.submit a.js-back', function (e) {
         e.preventDefault();
 
         showImportForm();
@@ -99,7 +101,6 @@ jQuery(function ($) {
         e.preventDefault();
 
         alert('NOT READY!!!');
-        showImportForm();
     })
 
     function showImportForm() {
@@ -153,13 +154,13 @@ jQuery(function ($) {
     function renderTables(data) {
         $dataTableContainer.html('');
 
-        $dataTableContainer.append(tableTemplate({
-            title: 'Items 1',
-            cols: {
-                data: 'Data',
-                test: '<h1>Daaaata</h1>'
-            }
-        }))
+        Object.entries(data).forEach(([objectType, data]) => {
+            $dataTableContainer.append(tableTemplates[objectType]({
+                type: objectType,
+                title: objectType.charAt(0).toUpperCase() + objectType.slice(1),
+                rows: data
+            }))
+        })
     }
 
     $.blockUI.defaults = $.extend($.blockUI.defaults, {

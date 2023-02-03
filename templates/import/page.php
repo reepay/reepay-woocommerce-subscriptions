@@ -21,14 +21,14 @@
     <form class="js-reepay-import-form-view" style="display:none">
         <p class="submit">
 		    <?php submit_button( 'Import selected', 'primary', 'submit', false ); ?>
-		    <?php submit_button( 'Back', 'secondary', 'back', false ); ?>
+            <a href="#" class="button button-secondary js-back">Back</a>
         </p>
 
         <div class="js-reepay-import-table-container"></div>
 
         <p class="submit">
 	        <?php submit_button( 'Import selected', 'primary', 'submit', false ); ?>
-	        <?php submit_button( 'Back', 'secondary', 'back', false ); ?>
+            <a href="#" class="button button-secondary js-back">Back</a>
         </p>
     </form>
 </div>
