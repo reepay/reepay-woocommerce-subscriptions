@@ -4,7 +4,7 @@ class WC_Reepay_Import {
 	/**
 	 * @var string
 	 */
-	public $option_name = 'reepay_import';
+	public static $option_name = 'reepay_import';
 
 	/**
 	 * @var string
@@ -14,32 +14,32 @@ class WC_Reepay_Import {
 	/**
 	 * @var array
 	 */
-	public $import_objects = [
-		'users' => [
+	public static $import_objects = [
+		'customers' => [
 			'input_type' => 'radio',
 			'options' => [
 				'all' => 'All',
 				'with_active_subscription' => 'Only customers with active subscriptions'
 			]
 		],
-		'cards' => [
-			'input_type' => 'radio',
-			'options' => [
-				'all' => 'All',
-				'active' => 'Only active cards'
-			]
-		],
-		'subscriptions' => [
-			'input_type' => 'checkbox',
-			'options' => [
-				'all' => 'All',
-				'active' => 'Active',
-				'on_hold' => 'On hold',
-				'dunning' => 'Dunning',
-				'canceled' => 'Cancelled',
-				'expired' => 'Expired'
-			]
-		]
+//		'cards' => [
+//			'input_type' => 'radio',
+//			'options' => [
+//				'all' => 'All',
+//				'active' => 'Only active cards'
+//			]
+//		],
+//		'subscriptions' => [
+//			'input_type' => 'checkbox',
+//			'options' => [
+//				'all' => 'All',
+//				'active' => 'Active',
+//				'on_hold' => 'On hold',
+//				'dunning' => 'Dunning',
+//				'canceled' => 'Cancelled',
+//				'expired' => 'Expired'
+//			]
+//		]
 	];
 
 	/**
@@ -53,16 +53,17 @@ class WC_Reepay_Import {
 	public function __construct() {
 		session_start();
 
-		new WC_Reepay_Import_Menu( $this->option_name, $this->import_objects );
+		new WC_Reepay_Import_Menu();
 		new WC_Reepay_Import_AJAX();
 	}
 
 	/**
-	 * @param  string  $token
+	 * @param  string  $options
+	 * @param  bool    $save_to_wp
 	 *
-	 * @return bool|WP_Error
+	 * @return array|WP_Error
 	 */
-	public static function process_import_customers( $options = array(), $token = '' ) {
+	public static function process_import_customers( $options = array() ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -72,33 +73,56 @@ class WC_Reepay_Import {
 			$params['next_page_token'] = $token;
 		}
 
-		try {
-			/**
-			 * @see https://reference.reepay.com/api/#get-list-of-customers
-			 **/
-			$customers_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
-		} catch ( Exception $e ) {
-			return new WP_Error( 400, $e->getMessage() );
-		}
+		$only_with_active_subscription = in_array( 'with_active_subscription', $options );
 
+		$customers_to_import = [
+			'all'                          => [],
+			'types' => [
+				'exists'                       => [],
+				'import'                       => [],
+				'without_active_subscriptions' => [],
+			]
+		];
 
-		if ( ! empty( $customers_data ) && ! empty( $customers_data['content'] ) ) {
+		$customers_data['next_page_token'] = true;
+		while ( ! empty( $customers_data['next_page_token'] ) ) {
+			try {
+				/**
+				 * @see https://reference.reepay.com/api/#get-list-of-customers
+				 **/
+				$customers_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
+			} catch ( Exception $e ) {
+				return new WP_Error( 400, $e->getMessage() );
+			}
+
+			if ( empty( $customers_data ) || empty( $customers_data['content'] ) ) {
+				break;
+			}
+
 			$customers = $customers_data['content'];
 
 			foreach ( $customers as $customer ) {
+				$customers_to_import['all'][ $customer['handle'] ] = $customer;
+
+				if ( 0 === $customer['active_subscriptions'] ) {
+					$customers_to_import['types']['without_active_subscriptions'][] = $customer['handle'];
+
+					if ( $only_with_active_subscription ) {
+						continue;
+					}
+				}
+
 				$wp_user_id = rp_get_userid_by_handle( $customer['handle'] );
 
 				if ( false === get_user_by( 'id', $wp_user_id ) ) {
-					$wp_user_id = WC_Reepay_Import_Helpers::create_woo_customer( $customer );
+					$customers_to_import['types']['import'][] = $customer['handle'];
+				} else {
+					$customers_to_import['types']['exists'][] = $customer['handle'];
 				}
-			}
-
-			if ( ! empty( $customers_data['next_page_token'] ) ) {
-				return self::process_import_customers( $options, $customers_data['next_page_token'] );
 			}
 		}
 
-		return true;
+		return $customers_to_import;
 	}
 
 	public static function process_import_cards( $options = array() ) {

@@ -4,28 +4,12 @@ class WC_Reepay_Import_Menu {
 	/**
 	 * @var string
 	 */
-	public $option_name;
-
-	/**
-	 * @var array
-	 */
-	public $import_objects;
-
-	/**
-	 * @var string
-	 */
 	public static $menu_slug = 'reepay_import';
 
 	/**
 	 * WC_Reepay_Import_Menu constructor.
-	 *
-	 * @param string $option_name
-	 * @param array $import_objects
 	 */
-	public function __construct( $option_name, $import_objects ) {
-		$this->option_name    = $option_name;
-		$this->import_objects = $import_objects;
-
+	public function __construct() {
 		add_action( 'admin_menu', [ $this, 'create_submenu' ] );
 		add_action( 'admin_init', [ $this, 'create_settings_fields' ] );
 	}
@@ -43,9 +27,9 @@ class WC_Reepay_Import_Menu {
 	}
 
 	function create_settings_fields() {
-		register_setting( 'reepay_import_settings', $this->option_name, [ $this, 'import_sanitize_checkbox' ] );
+		register_setting( 'reepay_import_settings', WC_Reepay_Import::$option_name, [ $this, 'import_sanitize_checkbox' ] );
 
-		foreach ( $this->import_objects as $object => ['input_type' => $options_input_type, 'options' => $options] ) {
+		foreach ( WC_Reepay_Import::$import_objects as $object => ['input_type' => $options_input_type, 'options' => $options] ) {
 			add_settings_section(
 				"import_section_$object",
 				'',
@@ -81,25 +65,16 @@ class WC_Reepay_Import_Menu {
 		}
 	}
 
-	function import_sanitize_checkbox( $args ) {
-		foreach ( $args as &$arg ) {
-			if ( is_array( $arg ) ) {
-				$arg = array_keys( $arg );
-
-				if ( in_array( 'all', $arg ) ) {
-					$arg = [ 'all' ];
-				}
-			} else {
-				$arg = [ 'all' ];
-			}
-		}
-
-		return $args;
-	}
-
 	function print_import_page() {
 		wc_get_template(
 			'import/page.php',
+			array(),
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+
+		wc_get_template(
+			'import/data_table.php',
 			array(),
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'

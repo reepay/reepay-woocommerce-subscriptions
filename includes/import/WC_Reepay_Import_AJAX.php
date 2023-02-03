@@ -54,6 +54,35 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	public function get_items() {
-		wp_send_json_success();
+		$res = [];
+		$objects_to_import = $this->get_object_to_import();
+
+		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
+			if ( ! empty( $objects_to_import[ $object ] ) ) {
+				$res[ $object ] = call_user_func( "WC_Reepay_Import::process_import_$object", $objects_to_import[ $object ] );
+			}
+		}
+
+		wp_send_json_success($res);
+	}
+
+	public function get_object_to_import($data = null) {
+		if ( is_null( $data ) ) {
+			$data = $_GET[ WC_Reepay_Import::$option_name ] ?? [];
+		}
+
+		foreach ( $data as &$arg ) {
+			if ( is_array( $arg ) ) {
+				$arg = array_keys( $arg );
+
+				if ( in_array( 'all', $arg ) ) {
+					$arg = [ 'all' ];
+				}
+			} else {
+				$arg = [ 'all' ];
+			}
+		}
+
+		return $data;
 	}
 }
