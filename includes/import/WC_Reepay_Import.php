@@ -59,11 +59,10 @@ class WC_Reepay_Import {
 
 	/**
 	 * @param  string  $options
-	 * @param  bool    $save_to_wp
 	 *
 	 * @return array|WP_Error
 	 */
-	public static function process_import_customers( $options = array() ) {
+	public static function get_reepay_customers( $options = array() ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -108,7 +107,29 @@ class WC_Reepay_Import {
 		return $customers_to_import;
 	}
 
-	public static function process_import_cards( $options = array() ) {
+	/**
+	 * @param array $customers array of reepay customers @see https://reference.reepay.com/api/#the-customer-object
+	 * @param array $selected_customer_handles handles of customers to import from $customers array
+	 *
+	 * @return array|array[]
+	 */
+	public static function import_customers( $customers, $selected_customer_handles ) {
+		$result = [];
+
+		foreach ( $selected_customer_handles as $customer_handle ) {
+			if ( empty( $customers[ $customer_handle ] ) ) {
+				continue;
+			}
+
+			$create_result = WC_Reepay_Import_Helpers::create_woo_customer( $customers[ $customer_handle ] );
+
+			$result[ $customer_handle ] = is_int( $create_result ) ? true : $create_result->get_error_message();
+		}
+
+		return $result;
+	}
+
+	public static function get_reepay_cards( $options = array() ) {
 		$users = get_users( [ 'fields' => [ 'ID' ] ] );
 
 		foreach ( $users as $user ) {
@@ -151,7 +172,7 @@ class WC_Reepay_Import {
 	 * @return bool|WP_Error
 	 * @throws WC_Data_Exception
 	 */
-	public static function process_import_subscriptions( $options = array(),  $token = '' ) {
+	public static function get_reepay_subscriptions( $options = array(),  $token = '' ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -180,7 +201,7 @@ class WC_Reepay_Import {
 			}
 
 			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
-				return self::process_import_subscriptions( $options,  $subscriptions_data['next_page_token'] );
+				return self::get_reepay_subscriptions( $options,  $subscriptions_data['next_page_token'] );
 			}
 		}
 

@@ -376,3 +376,11 @@ body.tools_page_reepay_import .form-table{
     padding-left: 10px;
     padding-right: 0;
 }
+
+.reepay-import-table tr.success {
+    background-color: #b3ffe5!important;
+}
+
+.reepay-import-table tr.error {
+    background-color: #ffc7c7!important;
+}

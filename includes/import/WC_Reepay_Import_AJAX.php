@@ -14,6 +14,11 @@ class WC_Reepay_Import_AJAX {
 	/**
 	 * @var string
 	 */
+	public static $session_key = 'reepay_subscriptions_import_data';
+
+	/**
+	 * @var string
+	 */
 	public static $ajax_nonce = 'reepay_subscriptions_import_nonce';
 
 	/**
@@ -55,16 +60,53 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	public function get_objects() {
+//		$this->chech_nonce();
+//
+//		$result = [];
+//		$objects_to_import = $this->get_object_to_import();
+//
+//		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
+//			if ( ! empty( $objects_to_import[ $object ] ) ) {
+//				$res = call_user_func( "WC_Reepay_Import::get_reepay_$object", $objects_to_import[ $object ] );
+//
+//				if ( is_wp_error( $res ) ) {
+//					wp_send_json_error( $res );
+//				}
+//
+//				$result[ $object ] = $res;
+//			}
+//		}
+//
+//		$_SESSION[ self::$session_key ] = json_encode( $result );
+//
+//		wp_send_json_success($result);
+
+		wp_send_json_success(json_decode( $_SESSION[ self::$session_key ], true ));
+	}
+
+	public function save_objects() {
+		$this->chech_nonce();
+
 		$res = [];
-		$objects_to_import = $this->get_object_to_import();
+
+		$objects_data = [];
+
+		try {
+			$objects_data = json_decode( $_SESSION[ self::$session_key ], true );
+		} catch ( Exception $e ) {
+		}
 
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
-			if ( ! empty( $objects_to_import[ $object ] ) ) {
-				$res[ $object ] = call_user_func( "WC_Reepay_Import::process_import_$object", $objects_to_import[ $object ] );
+			if ( empty( $objects_data[ $object ] ) ) {
+				$objects_data[ $object ] = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
+			}
+
+			if ( ! empty( $objects_data[ $object ] ) && ! empty( $_POST['selected'][ $object ] ) ) {
+				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data[ $object ], $_POST['selected'][ $object ] );
 			}
 		}
 
-		wp_send_json_success($res);
+		wp_send_json_success( $res );
 	}
 
 	public function get_object_to_import($data = null) {
@@ -88,7 +130,7 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	public function chech_nonce() {
-		if ( ! check_ajax_referer( self::$ajax_prefix, 'nonce', false ) ) {
+		if ( ! check_ajax_referer( self::$ajax_nonce, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
 					'error' => 'User verification error. Reload page and try again'

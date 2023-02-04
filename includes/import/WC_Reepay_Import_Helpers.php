@@ -10,6 +10,8 @@ class WC_Reepay_Import_Helpers {
 
 	/**
 	 * @param  array  $customer_data  https://reference.reepay.com/api/#the-customer-object
+	 *
+	 * @return int|WP_Error created user id or error object
 	 */
 	public static function create_woo_customer( $customer_data ) {
 		$user_id = wp_create_user(

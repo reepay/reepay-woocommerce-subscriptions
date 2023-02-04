@@ -16,7 +16,7 @@ jQuery(function ($) {
     const $submitBtn = $importForm.find('input[type="submit"]');
 
     const $viewImportForm = $('.js-reepay-import-form-view');
-    const $dataTableContainer = $viewImportForm.find('.js-reepay-import-table-container');
+    const $dataTablesContainer = $viewImportForm.find('.js-reepay-import-table-container');
     const tableTemplates = {
         'customers': _.template($('#tmpl-reepay-subscriptions-import-data-table-customers').html())
     };
@@ -80,10 +80,10 @@ jQuery(function ($) {
 
             },
             success: function (response) {
-                if(response.success) {
+                if (response.success) {
                     showImportTables(response.data)
                 } else {
-                    alert(response.data.error);
+                    alert(JSON.stringify(response.data));
                 }
             },
             error: function (request, status, error) {
@@ -104,7 +104,38 @@ jQuery(function ($) {
     $viewImportForm.on('submit', function (e) {
         e.preventDefault();
 
-        alert('NOT READY!!!');
+        const $this = $(this);
+
+        $this.block();
+
+        const data = {
+            selected: serializeImportTables()
+        }
+
+        console.log(data);
+
+
+        $.ajax({
+            url: config.urls.save_objects,
+            data: data,
+            method: 'POST',
+            beforeSend: function (xhr) {
+
+            },
+            success: function (response) {
+                if (response.success) {
+                    endImport(response.data)
+                } else {
+                    alert(response.data.error);
+                }
+            },
+            error: function (request, status, error) {
+                alert('Request error. Try again')
+            },
+            complete: function () {
+                $this.unblock();
+            },
+        })
     })
 
     function showImportForm() {
@@ -121,7 +152,7 @@ jQuery(function ($) {
             data = loadObjectsToImport()
         }
 
-        if(!data) {
+        if (!data) {
             return;
         }
 
@@ -129,6 +160,7 @@ jQuery(function ($) {
 
         $importForm.hide();
         $viewImportForm.show();
+        $viewImportForm.find('input[type="submit"]').show();
     }
 
     function saveObjectsToImport(data) {
@@ -156,11 +188,11 @@ jQuery(function ($) {
     }
 
     function renderTables(data) {
-        $dataTableContainer.html('');
+        $dataTablesContainer.html('');
 
         Object.entries(data).forEach(([objectType, data]) => {
-            if(tableTemplates[objectType]) {
-                $dataTableContainer.append(tableTemplates[objectType]({
+            if (tableTemplates[objectType]) {
+                $dataTablesContainer.append(tableTemplates[objectType]({
                     type: objectType,
                     title: objectType.charAt(0).toUpperCase() + objectType.slice(1),
                     rows: data
@@ -168,6 +200,51 @@ jQuery(function ($) {
             } else {
                 console.warn('Wrong object type in tables render', objectType);
             }
+        })
+    }
+
+    function serializeImportTables() {
+        const data = {};
+
+        $.each($('.js-reepay-import-table[data-type]'), function () {
+            const $this = $(this);
+            const objectType = $this.attr('data-type');
+
+            data[objectType] = []
+
+            $.each($this.find('input:checked'), function () {
+                if (this.name) {
+                    data[objectType].push(this.name)
+                }
+            })
+        })
+
+        return data;
+    }
+
+    function endImport(importedObjects) {
+        // $viewImportForm.find('input[type="submit"]').hide();
+
+        Object.entries(importedObjects).forEach(([objectType, importResults]) => {
+            const $table = $(`.js-reepay-import-table[data-type="${objectType}"]`)
+
+            Object.entries(importResults)
+                .forEach(([handle, status]) => {
+                        const $tr = $table
+                            .find(`input[name="${handle}"]`)
+                            .parents('tr');
+
+                        const $colMessage = $tr.find('.js-column-message');
+
+                        if (status === true) {
+                            $tr.addClass( 'success' );
+                            $colMessage.html( 'Successfully imported' )
+                        } else {
+                            $tr.addClass( 'error' );
+                            $colMessage.html( status )
+                        }
+                    }
+                )
         })
     }
 
