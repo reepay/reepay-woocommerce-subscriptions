@@ -60,28 +60,26 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	public function get_objects() {
-//		$this->chech_nonce();
-//
-//		$result = [];
-//		$objects_to_import = $this->get_object_to_import();
-//
-//		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
-//			if ( ! empty( $objects_to_import[ $object ] ) ) {
-//				$res = call_user_func( "WC_Reepay_Import::get_reepay_$object", $objects_to_import[ $object ] );
-//
-//				if ( is_wp_error( $res ) ) {
-//					wp_send_json_error( $res );
-//				}
-//
-//				$result[ $object ] = $res;
-//			}
-//		}
-//
-//		$_SESSION[ self::$session_key ] = json_encode( $result );
-//
-//		wp_send_json_success($result);
+		$this->chech_nonce();
 
-		wp_send_json_success(json_decode( $_SESSION[ self::$session_key ], true ));
+		$result = [];
+		$objects_to_import = $this->get_object_to_import();
+
+		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
+			if ( ! empty( $objects_to_import[ $object ] ) ) {
+				$res = call_user_func( "WC_Reepay_Import::get_reepay_$object", $objects_to_import[ $object ] );
+
+				if ( is_wp_error( $res ) ) {
+					wp_send_json_error( $res );
+				}
+
+				$result[ $object ] = $res;
+			}
+		}
+
+		$_SESSION[ self::$session_key ] = json_encode( $result );
+
+		wp_send_json_success($result);
 	}
 
 	public function save_objects() {
@@ -92,7 +90,7 @@ class WC_Reepay_Import_AJAX {
 		$objects_data = [];
 
 		try {
-			$objects_data = json_decode( $_SESSION[ self::$session_key ], true );
+			$objects_data = json_decode( $_SESSION[ self::$session_key ], true ) ?: [];
 		} catch ( Exception $e ) {
 		}
 

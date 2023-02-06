@@ -29,7 +29,7 @@ class WC_Reepay_Import_Menu {
 	function create_settings_fields() {
 		register_setting( 'reepay_import_settings', WC_Reepay_Import::$option_name, [ $this, 'import_sanitize_checkbox' ] );
 
-		foreach ( WC_Reepay_Import::$import_objects as $object => ['input_type' => $options_input_type, 'options' => $options] ) {
+		foreach ( WC_Reepay_Import::$import_objects as $object => ['options' => $options] ) {
 			add_settings_section(
 				"import_section_$object",
 				'',
