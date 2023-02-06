@@ -30,7 +30,6 @@
         <% _(rows).forEach(function(data, card_id) { %>
             <tr class="">
                 <th scope="row" class="check-column">
-                    <label class="screen-reader-text" for="cb-select-<%= card_id %>">Select Simple product (access with woo mems)</label>
                     <input id="cb-select-<%= card_id %>" type="checkbox" name="<%= card_id %>" checked>
                 </th>
 

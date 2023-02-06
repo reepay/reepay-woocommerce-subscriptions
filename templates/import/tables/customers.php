@@ -27,7 +27,6 @@
         <% _(rows).forEach(function(data, handle) { %>
             <tr class="">
                 <th scope="row" class="check-column">
-                    <label class="screen-reader-text" for="cb-select-<%= handle %>">Select Simple product (access with woo mems)</label>
                     <input id="cb-select-<%= handle %>" type="checkbox" name="<%= handle %>" checked>
                 </th>
                 <td class="column-data column-name">
