@@ -56,6 +56,7 @@ class WC_Reepay_Import_AJAX {
 
 		return [
 			'urls' => $urls,
+			'objects' => array_keys( WC_Reepay_Import::$import_objects )
 		];
 	}
 

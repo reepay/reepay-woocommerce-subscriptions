@@ -17,11 +17,11 @@ jQuery(function ($) {
 
     const $viewImportForm = $('.js-reepay-import-form-view');
     const $dataTablesContainer = $viewImportForm.find('.js-reepay-import-table-container');
-    const tableTemplates = {
-        'customers': _.template($('#tmpl-reepay-subscriptions-import-data-table-customers').html()),
-        'cards': _.template($('#tmpl-reepay-subscriptions-import-data-table-cards').html()),
-        'subscriptions': _.template($('#tmpl-reepay-subscriptions-import-data-table-subscriptions').html()),
-    };
+    const tableTemplates = config.objects.reduce(
+        (templates, objectName) => {
+            templates[objectName] = _.template($(`#tmpl-reepay-subscriptions-import-data-table-${objectName}`).html())
+            return templates;
+        }, {})
 
     showImportTables();
 
