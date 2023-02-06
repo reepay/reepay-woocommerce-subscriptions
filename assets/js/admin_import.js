@@ -18,7 +18,8 @@ jQuery(function ($) {
     const $viewImportForm = $('.js-reepay-import-form-view');
     const $dataTablesContainer = $viewImportForm.find('.js-reepay-import-table-container');
     const tableTemplates = {
-        'customers': _.template($('#tmpl-reepay-subscriptions-import-data-table-customers').html())
+        'customers': _.template($('#tmpl-reepay-subscriptions-import-data-table-customers').html()),
+        'cards': _.template($('#tmpl-reepay-subscriptions-import-data-table-cards').html()),
     };
 
     showImportTables();
@@ -112,9 +113,6 @@ jQuery(function ($) {
             selected: serializeImportTables()
         }
 
-        console.log(data);
-
-
         $.ajax({
             url: config.urls.save_objects,
             data: data,
@@ -124,7 +122,7 @@ jQuery(function ($) {
             },
             success: function (response) {
                 if (response.success) {
-                    endImport(response.data)
+                    finishImport(response.data)
                 } else {
                     alert(response.data.error);
                 }
@@ -193,8 +191,6 @@ jQuery(function ($) {
         Object.entries(data).forEach(([objectType, data]) => {
             if (tableTemplates[objectType]) {
                 $dataTablesContainer.append(tableTemplates[objectType]({
-                    type: objectType,
-                    title: objectType.charAt(0).toUpperCase() + objectType.slice(1),
                     rows: data
                 }))
             } else {
@@ -222,7 +218,7 @@ jQuery(function ($) {
         return data;
     }
 
-    function endImport(importedObjects) {
+    function finishImport(importedObjects) {
         // $viewImportForm.find('input[type="submit"]').hide();
 
         Object.entries(importedObjects).forEach(([objectType, importResults]) => {

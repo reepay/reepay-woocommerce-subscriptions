@@ -73,12 +73,14 @@ class WC_Reepay_Import_Menu {
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
 
-		wc_get_template(
-			'import/data-table-customers.php',
-			array(),
-			'',
-			reepay_s()->settings( 'plugin_path' ) . 'templates/'
-		);
+		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
+			wc_get_template(
+				"import/tables/$object.php",
+				array(),
+				'',
+				reepay_s()->settings( 'plugin_path' ) . 'templates/'
+			);
+		}
 	}
 
 	function print_checkbox( $args ) {

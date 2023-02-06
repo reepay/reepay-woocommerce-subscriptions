@@ -102,10 +102,11 @@ class WC_Reepay_Import_Helpers {
 			$token->set_masked_card( $card['masked_card'] );
 		}
 
-		$token->save();
-		if ( ! $token->get_id() ) {
+		if ( !$token->save() ) {
 			return new WP_Error( 'Unable to save bank card - ' . $card['masked_card'] . ', ' . $card['customer'] );
 		}
+
+		var_dump( $token->get_id(), $user_id, $token->get_token() );
 
 		return true;
 	}

@@ -7,7 +7,7 @@
 
 ?>
 <script type="text/template" id="tmpl-reepay-subscriptions-import-data-table-customers">
-    <h3> <%= title %> </h3>
+    <h3> Customers </h3>
     <table class="wp-list-table widefat fixed striped table-view-list reepay-import-table js-reepay-import-table" data-type="customers">
         <thead>
         <tr>
