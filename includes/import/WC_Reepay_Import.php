@@ -27,16 +27,17 @@ class WC_Reepay_Import {
 				'active' => 'Only active cards'
 			]
 		],
-//		'subscriptions' => [
-//			'options' => [
-//				'all' => 'All',
-//				'active' => 'Active',
-//				'on_hold' => 'On hold',
-//				'dunning' => 'Dunning',
-//				'canceled' => 'Cancelled',
-//				'expired' => 'Expired'
-//			]
-//		]
+		'subscriptions' => [
+			'options' => [
+				'all' => 'All',
+				'active' => 'Active',
+				'on_hold' => 'On hold',
+				'pending' => 'Pending',
+				'dunning' => 'Dunning',
+				'cancelled' => 'Cancelled',
+				'expired' => 'Expired'
+			]
+		]
 	];
 
 	/**
@@ -204,44 +205,84 @@ class WC_Reepay_Import {
 	}
 
 	/**
-	 * @param  string  $token
+	 * @param  array  $statuses
 	 *
-	 * @return bool|WP_Error
-	 * @throws WC_Data_Exception
+	 * @return array|WP_Error
 	 */
-	public static function get_reepay_subscriptions( $options = array(),  $token = '' ) {
+	public static function get_reepay_subscriptions( $statuses = array() ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
 		];
 
-		if ( ! empty( $token ) ) {
-			$params['next_page_token'] = $token;
-		}
+		$import_all_statuses = in_array( 'all', $statuses );
+		$import_dunning = in_array( 'dunning', $statuses );
+		$import_cancelled = in_array( 'cancelled', $statuses );
 
-		try {
-			/**
-			 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
-			 **/
-			$subscriptions_data = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
-		} catch ( Exception $e ) {
-			return new WP_Error( 400, $e->getMessage() );
-		}
+		$subscriptions_to_import = [];
 
-		if ( ! empty( $subscriptions_data ) && ! empty( $subscriptions_data['content'] ) ) {
-			$subscriptions = $subscriptions_data['content'];
+		$subscriptions_data['next_page_token'] = true; $i = 5   ;
+		while ( ! empty( $subscriptions_data['next_page_token'] ) && $i--) {
+			try {
+				/**
+				 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
+				 **/
+				$subscriptions_data = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
+			} catch ( Exception $e ) {
+				return new WP_Error( 400, $e->getMessage() );
+			}
 
-			foreach ( $subscriptions as $subscription ) {
-				if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] ) ) {
-					$imported = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscription );
+			if ( empty( $subscriptions_data ) || empty( $subscriptions_data['content'] ) ) {
+				break;
+			}
+
+			foreach ( $subscriptions_data['content'] as $subscription ) {
+				if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] )
+				     && ( $import_all_statuses
+				          || in_array( $subscription['state'], $statuses )
+				          || $import_dunning && $subscription['dunning_invoices'] !== 0
+				          || $import_cancelled && $subscription['is_cancelled'] )
+
+				) {
+					$wp_user_id = rp_get_userid_by_handle( $subscription['customer'] );
+
+					$subscription['customer_email'] = get_userdata( $wp_user_id )->user_email;
+
+					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
 				}
 			}
 
-			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
-				return self::get_reepay_subscriptions( $options,  $subscriptions_data['next_page_token'] );
-			}
+			$params['next_page_token'] = $subscriptions_data['next_page_token'] ?? '';
 		}
 
-		return true;
+		return $subscriptions_to_import;
+	}
+
+	/**
+	 * @param  array  $subscriptions                  array of reepay subscriptions @see https://reference.reepay.com/api/#the-subscription-object
+	 * @param  array  $selected_subscription_handles  handles of subscriptions to import from $subscriptions array
+	 *
+	 * @return array|array[]
+	 */
+	public static function import_subscriptions( $subscriptions, $selected_subscription_handles ) {
+		$result = [];
+
+		foreach ( $selected_subscription_handles as $subscription_handle ) {
+			if ( empty( $subscriptions[ $subscription_handle ] )
+			     || WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription_handle )
+			) {
+				continue;
+			}
+
+			try {
+				$create_result = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscriptions[ $subscription_handle ] );
+			} catch (Exception $e) {
+				$create_result = new WP_Error('Import error');
+			}
+
+			$result[ $subscription_handle ] = true === $create_result ? true : $create_result->get_error_message();
+		}
+
+		return $result;
 	}
 }

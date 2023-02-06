@@ -20,6 +20,7 @@ jQuery(function ($) {
     const tableTemplates = {
         'customers': _.template($('#tmpl-reepay-subscriptions-import-data-table-customers').html()),
         'cards': _.template($('#tmpl-reepay-subscriptions-import-data-table-cards').html()),
+        'subscriptions': _.template($('#tmpl-reepay-subscriptions-import-data-table-subscriptions').html()),
     };
 
     showImportTables();
