@@ -65,10 +65,6 @@ class WC_Reepay_Import {
 			'size' => 100,
 		];
 
-		if ( ! empty( $token ) ) {
-			$params['next_page_token'] = $token;
-		}
-
 		$only_with_active_subscription = in_array( 'with_active_subscription', $options );
 
 		$customers_to_import = [];
@@ -99,6 +95,8 @@ class WC_Reepay_Import {
 					$customers_to_import[ $customer['handle'] ] = $customer;
 				}
 			}
+
+			$params['next_page_token'] = $customers_data['next_page_token'] ?? '';
 		}
 
 		return $customers_to_import;
