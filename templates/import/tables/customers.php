@@ -25,21 +25,21 @@
 
         <tbody>
         <% _(rows).forEach(function(data, handle) { %>
-            <tr class="">
-                <th scope="row" class="check-column">
-                    <input id="cb-select-<%= handle %>" type="checkbox" name="<%= handle %>" checked>
-                </th>
-                <td class="column-data column-name">
-                    <%= data.first_name %> <%= data.last_name %>
-                </td>
-                <td class="column-data column-email">
-                    <%= data.email %>
-                </td>
-                <td class="column-data column-reepay-handle">
-                    <%= handle %>
-                </td>
-                <td class="column-data column-message js-column-message"></td>
-            </tr>
+        <tr class="">
+            <th scope="row" class="check-column">
+                <input id="cb-select-<%= handle %>" type="checkbox" name="<%= handle %>" checked>
+            </th>
+            <td class="column-data column-name">
+                <%= data.first_name %> <%= data.last_name %>
+            </td>
+            <td class="column-data column-email">
+                <%= data.email %>
+            </td>
+            <td class="column-data column-reepay-handle">
+                <%= handle %>
+            </td>
+            <td class="column-data column-message js-column-message"></td>
+        </tr>
         <% }); %>
         </tbody>
 

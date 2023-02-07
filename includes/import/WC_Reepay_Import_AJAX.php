@@ -25,8 +25,8 @@ class WC_Reepay_Import_AJAX {
 	 * @var array action to function
 	 */
 	public static $actions = [
-		'get_objects' => 'get_objects',
-		'save_objects' => 'save_objects'
+		'get_objects'  => 'get_objects',
+		'save_objects' => 'save_objects',
 	];
 
 	/**
@@ -39,7 +39,7 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	public static function get_localize_data() {
-		$nonce = wp_create_nonce(self::$ajax_nonce);
+		$nonce    = wp_create_nonce( self::$ajax_nonce );
 		$ajax_url = admin_url( "admin-ajax.php" );
 
 		$urls = [];
@@ -48,22 +48,22 @@ class WC_Reepay_Import_AJAX {
 			$urls[ $action ] = add_query_arg(
 				[
 					'nonce'  => $nonce,
-					'action' => self::$ajax_prefix . '_' .$action,
+					'action' => self::$ajax_prefix . '_' . $action,
 				],
 				$ajax_url
 			);
 		}
 
 		return [
-			'urls' => $urls,
-			'objects' => array_keys( WC_Reepay_Import::$import_objects )
+			'urls'    => $urls,
+			'objects' => array_keys( WC_Reepay_Import::$import_objects ),
 		];
 	}
 
 	public function get_objects() {
 		$this->chech_nonce();
 
-		$result = [];
+		$result            = [];
 		$objects_to_import = $this->get_object_to_import();
 
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
@@ -80,7 +80,7 @@ class WC_Reepay_Import_AJAX {
 
 		$_SESSION[ self::$session_key ] = json_encode( $result );
 
-		wp_send_json_success($result);
+		wp_send_json_success( $result );
 	}
 
 	public function save_objects() {
@@ -108,7 +108,7 @@ class WC_Reepay_Import_AJAX {
 		wp_send_json_success( $res );
 	}
 
-	public function get_object_to_import($data = null) {
+	public function get_object_to_import( $data = null ) {
 		if ( is_null( $data ) ) {
 			$data = $_GET[ WC_Reepay_Import::$option_name ] ?? [];
 		}
@@ -132,7 +132,7 @@ class WC_Reepay_Import_AJAX {
 		if ( ! check_ajax_referer( self::$ajax_nonce, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
-					'error' => 'User verification error. Reload page and try again'
+					'error' => 'User verification error. Reload page and try again',
 				]
 			);
 		}

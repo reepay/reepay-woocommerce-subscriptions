@@ -15,29 +15,29 @@ class WC_Reepay_Import {
 	 * @var array
 	 */
 	public static $import_objects = [
-		'customers' => [
+		'customers'     => [
 			'options' => [
-				'all' => 'All',
-				'with_active_subscription' => 'Only customers with active subscriptions'
-			]
+				'all'                      => 'All',
+				'with_active_subscription' => 'Only customers with active subscriptions',
+			],
 		],
-		'cards' => [
+		'cards'         => [
 			'options' => [
-				'all' => 'All',
-				'active' => 'Only active cards'
-			]
+				'all'    => 'All',
+				'active' => 'Only active cards',
+			],
 		],
 		'subscriptions' => [
 			'options' => [
-				'all' => 'All',
-				'active' => 'Active',
-				'on_hold' => 'On hold',
-				'pending' => 'Pending',
-				'dunning' => 'Dunning',
+				'all'       => 'All',
+				'active'    => 'Active',
+				'on_hold'   => 'On hold',
+				'pending'   => 'Pending',
+				'dunning'   => 'Dunning',
 				'cancelled' => 'Cancelled',
-				'expired' => 'Expired'
-			]
-		]
+				'expired'   => 'Expired',
+			],
+		],
 	];
 
 	/**
@@ -104,8 +104,8 @@ class WC_Reepay_Import {
 	}
 
 	/**
-	 * @param array $customers array of reepay customers @see https://reference.reepay.com/api/#the-customer-object
-	 * @param array $selected_customer_handles handles of customers to import from $customers array
+	 * @param  array  $customers                  array of reepay customers @see https://reference.reepay.com/api/#the-customer-object
+	 * @param  array  $selected_customer_handles  handles of customers to import from $customers array
 	 *
 	 * @return array|array[]
 	 */
@@ -176,8 +176,8 @@ class WC_Reepay_Import {
 	}
 
 	/**
-	 * @param array $cards array of cards @see https://reference.reepay.com/api/#get-list-of-payment-methods
-	 * @param array $selected_card_ids ids of cards to import from $cards array
+	 * @param  array  $cards              array of cards @see https://reference.reepay.com/api/#get-list-of-payment-methods
+	 * @param  array  $selected_card_ids  ids of cards to import from $cards array
 	 *
 	 * @return array|array[]
 	 */
@@ -189,14 +189,14 @@ class WC_Reepay_Import {
 				continue;
 			}
 
-			$wp_user_id = rp_get_userid_by_handle(  $cards[ $card_id ]['customer'] );
+			$wp_user_id = rp_get_userid_by_handle( $cards[ $card_id ]['customer'] );
 
 			if ( empty( $wp_user_id ) ) {
 				$result[ $card_id ] = "User not found";
 				continue;
 			}
 
-			$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $wp_user_id,  $cards[ $card_id ] );
+			$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $wp_user_id, $cards[ $card_id ] );
 
 			$result[ $card_id ] = true === $card_added ? true : $card_added->get_error_message();
 		}
@@ -216,13 +216,13 @@ class WC_Reepay_Import {
 		];
 
 		$import_all_statuses = in_array( 'all', $statuses );
-		$import_dunning = in_array( 'dunning', $statuses );
-		$import_cancelled = in_array( 'cancelled', $statuses );
+		$import_dunning      = in_array( 'dunning', $statuses );
+		$import_cancelled    = in_array( 'cancelled', $statuses );
 
 		$subscriptions_to_import = [];
 
-		$subscriptions_data['next_page_token'] = true; $i = 5   ;
-		while ( ! empty( $subscriptions_data['next_page_token'] ) && $i--) {
+		$subscriptions_data['next_page_token'] = true;
+		while ( ! empty( $subscriptions_data['next_page_token'] ) ) {
 			try {
 				/**
 				 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
@@ -276,8 +276,8 @@ class WC_Reepay_Import {
 
 			try {
 				$create_result = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscriptions[ $subscription_handle ] );
-			} catch (Exception $e) {
-				$create_result = new WP_Error('Import error');
+			} catch ( Exception $e ) {
+				$create_result = new WP_Error( 'Import error' );
 			}
 
 			$result[ $subscription_handle ] = true === $create_result ? true : $create_result->get_error_message();

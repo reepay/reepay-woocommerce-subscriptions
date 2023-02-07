@@ -68,12 +68,14 @@ class WC_Reepay_Import_Helpers {
 			update_user_meta( $user_id, $meta_key, $datum );
 		}
 
-		wp_update_user([
-			'ID' => $user_id,
-			'user_email' => $customer_data['email'] ?? '',
-			'first_name' => $customer_data['first_name'] ?? '',
-			'last_name' => $customer_data['last_name'] ?? ''
-		]);
+		wp_update_user(
+			[
+				'ID'         => $user_id,
+				'user_email' => $customer_data['email'] ?? '',
+				'first_name' => $customer_data['first_name'] ?? '',
+				'last_name'  => $customer_data['last_name'] ?? '',
+			]
+		);
 	}
 
 	/**
@@ -102,7 +104,7 @@ class WC_Reepay_Import_Helpers {
 			$token->set_masked_card( $card['masked_card'] );
 		}
 
-		if ( !$token->save() ) {
+		if ( ! $token->save() ) {
 			return new WP_Error( 'Unable to save bank card - ' . $card['masked_card'] . ', ' . $card['customer'] );
 		}
 
@@ -166,9 +168,11 @@ class WC_Reepay_Import_Helpers {
 			'reactivated' => 'wc-completed',
 		];
 
-		$order = wc_create_order( [
-			'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
-		] );
+		$order = wc_create_order(
+			[
+				'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
+			]
+		);
 
 		//import logic
 		$order->set_billing_city( $customer['city'] );

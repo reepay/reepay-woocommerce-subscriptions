@@ -45,7 +45,7 @@ class WC_Reepay_Import_Menu {
 				"import_section_$object",
 				[
 					'option_name' => [ $object ],
-					'class' => 'reepay-import__row reepay-import__row--main'
+					'class'       => 'reepay-import__row reepay-import__row--main',
 				]
 			);
 
@@ -58,7 +58,7 @@ class WC_Reepay_Import_Menu {
 					"import_section_$object",
 					[
 						'option_name' => [ $object, $option ],
-						'class' => "reepay-import__row reepay-import__row--sub reepay-import__row--$option"
+						'class'       => "reepay-import__row reepay-import__row--sub reepay-import__row--$option",
 					]
 				);
 			}
@@ -89,16 +89,16 @@ class WC_Reepay_Import_Menu {
 		wc_get_template(
 			'import/checkbox.php',
 			array(
-				'args' => $args,
-				'value' => get_option( 'reepay_import' )[ $args['option_name'] ] ?? ''
+				'args'  => $args,
+				'value' => get_option( 'reepay_import' )[ $args['option_name'] ] ?? '',
 			),
 			'',
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
 	}
-	
+
 	public static function is_current_page() {
 		return isset( $_GET['page'] ) && self::$menu_slug === $_GET['page'];
 	}
-	
+
 }

@@ -220,7 +220,7 @@ jQuery(function ($) {
     }
 
     function finishImport(importedObjects) {
-        // $viewImportForm.find('input[type="submit"]').hide();
+        $viewImportForm.find('input[type="submit"]').hide();
 
         Object.entries(importedObjects).forEach(([objectType, importResults]) => {
             const $table = $(`.js-reepay-import-table[data-type="${objectType}"]`)
@@ -234,11 +234,11 @@ jQuery(function ($) {
                         const $colMessage = $tr.find('.js-column-message');
 
                         if (status === true) {
-                            $tr.addClass( 'success' );
-                            $colMessage.html( 'Successfully imported' )
+                            $tr.addClass('success');
+                            $colMessage.html('Successfully imported')
                         } else {
-                            $tr.addClass( 'error' );
-                            $colMessage.html( status )
+                            $tr.addClass('error');
+                            $colMessage.html(status)
                         }
                     }
                 )
