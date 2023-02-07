@@ -25,8 +25,9 @@ class WC_Reepay_Import_AJAX {
 	 * @var array action to function
 	 */
 	public static $actions = [
-		'get_objects'  => 'get_objects',
-		'save_objects' => 'save_objects',
+		'get_objects'       => 'get_objects',
+		'get_import_status' => 'get_import_status',
+		'save_objects'      => 'save_objects',
 	];
 
 	/**
@@ -91,6 +92,18 @@ class WC_Reepay_Import_AJAX {
 		wp_send_json_success( $result );
 	}
 
+	public function get_import_status() {
+		$this->chech_nonce();
+
+		$last_imported = WC_Reepay_Import::get_last_imported();
+
+		if ( empty( $last_imported ) ) {
+			wp_send_json_error();
+		}
+
+		wp_send_json_success( $last_imported );
+	}
+
 	/**
 	 * AJAX handler to save objects from request
 	 */
@@ -120,6 +133,8 @@ class WC_Reepay_Import_AJAX {
 				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data[ $object ], $_POST['selected'][ $object ] );
 			}
 		}
+
+		WC_Reepay_Import::clean_last_imported();
 
 		wp_send_json_success( $res );
 	}

@@ -132,9 +132,12 @@ jQuery(function ($) {
                 alert('Request error. Try again')
             },
             complete: function () {
+                // stop_import_check();
                 $this.unblock();
             },
         })
+
+        // check_current_import();
     })
 
     function showImportForm() {
@@ -274,6 +277,49 @@ jQuery(function ($) {
                     }
                 )
         })
+    }
+
+    //ToDo live checking
+    let check_current_import_timeout_id = 0;
+    let import_checker_running = false;
+
+    function check_current_import() {
+        import_checker_running = true;
+
+        check_current_import_timeout_id = setTimeout(function (){
+            $.ajax({
+                url: config.urls.get_import_status,
+                method: 'GET',
+                beforeSend: function (xhr) {
+
+                },
+                success: function (response) {
+                    console.log(response);
+
+                    if(import_checker_running) {
+                        check_current_import()
+                    }
+
+                    if (response.success) {
+                        // showImportTables(response.data)
+                    } else {
+                        // alert(JSON.stringify(response.data));
+                    }
+                },
+                error: function (request, status, error) {
+                    alert('Request error. Try again')
+                },
+                complete: function () {
+
+                },
+            })
+        }, 1000)
+    }
+
+    function stop_import_check() {
+        import_checker_running = false;
+
+        clearTimeout(check_current_import_timeout_id);
     }
 
     $.blockUI.defaults = $.extend($.blockUI.defaults, {
