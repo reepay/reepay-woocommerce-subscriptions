@@ -1,13 +1,5 @@
-<?php
-/**
- * @var string $title
- * @var string $type
- * @var array  $objects
- */
-
-?>
 <script type="text/template" id="tmpl-reepay-subscriptions-import-data-table-subscriptions">
-    <h3> Subscriptions </h3>
+    <h3> Subscriptions (<%= amount %>)</h3>
     <table class="wp-list-table widefat fixed striped table-view-list reepay-import-table js-reepay-import-table" data-type="subscriptions">
         <thead>
         <tr>

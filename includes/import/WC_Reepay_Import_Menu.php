@@ -14,6 +14,9 @@ class WC_Reepay_Import_Menu {
 		add_action( 'admin_init', [ $this, 'create_settings_fields' ] );
 	}
 
+	/**
+	 * Register submenu in tools menu
+	 */
 	function create_submenu() {
 		add_submenu_page(
 			'tools.php',
@@ -26,6 +29,9 @@ class WC_Reepay_Import_Menu {
 		);
 	}
 
+	/**
+	 * Register settings
+	 */
 	function create_settings_fields() {
 		register_setting( 'reepay_import_settings', WC_Reepay_Import::$option_name, [ $this, 'import_sanitize_checkbox' ] );
 
@@ -65,6 +71,9 @@ class WC_Reepay_Import_Menu {
 		}
 	}
 
+	/**
+	 * Print settings page with tables
+	 */
 	function print_import_page() {
 		wc_get_template(
 			'import/page.php',
@@ -83,6 +92,11 @@ class WC_Reepay_Import_Menu {
 		}
 	}
 
+	/**
+	 * Prepare name attribute and print setting checkbox
+	 *
+	 * @param array $args
+	 */
 	function print_checkbox( $args ) {
 		$args['option_name'] = '[' . implode( '][', $args['option_name'] ) . ']';
 
@@ -97,6 +111,11 @@ class WC_Reepay_Import_Menu {
 		);
 	}
 
+	/**
+	 * Check if current page is reepay import page
+	 *
+	 * @return bool
+	 */
 	public static function is_current_page() {
 		return isset( $_GET['page'] ) && self::$menu_slug === $_GET['page'];
 	}

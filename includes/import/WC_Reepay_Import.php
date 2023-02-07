@@ -179,7 +179,7 @@ class WC_Reepay_Import {
 	 * @param  array  $cards              array of cards @see https://reference.reepay.com/api/#get-list-of-payment-methods
 	 * @param  array  $selected_card_ids  ids of cards to import from $cards array
 	 *
-	 * @return array|array[]
+	 * @return array
 	 */
 	public static function import_cards( $cards, $selected_card_ids ) {
 		$result = [];
@@ -262,7 +262,7 @@ class WC_Reepay_Import {
 	 * @param  array  $subscriptions                  array of reepay subscriptions @see https://reference.reepay.com/api/#the-subscription-object
 	 * @param  array  $selected_subscription_handles  handles of subscriptions to import from $subscriptions array
 	 *
-	 * @return array|array[]
+	 * @return array
 	 */
 	public static function import_subscriptions( $subscriptions, $selected_subscription_handles ) {
 		$result = [];

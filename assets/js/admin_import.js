@@ -144,6 +144,10 @@ jQuery(function ($) {
         $viewImportForm.hide();
     }
 
+    /**
+     *
+     * @param  {object|undefined} data
+     */
     function showImportTables(data = undefined) {
         if (data) {
             saveObjectsToImport(data);
@@ -162,6 +166,11 @@ jQuery(function ($) {
         $viewImportForm.find('input[type="submit"]').show();
     }
 
+    /**
+     * Save data in session storage
+     *
+     * @param {object} data
+     */
     function saveObjectsToImport(data) {
         const serializedData = JSON.stringify(data);
 
@@ -172,6 +181,11 @@ jQuery(function ($) {
         }
     }
 
+    /**
+     * Get data from session storage
+     *
+     * @returns {object|false}
+     */
     function loadObjectsToImport() {
         const serializedData = sessionStorage.getItem(config.sessionStorageKey)
 
@@ -182,16 +196,24 @@ jQuery(function ($) {
         return JSON.parse(serializedData);
     }
 
+    /**
+     * Clean data from local storage
+     */
     function clearObjectsToImport() {
         sessionStorage.removeItem(config.sessionStorageKey)
     }
 
+    /**
+     *
+     * @param {object} data
+     */
     function renderTables(data) {
         $dataTablesContainer.html('');
 
         Object.entries(data).forEach(([objectType, data]) => {
             if (tableTemplates[objectType]) {
                 $dataTablesContainer.append(tableTemplates[objectType]({
+                    amount: Object.keys(data).length,
                     rows: data
                 }))
             } else {
@@ -200,6 +222,10 @@ jQuery(function ($) {
         })
     }
 
+    /**
+     *
+     * @returns {object}
+     */
     function serializeImportTables() {
         const data = {};
 
@@ -219,6 +245,11 @@ jQuery(function ($) {
         return data;
     }
 
+    /**
+     * Hide import button and mark table rows
+     *
+     * @param {object} importedObjects
+     */
     function finishImport(importedObjects) {
         $viewImportForm.find('input[type="submit"]').hide();
 

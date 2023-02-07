@@ -38,6 +38,11 @@ class WC_Reepay_Import_AJAX {
 		}
 	}
 
+	/**
+	 * Prepare data for script
+	 *
+	 * @return array
+	 */
 	public static function get_localize_data() {
 		$nonce    = wp_create_nonce( self::$ajax_nonce );
 		$ajax_url = admin_url( "admin-ajax.php" );
@@ -60,11 +65,14 @@ class WC_Reepay_Import_AJAX {
 		];
 	}
 
+	/**
+	 * AJAX handler to get objects that can be imported
+	 */
 	public function get_objects() {
 		$this->chech_nonce();
 
 		$result            = [];
-		$objects_to_import = $this->get_object_to_import();
+		$objects_to_import = $this->get_objects_to_import_from_get();
 
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
 			if ( ! empty( $objects_to_import[ $object ] ) ) {
@@ -83,6 +91,9 @@ class WC_Reepay_Import_AJAX {
 		wp_send_json_success( $result );
 	}
 
+	/**
+	 * AJAX handler to save objects from request
+	 */
 	public function save_objects() {
 		$this->chech_nonce();
 
@@ -96,11 +107,16 @@ class WC_Reepay_Import_AJAX {
 		}
 
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
+			if ( empty( $_POST['selected'][ $object ] ) ) {
+				continue;
+			}
+
+			//if no data in session
 			if ( empty( $objects_data[ $object ] ) ) {
 				$objects_data[ $object ] = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
 			}
 
-			if ( ! empty( $objects_data[ $object ] ) && ! empty( $_POST['selected'][ $object ] ) ) {
+			if ( ! empty( $objects_data[ $object ] ) ) {
 				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data[ $object ], $_POST['selected'][ $object ] );
 			}
 		}
@@ -108,7 +124,12 @@ class WC_Reepay_Import_AJAX {
 		wp_send_json_success( $res );
 	}
 
-	public function get_object_to_import( $data = null ) {
+	/**
+	 * @param  array|null  $data
+	 *
+	 * @return array
+	 */
+	public function get_objects_to_import_from_get( $data = null ) {
 		if ( is_null( $data ) ) {
 			$data = $_GET[ WC_Reepay_Import::$option_name ] ?? [];
 		}
@@ -128,6 +149,11 @@ class WC_Reepay_Import_AJAX {
 		return $data;
 	}
 
+	/**
+	 * Prevent AJAX request if nonce fails check
+	 *
+	 * @return true
+	 */
 	public function chech_nonce() {
 		if ( ! check_ajax_referer( self::$ajax_nonce, 'nonce', false ) ) {
 			wp_send_json_error(

@@ -1,7 +1,6 @@
 <?php
 /**
  * @var array  $args
- * @var string $value
  */
 
 ?>
