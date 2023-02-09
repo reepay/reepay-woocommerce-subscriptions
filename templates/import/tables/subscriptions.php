@@ -50,11 +50,10 @@
                 </td>
 
                 <td class="column-data column-status">
-                    Status: <%= data.state %>
-
                     <% if (data.is_cancelled) { %>
-                    <br>
-                    Cancelled
+                    Status: cancelled
+                    <% } else { %>
+                    Status: <%= data.state %>
                     <% } %>
 
                     <% if (data.dunning_invoices) { %>
@@ -79,7 +78,7 @@
                     Next period start: <%= data.next_period_start %>
                 </td>
 
-                <td class="column-data column-message js-column-message"></td>
+                <td class="column-data column-message js-column-message">Ready to import</td>
             </tr>
         <% }); %>
         </tbody>

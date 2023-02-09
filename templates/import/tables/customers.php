@@ -34,7 +34,7 @@
                 <td class="column-data column-reepay-handle">
                     <%= handle %>
                 </td>
-                <td class="column-data column-message js-column-message"></td>
+                <td class="column-data column-message js-column-message">Ready to import</td>
             </tr>
         <% }); %>
         </tbody>
