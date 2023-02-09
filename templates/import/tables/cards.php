@@ -20,7 +20,7 @@
 
         <tbody>
         <% if(!Object.keys(rows).length) { %>
-            <tr class="no-items"><td class="colspanchange" colspan="8">No cards found</td></tr>
+            <tr class="no-items"><td class="colspanchange" colspan="7">No cards found</td></tr>
         <% } %>
 
         <% _(rows).forEach(function(data, card_id) { %>
