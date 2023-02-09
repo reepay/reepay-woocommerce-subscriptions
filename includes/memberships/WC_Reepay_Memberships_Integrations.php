@@ -170,6 +170,10 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		 * ] $data
 		 */
 		public function renew_membership( $data ) {
+			/**
+			 * @var WC_Memberships_User_Membership $membership
+			 * @var array $subscription
+			 */
 			[ 'membership' => $membership, 'subscription' => $subscription  ] = self::get_membership_info( $data['subscription'] );
 
 			if ( is_null( $membership ) ) {
@@ -177,11 +181,14 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 			}
 
 			$membership->activate_membership();
-			update_post_meta(
-				$membership->get_id(),
-				'_end_date',
-				strtotime( $subscription['end_date'] ?? $subscription['next_period_start'] ) ?: ''
-			);
+
+			if ( $membership->get_plan()->is_access_length_type( 'subscription' ) ) {
+				update_post_meta(
+					$membership->get_id(),
+					'_end_date',
+					strtotime( $subscription['end_date'] ?? $subscription['next_period_start'] ) ?: 'Never'
+				);
+			}
 		}
 
 		/**
