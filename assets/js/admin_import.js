@@ -249,12 +249,14 @@ jQuery(function ($) {
     }
 
     /**
-     * Hide import button and mark table rows
+     * Hide import button, clear local data and mark table rows
      *
      * @param {object} importedObjects
      */
     function finishImport(importedObjects) {
         $viewImportForm.find('input[type="submit"]').hide();
+
+        clearObjectsToImport();
 
         Object.entries(importedObjects).forEach(([objectType, importResults]) => {
             const $table = $(`.js-reepay-import-table[data-type="${objectType}"]`)

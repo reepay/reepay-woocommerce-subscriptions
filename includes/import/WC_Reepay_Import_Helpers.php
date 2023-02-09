@@ -175,16 +175,16 @@ class WC_Reepay_Import_Helpers {
 		);
 
 		//import logic
-		$order->set_billing_city( $customer['city'] );
-		$order->set_billing_postcode( $customer['postal_code'] );
-		$order->set_billing_email( $customer['email'] );
-		$order->set_billing_phone( $customer['phone'] );
-		$order->set_billing_address_1( $customer['address'] );
-		$order->set_billing_address_2( $customer['address2'] );
-		$order->set_billing_country( $customer['country'] );
-		$order->set_billing_first_name( $customer['first_name'] );
-		$order->set_billing_last_name( $customer['last_name'] );
-		$order->set_billing_company( $customer['company'] );
+		$order->set_billing_city( $customer['city'] ?? '' );
+		$order->set_billing_postcode( $customer['postal_code']  ?? '' );
+		$order->set_billing_email( $customer['email']  ?? '' );
+		$order->set_billing_phone( $customer['phone']  ?? '' );
+		$order->set_billing_address_1( $customer['address']  ?? '' );
+		$order->set_billing_address_2( $customer['address2']  ?? '' );
+		$order->set_billing_country( $customer['country']  ?? '' );
+		$order->set_billing_first_name( $customer['first_name']  ?? '' );
+		$order->set_billing_last_name( $customer['last_name']  ?? '' );
+		$order->set_billing_company( $customer['company']  ?? '' );
 
 		$order->set_payment_method( 'reepay_checkout' );
 		$order->set_payment_method_title( 'Reepay Checkout' );

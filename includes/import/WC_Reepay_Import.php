@@ -245,9 +245,12 @@ class WC_Reepay_Import {
 				          || $import_cancelled && $subscription['is_cancelled'] )
 
 				) {
-					$wp_user_id = rp_get_userid_by_handle( $subscription['customer'] );
+					$wp_user_id   = rp_get_userid_by_handle( $subscription['customer'] );
+					$wp_user_data = get_userdata( $wp_user_id );
 
-					$subscription['customer_email'] = get_userdata( $wp_user_id )->user_email;
+					if ( $wp_user_data ) {
+						$subscription['customer_email'] = $wp_user_data->user_email;
+					}
 
 					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
 				}
