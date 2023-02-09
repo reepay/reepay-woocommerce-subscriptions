@@ -19,32 +19,36 @@
         </thead>
 
         <tbody>
+        <% if(!Object.keys(rows).length) { %>
+            <tr class="no-items"><td class="colspanchange" colspan="8">No cards found</td></tr>
+        <% } %>
+
         <% _(rows).forEach(function(data, card_id) { %>
-        <tr class="">
-            <th scope="row" class="check-column">
-                <input id="cb-select-<%= card_id %>" type="checkbox" name="<%= card_id %>" checked>
-            </th>
+            <tr class="">
+                <th scope="row" class="check-column">
+                    <input id="cb-select-<%= card_id %>" type="checkbox" name="<%= card_id %>" checked>
+                </th>
 
-            <td class="column-data column-name">
-                <%= data.masked_card %>
-            </td>
-            <td class="column-data column-type">
-                <%= data.transaction_card_type %>
-            </td>
-            <td class="column-data column-status">
-                <%= data.state %>
-            </td>
-            <td class="column-data column-expire">
-                <%= data.exp_date %>
-            </td>
-            <td class="column-data column-customer">
-                <%= data.customer_email %>
-                <br>
-                <%= data.customer %>
-            </td>
+                <td class="column-data column-name">
+                    <%= data.masked_card %>
+                </td>
+                <td class="column-data column-type">
+                    <%= data.transaction_card_type %>
+                </td>
+                <td class="column-data column-status">
+                    <%= data.state %>
+                </td>
+                <td class="column-data column-expire">
+                    <%= data.exp_date %>
+                </td>
+                <td class="column-data column-customer">
+                    <%= data.customer_email %>
+                    <br>
+                    <%= data.customer %>
+                </td>
 
-            <td class="column-data column-message js-column-message"></td>
-        </tr>
+                <td class="column-data column-message js-column-message"></td>
+            </tr>
         <% }); %>
         </tbody>
 
