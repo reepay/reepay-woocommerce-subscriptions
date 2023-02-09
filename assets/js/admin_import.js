@@ -114,6 +114,9 @@ jQuery(function ($) {
             selected: serializeImportTables()
         }
 
+        const $checkboxes = $viewImportForm.find('input[type="checkbox"]');
+        $checkboxes.prop('disabled', true)
+
         $.ajax({
             url: config.urls.save_objects,
             data: data,
@@ -126,10 +129,12 @@ jQuery(function ($) {
                     finishImport(response.data)
                 } else {
                     alert(response.data.error);
+                    $checkboxes.prop('disabled', false)
                 }
             },
             error: function (request, status, error) {
                 alert('Request error. Try again')
+                $checkboxes.prop('disabled', false)
             },
             complete: function () {
                 // stop_import_check();
@@ -278,6 +283,12 @@ jQuery(function ($) {
                         }
                     }
                 )
+
+            $table
+                .find('tbody tr:not(.success,.error)')
+                .addClass('skipped')
+                .find('.js-column-message')
+                .html('Skipped');
         })
     }
 
