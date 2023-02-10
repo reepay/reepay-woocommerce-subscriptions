@@ -285,11 +285,16 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 	}
 }
 
-if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' )
-     && ! is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' )
-     && ! class_exists( 'WC_Subscription' )
-) {
-	class WC_Subscription extends WC_Order {
-		public $fake = true;
+add_action( 'plugins_loaded', function () {
+	if ( is_plugin_active( 'woocommerce-memberships/woocommerce-memberships.php' )
+	     && ! is_plugin_active( 'woocommerce-subscriptions/woocommerce-subscriptions.php' )
+	     && ! class_exists( 'WC_Subscription' )
+//		     && class_exists( 'WC_Order' )
+	) {
+		class WC_Subscription extends WC_Order {
+			public $fake = true;
+		}
 	}
-}
+}, 5
+);
+
