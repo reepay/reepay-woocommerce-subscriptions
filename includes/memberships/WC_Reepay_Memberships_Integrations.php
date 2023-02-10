@@ -65,10 +65,6 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		 * @param  WC_Memberships_Membership_Plan  $plan                         Membership plan access will be granted to
 		 */
 		public function disable_default_membership_activation_for_reepay_products( $product_ids, $access_granting_product_ids, $plan ) {
-			if ( ! $plan->is_access_length_type( 'subscription' ) ) {
-				return $product_ids;
-			}
-
 			if ( ! is_array( $product_ids ) ) {
 				$product_ids = [ $product_ids ];
 			}
@@ -115,7 +111,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				}
 
 				foreach ( $membership_plans as $plan ) {
-					if ( ! $plan->has_products() || ! $plan->is_access_length_type( 'subscription' ) ) {
+					if ( ! $plan->has_products() ) {
 						continue;
 					}
 
@@ -155,9 +151,9 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		public function renew_membership( $data ) {
 			/**
 			 * @var WC_Memberships_User_Membership $membership
-			 * @var array $subscription
+			 * @var array                          $subscription
 			 */
-			[ 'membership' => $membership, 'subscription' => $subscription  ] = self::get_membership_info( $data['subscription'] );
+			[ 'membership' => $membership, 'subscription' => $subscription ] = self::get_membership_info( $data['subscription'] );
 
 			if ( is_null( $membership ) ) {
 				return;
@@ -165,13 +161,31 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 
 			$membership->activate_membership();
 
-			if ( $membership->get_plan()->is_access_length_type( 'subscription' ) ) {
-				update_post_meta(
-					$membership->get_id(),
-					'_end_date',
-					strtotime( $subscription['end_date'] ?? $subscription['next_period_start'] ) ?: 'Never'
+			$plan = new WC_Memberships_Integration_Subscriptions_Membership_Plan( $membership->get_plan()->get_id() );
+
+			$access_start_date = $plan->get_access_start_date( 'timestamp' );
+
+			if ( $plan->is_access_length_type( 'subscription' ) ) {
+				$membership->set_end_date(
+					strtotime( $subscription['end_date'] ?? $subscription['next_period_start'] ) ?: ''
 				);
+			} else {
+				$access_length_in_seconds = $plan->get_access_length_in_seconds();
+
+				if ( ! empty( $access_length_in_seconds ) ) {
+					$membership->set_end_date( $access_start_date + $access_length_in_seconds );
+				} else {
+					$membership->set_end_date( $plan->get_access_end_date( 'timestamp' ) );
+				}
 			}
+
+//			ToDo fix - $membership->get_subscription() - returns null for reepay subscriptions, because they are just orders
+//			$membership = new WC_Memberships_Integration_Subscriptions_User_Membership( $membership->get_id() );
+//			$membership->get_subscription()->update_dates(
+//				[
+//					'next_payment' => strtotime( $subscription['next_period_start'] ),
+//				]
+//			);
 		}
 
 		/**
