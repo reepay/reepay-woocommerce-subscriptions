@@ -21,7 +21,6 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				add_filter( 'woocommerce_is_subscription', [ $this, 'add_reepay_subscriptions_type' ], 100, 3 );
 
 				add_filter( 'wc_memberships_access_granting_purchased_product_id', [ $this, 'disable_default_membership_activation_for_reepay_products' ], 100, 3 );
-				add_filter( 'wc_memberships_grant_access_from_new_purchase', [ $this, 'disable_default_membership_activation_for_reepay_products_new_purchase' ], 100, 2 );
 
 				add_action( 'reepay_subscriptions_orders_created', [ $this, 'activate_memberships' ] );
 
@@ -66,6 +65,10 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 		 * @param  WC_Memberships_Membership_Plan  $plan                         Membership plan access will be granted to
 		 */
 		public function disable_default_membership_activation_for_reepay_products( $product_ids, $access_granting_product_ids, $plan ) {
+			if ( ! $plan->is_access_length_type( 'subscription' ) ) {
+				return $product_ids;
+			}
+
 			if ( ! is_array( $product_ids ) ) {
 				$product_ids = [ $product_ids ];
 			}
@@ -79,26 +82,6 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 			}
 
 			return $filtered_product_ids;
-		}
-
-		/**
-		 * Confirm grant access from new purchase to paid plan.
-		 *
-		 * @see WC_Memberships_Membership_Plans::grant_access_to_membership_from_order
-		 *
-		 * @param bool $grant_access by default true unless the order already granted access to the plan
-		 * @param array $args {
-		 *      @type int $user_id customer id for purchase order
-		 *      @type int $product_id ID of product that grants access
-		 *      @type int $order_id order ID containing the product
-		 * }
-		 */
-		public function disable_default_membership_activation_for_reepay_products_new_purchase( $grant_access, $args ) {
-			if ( WC_Reepay_Checkout::is_reepay_product( $args['product_id'] ) ) {
-				$grant_access = false;
-			}
-
-			return $grant_access;
 		}
 
 		/**
@@ -132,7 +115,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				}
 
 				foreach ( $membership_plans as $plan ) {
-					if ( ! $plan->has_products() ) {
+					if ( ! $plan->has_products() || ! $plan->is_access_length_type( 'subscription' ) ) {
 						continue;
 					}
 
