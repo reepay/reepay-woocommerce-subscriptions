@@ -347,3 +347,19 @@
 	do_action( 'woocommerce_product_options_tax' );
 	?>
 </div>
+
+<?php
+$roles = get_editable_roles();
+array_walk($roles, function (&$item, $key) {
+    $item = $item['name'];
+});
+$roles = [ 'without_changes' => __( 'Don\'t change', 'reepay-subscriptions-for-woocommerce' ) ] + $roles;
+
+woocommerce_wp_select(
+	[
+		'id'                => '_reepay_subscription_customer_role',
+		'value'             => $_reepay_subscription_customer_role ?? '',
+		'label'             => __( 'Customer role after subscription purchase', 'reepay-subscriptions-for-woocommerce' ),
+		'options'           => $roles,
+	]
+);

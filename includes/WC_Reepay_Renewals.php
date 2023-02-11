@@ -538,6 +538,7 @@ class WC_Reepay_Renewals {
 
 		self::update_subscription_status( $data, $status_main );
 		self::create_child_order( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
+		self::change_user_role( $data );
 	}
 
 	/**
@@ -955,6 +956,10 @@ class WC_Reepay_Renewals {
 				if ( ! empty( $meta_item ) ) {
 					foreach ( $meta_item as $value ) {
 						$product_item->add_meta_data( $value->key, $value->value );
+
+						if( '_reepay_subscription_customer_role' === $value->key ) {
+							$new_order->add_meta_data( '_reepay_subscription_customer_role', $value->value );
+						}
 					}
 				}
 				self::log( [
@@ -993,6 +998,41 @@ class WC_Reepay_Renewals {
 		$new_order->calculate_totals();
 
 		return $new_order;
+	}
+
+	/**
+	 * @param  array  $data  @see self::renew_subscription
+	 *
+	 * @return true|WP_Error
+	 */
+	public static function change_user_role( $data ) {
+		$order = self::get_order_by_subscription_handle( $data['subscription'] );
+
+		if ( empty( $order ) ) {
+			return new WP_Error('Order not found');
+		}
+
+		$new_role = $order->get_meta( '_reepay_subscription_customer_role' );
+
+		if ( empty( $new_role ) || 'without_changes' === $new_role ) {
+			return new WP_Error('Role change not required');
+		}
+
+		$customer_id = $order->get_customer_id();
+
+		if ( empty( $customer_id ) ) {
+			return new WP_Error('No customer in order');
+		}
+
+		$user = get_userdata( $customer_id );
+
+		if ( empty( $user ) ) {
+			return new WP_Error('Wrong customer id');
+		}
+
+		$user->set_role( $new_role );
+
+		return true;
 	}
 
 	/**
