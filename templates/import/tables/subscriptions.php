@@ -38,7 +38,7 @@
 
                     <br>
 
-                    <% if (data.customer_email) { %>
+                    <% if (data.customer_email !== undefined) { %>
                     <%= data.customer_email %>
                     <% } else { %>
                     <strong>Customer does not exist in this store</strong>
