@@ -249,7 +249,7 @@ class WC_Reepay_Import {
 					$wp_user_data = get_userdata( $wp_user_id );
 
 					if ( $wp_user_data ) {
-						$subscription['customer_email'] = $wp_user_data->user_email;
+						$subscription['customer_email'] = $wp_user_data->user_email ?: 'Email not set';
 					}
 
 					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
