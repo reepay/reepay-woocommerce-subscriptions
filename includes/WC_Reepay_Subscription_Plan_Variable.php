@@ -58,11 +58,36 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 		return $data;
 	}
-	
+
+	/**
+	 * @param array $data
+	 *
+	 * @return false|string
+	 */
+	public function get_plan_fields_data_template( $data ) {
+		$data['loop'] = $this->loop;
+
+		ob_start();
+		wc_get_template(
+			$this->plan_fields_data_template,
+			$data,
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+
+		return ob_get_clean();
+	}
+
 	public function save_subscription_meta( $post_id, $i = null ) {
 		$this->loop = $i;
 
 		parent::save_subscription_meta( $post_id );
+
+		if ( ! empty( $_POST['_reepay_subscription_customer_role'][$i] ) && $_POST['_reepay_subscription_customer_role'][$i] !== 'without_changes' ) {
+			update_post_meta( $post_id, '_reepay_subscription_customer_role', $_POST['_reepay_subscription_customer_role'][$i] );
+		} else {
+			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
+		}
 	}
 
 	public function get_subscription_handle_from_request() {
