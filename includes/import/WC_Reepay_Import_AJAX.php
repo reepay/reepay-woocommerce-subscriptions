@@ -42,9 +42,11 @@ class WC_Reepay_Import_AJAX {
 	/**
 	 * Prepare data for script
 	 *
+	 * @param array $additional_data
+	 *
 	 * @return array
 	 */
-	public static function get_localize_data() {
+	public static function get_localize_data( $data = []) {
 		$nonce    = wp_create_nonce( self::$ajax_nonce );
 		$ajax_url = admin_url( "admin-ajax.php" );
 
@@ -60,10 +62,10 @@ class WC_Reepay_Import_AJAX {
 			);
 		}
 
-		return [
-			'urls'    => $urls,
-			'objects' => array_keys( WC_Reepay_Import::$import_objects ),
-		];
+		$data['urls'] = $urls;
+		$data['objects'] = array_keys( WC_Reepay_Import::$import_objects );
+
+		return $data;
 	}
 
 	/**
