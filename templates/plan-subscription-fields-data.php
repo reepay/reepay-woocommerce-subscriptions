@@ -1,3 +1,13 @@
+<?php
+if ( ! function_exists( 'woocommerce_wp_select' ) ) {
+	include_once dirname( WC_PLUGIN_FILE ) . '/includes/admin/wc-meta-box-functions.php';
+}
+
+global $post;
+if ( empty( $post ) ) {
+	$post = new WP_Post((object)[]);
+}
+?>
 <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
     <p class="form-field">
         <label for="#"><?php _e( 'Price', 'reepay-subscriptions-for-woocommerce' ); ?></label>
@@ -347,3 +357,19 @@
 	do_action( 'woocommerce_product_options_tax' );
 	?>
 </div>
+
+<?php
+$roles = apply_filters( 'editable_roles', wp_roles()->roles );
+array_walk($roles, function (&$item, $key) {
+    $item = $item['name'];
+});
+$roles = [ 'without_changes' => __( 'Don\'t change', 'reepay-subscriptions-for-woocommerce' ) ] + $roles;
+
+woocommerce_wp_select(
+	[
+		'id'                => '_reepay_subscription_customer_role' . ( isset( $loop ) ? "[$loop]" : '' ),
+		'value'             => $_reepay_subscription_customer_role ?? '',
+		'label'             => __( 'Customer role after subscription purchase', 'reepay-subscriptions-for-woocommerce' ),
+		'options'           => $roles,
+	]
+);
