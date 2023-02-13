@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Reepay Subscriptions for WooCommerce\n"
-"POT-Creation-Date: 2023-02-13 23:17+0300\n"
-"PO-Revision-Date: 2023-02-13 23:16+0300\n"
+"POT-Creation-Date: 2023-02-13 23:41+0300\n"
+"PO-Revision-Date: 2023-02-13 23:40+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -90,7 +90,7 @@ msgid "My Account"
 msgstr ""
 
 #: includes/WC_Reepay_Admin_Frontend.php:88
-msgid "&nbsp;Sub Order of"
+msgid "Sub Order of"
 msgstr ""
 
 #: includes/WC_Reepay_Discounts_And_Coupons.php:55
@@ -639,7 +639,27 @@ msgstr ""
 msgid "Upgrade finished."
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:204
+#: reepay-subscriptions-for-woocommerce.php:143
+msgid "None"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:144
+msgid "Full refund"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:145
+msgid "Prorated refund"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:146
+msgid "Full credit"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:147
+msgid "Prorated credit"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:205
 #, php-format
 msgid ""
 "The plugin Reepay Checkout for WooCommerce is required for Reepay "
@@ -647,118 +667,118 @@ msgid ""
 "install and activate the plugin.</a>"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:227
+#: reepay-subscriptions-for-woocommerce.php:228
 #, php-format
 msgid ""
 "Reepay checkout test key must match with Reepay subscriptions test key, "
 "please <a href=\"%s\">check settings</a>"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:249
+#: reepay-subscriptions-for-woocommerce.php:250
 #, php-format
 msgid ""
 "Reepay checkout live key must match with Reepay subscriptions live key, "
 "please <a href=\"%s\">check settings</a>"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:280
+#: reepay-subscriptions-for-woocommerce.php:281
 msgid "Get free test account"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:281
+#: reepay-subscriptions-for-woocommerce.php:282
 msgid "Pricing"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:327
+#: reepay-subscriptions-for-woocommerce.php:328
 msgid "Settings"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:334
+#: reepay-subscriptions-for-woocommerce.php:335
 msgid "Reepay Subscriptions"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:381
+#: reepay-subscriptions-for-woocommerce.php:382
 msgid "Reepay Subscription"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:393
+#: reepay-subscriptions-for-woocommerce.php:394
 msgid "Enable logging"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:395
+#: reepay-subscriptions-for-woocommerce.php:396
 msgid "Enable API logging. Logs can be seen in WooCommerce > Status > Logs"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:403
-#: reepay-subscriptions-for-woocommerce.php:405
+#: reepay-subscriptions-for-woocommerce.php:404
+#: reepay-subscriptions-for-woocommerce.php:406
 msgid "Enable On Hold"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:409
+#: reepay-subscriptions-for-woocommerce.php:410
 msgid "Compensation method for On Hold"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:412
+#: reepay-subscriptions-for-woocommerce.php:413
 msgid "Compensation method when setting a subscription to On Hold."
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:416
-#: reepay-subscriptions-for-woocommerce.php:418
+#: reepay-subscriptions-for-woocommerce.php:417
+#: reepay-subscriptions-for-woocommerce.php:419
 msgid "Enable Cancel"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:422
+#: reepay-subscriptions-for-woocommerce.php:423
 msgid "Compensation method for Cancel"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:425
+#: reepay-subscriptions-for-woocommerce.php:426
 msgid "Compensation method when cancelling a subscription."
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:433
+#: reepay-subscriptions-for-woocommerce.php:434
 msgid "Subscription order default status after creation"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:436
+#: reepay-subscriptions-for-woocommerce.php:437
 msgid ""
 "Setting to control witch status the Reepay subscription order in WooCommerce "
 "gets."
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:440
+#: reepay-subscriptions-for-woocommerce.php:441
 msgid "Renewal order default status after creation"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:443
+#: reepay-subscriptions-for-woocommerce.php:444
 msgid ""
 "Setting to control witch status the Reepay renewal order in WooCommerce gets."
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:451
+#: reepay-subscriptions-for-woocommerce.php:452
 msgid "Enable manual subscription start date"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:453
+#: reepay-subscriptions-for-woocommerce.php:454
 msgid ""
 "Enable manual subscription start date <p class=\"description\">This will set "
 "a temporary start date for the subscription that is far in the future. We "
 "recommend removing the start date tag from your sign up emails in Reepay.</p>"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:457
+#: reepay-subscriptions-for-woocommerce.php:458
 msgid "Manual start date order status"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:460
+#: reepay-subscriptions-for-woocommerce.php:461
 msgid ""
 "Subscription will start when parent order get changed to this order status."
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:535
+#: reepay-subscriptions-for-woocommerce.php:536
 msgid "Request error. Try again"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:562
+#: reepay-subscriptions-for-woocommerce.php:563
 #: templates/discounts-and-coupons-fields-data-discount.php:18
 msgid "Percentage"
 msgstr ""
