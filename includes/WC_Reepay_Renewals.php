@@ -17,23 +17,17 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
-		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
+		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] )
+		;
 		add_action( 'woocommerce_order_status_changed', array( $this, 'status_manual_start_date' ), 10, 4 );
+
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-		add_filter( 'woocommerce_get_formatted_order_total', array(
-			$this,
-			'display_real_total'
-		), 10, 4 );
 
-		add_filter( 'reepay_settled_order_status', array(
-			$this,
-			'reepay_subscriptions_order_status'
-		), 11, 2 );
+		add_filter( 'woocommerce_get_formatted_order_total', array( $this, 'display_real_total' ), 10, 4 );
 
-		add_filter( 'show_reepay_metabox', array(
-			$this,
-			'disable_for_sub'
-		), 10, 2 );
+		add_filter( 'reepay_settled_order_status', array( $this, 'reepay_subscriptions_order_status' ), 11, 2 );
+
+		add_filter( 'show_reepay_metabox', array( $this, 'disable_for_sub' ), 10, 2 );
 
 		add_filter( 'order_contains_reepay_subscription', function ( $contains, $order ) {
 			if ( $this->reepay_order_contains_subscription( $order ) ) {
@@ -939,6 +933,8 @@ class WC_Reepay_Renewals {
 		$order->set_status( $status );
 		$order->save();
 
+		self::save_reepay_subscription_dates( $order );
+
 		return true;
 	}
 
@@ -1098,6 +1094,93 @@ class WC_Reepay_Renewals {
 		$user->set_role( $new_role );
 
 		return true;
+	}
+
+	/**
+	 * @param  mixed  $order
+	 * @param  array[]|null $data - @see https://reference.reepay.com/api/#the-subscription-object
+	 *
+	 * @return array|WP_Error - array of saved data or error
+	 */
+	public static function save_reepay_subscription_dates( $order, $data = null ) {
+		$order = wc_get_order( $order );
+
+		if ( empty( $order ) ) {
+			return new WP_Error( __( 'Undefined order', 'reepay-subscriptions-for-woocommerce' ) );
+		}
+
+		if ( is_null( $data ) ) {
+			$handle = $order->get_meta( '_reepay_subscription_handle' );
+
+			if ( empty( $handle ) ) {
+				return new WP_Error( __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
+			}
+
+			try {
+				$data = reepay_s()->api()->request( "subscription/$handle" );
+			} catch ( Exception $e ) {
+				return new WP_Error( $e->getMessage() );
+			}
+		}
+
+		$time_data = [
+			'expires'              => strtotime( $data['expires'] ?? false ),
+			'reactivated'          => strtotime( $data['reactivated'] ?? false ),
+			'created'              => strtotime( $data['created'] ?? false ),
+			'activated'            => strtotime( $data['activated'] ?? false ),
+			'start_date'           => strtotime( $data['start_date'] ?? false ),
+			'end_date'             => strtotime( $data['end_date'] ?? false ),
+			'current_period_start' => strtotime( $data['current_period_start'] ?? false ),
+			'next_period_start'    => strtotime( $data['next_period_start'] ?? false ),
+			'first_period_start'   => strtotime( $data['first_period_start'] ?? false ),
+			'last_period_start'    => strtotime( $data['last_period_start'] ?? false ),
+			'trial_start'          => strtotime( $data['trial_start'] ?? false ),
+			'trial_end'            => strtotime( $data['trial_end'] ?? false ),
+			'cancelled_date'       => strtotime( $data['cancelled_date'] ?? false ),
+			'expired_date'         => strtotime( $data['expired_date'] ?? false ),
+			'on_hold_date'         => strtotime( $data['on_hold_date'] ?? false ),
+			'reminder_email_sent'  => strtotime( $data['reminder_email_sent'] ?? false ),
+		];
+
+		$order->update_meta_data( '_reepay_subscription_dates', $time_data );
+		$order->save();
+
+		return $time_data;
+	}
+
+	/**
+	 * @param  mixed   $order
+	 * @param  string  $date_key
+	 * @param  string  $date_format
+	 *
+	 * @return string
+	 */
+	public static function get_reepay_subscription_dates( $order, $date_key, $date_format = 'wordpress' ) {
+		$order = wc_get_order( $order );
+
+		if ( empty( $order ) ) {
+			return '';
+		}
+
+		$dates = $order->get_meta( '_reepay_subscription_dates' );
+
+		if ( empty( $dates ) ) {
+			$dates = self::save_reepay_subscription_dates( $order );
+
+			if ( is_wp_error( $dates ) ) {
+				return '';
+			}
+		}
+
+		if ( empty( $dates[ $date_key ] ) ) {
+			return '';
+		}
+
+		if ( 'wordpress' === $date_format ) {
+			return wp_date( get_option( 'date_format' ), $dates[ $date_key ] );
+		}
+
+		return $dates[ $date_key ];
 	}
 
 	/**

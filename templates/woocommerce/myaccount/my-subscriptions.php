@@ -84,7 +84,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </td>
                         <td class="subscription-next-payment order-date woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-next-payment woocommerce-orders-table__cell-order-date"
                             data-title="<?php echo esc_attr_x( 'Next Payment', 'table heading', 'reepay-subscriptions-for-woocommerce' ); ?>">
-                            -
+	                        <?php echo WC_Reepay_Renewals::get_reepay_subscription_dates( $subscription, 'next_period_start' ) ?: '-' ?>
                         </td>
                         <td class="subscription-total order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-total woocommerce-orders-table__cell-order-total"
                             data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'reepay-subscriptions-for-woocommerce' ); ?>">
