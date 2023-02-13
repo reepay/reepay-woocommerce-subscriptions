@@ -62,13 +62,7 @@ class WooCommerce_Reepay_Subscriptions {
 	/**
 	 * @var <string, string>
 	 */
-	public static $compensation_methods = [
-		'none'            => 'None',
-		'full_refund'     => 'Full refund',
-		'prorated_refund' => 'Prorated refund',
-		'full_credit'     => 'Full credit',
-		'prorated_credit' => 'Prorated credit',
-	];
+	public static $compensation_methods = [];
 
 	/**
 	 * @var <string>
@@ -145,6 +139,13 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_manual_start_date_status'           => get_option( '_reepay_manual_start_date_status' ) ?: 'wc-completed',
 		];
 
+        self::$compensation_methods = [
+	        'none'            => __( 'None', 'reepay-subscriptions-for-woocommerce'),
+	        'full_refund'     => __( 'Full refund', 'reepay-subscriptions-for-woocommerce'),
+	        'prorated_refund' => __( 'Prorated refund', 'reepay-subscriptions-for-woocommerce'),
+	        'full_credit'     => __( 'Full credit', 'reepay-subscriptions-for-woocommerce'),
+	        'prorated_credit' => __( 'Prorated credit', 'reepay-subscriptions-for-woocommerce'),
+        ];
 
 		$this->includes();
 		$this->init_classes();
