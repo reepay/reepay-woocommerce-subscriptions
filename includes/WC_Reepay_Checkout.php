@@ -104,7 +104,7 @@ class WC_Reepay_Checkout {
 	 *
 	 * @return bool
 	 */
-	public static function is_reepay_product( $product ) {
+	public static function is_reepay_product( $product = false ) {
 		$product = wc_get_product( $product );
 
 		if ( $product->is_type( 'variation' ) ) {

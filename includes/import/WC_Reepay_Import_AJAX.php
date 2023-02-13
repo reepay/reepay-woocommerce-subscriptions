@@ -175,7 +175,7 @@ class WC_Reepay_Import_AJAX {
 		if ( ! check_ajax_referer( self::$ajax_nonce, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
-					'error' => 'User verification error. Reload page and try again',
+					'error' => __( 'User verification error. Reload page and try again', 'reepay-subscriptions-for-woocommerce' ),
 				]
 			);
 		}

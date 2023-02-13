@@ -137,7 +137,7 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
 					<?php if ( $payment_method->get_token() === $payment_methods[0]['id'] ): ?>
 						<?php _e( 'Current', 'reepay-subscriptions-for-woocommerce' ); ?>
 					<?php else: ?>
-                        <a href="?change_payment_method=<?php echo __( $reepay_subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"
+                        <a href="?change_payment_method=<?php _e( $reepay_subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"
                            class="button"><?php _e( 'Change', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php endif; ?>
                 </td>
@@ -158,7 +158,7 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
 </table>
 
 <header>
-    <h2><?php esc_html_e( 'Related orders', 'woocommerce-subscriptions' ); ?></h2>
+    <h2><?php esc_html_e( 'Related orders', 'reepay-subscriptions-for-woocommerce' ); ?></h2>
 </header>
 
 <table class="shop_table shop_table_responsive my_account_orders woocommerce-orders-table woocommerce-MyAccount-orders woocommerce-orders-table--orders">
@@ -166,13 +166,13 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
     <thead>
     <tr>
         <th class="order-number woocommerce-orders-table__header woocommerce-orders-table__header-order-number"><span
-                    class="nobr"><?php esc_html_e( 'Order', 'woocommerce-subscriptions' ); ?></span></th>
+                    class="nobr"><?php esc_html_e( 'Order', 'reepay-subscriptions-for-woocommerce' ); ?></span></th>
         <th class="order-date woocommerce-orders-table__header woocommerce-orders-table__header-order-date woocommerce-orders-table__header-order-date">
-            <span class="nobr"><?php esc_html_e( 'Date', 'woocommerce-subscriptions' ); ?></span></th>
+            <span class="nobr"><?php esc_html_e( 'Date', 'reepay-subscriptions-for-woocommerce' ); ?></span></th>
         <th class="order-status woocommerce-orders-table__header woocommerce-orders-table__header-order-status"><span
-                    class="nobr"><?php esc_html_e( 'Status', 'woocommerce-subscriptions' ); ?></span></th>
+                    class="nobr"><?php esc_html_e( 'Status', 'reepay-subscriptions-for-woocommerce' ); ?></span></th>
         <th class="order-total woocommerce-orders-table__header woocommerce-orders-table__header-order-total"><span
-                    class="nobr"><?php echo esc_html_x( 'Total', 'table heading', 'woocommerce-subscriptions' ); ?></span>
+                    class="nobr"><?php echo esc_html_x( 'Total', 'table heading', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </th>
         <th class="order-actions woocommerce-orders-table__header woocommerce-orders-table__header-order-actions">
             &nbsp;
@@ -194,25 +194,25 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
 		?>
         <tr class="order woocommerce-orders-table__row woocommerce-orders-table__row--status-<?php echo esc_attr( $order->get_status() ); ?>">
             <td class="order-number woocommerce-orders-table__cell woocommerce-orders-table__cell-order-number"
-                data-title="<?php esc_attr_e( 'Order Number', 'woocommerce-subscriptions' ); ?>">
+                data-title="<?php esc_attr_e( 'Order Number', 'reepay-subscriptions-for-woocommerce' ); ?>">
                 <a href="<?php echo esc_url( $order->get_view_order_url() ); ?>">
-					<?php echo sprintf( esc_html_x( '#%s', 'hash before order number', 'woocommerce-subscriptions' ), esc_html( $order->get_order_number() ) ); ?>
+					<?php echo sprintf( esc_html_x( '#%s', 'hash before order number', 'reepay-subscriptions-for-woocommerce' ), esc_html( $order->get_order_number() ) ); ?>
                 </a>
             </td>
             <td class="order-date woocommerce-orders-table__cell woocommerce-orders-table__cell-order-date"
-                data-title="<?php esc_attr_e( 'Date', 'woocommerce-subscriptions' ); ?>">
+                data-title="<?php esc_attr_e( 'Date', 'reepay-subscriptions-for-woocommerce' ); ?>">
                 <time datetime="<?php echo esc_attr( $order_date->date( 'Y-m-d' ) ); ?>"
                       title="<?php echo esc_attr( $order_date->getTimestamp() ); ?>"><?php echo wp_kses_post( $order_date->date_i18n( wc_date_format() ) ); ?></time>
             </td>
             <td class="order-status woocommerce-orders-table__cell woocommerce-orders-table__cell-order-status"
-                data-title="<?php esc_attr_e( 'Status', 'woocommerce-subscriptions' ); ?>" style="white-space:nowrap;">
+                data-title="<?php esc_attr_e( 'Status', 'reepay-subscriptions-for-woocommerce' ); ?>" style="white-space:nowrap;">
 				<?php echo esc_html( wc_get_order_status_name( $order->get_status() ) ); ?>
             </td>
             <td class="order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-order-total"
-                data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'woocommerce-subscriptions' ); ?>">
+                data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'reepay-subscriptions-for-woocommerce' ); ?>">
 				<?php
 				// translators: $1: formatted order total for the order, $2: number of items bought
-				echo wp_kses_post( sprintf( _n( '%1$s for %2$d item', '%1$s for %2$d items', $item_count, 'woocommerce-subscriptions' ), $order->get_formatted_order_total(), $item_count ) );
+				echo wp_kses_post( sprintf( _n( '%1$s for %2$d item', '%1$s for %2$d items', $item_count, 'reepay-subscriptions-for-woocommerce' ), $order->get_formatted_order_total(), $item_count ) );
 				?>
             </td>
             <td class="order-actions woocommerce-orders-table__cell woocommerce-orders-table__cell-order-actions">
@@ -221,7 +221,7 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
 				if ( $order->needs_payment() && wcs_get_objects_property( $order, 'id' ) == $subscription->get_last_order( 'ids', 'any' ) ) {
 					$actions['pay'] = array(
 						'url'  => $order->get_checkout_payment_url(),
-						'name' => esc_html_x( 'Pay', 'pay for a subscription', 'woocommerce-subscriptions' ),
+						'name' => esc_html_x( 'Pay', 'pay for a subscription', 'reepay-subscriptions-for-woocommerce' ),
 					);
 				}
 
@@ -237,13 +237,13 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
 
 					$actions['cancel'] = array(
 						'url'  => $order->get_cancel_order_url( $redirect ),
-						'name' => esc_html_x( 'Cancel', 'an action on a subscription', 'woocommerce-subscriptions' ),
+						'name' => esc_html_x( 'Cancel', 'an action on a subscription', 'reepay-subscriptions-for-woocommerce' ),
 					);
 				}
 
 				$actions['view'] = array(
 					'url'  => $order->get_view_order_url(),
-					'name' => esc_html_x( 'View', 'view a subscription', 'woocommerce-subscriptions' ),
+					'name' => esc_html_x( 'View', 'view a subscription', 'reepay-subscriptions-for-woocommerce' ),
 				);
 
 				$actions = apply_filters( 'woocommerce_my_account_my_orders_actions', $actions, $order );

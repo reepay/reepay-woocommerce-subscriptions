@@ -209,7 +209,6 @@ class WC_Reepay_Subscription_Addons {
 					'billing_plan' => WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true ),
 					'product'      => $product,
 					'addons'       => $product_addons,
-					'domain'       => 'reepay-subscriptions-for-woocommerce'
 				],
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'
@@ -221,12 +220,10 @@ class WC_Reepay_Subscription_Addons {
 	 * Add product tab.
 	 */
 	public function tab_addons() {
-		global $post;
-		$_product = wc_get_product( $post->ID );
-		if ( $_product->is_type( 'reepay_simple_subscriptions' ) || $_product->is_type( 'reepay_variable_subscriptions' ) ) {
+		if ( WC_Reepay_Checkout::is_reepay_product() ) {
 			?>
             <li class="addons_tab product_addons">
-            <a href="#product_addons_data"><span><?php _e( 'Add-ons', 'reepay-subscriptions-for-woocommerce' ); ?></span></a>
+            <a href="#product_addons_data"><span><?php reepay_s()->_e( 'Add-ons' ); ?></span></a>
             </li><?php
 		}
 	}
@@ -246,7 +243,6 @@ class WC_Reepay_Subscription_Addons {
 		wc_get_template(
 			'admin-addons-panel.php',
 			[
-				'domain'         => 'reepay-subscriptions-for-woocommerce',
 				'product_addons' => $product_addons,
 				'addons_list'    => $addons_list
 			],
@@ -269,9 +265,7 @@ class WC_Reepay_Subscription_Addons {
 
 		try {
 			$addons_list = reepay_s()->api()->request( "add_on?size=100" );
-			/*echo '<pre>';
-			var_dump( $addons_list );
-			exit;*/
+
 			if ( ! empty( $addons_list['content'] ) ) {
 				foreach ( $addons_list['content'] as $i => $addon ) {
 					if ( ! $addon['all_plans'] && ( ! empty( $plan_handle ) && ! in_array( $plan_handle, $addon['eligible_plans'] ) ) ) {
@@ -331,26 +325,26 @@ class WC_Reepay_Subscription_Addons {
 
 	public function save_to_reepay( $product_addon, $post_id, $i ) {
 		$product = wc_get_product( $post_id );
+		$plan_handles   = [];
 
 		if ( $product->is_type( 'reepay_simple_subscriptions' ) ) {
 			$plan_handle = get_post_meta( $post_id, '_reepay_subscription_handle', true );
 
 			if ( empty( $plan_handle ) ) {
-				WC_Reepay_Subscription_Admin_Notice::add_notice( 'Wrong plan_handle. Order - #' . $post_id );
+				WC_Reepay_Subscription_Admin_Notice::add_notice( sprintf( __( 'Wrong plan_handle. Order - #%s', 'reepay-subscriptions-for-woocommerce' ), $post_id ) );
 
 				return [];
 			}
 
 			$plan_handles = [ $plan_handle ];
 		} elseif ( $product->is_type( 'reepay_variable_subscriptions' ) ) {
-			$plan_handles   = [];
 			$children_posts = $product->get_children();
 
 			foreach ( $children_posts as $children_post ) {
 				$plan_handle = get_post_meta( $children_post, '_reepay_subscription_handle', true );
 
 				if ( empty( $plan_handle ) ) {
-					WC_Reepay_Subscription_Admin_Notice::add_notice( 'Wrong plan_handle. Variation - #' . $children_post );
+					WC_Reepay_Subscription_Admin_Notice::add_notice( sprintf( __( 'Wrong plan_handle. Variation - #%s', 'reepay-subscriptions-for-woocommerce' ), $children_post ) );
 
 					return [];
 				}

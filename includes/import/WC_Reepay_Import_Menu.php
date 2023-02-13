@@ -20,8 +20,8 @@ class WC_Reepay_Import_Menu {
 	function create_submenu() {
 		add_submenu_page(
 			'tools.php',
-			'Reepay Import',
-			'Reepay Import',
+			__( 'Reepay Import' ),
+			__( 'Reepay Import' ),
 			'manage_options',
 			self::$menu_slug,
 			[ $this, 'print_import_page' ],
@@ -35,35 +35,35 @@ class WC_Reepay_Import_Menu {
 	function create_settings_fields() {
 		register_setting( 'reepay_import_settings', WC_Reepay_Import::$option_name, [ $this, 'import_sanitize_checkbox' ] );
 
-		foreach ( WC_Reepay_Import::$import_objects as $object => ['options' => $options] ) {
+		foreach ( WC_Reepay_Import::$import_objects as $object_key => $object ) {
 			add_settings_section(
-				"import_section_$object",
+				"import_section_$object_key",
 				'',
 				'',
 				self::$menu_slug
 			);
 
 			add_settings_field(
-				"import_$object",
-				"Import $object",
+				"import_$object_key",
+				sprintf( __( 'Import %s' ), $object['label'] ),
 				[ $this, 'print_checkbox' ],
 				self::$menu_slug,
-				"import_section_$object",
+				"import_section_$object_key",
 				[
-					'option_name' => [ $object ],
+					'option_name' => [ $object_key ],
 					'class'       => 'reepay-import__row reepay-import__row--main',
 				]
 			);
 
-			foreach ( $options as $option => $option_label ) {
+			foreach ( $object['options'] as $option => $option_label ) {
 				add_settings_field(
-					"import_{$object}_{$option}",
+					"import_{$object_key}_{$option}",
 					$option_label,
 					[ $this, 'print_checkbox' ],
 					self::$menu_slug,
-					"import_section_$object",
+					"import_section_$object_key",
 					[
-						'option_name' => [ $object, $option ],
+						'option_name' => [ $object_key, $option ],
 						'class'       => "reepay-import__row reepay-import__row--sub reepay-import__row--$option",
 					]
 				);
@@ -82,9 +82,9 @@ class WC_Reepay_Import_Menu {
 			reepay_s()->settings( 'plugin_path' ) . 'templates/'
 		);
 
-		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
+		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object_key ) {
 			wc_get_template(
-				"import/tables/$object.php",
+				"import/tables/$object_key.php",
 				array(),
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'

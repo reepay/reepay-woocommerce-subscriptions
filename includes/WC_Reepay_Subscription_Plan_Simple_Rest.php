@@ -19,7 +19,7 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 		register_rest_route( $this->namespace, $this->rest_base, [
 			"methods"             => WP_REST_Server::READABLE,
 			"callback"            => array( $this, "get_item" ),
-			"permission_callback" => array( $this, "get_item_permissions_check" ),
+			"permission_callback" => '__return_true',
 			"args"                => array(
 				"handle" => array(
 					"type"              => "string",
@@ -107,7 +107,6 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 			$plan_meta_data                            = $plan->get_remote_plan_meta( $request['handle'] );
 			$plan_meta_data['disabled']                = true;
 			$plan_meta_data['plans_list']              = reepay_s()->plan()->get_reepay_plans_list() ?: [];
-			$plan_meta_data['domain']                  = 'reepay-subscriptions-for-woocommerce';
 
 			if ( isset( $request['loop'] ) ) {
 				$plan_meta_data['loop'] = $request['loop'];
@@ -132,28 +131,6 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 
 			return new WP_Error( 400, $e->getMessage() );
 		}
-	}
-
-	/**
-	 * Checks if a given request has access to get a specific item.
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 *
-	 * @return true|WP_Error True if the request has read access for the item, WP_Error object otherwise.
-	 * @since 4.7.0
-	 *
-	 */
-	public function get_item_permissions_check( $request ) {
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			return true;
-		}
-
-		//@todo сделать проверку прав и авторизацию эта работает криво
-		/*if ( ! current_user_can( 'edit_posts' ) ) {
-			return new WP_Error(401, 'Not authorized or no access');
-		}*/
-
-		return true;
 	}
 }
 

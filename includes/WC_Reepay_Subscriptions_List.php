@@ -25,8 +25,6 @@ class WC_Reepay_Subscriptions_List {
 	}
 
 	function create_menu() {
-		//create new top-level menu
-
 		add_submenu_page(
 			'woocommerce',
 			'Subscriptions',

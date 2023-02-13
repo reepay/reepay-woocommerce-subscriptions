@@ -59,7 +59,7 @@ class WC_Reepay_Account_Page {
 					'source' => $token->get_token(),
 				] );
 				set_transient( $handle . '_payment_methods', $payment_methods );
-				wc_add_notice( __( 'Payment method successfully added.', 'reepay-subscriptions-for-woocommerce' ) );
+				wc_add_notice( __( 'Payment method successfully added.' ) );
 			} catch ( Exception $exception ) {
 				wc_add_notice( $exception->getMessage() );
 			}
@@ -129,7 +129,7 @@ class WC_Reepay_Account_Page {
 					wc_add_notice( $exception->getMessage(), 'error' );
 				}
 			} else {
-				wc_add_notice( 'Permission denied', 'error' );
+				wc_add_notice( __( 'Permission denied' ), 'error' );
 			}
 
 			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
@@ -162,7 +162,7 @@ class WC_Reepay_Account_Page {
 					wc_add_notice( $e->getMessage(), 'error' );
 				}
 			} else {
-				wc_add_notice( 'Permission denied', 'error' );
+				wc_add_notice( __( 'Permission denied' ), 'error' );
 			}
 
 
@@ -186,7 +186,7 @@ class WC_Reepay_Account_Page {
 					wc_add_notice( $e->getMessage() );
 				}
 			} else {
-				wc_add_notice( 'Permission denied', 'error' );
+				wc_add_notice( __( 'Permission denied' ), 'error' );
 			}
 			wp_redirect( wc_get_endpoint_url( 'view-subscription', $order->get_id() ) );
 			exit;
@@ -224,7 +224,7 @@ class WC_Reepay_Account_Page {
 	}
 
 	public function get_title() {
-		return __( "Subscriptions", 'reepay-subscriptions-for-woocommerce' );
+		return __( 'Subscriptions' );
 	}
 
 	/**
@@ -304,18 +304,18 @@ class WC_Reepay_Account_Page {
 
 	function get_status( $subscription ) {
 		if ( $subscription['is_cancelled'] === true ) {
-			return 'Cancelled';
+			return __( 'Cancelled' );
 		}
 		if ( $subscription['state'] === 'expired' ) {
-			return 'Expired';
+			return __( 'Expired' );
 		}
 
 		if ( $subscription['state'] === 'on_hold' ) {
-			return 'On hold';
+			return __( 'On hold' );
 		}
 
 		if ( $subscription['state'] === 'is_cancelled' ) {
-			return 'Cancelled';
+			return __( 'Cancelled' );
 		}
 
 		if ( $subscription['state'] === 'active' ) {
@@ -323,11 +323,11 @@ class WC_Reepay_Account_Page {
 				$now       = new DateTime();
 				$trial_end = new DateTime( $subscription['trial_end'] );
 				if ( $trial_end > $now ) {
-					return 'Trial';
+					return __( 'Trial' );
 				}
 			}
 
-			return 'Active';
+			return __( 'Active' );
 		}
 
 		return $subscription['state'];
@@ -356,7 +356,7 @@ class WC_Reepay_Account_Page {
 	 * @param array $columns
 	 */
 	public function add_column_to_account_orders( $columns ) {
-		$columns['order_type'] = 'Order type';
+		$columns['order_type'] = __( 'Order type' );
 
 		return $columns;
 	}
@@ -368,17 +368,17 @@ class WC_Reepay_Account_Page {
 		$type = '';
 
 		if ( $order->get_meta( '_reepay_subscription_handle' ) ) {
-			$type = 'Reepay subscription';
+			$type = __( 'Reepay subscription' );
 		} elseif ( class_exists( 'WC_Subscriptions_Product' ) ) {
 			$product = current( $order->get_items() )->get_product();
 
 			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
-				$type = 'Subscription';
+				$type = __( 'Subscription' );
 			} else {
-				$type = 'Order';
+				$type = __( 'Order' );
 			}
 		} else {
-			$type = 'Order';
+			$type = __( 'Order' );
 		}
 
 		echo '<span>' . $type . '</span>';
@@ -402,7 +402,12 @@ class WC_Reepay_Account_Page {
 		$subscription = apply_filters( 'wcs_get_subscription', false );
 
 		if ( ! $subscription || ! current_user_can( 'view_order', $subscription->get_id() ) ) {
-			echo '<div class="woocommerce-error">' . esc_html__( 'Invalid Subscription.', 'woocommerce-subscriptions' ) . ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' . esc_html__( 'My Account', 'woocommerce-subscriptions' ) . '</a>' . '</div>';
+			echo '<div class="woocommerce-error">' .
+			     __( 'Invalid Subscription.' ) .
+			     ' <a href="' . esc_url( wc_get_page_permalink( 'myaccount' ) ) . '" class="wc-forward">' .
+			     __( 'My Account' ) .
+			     '</a>' .
+			     '</div>';
 
 			return;
 		}

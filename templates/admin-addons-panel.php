@@ -24,7 +24,6 @@
 				array(
 					'addon'       => $addon,
 					'loop'        => $loop,
-					'domain'      => 'reepay-subscriptions-for-woocommerce',
 					'addons_list' => $addons_list['content']
 				),
 				'',
@@ -80,7 +79,6 @@
 						array(
 							'addon'       => $addon,
 							'loop'        => $loop,
-							'domain'      => 'reepay-subscriptions-for-woocommerce',
 							'addons_list' => $addons_list['content']
 						),
 						'',
