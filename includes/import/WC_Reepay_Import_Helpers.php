@@ -105,7 +105,7 @@ class WC_Reepay_Import_Helpers {
 		}
 
 		if ( ! $token->save() ) {
-			return new WP_Error( 'Unable to save bank card - ' . $card['masked_card'] . ', ' . $card['customer'] );
+			return new WP_Error( __( 'Unable to save bank card' ) .' - '. $card['masked_card'] . ', ' . $card['customer'] );
 		}
 
 		return true;
@@ -147,14 +147,14 @@ class WC_Reepay_Import_Helpers {
 			$plan = $subscription['plan'];
 			$plan = reepay_s()->api()->request( "plan/$plan/current" );
 		} catch ( Exception $e ) {
-			return new WP_Error( 'Plan request error' );
+			return new WP_Error( __( 'Plan request error' ) );
 		}
 
 		try {
 			$customer = $subscription['customer'];
 			$customer = reepay_s()->api()->request( "customer/$customer" );
 		} catch ( Exception $e ) {
-			return new WP_Error( 'Plan request error' );
+			return new WP_Error( __( 'Plan request error' ) );
 		}
 
 		$reepay_to_woo_statuses = [

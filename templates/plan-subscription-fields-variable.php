@@ -13,7 +13,7 @@
         <div class="options_group choose-plan-variable">
             <p class="form-field" style="display:block;">
                 <label for="_reepay_subscription_handle">
-					<?php echo __( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
+					<?php _e( 'Choose plan', 'reepay-subscriptions-for-woocommerce' ); ?>
                 </label>
 
 				<?php

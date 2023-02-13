@@ -16,37 +16,46 @@ class WC_Reepay_Import {
 	/**
 	 * @var array
 	 */
-	public static $import_objects = [
-		'customers'     => [
-			'options' => [
-				'all'                      => 'All',
-				'with_active_subscription' => 'Only customers with active subscriptions',
-			],
-		],
-		'cards'         => [
-			'options' => [
-				'all'    => 'All',
-				'active' => 'Only active cards',
-			],
-		],
-		'subscriptions' => [
-			'options' => [
-				'all'       => 'All',
-				'active'    => 'Active',
-				'on_hold'   => 'On hold',
-				'pending'   => 'Pending',
-				'dunning'   => 'Dunning',
-				'cancelled' => 'Cancelled',
-				'expired'   => 'Expired',
-			],
-		],
-	];
+	public static $import_objects = [];
 
 	/**
 	 * Constructor
 	 */
 	public function __construct() {
 		session_start();
+
+		add_action( 'reepay_subscriptions_init', [ $this, 'init'] );
+	}
+
+	public function init() {
+		self::$import_objects = [
+			'customers'     => [
+				'label'   => __( 'customers', 'reepay-subscriptions-for-woocommerce' ),
+				'options' => [
+					'all'                      => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
+					'with_active_subscription' => __( 'Only customers with active subscriptions', 'reepay-subscriptions-for-woocommerce' ),
+				],
+			],
+			'cards'         => [
+				'label'   => __( 'customers', 'reepay-subscriptions-for-woocommerce' ),
+				'options' => [
+					'all'    => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
+					'active' => __( 'Only active cards', 'reepay-subscriptions-for-woocommerce' ),
+				],
+			],
+			'subscriptions' => [
+				'label'   => __( 'customers', 'reepay-subscriptions-for-woocommerce' ),
+				'options' => [
+					'all'       => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
+					'active'    => __( 'Active', 'reepay-subscriptions-for-woocommerce' ),
+					'on_hold'   => __( 'On hold', 'reepay-subscriptions-for-woocommerce' ),
+					'pending'   => __( 'Pending', 'reepay-subscriptions-for-woocommerce' ),
+					'dunning'   => __( 'Dunning', 'reepay-subscriptions-for-woocommerce' ),
+					'cancelled' => __( 'Cancelled', 'reepay-subscriptions-for-woocommerce' ),
+					'expired'   => __( 'Expired', 'reepay-subscriptions-for-woocommerce' ),
+				],
+			],
+		];
 
 		new WC_Reepay_Import_Menu();
 		new WC_Reepay_Import_AJAX();
@@ -191,7 +200,7 @@ class WC_Reepay_Import {
 			$wp_user_id = rp_get_userid_by_handle( $cards[ $card_id ]['customer'] );
 
 			if ( empty( $wp_user_id ) ) {
-				$result[ $card_id ] = "User not found";
+				$result[ $card_id ] = __( 'User not found', 'reepay-subscriptions-for-woocommerce' );
 				continue;
 			}
 
@@ -249,7 +258,7 @@ class WC_Reepay_Import {
 					$wp_user_data = get_userdata( $wp_user_id );
 
 					if ( $wp_user_data ) {
-						$subscription['customer_email'] = $wp_user_data->user_email ?: 'Email not set';
+						$subscription['customer_email'] = $wp_user_data->user_email ?: __( 'Email not set', 'reepay-subscriptions-for-woocommerce' );
 					}
 
 					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
@@ -281,7 +290,7 @@ class WC_Reepay_Import {
 			try {
 				$create_result = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscriptions[ $subscription_handle ] );
 			} catch ( Exception $e ) {
-				$create_result = new WP_Error( 'Import error' );
+				$create_result = new WP_Error( __( 'Import error', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
 			$result[ $subscription_handle ] = true === $create_result ? true : $create_result->get_error_message();

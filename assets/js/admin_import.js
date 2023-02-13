@@ -89,7 +89,7 @@ jQuery(function ($) {
                 }
             },
             error: function (request, status, error) {
-                alert('Request error. Try again')
+                alert(config.i18n.request_error)
             },
             complete: function () {
                 $this.unblock();
@@ -133,7 +133,7 @@ jQuery(function ($) {
                 }
             },
             error: function (request, status, error) {
-                alert('Request error. Try again')
+                alert(config.i18n.request_error)
                 $checkboxes.prop('disabled', false)
             },
             complete: function () {
@@ -320,7 +320,7 @@ jQuery(function ($) {
                     }
                 },
                 error: function (request, status, error) {
-                    alert('Request error. Try again')
+                    alert(config.i18n.request_error)
                 },
                 complete: function () {
 

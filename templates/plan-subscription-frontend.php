@@ -4,7 +4,6 @@
  * @var string $trial
  * @var string $contract_period
  * @var string $setup_fee
- * @var string 'reepay-subscriptions-for-woocommerce'
  * @var boolean $is_checkout
  */
 ?>

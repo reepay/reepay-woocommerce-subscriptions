@@ -69,7 +69,6 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 				array(
 					'addon'  => $addon_data,
 					'loop'   => - 1,
-					'domain' => 'reepay-subscriptions-for-woocommerce'
 				),
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'
