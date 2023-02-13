@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Reepay Subscriptions for WooCommerce\n"
-"POT-Creation-Date: 2023-02-13 23:41+0300\n"
-"PO-Revision-Date: 2023-02-13 23:40+0300\n"
+"POT-Creation-Date: 2023-02-13 23:44+0300\n"
+"PO-Revision-Date: 2023-02-13 23:44+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -61,7 +61,7 @@ msgid "Active"
 msgstr ""
 
 #: includes/WC_Reepay_Account_Page.php:359
-#: includes/WC_Reepay_Admin_Frontend.php:145
+#: includes/WC_Reepay_Admin_Frontend.php:141
 msgid "Order type"
 msgstr ""
 
@@ -70,7 +70,8 @@ msgid "Reepay subscription"
 msgstr ""
 
 #: includes/WC_Reepay_Account_Page.php:376
-#: includes/WC_Reepay_Admin_Frontend.php:144
+#: includes/WC_Reepay_Admin_Frontend.php:98
+#: includes/WC_Reepay_Admin_Frontend.php:140
 #: templates/woocommerce/myaccount/my-subscriptions.php:22
 msgid "Subscription"
 msgstr ""
@@ -91,6 +92,14 @@ msgstr ""
 
 #: includes/WC_Reepay_Admin_Frontend.php:88
 msgid "Sub Order of"
+msgstr ""
+
+#: includes/WC_Reepay_Admin_Frontend.php:100
+msgid "Renewal"
+msgstr ""
+
+#: includes/WC_Reepay_Admin_Frontend.php:102
+msgid "Regular"
 msgstr ""
 
 #: includes/WC_Reepay_Discounts_And_Coupons.php:55
@@ -778,7 +787,7 @@ msgstr ""
 msgid "Request error. Try again"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:563
+#: reepay-subscriptions-for-woocommerce.php:562
 #: templates/discounts-and-coupons-fields-data-discount.php:18
 msgid "Percentage"
 msgstr ""

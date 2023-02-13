@@ -94,16 +94,12 @@ class WC_Reepay_Admin_Frontend {
 
 			case 'order_type':
 				$handle   = $the_order->get_meta( '_reepay_subscription_handle' );
-				$imported = $the_order->get_meta( '_reepay_imported' );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
-					/*$output = sprintf( '<a href="#" class="show-sub-orders" data-class="parent-%1$d" data-show="%2$s" data-hide="%3$s">%2$s</a>',
-						esc_attr( $post->ID ), esc_attr__( 'Show history', 'reepay-subscriptions-for-woocommerce' ),
-						esc_attr__( 'Hide history', 'reepay-subscriptions-for-woocommerce' ) );*/
-					$output = 'Subscription';
+					$output = __( 'Subscription', 'reepay-subscriptions-for-woocommerce');
 				} elseif ( ! empty( $the_order->get_meta( '_reepay_order' ) ) && $post->post_parent != 0 ) {
-					$output = 'Renewal';
+					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce');
 				} else {
-					$output = 'Regular';
+					$output = __( 'Regular', 'reepay-subscriptions-for-woocommerce');
 				}
 
 				break;
