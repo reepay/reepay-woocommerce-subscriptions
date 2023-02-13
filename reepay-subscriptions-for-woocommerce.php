@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.13
+ * Version: 1.0.14
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -575,7 +575,7 @@ class WooCommerce_Reepay_Subscriptions {
 	public function admin_enqueue_scripts() {
 		$product = wc_get_product();
 
-		if (  WC_Reepay_Import_Menu::is_current_page() ) {
+		if ( WC_Reepay_Import_Menu::is_current_page() ) {
 			wp_enqueue_script( 'admin-reepay-subscription-import', $this->settings( 'plugin_url' ) . 'assets/js/admin_import.js', [ 'jquery' ], $this->settings( 'version' ), true );
 
 			wp_localize_script( 'admin-reepay-subscription-import', WC_Reepay_Import_AJAX::$js_object_name, WC_Reepay_Import_AJAX::get_localize_data() );
@@ -583,7 +583,11 @@ class WooCommerce_Reepay_Subscriptions {
 
 		wp_enqueue_style( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/css/admin.css' );
 
-		wp_enqueue_script( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/js/admin.js', [ 'jquery', 'jquery-blockui', 'wp-util' ], $this->settings( 'version' ), true );
+		wp_enqueue_script( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/js/admin.js', [
+			'jquery',
+			'jquery-blockui',
+			'wp-util'
+		], $this->settings( 'version' ), true );
 		wp_localize_script( 'admin-reepay-subscription', 'reepay', [
 			'amountPercentageLabel' => __( 'Percentage', reepay_s()->settings( 'domain' ) ),
 			'product'               => [
