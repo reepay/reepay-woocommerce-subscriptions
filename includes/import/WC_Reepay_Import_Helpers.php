@@ -10,6 +10,8 @@ class WC_Reepay_Import_Helpers {
 
 	/**
 	 * @param  array  $customer_data  https://reference.reepay.com/api/#the-customer-object
+	 *
+	 * @return int|WP_Error created user id or error object
 	 */
 	public static function create_woo_customer( $customer_data ) {
 		$user_id = wp_create_user(
@@ -66,12 +68,14 @@ class WC_Reepay_Import_Helpers {
 			update_user_meta( $user_id, $meta_key, $datum );
 		}
 
-		wp_update_user([
-			'ID' => $user_id,
-			'user_email' => $customer_data['email'] ?? '',
-			'first_name' => $customer_data['first_name'] ?? '',
-			'last_name' => $customer_data['last_name'] ?? ''
-		]);
+		wp_update_user(
+			[
+				'ID'         => $user_id,
+				'user_email' => $customer_data['email'] ?? '',
+				'first_name' => $customer_data['first_name'] ?? '',
+				'last_name'  => $customer_data['last_name'] ?? '',
+			]
+		);
 	}
 
 	/**
@@ -100,8 +104,7 @@ class WC_Reepay_Import_Helpers {
 			$token->set_masked_card( $card['masked_card'] );
 		}
 
-		$token->save();
-		if ( ! $token->get_id() ) {
+		if ( ! $token->save() ) {
 			return new WP_Error( 'Unable to save bank card - ' . $card['masked_card'] . ', ' . $card['customer'] );
 		}
 
@@ -163,24 +166,27 @@ class WC_Reepay_Import_Helpers {
 			'reactivated' => 'wc-completed',
 		];
 
-		$order = wc_create_order( [
-			'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
-		] );
+		$order = wc_create_order(
+			[
+				'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
+			]
+		);
 
 		//import logic
-		$order->set_billing_city( $customer['city'] );
-		$order->set_billing_postcode( $customer['postal_code'] );
-		$order->set_billing_email( $customer['email'] );
-		$order->set_billing_phone( $customer['phone'] );
-		$order->set_billing_address_1( $customer['address'] );
-		$order->set_billing_address_2( $customer['address2'] );
-		$order->set_billing_country( $customer['country'] );
-		$order->set_billing_first_name( $customer['first_name'] );
-		$order->set_billing_last_name( $customer['last_name'] );
-		$order->set_billing_company( $customer['company'] );
+		$order->set_billing_city( $customer['city'] ?? '' );
+		$order->set_billing_postcode( $customer['postal_code']  ?? '' );
+		$order->set_billing_email( $customer['email']  ?? '' );
+		$order->set_billing_phone( $customer['phone']  ?? '' );
+		$order->set_billing_address_1( $customer['address']  ?? '' );
+		$order->set_billing_address_2( $customer['address2']  ?? '' );
+		$order->set_billing_country( $customer['country']  ?? '' );
+		$order->set_billing_first_name( $customer['first_name']  ?? '' );
+		$order->set_billing_last_name( $customer['last_name']  ?? '' );
+		$order->set_billing_company( $customer['company']  ?? '' );
 
 		$order->set_payment_method( 'reepay_checkout' );
 		$order->set_payment_method_title( 'Reepay Checkout' );
+		$order->set_currency( $plan['currency'] ?? '' );
 		$order->add_meta_data( '_reepay_state_authorized', 1 );
 
 		$order->add_meta_data( '_reepay_order', $subscription['handle'] );

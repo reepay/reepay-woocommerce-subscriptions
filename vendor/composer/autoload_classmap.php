@@ -15,6 +15,7 @@ return array(
     'WC_Reepay_Checkout' => $baseDir . '/includes/WC_Reepay_Checkout.php',
     'WC_Reepay_Discounts_And_Coupons' => $baseDir . '/includes/WC_Reepay_Discounts_And_Coupons.php',
     'WC_Reepay_Import' => $baseDir . '/includes/import/WC_Reepay_Import.php',
+    'WC_Reepay_Import_AJAX' => $baseDir . '/includes/import/WC_Reepay_Import_AJAX.php',
     'WC_Reepay_Import_Helpers' => $baseDir . '/includes/import/WC_Reepay_Import_Helpers.php',
     'WC_Reepay_Import_Menu' => $baseDir . '/includes/import/WC_Reepay_Import_Menu.php',
     'WC_Reepay_Memberships_Integrations' => $baseDir . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
