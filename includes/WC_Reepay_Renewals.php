@@ -219,7 +219,7 @@ class WC_Reepay_Renewals {
 				'source'   => 'WC_Reepay_Renewals::create_subscription',
 				'error'    => 'Subscription create request',
 				'data'     => $data,
-				'order_id' => empty($order) ? 'false' : $order->get_id()
+				'order_id' => empty( $order ) ? 'false' : $order->get_id()
 			],
 		] );
 
@@ -246,10 +246,9 @@ class WC_Reepay_Renewals {
 			],
 		] );
 
-		if ( ! empty( $child_order ) && $child_order->post_status == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
-			$order_child_obj = wc_get_order( $child_order->ID );
-			$order_child_obj->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
-			$order_child_obj->save();
+		if ( ! empty( $child_order ) && $child_order->get_status() == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
+			$child_order->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
+			$child_order->save();
 		}
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
@@ -288,7 +287,7 @@ class WC_Reepay_Renewals {
 	}
 
 	public static function is_order_contain_subscription( $order ) {
-		foreach ( $order->get_items() as $item_key => $item_values ) {
+		foreach ( $order->get_items() as $item_values ) {
 			$product = $item_values->get_product();
 
 			//Imported subscriptions are empty
@@ -393,18 +392,17 @@ class WC_Reepay_Renewals {
 
 		$main_order->calculate_totals();
 
+		$created_reepay_orders = [];
 		foreach ( $orders as $order ) {
 			if ( ! self::is_order_contain_subscription( $order ) ) {
 				continue;
 			}
-
 
 			if ( floatval( $order->get_total() ) != 0 ) {
 				update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
 				$new_total = 0;
 				$order->set_total( $new_total );
 			}
-
 
 			$order_items = $order->get_items();
 			$order_item  = reset( $order_items );
@@ -414,7 +412,6 @@ class WC_Reepay_Renewals {
 			$handle = $order->get_id() . '_' . $product->get_id();
 
 			$addons = array_merge( self::get_shipping_addons( $order ), self::get_plan_addons( $order_item ) ?: [] );
-
 
 			$new_subscription = null;
 			try {
@@ -516,7 +513,11 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
+
+			$created_reepay_orders[] = $order->get_id();
 		}
+
+		do_action('reepay_subscriptions_orders_created', $created_reepay_orders);
 	}
 
 
@@ -661,6 +662,49 @@ class WC_Reepay_Renewals {
 		return current( $orders );
 	}
 
+	/**
+	 * @param  mixed  $order
+	 */
+	public static function is_order_subscription_active( $order ) {
+		$order = wc_get_order( $order );
+
+		if ( empty( $order ) ) {
+			return false;
+		}
+
+		$transient_name = 'reepay_subscription_status_' . $order->get_id();
+
+		$maybe_is_actibe = get_transient( $transient_name );
+
+		if ( ! empty( $maybe_is_actibe ) ) {
+			return $maybe_is_actibe === '1';
+		}
+
+		$handle = $order->get_meta( '_reepay_subscription_handle' );
+
+		if ( empty( $handle ) ) {
+			return false;
+		}
+
+		try {
+			$subscription = reepay_s()->api()->request( "subscription/$handle" );
+		} catch (Exception $e) {
+			return false;
+		}
+
+		$is_active = $subscription['state'] === 'active';
+
+		set_transient($transient_name, $is_active ? '1' : '0', HOUR_IN_SECONDS);
+
+		return $is_active;
+	}
+
+	/**
+	 * @param WC_Order $parent_order
+	 * @param string $invoice
+	 *
+	 * @return WC_Order|false
+	 */
 	public function get_child_order( $parent_order, $invoice ) {
 		$query = new WP_Query( [
 			'post_parent'    => $parent_order->get_id(),
@@ -675,7 +719,7 @@ class WC_Reepay_Renewals {
 			]
 		] );
 
-		return ! empty( $query->posts ) ? $query->posts[0] : false;
+		return ! empty( $query->posts ) ? wc_get_order( $query->posts[0] ) : false;
 	}
 
 	/**
@@ -934,6 +978,7 @@ class WC_Reepay_Renewals {
 			'_reepay_state_authorized',
 			'_reepay_token_id',
 			'_reepay_token',
+			'_reepay_customer',
 		];
 
 		foreach ( $fields_to_copy as $field_name ) {
