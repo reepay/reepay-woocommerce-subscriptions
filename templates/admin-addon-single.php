@@ -14,9 +14,6 @@ global $post;
 ?>
 <div class="woocommerce_product_addon wc-metabox closed">
     <h3>
-        <!--<button type="button"
-                class="remove_addon button"><?php /*_e( 'Remove', 'reepay-subscriptions-for-woocommerce' ); */ ?></button>-->
-
         <div class="handlediv" title="<?php _e( 'Click to toggle', 'reepay-subscriptions-for-woocommerce' ); ?>"></div>
         <strong><?php _e( 'Add-on', 'reepay-subscriptions-for-woocommerce' ); ?>: <span
                     class="group_name"><?php if ( $addon['name'] ) {
@@ -41,7 +38,7 @@ global $post;
 				<?php if ( ! empty( $addons_list ) ): ?>
                     <select name="addon_choose_exist[<?php echo $loop; ?>]"
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">
-                        <option value=""><?php echo __( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ); ?></option>
+                        <option value=""><?php _e( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ); ?></option>
 						<?php foreach ( $addons_list as $addon_rem ): ?>
                             <option value="<?php echo esc_attr( $addon_rem['handle'] ) ?>" <?php ! empty( $addon['exist'] ) && $addon['choose'] == 'exist' ? selected( $addon_rem['handle'], $addon['exist'] ) : '' ?>><?php echo esc_attr( $addon_rem['name'] ) ?></option>
 						<?php endforeach; ?>
@@ -58,7 +55,7 @@ global $post;
 						_e( 'Create new addon', 'reepay-subscriptions-for-woocommerce' ) ?>
                     </a>
 				<?php else: ?>
-					<?php echo __( 'Add-ons list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
+					<?php _e( 'Add-ons list is empty', 'reepay-subscriptions-for-woocommerce' ); ?>
 				<?php endif; ?>
             </td>
         </tr>

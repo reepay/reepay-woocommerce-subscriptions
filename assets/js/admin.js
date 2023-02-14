@@ -123,7 +123,7 @@ jQuery(function ($) {
                     $select.html(response_data.html);
                 },
                 error: function (request, status, error) {
-                    alert('Request error. Try again')
+                    alert(window.reepay.i18n.request_error)
                 },
                 complete: function () {
                     $container.unblock();
@@ -170,7 +170,7 @@ jQuery(function ($) {
                     $select.html(response_data.html);
                 },
                 error: function (request, status, error) {
-                    alert('Request error. Try again')
+                    alert(window.reepay.i18n.request_error)
                 },
                 complete: function () {
                     $container.unblock();
@@ -625,7 +625,7 @@ jQuery(function ($) {
                 $('.reepay_subscription_settings_exist').html(response_data.html);
             },
             error: function (request, status, error) {
-                alert('Request error. Try again')
+                alert(window.reepay.i18n.request_error)
             },
         })
     });
@@ -677,7 +677,7 @@ jQuery(function ($) {
                     $select.html($(response_data.html).html())
                 },
                 error: function (request, status, error) {
-                    alert('Request error. Try again')
+                    alert(window.reepay.i18n.request_error)
                 },
                 complete: function () {
                     $select.parent().unblock();
@@ -719,7 +719,7 @@ jQuery(function ($) {
                     $select.html(response_data.html)
                 },
                 error: function (request, status, error) {
-                    alert('Request error. Try again')
+                    alert(window.reepay.i18n.request_error)
                 },
                 complete: function () {
                     $container.unblock();

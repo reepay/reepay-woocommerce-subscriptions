@@ -15,9 +15,10 @@ return array(
     'WC_Reepay_Checkout' => $baseDir . '/includes/WC_Reepay_Checkout.php',
     'WC_Reepay_Discounts_And_Coupons' => $baseDir . '/includes/WC_Reepay_Discounts_And_Coupons.php',
     'WC_Reepay_Import' => $baseDir . '/includes/import/WC_Reepay_Import.php',
+    'WC_Reepay_Import_AJAX' => $baseDir . '/includes/import/WC_Reepay_Import_AJAX.php',
     'WC_Reepay_Import_Helpers' => $baseDir . '/includes/import/WC_Reepay_Import_Helpers.php',
     'WC_Reepay_Import_Menu' => $baseDir . '/includes/import/WC_Reepay_Import_Menu.php',
-    'WC_Reepay_Meta_Boxes' => $baseDir . '/includes/WC_Reepay_Meta_Boxes.php',
+    'WC_Reepay_Memberships_Integrations' => $baseDir . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
     'WC_Reepay_Renewals' => $baseDir . '/includes/WC_Reepay_Renewals.php',
     'WC_Reepay_Statistics' => $baseDir . '/includes/WC_Reepay_Statistics.php',
     'WC_Reepay_Subscription_API' => $baseDir . '/includes/WC_Reepay_Subscription_API.php',
@@ -37,4 +38,5 @@ return array(
     'WC_Reepay_Sync_Customers' => $baseDir . '/includes/sync/WC_Reepay_Sync_Customers.php',
     'WC_Reepay_Sync_Subscriptions' => $baseDir . '/includes/sync/WC_Reepay_Sync_Subscriptions.php',
     'WC_Reepay_Woocommerce_Subscription_Extension' => $baseDir . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
+    'WC_Subscription' => $baseDir . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
 );

@@ -18,22 +18,16 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
+
 		add_action( 'woocommerce_order_status_changed', array( $this, 'status_manual_start_date' ), 10, 4 );
+
 		add_filter( 'woocommerce_available_payment_gateways', array( $this, 'get_available_payment_gateways' ) );
-		add_filter( 'woocommerce_get_formatted_order_total', array(
-			$this,
-			'display_real_total'
-		), 10, 4 );
 
-		add_filter( 'reepay_settled_order_status', array(
-			$this,
-			'reepay_subscriptions_order_status'
-		), 11, 2 );
+		add_filter( 'woocommerce_get_formatted_order_total', array( $this, 'display_real_total' ), 10, 4 );
 
-		add_filter( 'show_reepay_metabox', array(
-			$this,
-			'disable_for_sub'
-		), 10, 2 );
+		add_filter( 'reepay_settled_order_status', array( $this, 'reepay_subscriptions_order_status' ), 11, 2 );
+
+		add_filter( 'show_reepay_metabox', array( $this, 'disable_for_sub' ), 10, 2 );
 
 		add_filter( 'order_contains_reepay_subscription', function ( $contains, $order ) {
 			if ( $this->reepay_order_contains_subscription( $order ) ) {
@@ -165,9 +159,14 @@ class WC_Reepay_Renewals {
 						]
 					] );
 
-					$order->add_order_note( 'Unable to change subscription period to ' . $params['next_period_start'] . '. Error from acquire: ' . $e->getMessage() );
+					$notice = sprintf(
+						__( 'Unable to change subscription period to %s. Error from acquire: %s', 'reepay-subscriptions-for-woocommerce' ),
+						$params['next_period_start'],
+						$e->getMessage()
+					);
 
-					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( 'Unable to change subscription period to ' . $params['next_period_start'] . '. Error from acquire: ' . $e->getMessage(), $order->get_id() );
+					$order->add_order_note( $notice );
+					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( $notice , $order->get_id() );
 				}
 
 			}
@@ -246,10 +245,9 @@ class WC_Reepay_Renewals {
 			],
 		] );
 
-		if ( ! empty( $child_order ) && $child_order->post_status == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
-			$order_child_obj = wc_get_order( $child_order->ID );
-			$order_child_obj->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
-			$order_child_obj->save();
+		if ( ! empty( $child_order ) && $child_order->get_status() == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
+			$child_order->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
+			$child_order->save();
 		}
 
 		if ( ! empty( $order->get_meta( '_reepay_subscription_handle' ) ) ) {
@@ -288,7 +286,7 @@ class WC_Reepay_Renewals {
 	}
 
 	public static function is_order_contain_subscription( $order ) {
-		foreach ( $order->get_items() as $item_key => $item_values ) {
+		foreach ( $order->get_items() as $item_values ) {
 			$product = $item_values->get_product();
 
 			//Imported subscriptions are empty
@@ -342,9 +340,13 @@ class WC_Reepay_Renewals {
 					'error'  => 'Empty token',
 					'data'   => $data
 				],
-				'notice' => "Subscription {$main_order->get_id()} has no payment token"
+				'notice' => sprintf(
+					__( 'Subscription %d has no payment token', 'reepay-subscriptions-for-woocommerce' ),
+					(string) $main_order->get_id()
+				)
 			] );
-			$main_order->add_order_note( "Unable to create subscription. Empty token" );
+
+			$main_order->add_order_note( __( "Unable to create subscription. Empty token", 'reepay-subscriptions-for-woocommerce' ) );
 
 			return;
 		}
@@ -393,18 +395,17 @@ class WC_Reepay_Renewals {
 
 		$main_order->calculate_totals();
 
+		$created_reepay_orders = [];
 		foreach ( $orders as $order ) {
 			if ( ! self::is_order_contain_subscription( $order ) ) {
 				continue;
 			}
-
 
 			if ( floatval( $order->get_total() ) != 0 ) {
 				update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
 				$new_total = 0;
 				$order->set_total( $new_total );
 			}
-
 
 			$order_items = $order->get_items();
 			$order_item  = reset( $order_items );
@@ -414,7 +415,6 @@ class WC_Reepay_Renewals {
 			$handle = $order->get_id() . '_' . $product->get_id();
 
 			$addons = array_merge( self::get_shipping_addons( $order ), self::get_plan_addons( $order_item ) ?: [] );
-
 
 			$new_subscription = null;
 			try {
@@ -459,12 +459,16 @@ class WC_Reepay_Renewals {
 
 				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
 			} catch ( Exception $e ) {
-				self::log( [
-					'notice' => $e->getMessage()
-				] );
-				$order->add_order_note( 'Unable to create subscription. Error from acquire: ' . $e->getMessage() );
+				$notice = sprintf(
+					__( 'Unable to create subscription. Error from acquire: %s', 'reepay-subscriptions-for-woocommerce' ),
+					$e->getMessage()
+				);
 
-				WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( 'Unable to create subscription. Error from acquire: ' . $e->getMessage(), $order->get_id() );
+				self::log( [
+					'notice' => $notice
+				] );
+
+				$order->add_order_note( $notice );
 			}
 
 
@@ -473,10 +477,13 @@ class WC_Reepay_Renewals {
 					'log'    => [
 						'source' => 'WC_Reepay_Renewals::create_subscription',
 						'error'  => 'create-subscription',
-						'data'   => $sub_data,
+						'data'   => $sub_data ?? 'empty',
 						'plan'   => $product->get_meta( '_reepay_subscription_handle' )
 					],
-					'notice' => "Subscription {$data['order_id']} - unable to create subscription"
+					'notice' => sprintf(
+						__( "Subscription %s - unable to create subscription", 'reepay-subscriptions-for-woocommerce' ),
+						$data['order_id']
+					)
 				] );
 
 				continue;
@@ -504,7 +511,10 @@ class WC_Reepay_Renewals {
 						'error'  => 'set-payment-method',
 						'data'   => $data
 					],
-					'notice' => "Subscription {$data['order_id']} - unable to assign payment method to subscription"
+					'notice' => sprintf(
+						__( "Subscription %s - unable to assign payment method to subscription", 'reepay-subscriptions-for-woocommerce' ),
+						$data['order_id']
+					)
 				] );
 
 				continue;
@@ -516,7 +526,11 @@ class WC_Reepay_Renewals {
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
 			$order->save();
+
+			$created_reepay_orders[] = $order->get_id();
 		}
+
+		do_action('reepay_subscriptions_orders_created', $created_reepay_orders);
 	}
 
 
@@ -592,6 +606,8 @@ class WC_Reepay_Renewals {
 	/**
 	 * Get payment token.
 	 *
+	 * @todo refactor with while cycle
+	 *
 	 * @param WC_Order $order
 	 *
 	 * @return WC_Payment_Token_Reepay|false
@@ -662,6 +678,49 @@ class WC_Reepay_Renewals {
 		return current( $orders );
 	}
 
+	/**
+	 * @param  mixed  $order
+	 */
+	public static function is_order_subscription_active( $order ) {
+		$order = wc_get_order( $order );
+
+		if ( empty( $order ) ) {
+			return false;
+		}
+
+		$transient_name = 'reepay_subscription_status_' . $order->get_id();
+
+		$maybe_is_actibe = get_transient( $transient_name );
+
+		if ( ! empty( $maybe_is_actibe ) ) {
+			return $maybe_is_actibe === '1';
+		}
+
+		$handle = $order->get_meta( '_reepay_subscription_handle' );
+
+		if ( empty( $handle ) ) {
+			return false;
+		}
+
+		try {
+			$subscription = reepay_s()->api()->request( "subscription/$handle" );
+		} catch (Exception $e) {
+			return false;
+		}
+
+		$is_active = $subscription['state'] === 'active';
+
+		set_transient($transient_name, $is_active ? '1' : '0', HOUR_IN_SECONDS);
+
+		return $is_active;
+	}
+
+	/**
+	 * @param WC_Order $parent_order
+	 * @param string $invoice
+	 *
+	 * @return WC_Order|false
+	 */
 	public function get_child_order( $parent_order, $invoice ) {
 		$query = new WP_Query( [
 			'post_parent'    => $parent_order->get_id(),
@@ -676,7 +735,7 @@ class WC_Reepay_Renewals {
 			]
 		] );
 
-		return ! empty( $query->posts ) ? $query->posts[0] : false;
+		return ! empty( $query->posts ) ? wc_get_order( $query->posts[0] ) : false;
 	}
 
 	/**
@@ -695,13 +754,13 @@ class WC_Reepay_Renewals {
 		] );
 
 		if ( empty( $data['subscription'] ) ) {
-			return new WP_Error( 'Undefined subscription handle' );
+			return new WP_Error(  __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $parent_order ) ) {
-			return new WP_Error( 'Undefined parent order' );
+			return new WP_Error(  __( 'Undefined parent order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$query = new WP_Query( [
@@ -726,7 +785,7 @@ class WC_Reepay_Renewals {
 				]
 			] );
 
-			return new WP_Error( 'Duplicate order' );
+			return new WP_Error(  __( 'Duplicate order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		self::log( [
@@ -851,7 +910,7 @@ class WC_Reepay_Renewals {
 		] );
 
 		if ( empty( $data['subscription'] ) ) {
-			return new WP_Error( 'Undefined subscription handle' );
+			return new WP_Error(  __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$order = self::get_order_by_subscription_handle( $data['subscription'] );
@@ -864,15 +923,17 @@ class WC_Reepay_Renewals {
 		] );
 
 		if ( empty( $order ) ) {
-			return new WP_Error( 'Undefined parent order' );
+			return new WP_Error( __( 'Undefined parent order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		if ( $order->get_status() === $status ) {
-			return new WP_Error( 'Duplication of order status' );
+			return new WP_Error( __( 'Duplication of order status', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$order->set_status( $status );
 		$order->save();
+
+		self::save_reepay_subscription_dates( $order );
 
 		return true;
 	}
@@ -1009,30 +1070,117 @@ class WC_Reepay_Renewals {
 		$order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $order ) ) {
-			return new WP_Error('Order not found');
+			return new WP_Error( __( 'Order not found', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$new_role = $order->get_meta( '_reepay_subscription_customer_role' );
 
 		if ( empty( $new_role ) || 'without_changes' === $new_role ) {
-			return new WP_Error('Role change not required');
+			return new WP_Error( __( 'Role change not required', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$customer_id = $order->get_customer_id();
 
 		if ( empty( $customer_id ) ) {
-			return new WP_Error('No customer in order');
+			return new WP_Error( __( 'No customer in order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$user = get_userdata( $customer_id );
 
 		if ( empty( $user ) ) {
-			return new WP_Error('Wrong customer id');
+			return new WP_Error( __( 'Wrong customer id', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$user->set_role( $new_role );
 
 		return true;
+	}
+
+	/**
+	 * @param  mixed  $order
+	 * @param  array[]|null $data - @see https://reference.reepay.com/api/#the-subscription-object
+	 *
+	 * @return array|WP_Error - array of saved data or error
+	 */
+	public static function save_reepay_subscription_dates( $order, $data = null ) {
+		$order = wc_get_order( $order );
+
+		if ( empty( $order ) ) {
+			return new WP_Error( __( 'Undefined order', 'reepay-subscriptions-for-woocommerce' ) );
+		}
+
+		if ( is_null( $data ) ) {
+			$handle = $order->get_meta( '_reepay_subscription_handle' );
+
+			if ( empty( $handle ) ) {
+				return new WP_Error( __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
+			}
+
+			try {
+				$data = reepay_s()->api()->request( "subscription/$handle" );
+			} catch ( Exception $e ) {
+				return new WP_Error( $e->getMessage() );
+			}
+		}
+
+		$time_data = [
+			'expires'              => strtotime( $data['expires'] ?? false ),
+			'reactivated'          => strtotime( $data['reactivated'] ?? false ),
+			'created'              => strtotime( $data['created'] ?? false ),
+			'activated'            => strtotime( $data['activated'] ?? false ),
+			'start_date'           => strtotime( $data['start_date'] ?? false ),
+			'end_date'             => strtotime( $data['end_date'] ?? false ),
+			'current_period_start' => strtotime( $data['current_period_start'] ?? false ),
+			'next_period_start'    => strtotime( $data['next_period_start'] ?? false ),
+			'first_period_start'   => strtotime( $data['first_period_start'] ?? false ),
+			'last_period_start'    => strtotime( $data['last_period_start'] ?? false ),
+			'trial_start'          => strtotime( $data['trial_start'] ?? false ),
+			'trial_end'            => strtotime( $data['trial_end'] ?? false ),
+			'cancelled_date'       => strtotime( $data['cancelled_date'] ?? false ),
+			'expired_date'         => strtotime( $data['expired_date'] ?? false ),
+			'on_hold_date'         => strtotime( $data['on_hold_date'] ?? false ),
+			'reminder_email_sent'  => strtotime( $data['reminder_email_sent'] ?? false ),
+		];
+
+		$order->update_meta_data( '_reepay_subscription_dates', $time_data );
+		$order->save();
+
+		return $time_data;
+	}
+
+	/**
+	 * @param  mixed   $order
+	 * @param  string  $date_key
+	 * @param  string  $date_format
+	 *
+	 * @return string
+	 */
+	public static function get_reepay_subscription_dates( $order, $date_key, $date_format = 'wordpress' ) {
+		$order = wc_get_order( $order );
+
+		if ( empty( $order ) ) {
+			return '';
+		}
+
+		$dates = $order->get_meta( '_reepay_subscription_dates' );
+
+		if ( empty( $dates ) ) {
+			$dates = self::save_reepay_subscription_dates( $order );
+
+			if ( is_wp_error( $dates ) ) {
+				return '';
+			}
+		}
+
+		if ( empty( $dates[ $date_key ] ) ) {
+			return '';
+		}
+
+		if ( 'wordpress' === $date_format ) {
+			return wp_date( get_option( 'date_format' ), $dates[ $date_key ] );
+		}
+
+		return $dates[ $date_key ];
 	}
 
 	/**

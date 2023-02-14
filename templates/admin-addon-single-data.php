@@ -53,13 +53,13 @@ global $post;
 
 <p class="form-field">
     <label for="addon_type_<?php echo esc_html( $loop ); ?>">
-		<?php echo __( 'Add-on availability', 'reepay-subscriptions-for-woocommerce' ); ?>
+		<?php _e( 'Add-on availability', 'reepay-subscriptions-for-woocommerce' ); ?>
     </label>
     <span>
         <?php if ( $addon['avai'] == 'current' ): ?>
-	        <?php echo __( 'Current plan', 'reepay-subscriptions-for-woocommerce' ); ?>
+	        <?php _e( 'Current plan', 'reepay-subscriptions-for-woocommerce' ); ?>
         <?php else: ?>
-	        <?php echo __( 'All plans', 'reepay-subscriptions-for-woocommerce' ); ?>
+	        <?php _e( 'All plans', 'reepay-subscriptions-for-woocommerce' ); ?>
         <?php endif; ?>
     </span>
 </p>

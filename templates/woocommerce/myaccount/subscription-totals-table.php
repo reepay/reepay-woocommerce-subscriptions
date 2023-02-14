@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php if ( $allow_item_removal ) : ?>
 			<th class="product-remove" style="width: 3em;">&nbsp;</th>
 			<?php endif; ?>
-			<th class="product-name"><?php echo esc_html_x( 'Product', 'table headings in notification email', 'woocommerce-subscriptions' ); ?></th>
-			<th class="product-total"><?php echo esc_html_x( 'Total', 'table heading', 'woocommerce-subscriptions' ); ?></th>
+			<th class="product-name"><?php echo esc_html_x( 'Product', 'table headings in notification email', 'reepay-subscriptions-for-woocommerce' ); ?></th>
+			<th class="product-total"><?php echo esc_html_x( 'Total', 'table heading', 'reepay-subscriptions-for-woocommerce' ); ?></th>
 		</tr>
 	</thead>
 	<tbody>
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php if ( $allow_item_removal ) : ?>
 						<td class="remove_item">
 							<?php if ( wcs_can_item_be_removed( $item, $subscription ) ) : ?>
-								<?php $confirm_notice = apply_filters( 'woocommerce_subscriptions_order_item_remove_confirmation_text', __( 'Are you sure you want remove this item from your subscription?', 'woocommerce-subscriptions' ), $item, $_product, $subscription );?>
+								<?php $confirm_notice = apply_filters( 'woocommerce_subscriptions_order_item_remove_confirmation_text', __( 'Are you sure you want remove this item from your subscription?', 'reepay-subscriptions-for-woocommerce' ), $item, $_product, $subscription );?>
 								<a href="<?php echo esc_url( WCS_Remove_Item::get_remove_url( $subscription->get_id(), $item_id ) );?>" class="remove" onclick="return confirm('<?php printf( esc_html( $confirm_notice ) ); ?>');">&times;</a>
 							<?php endif; ?>
 						</td>

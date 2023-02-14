@@ -4,18 +4,18 @@
 
 <!-- Amount -->
 <p class="form-field">
-    <label for="_reepay_discount_amount"><?php echo __( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_amount"><?php _e( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?></label>
     <span><?php echo esc_attr( $meta['_reepay_discount_amount'][0] ?? '0' ) ?></span>
 </p>
 <!-- End Amount -->
 
 <!--Discount type-->
 <p class="form-field">
-    <label for="_reepay_discount_type"><?php echo __( 'Discount Type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_type"><?php _e( 'Discount Type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 	<?php if ( $meta['_reepay_discount_type'][0] == 'reepay_fixed_product' ): ?>
-        <span><?php echo __( 'Fixed amount', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'Fixed amount', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php else: ?>
-        <span><?php echo __( 'Percentage', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'Percentage', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php endif; ?>
 </p>
 
@@ -23,11 +23,11 @@
 
 <!--Apply to-->
 <p class="form-field">
-    <label for="_reepay_discount_apply_to"><?php echo __( 'Apply to', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_apply_to"><?php _e( 'Apply to', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 	<?php if ( $meta['_reepay_discount_apply_to'][0] == 'all' ): ?>
-        <span><?php echo __( 'All', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'All', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php else: ?>
-        <span><?php echo __( 'Custom', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'Custom', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php endif; ?>
 </p>
 <p class="form-field active_if_apply_to_custom" style="margin-left: 20px">
@@ -48,24 +48,24 @@
 
 <!--Duration-->
 <p class="form-field">
-    <label for="_reepay_discount_duration"><?php echo __( 'Duration', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_duration"><?php _e( 'Duration', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 	<?php if ( $meta['_reepay_discount_duration'][0] == 'forever' ): ?>
-        <span><?php echo __( 'Forever', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'Forever', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php else: ?>
-        <span><?php echo __( 'Fixed number', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'Fixed number', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php endif; ?>
 </p>
 
 <?php if ( $meta['_reepay_discount_duration'][0] == 'fixed_number' ): ?>
     <p class="form-field">
-        <label for="_reepay_discount_fixed_count"><?php echo __( 'Times', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <label for="_reepay_discount_fixed_count"><?php _e( 'Times', 'reepay-subscriptions-for-woocommerce' ); ?></label>
         <span><?php echo esc_attr( $meta['_reepay_discount_fixed_count'][0] ?? '1' ) ?></span>
     </p>
 <?php endif; ?>
 
 <?php if ( $meta['_reepay_discount_duration'][0] == 'limited_time' || $meta['_reepay_discount_duration'][0] == 'limited_duration' ): ?>
     <p class="form-field">
-        <label for="_reepay_discount_fixed_count"><?php echo __( 'Limited Time', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <label for="_reepay_discount_fixed_count"><?php _e( 'Limited Time', 'reepay-subscriptions-for-woocommerce' ); ?></label>
         <span><?php echo esc_attr( $meta['_reepay_discount_fixed_period'][0] ?? '1' ) ?></span>
         <span><?php echo esc_attr( $meta['_reepay_discount_fixed_period_unit'][0] ?? '1' ) ?></span>
     </p>

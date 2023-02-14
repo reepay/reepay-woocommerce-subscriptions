@@ -126,21 +126,21 @@ class WC_Reepay_Subscription_Admin_Notice {
 					if ( $sub['in_trial'] ) {
 						$ret = array(
 							'state'   => 'paid',
-							'message' => 'Subscription is activated in trial'
+							'message' => __( 'Subscription is activated in trial', 'reepay-subscriptions-for-woocommerce' )
 						);
 					}
 
 					if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) && strtotime( $sub['next_period_start'] ) > strtotime( 'now' ) ) {
 						$ret = array(
 							'state'   => 'paid',
-							'message' => 'Subscription is activated in trial'
+							'message' => __( 'Subscription is activated in trial', 'reepay-subscriptions-for-woocommerce' )
 						);
 					}
 
 					if ( ! empty( $sub ) && $sub['state'] == 'active' ) {
 						$ret = array(
 							'state'   => 'paid',
-							'message' => 'Order has been paid'
+							'message' => __( 'Order has been paid', 'reepay-subscriptions-for-woocommerce' )
 						);
 					}
 
