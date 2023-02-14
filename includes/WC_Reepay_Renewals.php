@@ -59,13 +59,14 @@ class WC_Reepay_Renewals {
 
 	function reepay_cart_subscription_count() {
 		$count = 0;
+
 		if ( ! empty( WC()->cart->cart_contents ) ) {
 			foreach ( WC()->cart->cart_contents as $cart_item ) {
 				/**
 				 * @var WC_Product $product
 				 */
 				$product = $cart_item['data'];
-				if ( $product->is_type( 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ) ) {
+				if ( WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 					$count += $cart_item['quantity'];
 				}
 			}
