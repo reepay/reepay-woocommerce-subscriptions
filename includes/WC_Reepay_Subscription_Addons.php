@@ -223,7 +223,7 @@ class WC_Reepay_Subscription_Addons {
 		if ( WC_Reepay_Checkout::is_reepay_product() ) {
 			?>
             <li class="addons_tab product_addons">
-            <a href="#product_addons_data"><span><?php reepay_s()->_e( 'Add-ons' ); ?></span></a>
+            <a href="#product_addons_data"><span><?php _e( 'Add-ons', 'reepay-subscriptions-for-woocommerce' ); ?></span></a>
             </li><?php
 		}
 	}
