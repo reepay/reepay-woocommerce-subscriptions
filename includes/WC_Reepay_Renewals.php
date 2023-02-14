@@ -1014,16 +1014,16 @@ class WC_Reepay_Renewals {
 				$product_item->set_subtotal( $item->get_subtotal() );
 				$product_item->set_total( $item->get_total() );
 
-				$meta_item = $item->get_formatted_meta_data();
-				if ( ! empty( $meta_item ) ) {
-					foreach ( $meta_item as $value ) {
-						$product_item->add_meta_data( $value->key, $value->value );
+				$new_role_for_customer = get_post_meta( $item->get_product_id(), '_reepay_subscription_customer_role', true );
 
-						if( '_reepay_subscription_customer_role' === $value->key ) {
-							$new_order->add_meta_data( '_reepay_subscription_customer_role', $value->value );
-						}
-					}
+				if ( ! empty( $new_role_for_customer ) ) {
+					$main_order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
 				}
+
+				foreach ( $item->get_formatted_meta_data() as $value ) {
+					$product_item->add_meta_data( $value->key, $value->value );
+				}
+
 				self::log( [
 					'log' => [
 						'source' => 'WC_Reepay_Renewals::create_subscription_item_data',
@@ -1055,6 +1055,8 @@ class WC_Reepay_Renewals {
 
 			$new_order->calculate_totals();
 		}
+
+		$main_order->save();
 
 		$new_order->save();
 		$new_order->calculate_totals();
