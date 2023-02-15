@@ -4,27 +4,19 @@ class WC_Reepay_Import {
 	/**
 	 * @var string
 	 */
-	public $option_name = 'reepay_import';
+	public static $option_name = 'reepay_import';
 
 	/**
 	 * @var string
 	 */
 	public $menu_slug = 'reepay_import';
 
-	/**
-	 * @var string[]
-	 */
-	public $import_objects = [ 'customers', 'cards', 'subscriptions' ];
+	public static $session_key_last_imported = 'reepay_subscriptions_import_last_imported';
 
 	/**
-	 * @var string[]
+	 * @var array
 	 */
-	public $notices = [];
-
-	/**
-	 * @var string
-	 */
-	public $session_notices_key = 'reepay_import_notices';
+	public static $import_objects = [];
 
 	/**
 	 * Constructor
@@ -32,212 +24,317 @@ class WC_Reepay_Import {
 	public function __construct() {
 		session_start();
 
-		new WC_Reepay_Import_Menu( $this->option_name, $this->menu_slug, $this->import_objects );
-
-		/*
-		 * Start import with saving import settings
-		 * Use pre_update for the case when the options have not changed
-		 * Also use filter as action, but don't forget to return the value
-		 */
-		add_filter( 'pre_update_option', [ $this, 'process_import' ], 10, 2 );
-
-		add_action( 'admin_notices', [ $this, 'add_notices' ] );
+		add_action( 'reepay_subscriptions_init', [ $this, 'init'] );
 	}
 
-	public function process_import( $args, $option ) {
-		if ( $option == $this->option_name ) {
-			foreach ( $this->import_objects as $object ) {
-				if ( ! empty( $args[ $object ] ) && 'yes' == $args[ $object ] ) {
-					$res = call_user_func( [ $this, "process_import_$object" ] );
+	public function init() {
+		self::$import_objects = [
+			'customers'     => [
+				'label'   => __( 'customers', 'reepay-subscriptions-for-woocommerce' ),
+				'options' => [
+					'all'                      => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
+					'with_active_subscription' => __( 'Only customers with active subscriptions', 'reepay-subscriptions-for-woocommerce' ),
+				],
+			],
+			'cards'         => [
+				'label'   => __( 'cards', 'reepay-subscriptions-for-woocommerce' ),
+				'options' => [
+					'all'    => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
+					'active' => __( 'Only active cards', 'reepay-subscriptions-for-woocommerce' ),
+				],
+			],
+			'subscriptions' => [
+				'label'   => __( 'subscriptions', 'reepay-subscriptions-for-woocommerce' ),
+				'options' => [
+					'all'       => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
+					'active'    => __( 'Active', 'reepay-subscriptions-for-woocommerce' ),
+					'on_hold'   => __( 'On hold', 'reepay-subscriptions-for-woocommerce' ),
+					'pending'   => __( 'Pending', 'reepay-subscriptions-for-woocommerce' ),
+					'dunning'   => __( 'Dunning', 'reepay-subscriptions-for-woocommerce' ),
+					'cancelled' => __( 'Cancelled', 'reepay-subscriptions-for-woocommerce' ),
+					'expired'   => __( 'Expired', 'reepay-subscriptions-for-woocommerce' ),
+				],
+			],
+		];
 
-					if ( is_wp_error( $res ) ) {
-						$this->log(
-							"WC_Reepay_Import::process_import::process_import_$object",
-							$res,
-							"Error with $object import: " . $res->get_error_message()
-						);
-					}
-				}
-			}
-
-			$_SESSION[ $this->session_notices_key ] = $this->notices;
-		}
-
-		return $args;
+		new WC_Reepay_Import_Menu();
+		new WC_Reepay_Import_AJAX();
 	}
 
 	/**
-	 * @param  string  $token
+	 * @param  array  $options
 	 *
-	 * @return bool|WP_Error
+	 * @return array|WP_Error
 	 */
-	public function process_import_customers( $token = '' ) {
+	public static function get_reepay_customers( $options = array() ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
 		];
 
-		if ( ! empty( $token ) ) {
-			$params['next_page_token'] = $token;
-		}
+		$only_with_active_subscription = in_array( 'with_active_subscription', $options );
 
-		try {
-			/**
-			 * @see https://reference.reepay.com/api/#get-list-of-customers
-			 **/
-			$customers_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
-		} catch ( Exception $e ) {
-			return new WP_Error( 400, $e->getMessage() );
-		}
+		$customers_to_import = [];
 
+		$customers_data['next_page_token'] = true;
+		while ( ! empty( $customers_data['next_page_token'] ) ) {
+			try {
+				/**
+				 * @see https://reference.reepay.com/api/#get-list-of-customers
+				 **/
+				$customers_data = reepay_s()->api()->request( "list/customer?" . http_build_query( $params ) );
+			} catch ( Exception $e ) {
+				return new WP_Error( 400, $e->getMessage() );
+			}
 
-		if ( ! empty( $customers_data ) && ! empty( $customers_data['content'] ) ) {
-			$customers = $customers_data['content'];
+			if ( empty( $customers_data ) || empty( $customers_data['content'] ) ) {
+				break;
+			}
 
-			foreach ( $customers as $customer ) {
+			foreach ( $customers_data['content'] as $customer ) {
+				if ( $only_with_active_subscription && 0 === $customer['active_subscriptions'] ) {
+					continue;
+				}
+
 				$wp_user_id = rp_get_userid_by_handle( $customer['handle'] );
 
 				if ( false === get_user_by( 'id', $wp_user_id ) ) {
-					$wp_user_id = WC_Reepay_Import_Helpers::create_woo_customer( $customer );
-
-					if ( is_wp_error( $wp_user_id ) ) {
-						/** @var WP_Error $wp_user_id */
-
-						$name = $customer['email'] ?? $customer['handle'];
-
-						$this->log(
-							"WC_Reepay_Import::process_import_customers",
-							$wp_user_id,
-							"Error with creating wp user - {$name}. " . $wp_user_id->get_error_message()
-						);
-					}
+					$customers_to_import[ $customer['handle'] ] = $customer;
 				}
 			}
 
-			if ( ! empty( $customers_data['next_page_token'] ) ) {
-				return $this->process_import_customers();
-			}
+			$params['next_page_token'] = $customers_data['next_page_token'] ?? '';
 		}
 
-		return true;
+		return $customers_to_import;
 	}
 
-	public function process_import_cards() {
-		$users = get_users( [ 'fields' => [ 'ID' ] ] );
+	/**
+	 * @param  array  $customers                  array of reepay customers @see https://reference.reepay.com/api/#the-customer-object
+	 * @param  array  $selected_customer_handles  handles of customers to import from $customers array
+	 *
+	 * @return array|array[]
+	 */
+	public static function import_customers( $customers, $selected_customer_handles ) {
+		$result = [];
+
+		foreach ( $selected_customer_handles as $customer_handle ) {
+			if ( empty( $customers[ $customer_handle ] ) ) {
+				continue;
+			}
+
+			$create_result = WC_Reepay_Import_Helpers::create_woo_customer( $customers[ $customer_handle ] );
+
+			$result[ $customer_handle ] = is_int( $create_result ) ? true : $create_result->get_error_message();
+
+			self::set_last_imported('customers', $customer_handle, $result[ $customer_handle ] );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param  array  $options
+	 *
+	 * @return array
+	 */
+	public static function get_reepay_cards( $options = array() ) {
+		$users = get_users( [ 'fields' => [ 'ID', 'user_email' ] ] );
+
+		$only_active_cards = in_array( 'active', $options );
+
+		$cards_to_import = [];
 
 		foreach ( $users as $user ) {
-			/** @var WP_User $user */
 			$reepay_user_id = rp_get_customer_handle( $user->ID );
 
 			try {
 				/**
-				 * @see ? https://reference.reepay.com/api/#get-customer
+				 * @see https://reference.reepay.com/api/#get-list-of-payment-methods
 				 **/
 				$res = reepay_s()->api()->request(
 					'customer/' . $reepay_user_id . '/payment_method'
 				);
+			} catch ( Exception $e ) {
+				continue;
+			}
 
-				if ( is_wp_error( $res ) || empty( $res['cards'] ) ) {
+			if ( is_wp_error( $res ) || empty( $res['cards'] ) ) {
+				continue;
+			}
+
+			$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user->ID );
+
+			foreach ( $res['cards'] as $card ) {
+				if ( in_array( $card['id'], $customer_tokens )
+				     || ( $only_active_cards && 'active' !== $card['state'] )
+				) {
 					continue;
 				}
 
-				$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user->ID );
+				$card['customer_email'] = $user->user_email;
 
-				foreach ( $res['cards'] as $card ) {
-					if ( in_array( $card['id'], $customer_tokens ) ) {
-						continue;
-					}
-
-					$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $user->ID, $card );
-
-					if ( is_wp_error( $card_added ) ) {
-						$this->log(
-							"WC_Reepay_Import::process_import_cards",
-							$card_added,
-							"Error with import customer's card - " . $user->user_email
-						);
-					}
-				}
-
-			} catch ( Exception $e ) {
-
+				$cards_to_import[ $card['id'] ] = $card;
 			}
+
+			return $cards_to_import;
 		}
 
-		return true;
+		return $cards_to_import;
 	}
 
 	/**
-	 * @param  string  $token
+	 * @param  array  $cards              array of cards @see https://reference.reepay.com/api/#get-list-of-payment-methods
+	 * @param  array  $selected_card_ids  ids of cards to import from $cards array
 	 *
-	 * @return bool|WP_Error
-	 * @throws WC_Data_Exception
+	 * @return array
 	 */
-	public function process_import_subscriptions( $token = '' ) {
+	public static function import_cards( $cards, $selected_card_ids ) {
+		$result = [];
+
+		foreach ( $selected_card_ids as $card_id ) {
+			if ( empty( $cards[ $card_id ] ) ) {
+				continue;
+			}
+
+			$wp_user_id = rp_get_userid_by_handle( $cards[ $card_id ]['customer'] );
+
+			if ( empty( $wp_user_id ) ) {
+				$result[ $card_id ] = __( 'User not found', 'reepay-subscriptions-for-woocommerce' );
+				continue;
+			}
+
+			$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $wp_user_id, $cards[ $card_id ] );
+
+			$result[ $card_id ] = true === $card_added ? true : $card_added->get_error_message();
+
+			self::set_last_imported('cards', $card_id, $result[ $card_id ] );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * @param  array  $statuses
+	 *
+	 * @return array|WP_Error
+	 */
+	public static function get_reepay_subscriptions( $statuses = array() ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
 		];
 
-		if ( ! empty( $token ) ) {
-			$params['next_page_token'] = $token;
-		}
+		$import_all_statuses = in_array( 'all', $statuses );
+		$import_dunning      = in_array( 'dunning', $statuses );
+		$import_cancelled    = in_array( 'cancelled', $statuses );
 
-		try {
-			/**
-			 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
-			 **/
-			$subscriptions_data = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
-		} catch ( Exception $e ) {
-			return new WP_Error( 400, $e->getMessage() );
-		}
+		$subscriptions_to_import = [];
 
-		if ( ! empty( $subscriptions_data ) && ! empty( $subscriptions_data['content'] ) ) {
-			$subscriptions = $subscriptions_data['content'];
+		$subscriptions_data['next_page_token'] = true;
+		while ( ! empty( $subscriptions_data['next_page_token'] ) ) {
+			try {
+				/**
+				 * @see https://reference.reepay.com/api/#get-list-of-subscriptions
+				 **/
+				$subscriptions_data = reepay_s()->api()->request( "list/subscription?" . http_build_query( $params ) );
+			} catch ( Exception $e ) {
+				return new WP_Error( 400, $e->getMessage() );
+			}
 
-			foreach ( $subscriptions as $subscription ) {
-				if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] ) ) {
-					$imported = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscription );
+			if ( empty( $subscriptions_data ) || empty( $subscriptions_data['content'] ) ) {
+				break;
+			}
 
-					if ( is_wp_error( $imported ) ) {
-						$this->log(
-							"WC_Reepay_Import::process_import_subscriptions",
-							$imported,
-							"Error with import subscription - " . $subscription['handle']
-						);
+			foreach ( $subscriptions_data['content'] as $subscription ) {
+				if ( ! WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] )
+				     && ( $import_all_statuses
+				          || in_array( $subscription['state'], $statuses )
+				          || $import_dunning && $subscription['dunning_invoices'] !== 0
+				          || $import_cancelled && $subscription['is_cancelled'] )
+
+				) {
+					$wp_user_id   = rp_get_userid_by_handle( $subscription['customer'] );
+					$wp_user_data = get_userdata( $wp_user_id );
+
+					if ( $wp_user_data ) {
+						$subscription['customer_email'] = $wp_user_data->user_email ?: __( 'Email not set', 'reepay-subscriptions-for-woocommerce' );
 					}
+
+					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
 				}
 			}
 
-			if ( ! empty( $subscriptions_data['next_page_token'] ) ) {
-				return $this->process_import_subscriptions( $subscriptions_data['next_page_token'] );
+			$params['next_page_token'] = $subscriptions_data['next_page_token'] ?? '';
+		}
+
+		return $subscriptions_to_import;
+	}
+
+	/**
+	 * @param  array  $subscriptions                  array of reepay subscriptions @see https://reference.reepay.com/api/#the-subscription-object
+	 * @param  array  $selected_subscription_handles  handles of subscriptions to import from $subscriptions array
+	 *
+	 * @return array
+	 */
+	public static function import_subscriptions( $subscriptions, $selected_subscription_handles ) {
+		$result = [];
+
+		foreach ( $selected_subscription_handles as $subscription_handle ) {
+			if ( empty( $subscriptions[ $subscription_handle ] )
+			     || WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription_handle )
+			) {
+				continue;
 			}
+
+			try {
+				$create_result = WC_Reepay_Import_Helpers::import_reepay_subscription( $subscriptions[ $subscription_handle ] );
+			} catch ( Exception $e ) {
+				$create_result = new WP_Error( __( 'Import error', 'reepay-subscriptions-for-woocommerce' ) );
+			}
+
+			$result[ $subscription_handle ] = true === $create_result ? true : $create_result->get_error_message();
+
+			self::set_last_imported('subscriptions', $subscription_handle, $result[ $subscription_handle ] );
+		}
+
+		return $result;
+	}
+
+	public static function set_last_imported( $object, $handle, $message ) {
+		if ( ! in_array( $object, array_keys( self::$import_objects ) ) ) {
+			return false;
+		}
+
+		if ( ! is_array( $_SESSION[ self::$session_key_last_imported ] ) ) {
+			$_SESSION[ self::$session_key_last_imported ] = [];
+		}
+
+		try {
+			$_SESSION[ self::$session_key_last_imported ][] =
+				[
+					'object'  => $object,
+					'handle'  => $handle,
+					'message' => $message,
+				];
+		} catch (Exception $e) {
+			return false;
 		}
 
 		return true;
 	}
 
-	/**
-	 * @param  string  $source
-	 * @param  WP_Error  $error
-	 * @param  string  $notice
-	 */
-	function log( $source, $error, $notice = null ) {
-		reepay_s()->log()->log( [
-			'source'  => $source,
-			'message' => $error->get_error_messages()
-		] );
+	public static function get_last_imported( $clean = true ) {
+		$data = $_SESSION[ self::$session_key_last_imported ] ?? false;
 
-		if ( ! empty( $notice ) ) {
-			$this->notices[] = $notice;
+		if ( $clean ) {
+			self::clean_last_imported();
 		}
+
+		return $data;
 	}
 
-	function add_notices() {
-		foreach ( $_SESSION[ $this->session_notices_key ] ?? [] as $message ) {
-			printf( '<div class="notice notice-error"><p>%1$s</p></div>', esc_html( $message ) );
-		}
-
-		$_SESSION[ $this->session_notices_key ] = [];
+	public static function clean_last_imported() {
+		unset( $_SESSION[ self::$session_key_last_imported ] );
 	}
 }

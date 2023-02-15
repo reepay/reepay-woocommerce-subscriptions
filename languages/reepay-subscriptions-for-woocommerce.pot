@@ -1,0 +1,1559 @@
+#, fuzzy
+msgid ""
+msgstr ""
+"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Project-Id-Version: Reepay Subscriptions for WooCommerce\n"
+"POT-Creation-Date: 2023-02-15 13:51+0300\n"
+"PO-Revision-Date: 2023-02-15 13:50+0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.0.7\n"
+"X-Poedit-Basepath: ..\n"
+"X-Poedit-Flags-xgettext: --add-comments=translators:\n"
+"X-Poedit-WPHeader: reepay-subscriptions-for-woocommerce.php\n"
+"X-Poedit-SourceCharset: UTF-8\n"
+"X-Poedit-KeywordsList: __;_e;_n:1,2;_x:1,2c;_ex:1,2c;_nx:4c,1,2;esc_attr__;"
+"esc_attr_e;esc_attr_x:1,2c;esc_html__;esc_html_e;esc_html_x:1,2c;_n_noop:1,2;"
+"_nx_noop:3c,1,2;__ngettext_noop:1,2\n"
+"X-Poedit-SearchPath-0: .\n"
+"X-Poedit-SearchPathExcluded-0: *.js\n"
+
+#: includes/WC_Reepay_Account_Page.php:62
+msgid "Payment method successfully added."
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:132
+#: includes/WC_Reepay_Account_Page.php:165
+#: includes/WC_Reepay_Account_Page.php:189
+msgid "Permission denied"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:227
+msgid "Subscriptions"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:307
+#: includes/WC_Reepay_Account_Page.php:318
+#: includes/import/WC_Reepay_Import.php:54
+msgid "Cancelled"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:310
+#: includes/import/WC_Reepay_Import.php:55
+msgid "Expired"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:314
+#: includes/import/WC_Reepay_Import.php:51
+msgid "On hold"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:326
+msgid "Trial"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:330
+#: includes/import/WC_Reepay_Import.php:50
+msgid "Active"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:359
+#: includes/WC_Reepay_Admin_Frontend.php:141
+msgid "Order type"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:371
+msgid "Reepay subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:376
+#: includes/WC_Reepay_Admin_Frontend.php:98
+#: includes/WC_Reepay_Admin_Frontend.php:140
+#: templates/woocommerce/myaccount/my-subscriptions.php:22
+msgid "Subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:378
+#: includes/WC_Reepay_Account_Page.php:381
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:169
+msgid "Order"
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:406
+msgid "Invalid Subscription."
+msgstr ""
+
+#: includes/WC_Reepay_Account_Page.php:408
+msgid "My Account"
+msgstr ""
+
+#: includes/WC_Reepay_Admin_Frontend.php:88
+msgid "Sub Order of"
+msgstr ""
+
+#: includes/WC_Reepay_Admin_Frontend.php:100
+msgid "Renewal"
+msgstr ""
+
+#: includes/WC_Reepay_Admin_Frontend.php:102
+msgid "Regular"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:55
+#: templates/plan-subscription-fields-data.php:249
+msgid "Setup fee"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:56
+#: includes/WC_Reepay_Subscriptions_Table.php:93
+#: templates/import/tables/subscriptions.php:13
+#: templates/import/tables/subscriptions.php:95
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:37
+msgid "Plan"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:57
+msgid "Additional Costs"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:58
+msgid "Instant Charges"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:59
+#: templates/admin-addon-single.php:18
+msgid "Add-on"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:175
+msgid "Coupon is not applied for this plans"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:454
+msgid "Sorry, this coupon is not applicable to the products"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:526
+msgid "Reepay discount"
+msgstr ""
+
+#: includes/WC_Reepay_Discounts_And_Coupons.php:557
+msgid "This coupon cannot be used. Try another"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:164
+#, php-format
+msgid "Unable to change subscription period to %s. Error from acquire: %s"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:345
+#, php-format
+msgid "Subscription %d has no payment token"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:350
+msgid "Unable to create subscription. Empty token"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:464
+#, php-format
+msgid "Unable to create subscription. Error from acquire: %s"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:485
+#, php-format
+msgid "Subscription %s - unable to create subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:516
+#, php-format
+msgid "Subscription %s - unable to assign payment method to subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:758 includes/WC_Reepay_Renewals.php:914
+#: includes/WC_Reepay_Renewals.php:1119
+msgid "Undefined subscription handle"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:764 includes/WC_Reepay_Renewals.php:927
+msgid "Undefined parent order"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:789
+msgid "Duplicate order"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:931
+msgid "Duplication of order status"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:1076
+msgid "Order not found"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:1082
+msgid "Role change not required"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:1088
+msgid "No customer in order"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:1094
+msgid "Wrong customer id"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:1112
+msgid "Undefined order"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_API.php:106
+#, php-format
+msgid "Error: %s. Code: %s."
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_API.php:109
+#: includes/WC_Reepay_Subscription_API.php:141
+#, php-format
+msgid "Invalid HTTP Code: %s"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_API.php:118
+msgid "Reepay: Request rate limit exceeded"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_API.php:136
+#, php-format
+msgid "API Error (request): %s. HTTP Code: %s. Endpoint: %s"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons.php:226
+#: templates/plan-addons-subscription-frontend.php:8
+msgid "Add-ons"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons.php:334
+#, php-format
+msgid "Wrong plan_handle. Order - #%s"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons.php:347
+#, php-format
+msgid "Wrong plan_handle. Variation - #%s"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Rest.php:20
+#: templates/admin-addon-single.php:41
+msgid "Select add-on"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Shipping.php:38
+msgid "Choose add-on"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Shipping.php:39
+#: templates/admin-addons-panel.php:42
+msgid "New add-on"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Shipping.php:51
+msgid "Reepay Add-on"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Shipping.php:56
+msgid "Only add-ons not related to plans are available."
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Shipping.php:61
+msgid "Add-on name"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Addons_Shipping.php:68
+msgid "Add-on description"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Admin_Notice.php:129
+#: includes/WC_Reepay_Subscription_Admin_Notice.php:136
+msgid "Subscription is activated in trial"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Admin_Notice.php:143
+msgid "Order has been paid"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Coupons_Rest.php:20
+#: templates/discounts-and-coupons-fields.php:28
+msgid "Select coupon"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:105
+msgid "Day(s)"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:106
+msgid "Month(s)"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:107
+msgid "Fixed day of month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:108
+msgid "Last day of month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:109
+msgid "Quarterly Primo"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:110
+msgid "Quarterly Ultimo"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:111
+msgid "Half-yearly"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:112
+msgid "Yearly"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:113
+msgid "Fixed day of week"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:114
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:146
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:170
+msgid "Manual"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:118
+msgid "No Trial"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:119
+msgid "7 days"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:120
+msgid "14 days"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:121
+msgid "1 month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:122
+msgid "Customize"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:126
+msgid "Billed every day"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:127
+#, php-format
+msgid "Billed every %s days"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:129
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:132
+msgid "Billed every month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:130
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:133
+#, php-format
+msgid "Billed every %s months"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:135
+msgid "Billed every month on the last day of the month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:136
+#, php-format
+msgid "Billed every %s months on the last day of the month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:138
+#, php-format
+msgid ""
+"Billed every %s months, on the first day of the month. The billing is fixed "
+"to these months: January, April, July, October"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:139
+#, php-format
+msgid ""
+"Billed every %s months, on the last day of the month. The billing is fixed "
+"to these months: January, April, July, October"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:140
+#, php-format
+msgid ""
+"Billed every %s months, on the first day of the month. The billing is fixed "
+"to these months: January, July"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:141
+#, php-format
+msgid ""
+"Billed every %s months, on the first day of the month. The billing is fixed "
+"to these months: January"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:143
+msgid "Billed every Week"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:144
+#, php-format
+msgid "Billed every %s Weeks"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:150
+#: templates/plan-subscription-fields-data.php:25
+msgid "Day"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:151
+#, php-format
+msgid "%s days"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:153
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:156
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:159
+#: templates/plan-subscription-fields-data.php:33
+#: templates/plan-subscription-fields-data.php:54
+msgid "Month"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:154
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:157
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:160
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:162
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:163
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:164
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:165
+#, php-format
+msgid "%s months"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:167
+#: templates/plan-subscription-fields-data.php:170
+msgid "Week"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:168
+#, php-format
+msgid "%s Weeks"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:174
+msgid "Bill prorated (Default)"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:175
+msgid "Bill for full period)"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:176
+msgid "Bill a zero amount"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:177
+msgid "Do not consider the partial period a billing period"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:181
+msgid "Full day proration"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:182
+msgid "By the minute proration"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:186
+msgid "Monday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:187
+msgid "Tuesday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:188
+msgid "Wednesday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:189
+msgid "Thursday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:190
+msgid "Friday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:191
+msgid "Saturday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:192
+msgid "Sunday"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:223
+msgid "Reepay Simple Subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:471
+msgid "Plan not found"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:817
+msgid "Contract Period"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:846
+msgid "Subtotal:"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:850
+msgid "Total:"
+msgstr ""
+
+#: includes/WC_Reepay_Subscription_Plan_Variable.php:23
+msgid "Reepay Variable Subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_List.php:22
+msgid "See subscription"
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_Table.php:80
+msgid "No subscriptions found."
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_Table.php:90
+#: templates/import/tables/cards.php:13 templates/import/tables/cards.php:64
+#: templates/import/tables/subscriptions.php:14
+#: templates/import/tables/subscriptions.php:54
+#: templates/import/tables/subscriptions.php:56
+#: templates/import/tables/subscriptions.php:96
+#: templates/woocommerce/myaccount/my-subscriptions.php:24
+#: templates/woocommerce/myaccount/my-subscriptions.php:48
+#: templates/woocommerce/myaccount/my-subscriptions.php:82
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:33
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:173
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:208
+#: templates/woocommerce/myaccount/subscription-details.php:19
+msgid "Status"
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_Table.php:91
+#: templates/import/tables/subscriptions.php:11
+#: templates/import/tables/subscriptions.php:93
+msgid "Subscription handle"
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_Table.php:92
+msgid "Customer handle"
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_Table.php:94
+msgid "Created date"
+msgstr ""
+
+#: includes/WC_Reepay_Subscriptions_Table.php:95
+msgid "Next renewal date"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:33
+msgid "customers"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:35
+#: includes/import/WC_Reepay_Import.php:42
+#: includes/import/WC_Reepay_Import.php:49
+#: templates/discounts-and-coupons-fields-data-discount.php:28
+msgid "All"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:36
+msgid "Only customers with active subscriptions"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:40
+msgid "cards"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:43
+msgid "Only active cards"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:47
+msgid "subscriptions"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:52
+msgid "Pending"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:53
+msgid "Dunning"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:203
+msgid "User not found"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:261
+msgid "Email not set"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:293
+msgid "Import error"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import_AJAX.php:178
+msgid "User verification error. Reload page and try again"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import_Helpers.php:108
+msgid "Unable to save bank card"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import_Helpers.php:150
+#: includes/import/WC_Reepay_Import_Helpers.php:157
+msgid "Plan request error"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import_Menu.php:23
+#: includes/import/WC_Reepay_Import_Menu.php:24
+msgid "Reepay Import"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import_Menu.php:48
+#, php-format
+msgid "Import %s"
+msgstr ""
+
+#: includes/update/WC_Reepay_Subscriptions_Update.php:47
+msgid ""
+"Warning! WooCommerce Reepay Subscriptions plugin requires to update the "
+"database structure."
+msgstr ""
+
+#: includes/update/WC_Reepay_Subscriptions_Update.php:49
+#, php-format
+msgid "Please click %s here %s to start upgrade."
+msgstr ""
+
+#: includes/update/WC_Reepay_Subscriptions_Update.php:85
+msgid "Upgrade finished."
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:143
+msgid "None"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:144
+msgid "Full refund"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:145
+msgid "Prorated refund"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:146
+msgid "Full credit"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:147
+msgid "Prorated credit"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:205
+#, php-format
+msgid ""
+"The plugin Reepay Checkout for WooCommerce is required for Reepay "
+"Subscriptions for WooCommerce. <a target=\"_blank\" href=\"%s\">Please "
+"install and activate the plugin.</a>"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:228
+#, php-format
+msgid ""
+"Reepay checkout test key must match with Reepay subscriptions test key, "
+"please <a href=\"%s\">check settings</a>"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:250
+#, php-format
+msgid ""
+"Reepay checkout live key must match with Reepay subscriptions live key, "
+"please <a href=\"%s\">check settings</a>"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:281
+msgid "Get free test account"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:282
+msgid "Pricing"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:328
+msgid "Settings"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:335
+msgid "Reepay Subscriptions"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:382
+msgid "Reepay Subscription"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:394
+msgid "Enable logging"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:396
+msgid "Enable API logging. Logs can be seen in WooCommerce > Status > Logs"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:404
+#: reepay-subscriptions-for-woocommerce.php:406
+msgid "Enable On Hold"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:410
+msgid "Compensation method for On Hold"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:413
+msgid "Compensation method when setting a subscription to On Hold."
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:417
+#: reepay-subscriptions-for-woocommerce.php:419
+msgid "Enable Cancel"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:423
+msgid "Compensation method for Cancel"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:426
+msgid "Compensation method when cancelling a subscription."
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:434
+msgid "Subscription order default status after creation"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:437
+msgid ""
+"Setting to control witch status the Reepay subscription order in WooCommerce "
+"gets."
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:441
+msgid "Renewal order default status after creation"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:444
+msgid ""
+"Setting to control witch status the Reepay renewal order in WooCommerce gets."
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:452
+msgid "Enable manual subscription start date"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:454
+msgid ""
+"Enable manual subscription start date <p class=\"description\">This will set "
+"a temporary start date for the subscription that is far in the future. We "
+"recommend removing the start date tag from your sign up emails in Reepay.</p>"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:458
+msgid "Manual start date order status"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:461
+msgid ""
+"Subscription will start when parent order get changed to this order status."
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:536
+msgid "Request error. Try again"
+msgstr ""
+
+#: reepay-subscriptions-for-woocommerce.php:567
+#: templates/discounts-and-coupons-fields-data-discount.php:18
+msgid "Percentage"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:20
+#: templates/discounts-and-coupons-fields-data-coupon.php:9
+#: templates/import/tables/customers.php:11
+#: templates/import/tables/customers.php:50
+msgid "Name"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:26 templates/admin-addon-single.php:22
+#: templates/import/tables/cards.php:12 templates/import/tables/cards.php:63
+msgid "Type"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:30 templates/admin-addon-single.php:22
+msgid "On/Off"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:32 templates/admin-addon-single.php:22
+msgid "Quantity"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:40
+msgid "Description"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:41
+msgid "Will display on the frontend"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:49
+msgid "Amount (per unit)"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:56
+msgid "Add-on availability"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:60
+msgid "Current plan"
+msgstr ""
+
+#: templates/admin-addon-single-data.php:62
+#: templates/discounts-and-coupons-fields-data-coupon.php:18
+msgid "All plans"
+msgstr ""
+
+#: templates/admin-addon-single.php:17
+msgid "Click to toggle"
+msgstr ""
+
+#: templates/admin-addon-single.php:23
+#: templates/discounts-and-coupons-fields-data-discount.php:7
+msgid "Amount"
+msgstr ""
+
+#: templates/admin-addon-single.php:48
+#: templates/discounts-and-coupons-fields.php:34
+#: templates/plan-subscription-fields-variable.php:34
+#: templates/plan-subscription-fields.php:27
+msgid "Refresh list"
+msgstr ""
+
+#: templates/admin-addon-single.php:55
+msgid "Create new addon"
+msgstr ""
+
+#: templates/admin-addon-single.php:58
+msgid "Add-ons list is empty"
+msgstr ""
+
+#: templates/admin-addons-panel.php:12
+msgid "Close all"
+msgstr ""
+
+#: templates/admin-addons-panel.php:13
+msgid "Expand all"
+msgstr ""
+
+#: templates/admin-addons-panel.php:41
+msgid "Save changes"
+msgstr ""
+
+#: templates/admin-addons-panel.php:101
+msgid "Are you sure you want remove this add-on?"
+msgstr ""
+
+#: templates/admin-list-menu.php:16
+msgid "General"
+msgstr ""
+
+#: templates/admin-list-menu.php:20
+msgid "Import tools"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-coupon.php:16
+msgid "Availability"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-coupon.php:20
+msgid "Selected plans"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-coupon.php:28
+msgid "Select one or more plans"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-coupon.php:44
+msgid "No plans found"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:14
+msgid "Discount Type"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:16
+msgid "Fixed amount"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:26
+msgid "Apply to"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:30
+msgid "Custom"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:51
+msgid "Duration"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:53
+msgid "Forever"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:55
+msgid "Fixed number"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:61
+msgid "Times"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:68
+msgid "Limited Time"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:12
+msgid "Coupon creation type"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:13
+#: templates/discounts-and-coupons-fields.php:41
+msgid "Create new coupon"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:19
+msgid "Use existing coupon"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:44
+msgid "No coupons found"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:64
+msgid "Discount creation type"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:65
+msgid "Create new discount"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:71
+msgid "Use existing discount"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:81
+msgid "Select discount"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields.php:88
+msgid "No discounts found"
+msgstr ""
+
+#: templates/import/page.php:25 templates/import/page.php:39
+msgid "Import selected"
+msgstr ""
+
+#: templates/import/page.php:31 templates/import/page.php:44
+msgid "Back"
+msgstr ""
+
+#: templates/import/tables/cards.php:2
+msgid "Cards"
+msgstr ""
+
+#: templates/import/tables/cards.php:7 templates/import/tables/cards.php:58
+#: templates/import/tables/customers.php:7
+#: templates/import/tables/customers.php:46
+#: templates/import/tables/subscriptions.php:7
+#: templates/import/tables/subscriptions.php:89
+msgid "Select All"
+msgstr ""
+
+#: templates/import/tables/cards.php:11 templates/import/tables/cards.php:62
+msgid "Card"
+msgstr ""
+
+#: templates/import/tables/cards.php:14 templates/import/tables/cards.php:65
+msgid "Expire at"
+msgstr ""
+
+#: templates/import/tables/cards.php:15 templates/import/tables/cards.php:66
+#: templates/import/tables/subscriptions.php:12
+#: templates/import/tables/subscriptions.php:94
+msgid "Customer"
+msgstr ""
+
+#: templates/import/tables/cards.php:17 templates/import/tables/cards.php:68
+#: templates/import/tables/customers.php:15
+#: templates/import/tables/customers.php:54
+#: templates/import/tables/subscriptions.php:17
+#: templates/import/tables/subscriptions.php:99
+msgid "Import Message"
+msgstr ""
+
+#: templates/import/tables/cards.php:23
+msgid "No cards found"
+msgstr ""
+
+#: templates/import/tables/cards.php:50
+#: templates/import/tables/customers.php:38
+#: templates/import/tables/subscriptions.php:81
+msgid "Ready to import"
+msgstr ""
+
+#: templates/import/tables/customers.php:2
+#: templates/import/tables/subscriptions.php:2
+msgid "Customers"
+msgstr ""
+
+#: templates/import/tables/customers.php:12
+#: templates/import/tables/customers.php:51
+msgid "Email"
+msgstr ""
+
+#: templates/import/tables/customers.php:13
+#: templates/import/tables/customers.php:52
+msgid "Reepay Handle"
+msgstr ""
+
+#: templates/import/tables/customers.php:21
+msgid "No customers found"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:15
+#: templates/import/tables/subscriptions.php:97
+msgid "Dates"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:23
+msgid "No subscriptions found"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:44
+msgid "Customer does not exist in this store"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:61
+msgid "Dunning invoices"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:66
+msgid "Created"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:69
+msgid "Activated"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:72
+msgid "Start"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:75
+msgid "First period start"
+msgstr ""
+
+#: templates/import/tables/subscriptions.php:78
+msgid "Next period start"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:13
+msgid "Price"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:18
+msgid "Schedule type"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:24
+#: templates/plan-subscription-fields-data.php:31
+#: templates/plan-subscription-fields-data.php:52
+#: templates/plan-subscription-fields-data.php:168
+msgid "Charge every"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:25
+msgid "Days"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:58
+msgid "On this day of the month"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:63
+#: templates/plan-subscription-fields-data.php:98
+#: templates/plan-subscription-fields-data.php:125
+#: templates/plan-subscription-fields-data.php:152
+#: templates/plan-subscription-fields-data.php:177
+msgid "Partial period handling"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:67
+#: templates/plan-subscription-fields-data.php:102
+#: templates/plan-subscription-fields-data.php:129
+#: templates/plan-subscription-fields-data.php:156
+#: templates/plan-subscription-fields-data.php:183
+msgid "Proration setting"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:71
+#: templates/plan-subscription-fields-data.php:106
+#: templates/plan-subscription-fields-data.php:133
+#: templates/plan-subscription-fields-data.php:160
+#: templates/plan-subscription-fields-data.php:187
+msgid "Minimum prorated amount"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:90
+#: templates/plan-subscription-fields-data.php:113
+#: templates/plan-subscription-fields-data.php:140
+msgid "Charge first day of every"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:91
+msgid "3rd Month"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:94
+#: templates/plan-subscription-fields-data.php:121
+#: templates/plan-subscription-fields-data.php:148
+msgid "Fixed months:"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:95
+msgid "Jan, Apr, Jul, Oct"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:114
+msgid "6th Month"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:117
+#: templates/plan-subscription-fields-data.php:144
+msgid "On this day of the month:"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:118
+#: templates/plan-subscription-fields-data.php:145
+msgid "1st"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:122
+msgid "Jan, Jul"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:141
+msgid "12th Month"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:149
+msgid "Jan"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:173
+msgid "On this day of the week"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:194
+msgid "Default quantity"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:197
+msgid ""
+"Default quantity to use when creating a new subscription. Also used as the "
+"quantity on hosted pages."
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:203
+msgid "Renewal Reminder"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:211
+msgid "Minimum contract period"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:214
+#: templates/plan-subscription-fields-data.php:224
+msgid ""
+"Periods are relative to the billing frequency. If you have chosen to bill "
+"every month, a period is one month."
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:221
+msgid "Notice period"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:228
+msgid "Notice period start"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:232
+msgid "When the current cancelled period ends"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:234
+msgid "Immediately after cancellation"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:244
+msgid "Include setup fee"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:253
+msgid "Text"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:257
+msgid "Handling"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:260
+msgid "Include setup fee as order line on the first scheduled invoice"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:262
+msgid "Create a separate invoice for the setup fee"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:264
+msgid ""
+"Create a separate invoice for the setup fee, if the first invoice is not "
+"created in conjunction with the creation"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:275
+msgid "Trial period"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:295
+msgid "Tax status"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:297
+msgid "Taxable"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:298
+msgid "Shipping only"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:299
+msgctxt "Tax status"
+msgid "None"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:309
+msgid "Tax class"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:325
+msgid "Don't change"
+msgstr ""
+
+#: templates/plan-subscription-fields-data.php:331
+msgid "Customer role after subscription purchase"
+msgstr ""
+
+#: templates/plan-subscription-fields-variable.php:16
+#: templates/plan-subscription-fields.php:11
+msgid "Choose plan"
+msgstr ""
+
+#: templates/plan-subscription-fields-variable.php:42
+#: templates/plan-subscription-fields.php:34
+msgid "Create new plan"
+msgstr ""
+
+#: templates/plan-subscription-fields-variable.php:55
+msgid "Save plan to variation"
+msgstr ""
+
+#: templates/plan-subscription-fields.php:47
+msgid "Save plan to product"
+msgstr ""
+
+#: templates/plan-subscription-frontend.php:13
+msgid "Subscription details"
+msgstr ""
+
+#: templates/plan-subscription-plans-select.php:15
+msgid "Plans list is empty"
+msgstr ""
+
+#: templates/plan-subscription-plans-select.php:17
+msgid "Select plan"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:26
+msgctxt "table heading"
+msgid "Next payment"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:29
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:175
+#: templates/woocommerce/myaccount/subscription-totals-table.php:22
+msgctxt "table heading"
+msgid "Total"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:43
+#: templates/woocommerce/myaccount/my-subscriptions.php:77
+msgid "ID"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:44
+#: templates/woocommerce/myaccount/my-subscriptions.php:78
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:199
+#, php-format
+msgctxt "hash before order number"
+msgid "#%s"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:52
+#: templates/woocommerce/myaccount/my-subscriptions.php:86
+msgctxt "table heading"
+msgid "Next Payment"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:60
+#: templates/woocommerce/myaccount/my-subscriptions.php:90
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:212
+msgctxt "Used in data attribute. Escaped"
+msgid "Total"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:65
+#: templates/woocommerce/myaccount/my-subscriptions.php:95
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:246
+msgctxt "view a subscription"
+msgid "View"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:108
+msgid "Previous"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:113
+msgid "Next"
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:120
+#, php-format
+msgid "You have reached the end of subscriptions. Go to the %sfirst page%s."
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:122
+msgid "You have no active subscriptions."
+msgstr ""
+
+#: templates/woocommerce/myaccount/my-subscriptions.php:126
+msgid "Browse products"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:39
+msgid "Undefined"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:51
+#: templates/woocommerce/myaccount/subscription-details.php:25
+msgctxt "customer subscription table header"
+msgid "Start date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:55
+msgctxt "customer subscription table header"
+msgid "Last payment date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:59
+#: templates/woocommerce/myaccount/subscription-details.php:27
+msgctxt "customer subscription table header"
+msgid "Next payment date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:63
+#: templates/woocommerce/myaccount/subscription-details.php:28
+msgctxt "customer subscription table header"
+msgid "End date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:67
+msgctxt "customer subscription table header"
+msgid "Trial start date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:71
+#: templates/woocommerce/myaccount/subscription-details.php:29
+msgctxt "customer subscription table header"
+msgid "Trial end date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:102
+msgid "Actions:"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:106
+msgid "Reactivate"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:110
+msgid "Put on hold"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:117
+msgid "Uncancel"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:121
+msgid "Cancel Subscription"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:130
+msgid "Payment methods:"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:138
+msgid "Current"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:141
+msgid "Change"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:152
+msgid "Add payment method"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:161
+msgid "Related orders"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:171
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:203
+msgid "Date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:197
+msgid "Order Number"
+msgstr ""
+
+#. translators: $1: formatted order total for the order, $2: number of items bought
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:215
+#, php-format
+msgid "%1$s for %2$d item"
+msgid_plural "%1$s for %2$d items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:224
+msgctxt "pay for a subscription"
+msgid "Pay"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details-reepay.php:240
+msgctxt "an action on a subscription"
+msgid "Cancel"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:26
+msgctxt "customer subscription table header"
+msgid "Last order date"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:43
+msgid "Auto renew"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:51
+msgid "Enable auto renew"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:58
+msgid "Disable auto renew"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:63
+msgid "Using the auto-renewal toggle is disabled while in staging mode."
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:72
+msgid "Payment"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:82
+msgid "Actions"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:103
+msgid "Subscription updates"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-details.php:109
+msgctxt "date on subscription updates list. Will be localized"
+msgid "l jS \\o\\f F Y, h:ia"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-totals-table.php:21
+msgctxt "table headings in notification email"
+msgid "Product"
+msgstr ""
+
+#: templates/woocommerce/myaccount/subscription-totals-table.php:35
+msgid "Are you sure you want remove this item from your subscription?"
+msgstr ""
+
+#. Plugin Name of the plugin/theme
+msgid "Reepay Subscriptions for WooCommerce"
+msgstr ""
+
+#. Description of the plugin/theme
+msgid ""
+"Get all the advanced subscription features from Reepay while still keeping "
+"your usual WooCommerce tools. The Reepay Subscription for WooCommerce "
+"plugins gives you the best prerequisites to succeed with your subscription "
+"business."
+msgstr ""
+
+#. Author of the plugin/theme
+msgid "reepay"
+msgstr ""
+
+#. Author URI of the plugin/theme
+msgid "https://reepay.com/"
+msgstr ""

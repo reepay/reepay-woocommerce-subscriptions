@@ -53,6 +53,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		'_reepay_subscription_trial',
 		'_reepay_subscription_fee',
 		'_reepay_subscription_currency',
+		'_reepay_subscription_customer_role',
 	];
 
 	/**
@@ -166,29 +167,29 @@ class WC_Reepay_Subscription_Plan_Simple {
 			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY               => __( 'Week', 'reepay-subscriptions-for-woocommerce' ),
 			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( '%s Weeks', 'reepay-subscriptions-for-woocommerce' ),
 
-			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual' ),
 		];
 
 		self::$bill_types = [
-			'bill_prorated'    => __( 'Bill prorated (Default)', 'reepay-subscriptions-for-woocommerce' ),
-			'bill_full'        => __( 'Bill for full period)', 'reepay-subscriptions-for-woocommerce' ),
-			'bill_zero_amount' => __( 'Bill a zero amount', 'reepay-subscriptions-for-woocommerce' ),
-			'no_bill'          => __( 'Do not consider the partial period a billing period', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_prorated'    => __( 'Bill prorated (Default)' ),
+			'bill_full'        => __( 'Bill for full period)' ),
+			'bill_zero_amount' => __( 'Bill a zero amount' ),
+			'no_bill'          => __( 'Do not consider the partial period a billing period' ),
 		];
 
 		self::$proration_types = [
-			'full_day'  => __( 'Full day proration', 'reepay-subscriptions-for-woocommerce' ),
-			'by_minute' => __( 'By the minute proration', 'reepay-subscriptions-for-woocommerce' ),
+			'full_day'  => __( 'Full day proration' ),
+			'by_minute' => __( 'By the minute proration' ),
 		];
 
 		self::$number_to_week_day = [
-			1 => __( 'Monday', 'reepay-subscriptions-for-woocommerce' ),
-			2 => __( 'Tuesday', 'reepay-subscriptions-for-woocommerce' ),
-			3 => __( 'Wednesday', 'reepay-subscriptions-for-woocommerce' ),
-			4 => __( 'Thursday', 'reepay-subscriptions-for-woocommerce' ),
-			5 => __( 'Friday', 'reepay-subscriptions-for-woocommerce' ),
-			6 => __( 'Saturday', 'reepay-subscriptions-for-woocommerce' ),
-			7 => __( 'Sunday', 'reepay-subscriptions-for-woocommerce' ),
+			1 => __( 'Monday' ),
+			2 => __( 'Tuesday' ),
+			3 => __( 'Wednesday' ),
+			4 => __( 'Thursday' ),
+			5 => __( 'Friday' ),
+			6 => __( 'Saturday' ),
+			7 => __( 'Sunday' ),
 		];
 	}
 
@@ -219,7 +220,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	}
 
 	public function add_subscription_product_type( $types ) {
-		$types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription', 'reepay-subscriptions-for-woocommerce' );
+		$types['reepay_simple_subscriptions'] = __( 'Reepay Simple Subscription' );
 
 		return $types;
 	}
@@ -271,7 +272,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 				'trial'           => self::get_trial( $product ),
 				'setup_fee'       => self::get_setup_fee( $product ),
 				'contract_period' => self::get_contract_period( $product ),
-				'domain'          => 'reepay-subscriptions-for-woocommerce',
 				'is_checkout'     => $is_checkout
 			],
 			'',
@@ -371,7 +371,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 			'post_id'    => $post_id,
 			'plans_list' => $this->get_reepay_plans_list() ?: [],
 			'disabled'   => true,
-			'domain'     => 'reepay-subscriptions-for-woocommerce',
 		];
 
 		foreach ( self::$meta_fields as $meta_field ) {
@@ -469,7 +468,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$plan_meta = [];
 
 		if ( empty( $plan_data ) ) {
-			$this->plan_error( __( 'Plan not found', 'reepay-subscriptions-for-woocommerce' ) );
+			$this->plan_error( __( 'Plan not found' ) );
 
 			return [];
 		}
@@ -638,6 +637,12 @@ class WC_Reepay_Subscription_Plan_Simple {
 		if ( ! empty( $plan_data['_reepay_subscription_price'] ) ) {
 			update_post_meta( $post_id, '_regular_price', $plan_data['_reepay_subscription_price'] );
 			update_post_meta( $post_id, '_price', $plan_data['_reepay_subscription_price'] );
+		}
+
+		if ( ! empty( $_POST['_reepay_subscription_customer_role'] ) && $_POST['_reepay_subscription_customer_role'] !== 'without_changes' ) {
+			update_post_meta( $post_id, '_reepay_subscription_customer_role', $_POST['_reepay_subscription_customer_role'] );
+		} else {
+			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
 		}
 	}
 
@@ -809,7 +814,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$plan    = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true );
 		$ret     = '';
 		if ( ! empty( $periods ) ) {
-			$ret = __( 'Contract Period', 'reepay-subscriptions-for-woocommerce' ) . ': ' . $periods . ' x ' . $plan;
+			$ret = __( 'Contract Period' ) . ': ' . $periods . ' x ' . $plan;
 		}
 
 		return $ret;
@@ -822,7 +827,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$fee     = $product->get_meta( '_reepay_subscription_fee' );
 				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
 					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
-					WC()->cart->add_fee( __( $product->get_name() . ' - ' . $fee["text"], 'reepay-subscriptions-for-woocommerce' ), $amount, false );
+					WC()->cart->add_fee(  $product->get_name() . ' - ' . $fee["text"], $amount );
 				}
 			}
 		}

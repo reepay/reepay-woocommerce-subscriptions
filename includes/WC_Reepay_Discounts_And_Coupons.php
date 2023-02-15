@@ -1,20 +1,14 @@
 <?php
 
 class WC_Reepay_Discounts_And_Coupons {
+	/**
+	 * @var array<string, string>
+	 */
+	public static $apply_to = [];
 
-	public static $apply_to = [
-		'setup_fee'       => 'Setup fee',
-		'plan'            => 'Plan',
-		'additional_cost' => 'Additional Costs',
-		'ondemand'        => 'Instant Charges',
-		'add_on'          => 'Add-on',
-	];
-
-	public static $coupon_types = [
-		'reepay_percentage'    => 'Reepay Percentage Discount',
-		'reepay_fixed_product' => 'Reepay Fixed product Discount',
-	];
-
+	/**
+	 * @var string[]
+	 */
 	public static $meta_fields = [
 		'_reepay_discount_use_existing_coupon_id',
 		'_reepay_discount_name',
@@ -41,6 +35,8 @@ class WC_Reepay_Discounts_And_Coupons {
 	 * Constructor
 	 */
 	public function __construct() {
+		add_action( 'reepay_subscriptions_init', [ $this, 'init'] );
+
 		add_filter( 'woocommerce_coupon_discount_types', [ $this, 'add_coupon_types' ], 10, 1 );
 		add_action( 'woocommerce_coupon_options', [ $this, 'add_coupon_text_field' ], 10 );
 		add_action( 'woocommerce_coupon_options_save', [ $this, 'save_coupon_text_field' ], 10, 2 );
@@ -52,6 +48,16 @@ class WC_Reepay_Discounts_And_Coupons {
 
         add_action('woocommerce_after_order_object_save', [ $this, "on_order_save" ]);
 
+	}
+
+	public function init() {
+		self::$apply_to = [
+			'setup_fee'       => __( 'Setup fee' ),
+			'plan'            => __( 'Plan' ),
+			'additional_cost' => __( 'Additional Costs' ),
+			'ondemand'        => __( 'Instant Charges' ),
+			'add_on'          => __( 'Add-on' ),
+		];
 	}
 
 	function get_discount_default_params( WC_Coupon $coupon, $data = [] ) {
@@ -166,7 +172,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 	function plugin_coupon_error_message( $err, $err_code, WC_Coupon $coupon = null ) {
 		if ( ! is_null( $coupon ) && $coupon->is_type( 'reepay_type' ) && intval( $err_code ) === 117 ) {
-			return __( 'Coupon is not applied for this plans', 'reepay-subscriptions-for-woocommerce' );
+			return __( 'Coupon is not applied for this plans' );
 		}
 
 		return $err;
@@ -445,7 +451,7 @@ class WC_Reepay_Discounts_And_Coupons {
 		}
 
 		if ( $apply_to_all_plans === '0' && ! $apply ) {
-			throw new Exception( __( 'Sorry, this coupon is not applicable to the products', 'woocommerce' ), 113 );
+			throw new Exception( __( 'Sorry, this coupon is not applicable to the products' ), 113 );
 		}
 
 		$coupon_code_real = static::get_coupon_code_real($coupon);
@@ -517,7 +523,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 	public function add_coupon_types( $discount_types ) {
 		return array_merge( $discount_types, [
-			'reepay_type' => 'Reepay discount',
+			'reepay_type' => __( 'Reepay discount' ),
 		] );
 	}
 
@@ -548,7 +554,7 @@ class WC_Reepay_Discounts_And_Coupons {
 			reepay_s()->api()->request( $request_url );
 			return true;
 		} catch (Exception $e) {
-			return new WP_Error( 404, 'This coupon cannot be used. Try another' );
+			return new WP_Error( 404, __( 'This coupon cannot be used. Try another' ) );
 		}
 	}
 }

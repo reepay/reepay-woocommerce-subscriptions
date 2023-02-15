@@ -1,3 +1,13 @@
+<?php
+if ( ! function_exists( 'woocommerce_wp_select' ) ) {
+	include_once dirname( WC_PLUGIN_FILE ) . '/includes/admin/wc-meta-box-functions.php';
+}
+
+global $post;
+if ( empty( $post ) ) {
+	$post = new WP_Post((object)[]);
+}
+?>
 <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
     <p class="form-field">
         <label for="#"><?php _e( 'Price', 'reepay-subscriptions-for-woocommerce' ); ?></label>
@@ -228,47 +238,6 @@
     </p>
 </div>
 
-<?php $fee = ! empty( $_reepay_subscription_fee ) ? $_reepay_subscription_fee : [] ?>
-
-<?php if ( false ): ?>
-    <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
-
-        <p class="form-field">
-            <label for="_subscription_fee"><?php echo __( 'Include setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-			<?php echo __( 'Yes' ) ?>
-            <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
-                   name="_reepay_subscription_fee[enabled]"
-                   value="yes" <?php echo ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ? 'checked' : '' ?> />
-			<?php echo __( 'No' ) ?>
-            <input type="radio" id="_subscription_fee" <?php echo esc_attr( $disabled ) ?>
-                   name="_reepay_subscription_fee[enabled]"
-                   value="no" <?php echo empty( $fee['enabled'] ) || $fee['enabled'] != 'yes' ? 'checked' : '' ?> />
-        </p>
-
-        <p class="form-field fee-fields hidden">
-            <label for="_subscription_fee_amount"><?php echo __( 'Setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span class="wrap">
-            <input type="number" min="0"
-                   id="_subscription_fee_amount" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[amount]"
-                   class="wc_input_price wc_input_subscription_price"
-                   placeholder="<?php echo esc_attr( 'Amount' ); ?>" step="any" min="0"
-                   value="<?php echo ! empty( $fee['amount'] ) ? esc_attr( $fee['amount'] ) : 0 ?>"/>
-            <input type="text"
-                   id="_subscription_fee_text" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[text]"
-                   placeholder="<?php echo esc_attr( 'Text' ); ?>"
-                   value="<?php echo ! empty( $fee['text'] ) ? esc_attr( $fee['text'] ) : '' ?>"/>
-            <select id="_subscription_fee_handling" <?php echo esc_attr( $disabled ) ?> name="_reepay_subscription_fee[handling]"
-                    class="wc_input_subscription_period_interval">ё
-                <option value="first" <?php echo ! empty( $fee['handling'] ) ? selected( 'first', $fee['handling'], false ) : '' ?>><?php echo __( 'Include setup fee as order line on the first scheduled invoice', 'reepay-subscriptions-for-woocommerce' ); ?></option>
-                <option value="separate" <?php echo ! empty( $fee['handling'] ) ? selected( 'separate', $fee['handling'], false ) : '' ?>><?php echo __( 'Create a separate invoice for the setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></option>
-                <option value="separate_conditional" <?php echo ! empty( $fee['handling'] ) ? selected( 'separate_conditional', $fee['handling'], false ) : '' ?>><?php echo __( 'Create a separate invoice for the setup fee, if the first invoice is not created in conjunction with the creation', 'reepay-subscriptions-for-woocommerce' ); ?></option>
-            </select>
-        </span>
-        </p>
-    </div>
-<?php endif ?>
-
-
 <?php if ( ! empty( $_reepay_subscription_fee ) ) : ?>
     <div class="options_group reepay_subscription_fee show_if_reepay_subscription">
         <p class="form-field">
@@ -347,3 +316,19 @@
 	do_action( 'woocommerce_product_options_tax' );
 	?>
 </div>
+
+<?php
+$roles = apply_filters( 'editable_roles', wp_roles()->roles );
+array_walk($roles, function (&$item, $key) {
+    $item = $item['name'];
+});
+$roles = [ 'without_changes' => __( 'Don\'t change', 'reepay-subscriptions-for-woocommerce' ) ] + $roles;
+
+woocommerce_wp_select(
+	[
+		'id'                => '_reepay_subscription_customer_role' . ( isset( $loop ) ? "[$loop]" : '' ),
+		'value'             => $_reepay_subscription_customer_role ?? '',
+		'label'             => __( 'Customer role after subscription purchase', 'reepay-subscriptions-for-woocommerce' ),
+		'options'           => $roles,
+	]
+);

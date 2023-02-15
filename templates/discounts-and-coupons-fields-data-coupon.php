@@ -6,18 +6,18 @@
 
 <!-- Name -->
 <p class="form-field">
-    <label for="_reepay_discount_name"><?php echo __( 'Name', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_name"><?php _e( 'Name', 'reepay-subscriptions-for-woocommerce' ); ?></label>
     <span><?php echo $meta['_reepay_discount_name'][0] ? esc_attr( $meta['_reepay_discount_name'][0] ) : esc_attr( $meta['_reepay_coupon_handle'][0] ) ?></span>
 
 </p>
 <!--End Name -->
 <!--Availability-->
 <p class="form-field">
-    <label for="_reepay_discount_all_plans"><?php echo __( 'Availability', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_all_plans"><?php _e( 'Availability', 'reepay-subscriptions-for-woocommerce' ); ?></label>
 	<?php if ( $meta['_reepay_discount_all_plans'][0] == '1' ): ?>
-        <span><?php echo __( 'All plans', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'All plans', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php else: ?>
-        <span><?php echo __( 'Selected plans', 'reepay-subscriptions-for-woocommerce' ); ?></span>
+        <span><?php _e( 'Selected plans', 'reepay-subscriptions-for-woocommerce' ); ?></span>
 	<?php endif; ?>
 </p>
 
@@ -25,7 +25,7 @@
     <p class="form-field">
 		<?php if ( ! empty( $plans ) ): ?>
 			<?php if ( ! $is_update ): ?>
-				<?php echo __( 'Select one or more plans', 'reepay-subscriptions-for-woocommerce' ); ?>
+				<?php _e( 'Select one or more plans', 'reepay-subscriptions-for-woocommerce' ); ?>
                 <br>
 			<?php endif; ?>
             <select name="_reepay_discount_eligible_plans[]" id="_reepay_discount_eligible_plans"
@@ -41,7 +41,7 @@
             </select>
 		<?php endif; ?>
 		<?php if ( empty( $plans ) ): ?>
-			<?php echo __( 'No plans found', 'reepay-subscriptions-for-woocommerce' ); ?>
+			<?php _e( 'No plans found', 'reepay-subscriptions-for-woocommerce' ); ?>
 		<?php endif; ?>
     </p>
 <?php endif; ?>

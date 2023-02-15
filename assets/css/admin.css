@@ -1,3 +1,9 @@
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
 .reepay_subscription_pricing .wrap input, .reepay_subscription_fee .wrap input, .reepay_subscription_pricing .wrap select, .reepay_subscription_fee .wrap select {
     width: 24.75% !important;
     margin-right: 3.8%;
@@ -334,6 +340,9 @@ p.form-field span.form-field_time-type {
 }
 
 .reepay_subscription_container .select2-container {
+    width: 100% !important;
+    max-width: 300px !important;
+    min-width: 100px !important;
     margin-right: 5px;
 }
 
@@ -350,4 +359,36 @@ p.form-field span.form-field_time-type {
 
 .reepay_subscription_variable .form-field select.short {
     width: 50%;
+}
+
+body.tools_page_reepay_import .form-table:first-of-type {
+    border-top: unset;
+}
+
+body.tools_page_reepay_import .form-table{
+    border-top: 1px solid #c4c4c4;
+}
+
+.reepay-import__row--sub th,
+.reepay-import__row--sub td {
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.reepay-import__row--sub th {
+    padding-left: 10px;
+    padding-right: 0;
+}
+
+.reepay-import-table tr.success {
+    background-color: #b3ffe5!important;
+}
+
+.reepay-import-table tr.skipped {
+    background-color: #fdffb3!important;
+    opacity: 0.6;
+}
+
+.reepay-import-table tr.error {
+    background-color: #ffc7c7!important;
 }
