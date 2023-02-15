@@ -3,8 +3,8 @@ msgid ""
 msgstr ""
 "Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
 "Project-Id-Version: Reepay Subscriptions for WooCommerce\n"
-"POT-Creation-Date: 2023-02-13 23:44+0300\n"
-"PO-Revision-Date: 2023-02-13 23:44+0300\n"
+"POT-Creation-Date: 2023-02-15 13:51+0300\n"
+"PO-Revision-Date: 2023-02-15 13:50+0300\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -144,65 +144,70 @@ msgstr ""
 msgid "This coupon cannot be used. Try another"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:169
+#: includes/WC_Reepay_Renewals.php:164
 #, php-format
 msgid "Unable to change subscription period to %s. Error from acquire: %s"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:350
+#: includes/WC_Reepay_Renewals.php:345
 #, php-format
 msgid "Subscription %d has no payment token"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:355
+#: includes/WC_Reepay_Renewals.php:350
 msgid "Unable to create subscription. Empty token"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:469
+#: includes/WC_Reepay_Renewals.php:464
 #, php-format
 msgid "Unable to create subscription. Error from acquire: %s"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:490
+#: includes/WC_Reepay_Renewals.php:485
 #, php-format
 msgid "Subscription %s - unable to create subscription"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:521
+#: includes/WC_Reepay_Renewals.php:516
 #, php-format
 msgid "Subscription %s - unable to assign payment method to subscription"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:763 includes/WC_Reepay_Renewals.php:919
+#: includes/WC_Reepay_Renewals.php:758 includes/WC_Reepay_Renewals.php:914
+#: includes/WC_Reepay_Renewals.php:1119
 msgid "Undefined subscription handle"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:769 includes/WC_Reepay_Renewals.php:932
+#: includes/WC_Reepay_Renewals.php:764 includes/WC_Reepay_Renewals.php:927
 msgid "Undefined parent order"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:794
+#: includes/WC_Reepay_Renewals.php:789
 msgid "Duplicate order"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:936
+#: includes/WC_Reepay_Renewals.php:931
 msgid "Duplication of order status"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:1077
+#: includes/WC_Reepay_Renewals.php:1076
 msgid "Order not found"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:1083
+#: includes/WC_Reepay_Renewals.php:1082
 msgid "Role change not required"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:1089
+#: includes/WC_Reepay_Renewals.php:1088
 msgid "No customer in order"
 msgstr ""
 
-#: includes/WC_Reepay_Renewals.php:1095
+#: includes/WC_Reepay_Renewals.php:1094
 msgid "Wrong customer id"
+msgstr ""
+
+#: includes/WC_Reepay_Renewals.php:1112
+msgid "Undefined order"
 msgstr ""
 
 #: includes/WC_Reepay_Subscription_API.php:106
@@ -570,8 +575,6 @@ msgid "Next renewal date"
 msgstr ""
 
 #: includes/import/WC_Reepay_Import.php:33
-#: includes/import/WC_Reepay_Import.php:40
-#: includes/import/WC_Reepay_Import.php:47
 msgid "customers"
 msgstr ""
 
@@ -586,8 +589,16 @@ msgstr ""
 msgid "Only customers with active subscriptions"
 msgstr ""
 
+#: includes/import/WC_Reepay_Import.php:40
+msgid "cards"
+msgstr ""
+
 #: includes/import/WC_Reepay_Import.php:43
 msgid "Only active cards"
+msgstr ""
+
+#: includes/import/WC_Reepay_Import.php:47
+msgid "subscriptions"
 msgstr ""
 
 #: includes/import/WC_Reepay_Import.php:52
@@ -787,7 +798,7 @@ msgstr ""
 msgid "Request error. Try again"
 msgstr ""
 
-#: reepay-subscriptions-for-woocommerce.php:562
+#: reepay-subscriptions-for-woocommerce.php:567
 #: templates/discounts-and-coupons-fields-data-discount.php:18
 msgid "Percentage"
 msgstr ""

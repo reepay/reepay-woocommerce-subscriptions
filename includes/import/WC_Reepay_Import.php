@@ -37,14 +37,14 @@ class WC_Reepay_Import {
 				],
 			],
 			'cards'         => [
-				'label'   => __( 'customers', 'reepay-subscriptions-for-woocommerce' ),
+				'label'   => __( 'cards', 'reepay-subscriptions-for-woocommerce' ),
 				'options' => [
 					'all'    => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
 					'active' => __( 'Only active cards', 'reepay-subscriptions-for-woocommerce' ),
 				],
 			],
 			'subscriptions' => [
-				'label'   => __( 'customers', 'reepay-subscriptions-for-woocommerce' ),
+				'label'   => __( 'subscriptions', 'reepay-subscriptions-for-woocommerce' ),
 				'options' => [
 					'all'       => __( 'All', 'reepay-subscriptions-for-woocommerce' ),
 					'active'    => __( 'Active', 'reepay-subscriptions-for-woocommerce' ),

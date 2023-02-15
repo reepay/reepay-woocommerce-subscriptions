@@ -340,6 +340,9 @@ p.form-field span.form-field_time-type {
 }
 
 .reepay_subscription_container .select2-container {
+    width: 100% !important;
+    max-width: 300px !important;
+    min-width: 100px !important;
     margin-right: 5px;
 }
 
