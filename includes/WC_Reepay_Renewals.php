@@ -357,15 +357,20 @@ class WC_Reepay_Renewals {
 		$order_items    = $main_order->get_items();
 		$created_orders = [ $main_order->get_id() ];
 		foreach ( $order_items as $order_item_key => $order_item ) {
-			if ( count( $order_items ) <= 1 ) {
-				break;
-			}
-
 			//Get the WC_Product object
 			$product = $order_item->get_product();
 
 			if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 				continue;
+			}
+
+			$new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(), '_reepay_subscription_customer_role', true );
+			if ( ! empty( $new_role_for_customer ) ) {
+				$main_order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
+			}
+
+			if ( count( $order_items ) <= 1 ) {
+				break;
 			}
 
 			$items_to_create = [ $order_item ];
@@ -1013,12 +1018,6 @@ class WC_Reepay_Renewals {
 				$product_item->set_variation_id( $item->get_variation_id() );
 				$product_item->set_subtotal( $item->get_subtotal() );
 				$product_item->set_total( $item->get_total() );
-
-				$new_role_for_customer = get_post_meta( $item->get_product_id(), '_reepay_subscription_customer_role', true );
-
-				if ( ! empty( $new_role_for_customer ) ) {
-					$main_order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
-				}
 
 				foreach ( $item->get_formatted_meta_data() as $value ) {
 					$product_item->add_meta_data( $value->key, $value->value );
