@@ -29,17 +29,17 @@
 					reepay_s()->settings( 'plugin_path' ) . 'templates/'
 				);
 				?>
-                <br>
+
                 <button class="button button-primary button-large js-refresh-plans-list">
-					<?php _e( 'Refresh list', 'reepay-subscriptions-for-woocommerce' ) ?>
+		            <?php _e( 'Refresh list', 'reepay-subscriptions-for-woocommerce' ) ?>
                 </button>
 
                 <a class="button button-primary button-large"
                    style="margin-left: 5px;"
                    href="https://app.reepay.com/#/rp/config/plans/create"
                    target="_blank">
-					<?php
-					_e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
+		            <?php
+		            _e( 'Create new plan', 'reepay-subscriptions-for-woocommerce' ) ?>
                 </a>
             </p>
         </div>
