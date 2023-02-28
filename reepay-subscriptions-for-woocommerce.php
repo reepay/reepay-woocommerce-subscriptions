@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.14
+ * Version: 1.0.15
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -139,13 +139,13 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_manual_start_date_status'           => get_option( '_reepay_manual_start_date_status' ) ?: 'wc-completed',
 		];
 
-        self::$compensation_methods = [
-	        'none'            => __( 'None', 'reepay-subscriptions-for-woocommerce'),
-	        'full_refund'     => __( 'Full refund', 'reepay-subscriptions-for-woocommerce'),
-	        'prorated_refund' => __( 'Prorated refund', 'reepay-subscriptions-for-woocommerce'),
-	        'full_credit'     => __( 'Full credit', 'reepay-subscriptions-for-woocommerce'),
-	        'prorated_credit' => __( 'Prorated credit', 'reepay-subscriptions-for-woocommerce'),
-        ];
+		self::$compensation_methods = [
+			'none'            => __( 'None', 'reepay-subscriptions-for-woocommerce' ),
+			'full_refund'     => __( 'Full refund', 'reepay-subscriptions-for-woocommerce' ),
+			'prorated_refund' => __( 'Prorated refund', 'reepay-subscriptions-for-woocommerce' ),
+			'full_credit'     => __( 'Full credit', 'reepay-subscriptions-for-woocommerce' ),
+			'prorated_credit' => __( 'Prorated credit', 'reepay-subscriptions-for-woocommerce' ),
+		];
 
 		$this->includes();
 		$this->init_classes();
@@ -534,9 +534,9 @@ class WooCommerce_Reepay_Subscriptions {
 
 		$i18n = [
 			'request_error' => __( 'Request error. Try again', 'reepay-subscriptions-for-woocommerce' ),
-        ];
+		];
 
-		if (  WC_Reepay_Import_Menu::is_current_page() ) {
+		if ( WC_Reepay_Import_Menu::is_current_page() ) {
 			wp_enqueue_script(
 				'admin-reepay-subscription-import',
 				$this->settings( 'plugin_url' ) . 'assets/js/admin_import.js',
@@ -546,14 +546,14 @@ class WooCommerce_Reepay_Subscriptions {
 			);
 
 			wp_localize_script(
-			        'admin-reepay-subscription-import',
-                    WC_Reepay_Import_AJAX::$js_object_name,
-			        WC_Reepay_Import_AJAX::get_localize_data(
-				        [
-                            'i18n' => $i18n
-				        ]
-			        )
-            );
+				'admin-reepay-subscription-import',
+				WC_Reepay_Import_AJAX::$js_object_name,
+				WC_Reepay_Import_AJAX::get_localize_data(
+					[
+						'i18n' => $i18n
+					]
+				)
+			);
 		}
 
 		wp_enqueue_style( 'admin-reepay-subscription', $this->settings( 'plugin_url' ) . 'assets/css/admin.css' );
@@ -576,7 +576,7 @@ class WooCommerce_Reepay_Subscriptions {
 				'get_discount' => get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/discount/" ),
 				'get_addon'    => get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ),
 			],
-            'i18n' => $i18n
+			'i18n'                  => $i18n
 		] );
 	}
 
@@ -642,4 +642,4 @@ function reepay_s() {
 
 reepay_s();
 
-do_action('reepay_subscriptions_init');
+do_action( 'reepay_subscriptions_init' );
