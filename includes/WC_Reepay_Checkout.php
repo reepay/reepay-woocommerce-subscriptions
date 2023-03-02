@@ -24,13 +24,11 @@ class WC_Reepay_Checkout {
 	 * @return mixed
 	 */
 	public function woocommerce_payment_gateways( $gateways ) {
-		if ( is_admin() || ! is_checkout() || ! self::is_reepay_product_in_cart() ) {
-			return $gateways;
-		}
-
-		foreach ( $gateways as $gateway_num => $gateway ) {
-			if ( ! self::is_reepay_gateway( $gateway ) ) {
-				unset( $gateways[ $gateway_num ] );
+		if ( isset( $GLOBALS['wp_query'] ) && is_checkout() && self::is_reepay_product_in_cart() ) {
+			foreach ( $gateways as $gateway_num => $gateway ) {
+				if ( ! self::is_reepay_gateway( $gateway ) ) {
+					unset( $gateways[ $gateway_num ] );
+				}
 			}
 		}
 
