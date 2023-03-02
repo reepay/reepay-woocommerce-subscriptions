@@ -37,7 +37,6 @@ return array(
     'WC_Reepay_Sync' => $baseDir . '/includes/sync/WC_Reepay_Sync.php',
     'WC_Reepay_Sync_Customers' => $baseDir . '/includes/sync/WC_Reepay_Sync_Customers.php',
     'WC_Reepay_Sync_Subscriptions' => $baseDir . '/includes/sync/WC_Reepay_Sync_Subscriptions.php',
-    'WC_Reepay_Woo_Blocks' => $baseDir . '/includes/woo-blocks/WC_Reepay_Woo_Blocks.php',
     'WC_Reepay_Woocommerce_Subscription_Extension' => $baseDir . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
     'WC_Subscription' => $baseDir . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
 );
