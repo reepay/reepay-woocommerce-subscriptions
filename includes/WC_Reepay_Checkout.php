@@ -24,7 +24,7 @@ class WC_Reepay_Checkout {
 	 * @return mixed
 	 */
 	public function woocommerce_payment_gateways( $gateways ) {
-		if ( ! is_checkout() || ! self::is_reepay_product_in_cart() ) {
+		if ( is_admin() || ! is_checkout() || ! self::is_reepay_product_in_cart() ) {
 			return $gateways;
 		}
 
