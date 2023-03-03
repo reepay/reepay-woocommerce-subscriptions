@@ -610,6 +610,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Memberships_Integrations();
+		new WC_Reepay_Woo_Blocks();
 	}
 
 

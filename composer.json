@@ -15,7 +15,8 @@
       "includes/import",
       "includes/memberships",
       "includes/update",
-      "includes/sync"
+      "includes/sync",
+      "includes/woo-blocks"
     ]
   }
 }
