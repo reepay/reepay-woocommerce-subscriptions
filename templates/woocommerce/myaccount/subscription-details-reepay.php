@@ -91,10 +91,15 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
 	<?php
 	try {
 		$reepay_subscription = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) );
-		$payment_methods     = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) . "/pm" );
 	} catch ( Exception $e ) {
 		$reepay_subscription = false;
 	}
+
+	try {
+		$payment_methods     = reepay_s()->api()->request( "subscription/" . $subscription->get_meta( '_reepay_subscription_handle' ) . "/pm" );
+    } catch ( Exception $e ) {
+		$payment_methods     = false;
+    }
 
 	if ( ! empty( $reepay_subscription ) && empty( $reepay_subscription['is_expired'] ) ): ?>
 		<?php if ( reepay_s()->settings( '_reepay_enable_on_hold' ) || reepay_s()->settings( '_reepay_enable_cancel' ) ): ?>
@@ -134,11 +139,11 @@ $plan_data = reepay_s()->api()->request( "plan/" . $subscription_reepay['plan'] 
             <tr>
                 <td><?php echo $payment_method->get_masked_card() ?><?php echo $payment_method->get_expiry_month() . '/' . $payment_method->get_expiry_year() ?></td>
                 <td>
-					<?php if ( $payment_method->get_token() === $payment_methods[0]['id'] ): ?>
+					<?php if ( $payment_methods && $payment_method->get_token() === $payment_methods[0]['id'] ): ?>
 						<?php _e( 'Current', 'reepay-subscriptions-for-woocommerce' ); ?>
 					<?php else: ?>
                         <a href="?change_payment_method=<?php _e( $reepay_subscription['handle'] ) ?>&token_id=<?php echo esc_html( $payment_method->get_id() ) ?>"
-                           class="button"><?php _e( 'Change', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+                           class="button"><?php _e( 'Use this card', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php endif; ?>
                 </td>
             </tr>
