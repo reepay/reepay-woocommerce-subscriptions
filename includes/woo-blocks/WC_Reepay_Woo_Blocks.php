@@ -4,6 +4,7 @@ class WC_Reepay_Woo_Blocks {
 
 	public function __construct() {
 		add_action( 'woocommerce_blocks_loaded', [ $this, 'add_gateways_filter' ] );
+		add_action( 'reepay_blocks_payment_method_data', [ $this, 'set_token_saving' ] );
 	}
 
 	public function add_gateways_filter() {
@@ -25,5 +26,20 @@ class WC_Reepay_Woo_Blocks {
 		}
 
 		return array();
+	}
+
+	/**
+	 * Set tokens' saving always on true
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	public function set_token_saving( $data ) {
+		if ( ! empty( $data['tokens'] ) ) {
+			$data['always_save_token'] = true;
+		}
+
+		return $data;
 	}
 }
