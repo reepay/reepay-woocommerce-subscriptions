@@ -167,7 +167,7 @@ class WC_Reepay_Renewals {
 					);
 
 					$order->add_order_note( $notice );
-					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( $notice , $order->get_id() );
+					WC_Reepay_Subscription_Admin_Notice::add_frontend_notice( $notice, $order->get_id() );
 				}
 
 			}
@@ -526,8 +526,9 @@ class WC_Reepay_Renewals {
 				continue;
 			}
 
-			if ( $order->get_status() != 'processing' ) {
-				$order->update_status( 'processing' );
+			$status_main = reepay_s()->settings( '_reepay_orders_default_subscription_status' );
+			if ( $order->get_status() != $status_main ) {
+				$order->update_status( $status_main );
 			}
 
 			$order->add_meta_data( '_reepay_subscription_handle', $handle );
@@ -536,7 +537,7 @@ class WC_Reepay_Renewals {
 			$created_reepay_orders[] = $order->get_id();
 		}
 
-		do_action('reepay_subscriptions_orders_created', $created_reepay_orders);
+		do_action( 'reepay_subscriptions_orders_created', $created_reepay_orders );
 	}
 
 
@@ -554,9 +555,8 @@ class WC_Reepay_Renewals {
 	 * ] $data
 	 */
 	public function renew_subscription( $data ) {
-		$status_main = reepay_s()->settings( '_reepay_manual_start_date' ) ? reepay_s()->settings( '_reepay_manual_start_date_status' ) : reepay_s()->settings( '_reepay_orders_default_subscription_status' );
-
-		self::update_subscription_status( $data, $status_main );
+		$status_main = reepay_s()->settings( '_reepay_orders_default_subscription_status' );
+		self::update_subscription_status( $data, $status_main, false );
 		self::create_child_order( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
 		self::change_user_role( $data );
 	}
@@ -612,11 +612,11 @@ class WC_Reepay_Renewals {
 	/**
 	 * Get payment token.
 	 *
-	 * @todo refactor with while cycle
-	 *
 	 * @param WC_Order $order
 	 *
 	 * @return WC_Payment_Token_Reepay|false
+	 * @todo refactor with while cycle
+	 *
 	 */
 	public static function get_payment_token_order( WC_Order $order ) {
 		$token = $order->get_meta( 'reepay_token' );
@@ -685,7 +685,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param  mixed  $order
+	 * @param mixed $order
 	 */
 	public static function is_order_subscription_active( $order ) {
 		$order = wc_get_order( $order );
@@ -710,13 +710,13 @@ class WC_Reepay_Renewals {
 
 		try {
 			$subscription = reepay_s()->api()->request( "subscription/$handle" );
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			return false;
 		}
 
 		$is_active = $subscription['state'] === 'active';
 
-		set_transient($transient_name, $is_active ? '1' : '0', HOUR_IN_SECONDS);
+		set_transient( $transient_name, $is_active ? '1' : '0', HOUR_IN_SECONDS );
 
 		return $is_active;
 	}
@@ -760,13 +760,13 @@ class WC_Reepay_Renewals {
 		] );
 
 		if ( empty( $data['subscription'] ) ) {
-			return new WP_Error(  __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
+			return new WP_Error( __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$parent_order = self::get_order_by_subscription_handle( $data['subscription'] );
 
 		if ( empty( $parent_order ) ) {
-			return new WP_Error(  __( 'Undefined parent order', 'reepay-subscriptions-for-woocommerce' ) );
+			return new WP_Error( __( 'Undefined parent order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$query = new WP_Query( [
@@ -791,7 +791,7 @@ class WC_Reepay_Renewals {
 				]
 			] );
 
-			return new WP_Error(  __( 'Duplicate order', 'reepay-subscriptions-for-woocommerce' ) );
+			return new WP_Error( __( 'Duplicate order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		self::log( [
@@ -906,7 +906,7 @@ class WC_Reepay_Renewals {
 	 *
 	 * @return bool|WP_Error
 	 */
-	public static function update_subscription_status( $data, $status ) {
+	public static function update_subscription_status( $data, $status, $update_status = true ) {
 		self::log( [
 			'log' => [
 				'source'  => 'WC_Reepay_Renewals::update_subscription_status',
@@ -916,7 +916,7 @@ class WC_Reepay_Renewals {
 		] );
 
 		if ( empty( $data['subscription'] ) ) {
-			return new WP_Error(  __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
+			return new WP_Error( __( 'Undefined subscription handle', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
 		$order = self::get_order_by_subscription_handle( $data['subscription'] );
@@ -932,12 +932,14 @@ class WC_Reepay_Renewals {
 			return new WP_Error( __( 'Undefined parent order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
-		if ( $order->get_status() === $status ) {
-			return new WP_Error( __( 'Duplication of order status', 'reepay-subscriptions-for-woocommerce' ) );
-		}
+		if ( ! $update_status ) {
+			if ( $order->get_status() === $status ) {
+				return new WP_Error( __( 'Duplication of order status', 'reepay-subscriptions-for-woocommerce' ) );
+			}
 
-		$order->set_status( $status );
-		$order->save();
+			$order->set_status( $status );
+			$order->save();
+		}
 
 		self::save_reepay_subscription_dates( $order );
 
@@ -1064,7 +1066,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param  array  $data  @see self::renew_subscription
+	 * @param array $data @see self::renew_subscription
 	 *
 	 * @return true|WP_Error
 	 */
@@ -1099,8 +1101,8 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param  mixed  $order
-	 * @param  array[]|null $data - @see https://reference.reepay.com/api/#the-subscription-object
+	 * @param mixed $order
+	 * @param array[]|null $data - @see https://reference.reepay.com/api/#the-subscription-object
 	 *
 	 * @return array|WP_Error - array of saved data or error
 	 */
@@ -1151,9 +1153,9 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param  mixed   $order
-	 * @param  string  $date_key
-	 * @param  string  $date_format
+	 * @param mixed $order
+	 * @param string $date_key
+	 * @param string $date_format
 	 *
 	 * @return string
 	 */
