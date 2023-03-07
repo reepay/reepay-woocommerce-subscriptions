@@ -932,7 +932,7 @@ class WC_Reepay_Renewals {
 			return new WP_Error( __( 'Undefined parent order', 'reepay-subscriptions-for-woocommerce' ) );
 		}
 
-		if ( ! $update_status ) {
+		if ( $update_status ) {
 			if ( $order->get_status() === $status ) {
 				return new WP_Error( __( 'Duplication of order status', 'reepay-subscriptions-for-woocommerce' ) );
 			}
