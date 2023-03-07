@@ -31,6 +31,8 @@
 
                 <td class="column-data column-name">
                     <%= data.masked_card %>
+                    <br>
+                    <span style="font-size: 9px"><%= data.id %></span>
                 </td>
                 <td class="column-data column-type">
                     <%= data.transaction_card_type %>

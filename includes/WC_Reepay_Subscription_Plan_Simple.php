@@ -741,15 +741,16 @@ class WC_Reepay_Subscription_Plan_Simple {
 			$types_arr = self::$types_info;
 
 			if ( $type == self::TYPE_MONTH_FIXED_DAY ) {
-				$types_arr[ $type ] = 'Billed every ' . $type_data['month'] . ' month on ' . $type_data['day'] . ' day of the month';
+
+				$types_arr[ $type ] = sprintf( __( 'Billed every %s month on %s day of the month', 'reepay-subscriptions-for-woocommerce' ), $type_data['month'], $type_data['day'] );
 			}
 
 			if ( $type == self::TYPE_MONTH_LAST_DAY ) {
-				$types_arr[ $type ] = 'Billed every ' . $type_data['month'] . ' month on the last day of the month';
+				$types_arr[ $type ] = sprintf( __( 'Billed every %s month on the last day of the month', 'reepay-subscriptions-for-woocommerce' ), $type_data['month'] );
 			}
 
 			if ( $type == self::TYPE_MONTH_START_DATE ) {
-				$types_arr[ $type ] = ' Every ' . $type_data . ' month on this day';
+				$types_arr[ $type ] = sprintf( __( ' Every %s month on this day', 'reepay-subscriptions-for-woocommerce' ), $type_data );
 			}
 
 			$types_info = $is_short ? self::$types_info_short : $types_arr;
@@ -827,7 +828,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$fee     = $product->get_meta( '_reepay_subscription_fee' );
 				if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
 					$amount = floatval( $fee["amount"] ) * $cart_item['quantity'];
-					WC()->cart->add_fee(  $product->get_name() . ' - ' . $fee["text"], $amount );
+					WC()->cart->add_fee( $product->get_name() . ' - ' . $fee["text"], $amount );
 				}
 			}
 		}
