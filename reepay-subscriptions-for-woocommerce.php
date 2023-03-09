@@ -123,7 +123,7 @@ class WooCommerce_Reepay_Subscriptions {
 			'version'                                    => static::$version,
 			'rest_api_namespace'                         => static::$rest_api_namespace,
 			'debug'                                      => get_option( '_reepay_debug' ) === 'yes',
-			'test_mode'                                  => $settings['test_mode'] === 'yes',
+			'test_mode'                                  => ! empty( $settings['test_mode'] ) && $settings['test_mode'] === 'yes',
 			'api_private_key'                            => ! empty( $settings['private_key'] ) ? $settings['private_key'] : '',
 			'api_private_key_test'                       => ! empty( $settings['private_key_test'] ) ? $settings['private_key_test'] : '',
 			'_reepay_enable_downgrade'                   => get_option( '_reepay_enable_downgrade' ) === 'yes',
@@ -376,7 +376,6 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function get_settings() {
-
 		$settings = [
 			'section_title'                              => [
 				'name' => __( 'Reepay Subscription', 'reepay-subscriptions-for-woocommerce' ),
@@ -384,12 +383,6 @@ class WooCommerce_Reepay_Subscriptions {
 				'desc' => '',
 				'id'   => 'reepay_section_title'
 			],
-			/*'test_mode'                              => [
-				'name' => __( 'Test mode', 'reepay-subscriptions-for-woocommerce' ),
-				'type' => 'checkbox',
-				'desc' => __( 'Enable test API mode', 'reepay-subscriptions-for-woocommerce' ),
-				'id'   => '_reepay_test_mode'
-			],*/
 			'debug'                                      => [
 				'name' => __( 'Enable logging', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
@@ -610,6 +603,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Memberships_Integrations();
+		new WC_Reepay_Woo_Blocks();
 	}
 
 
