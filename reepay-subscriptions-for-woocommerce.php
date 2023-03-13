@@ -215,52 +215,6 @@ class WooCommerce_Reepay_Subscriptions {
 				)
 			);
 		}
-
-		$settings           = get_option( 'woocommerce_reepay_checkout_settings' );
-		$test_subscriptions = get_option( '_reepay_api_private_key_test' );
-		$test_gateway       = $settings["private_key_test"] ?? '';
-
-		if ( ! empty( $test_subscriptions ) && ! empty( $test_gateway ) ) {
-			if ( $test_subscriptions != $test_gateway ) {
-				WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
-					sprintf(
-						wp_kses(
-							__( 'Reepay checkout test key must match with Reepay subscriptions test key, please <a href="%s">check settings</a>',
-								'reepay-subscriptions-for-woocommerce'
-							), [
-								'a' => [
-									'href' => true
-								]
-							]
-						),
-						get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions'
-					)
-				);
-			}
-		}
-
-		$live_subscriptions = get_option( '_reepay_api_private_key' );
-		$live_gateway       = $settings["private_key"] ?? '';
-
-		if ( ! empty( $live_subscriptions ) && ! empty( $live_gateway ) ) {
-			if ( $live_subscriptions != $live_gateway ) {
-				WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
-					sprintf(
-						wp_kses(
-							__( 'Reepay checkout live key must match with Reepay subscriptions live key, please <a href="%s">check settings</a>',
-								'reepay-subscriptions-for-woocommerce'
-							),
-							[
-								'a' => [
-									'href' => true
-								]
-							]
-						),
-						get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions'
-					)
-				);
-			}
-		}
 	}
 
 	/**
