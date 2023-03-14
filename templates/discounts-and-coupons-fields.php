@@ -27,7 +27,7 @@
                 <select name="_reepay_discount_use_existing_coupon_id" id="coupon_id" class="short">
                     <option value=""><?php _e( 'Select coupon', 'reepay-subscriptions-for-woocommerce' ); ?></option>
 					<?php foreach ( $coupons as $coupon ): ?>
-                        <option value="<?php echo esc_attr( $coupon['handle'] ) ?>"><?php echo esc_attr( $coupon['code'] ) ?></option>
+                        <option value="<?php echo esc_attr( $coupon['handle'] ) ?>"><?php echo esc_attr( $coupon['name'] ) ?></option>
 					<?php endforeach; ?>
                 </select>
                 <button class="button button-primary button-large js-refresh-coupons-list" style="margin-left: 5px;">

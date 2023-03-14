@@ -380,6 +380,11 @@ msgstr ""
 msgid "Billed every %s months on the last day of the month"
 msgstr ""
 
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:745
+#, php-format
+msgid "Billed every %s month on %s day of the month"
+msgstr ""
+
 #: includes/WC_Reepay_Subscription_Plan_Simple.php:138
 #, php-format
 msgid ""

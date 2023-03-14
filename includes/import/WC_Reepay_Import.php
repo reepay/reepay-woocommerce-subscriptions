@@ -22,7 +22,9 @@ class WC_Reepay_Import {
 	 * Constructor
 	 */
 	public function __construct() {
-		session_start();
+		if ( ! session_id() ) {
+			session_start();
+		}
 
 		add_action( 'reepay_subscriptions_init', [ $this, 'init'] );
 	}

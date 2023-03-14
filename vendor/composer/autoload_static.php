@@ -38,6 +38,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Sync' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync.php',
         'WC_Reepay_Sync_Customers' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Customers.php',
         'WC_Reepay_Sync_Subscriptions' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Subscriptions.php',
+        'WC_Reepay_Woo_Blocks' => __DIR__ . '/../..' . '/includes/woo-blocks/WC_Reepay_Woo_Blocks.php',
         'WC_Reepay_Woocommerce_Subscription_Extension' => __DIR__ . '/../..' . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
         'WC_Subscription' => __DIR__ . '/../..' . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
     );

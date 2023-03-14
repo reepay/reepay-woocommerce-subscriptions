@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.16
+ * Version: 1.0.17
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -123,7 +123,7 @@ class WooCommerce_Reepay_Subscriptions {
 			'version'                                    => static::$version,
 			'rest_api_namespace'                         => static::$rest_api_namespace,
 			'debug'                                      => get_option( '_reepay_debug' ) === 'yes',
-			'test_mode'                                  => $settings['test_mode'] === 'yes',
+			'test_mode'                                  => ! empty( $settings['test_mode'] ) && $settings['test_mode'] === 'yes',
 			'api_private_key'                            => ! empty( $settings['private_key'] ) ? $settings['private_key'] : '',
 			'api_private_key_test'                       => ! empty( $settings['private_key_test'] ) ? $settings['private_key_test'] : '',
 			'_reepay_enable_downgrade'                   => get_option( '_reepay_enable_downgrade' ) === 'yes',
@@ -214,52 +214,6 @@ class WooCommerce_Reepay_Subscriptions {
 					'https://wordpress.org/plugins/reepay-checkout-gateway/'
 				)
 			);
-		}
-
-		$settings           = get_option( 'woocommerce_reepay_checkout_settings' );
-		$test_subscriptions = get_option( '_reepay_api_private_key_test' );
-		$test_gateway       = $settings["private_key_test"] ?? '';
-
-		if ( ! empty( $test_subscriptions ) && ! empty( $test_gateway ) ) {
-			if ( $test_subscriptions != $test_gateway ) {
-				WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
-					sprintf(
-						wp_kses(
-							__( 'Reepay checkout test key must match with Reepay subscriptions test key, please <a href="%s">check settings</a>',
-								'reepay-subscriptions-for-woocommerce'
-							), [
-								'a' => [
-									'href' => true
-								]
-							]
-						),
-						get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions'
-					)
-				);
-			}
-		}
-
-		$live_subscriptions = get_option( '_reepay_api_private_key' );
-		$live_gateway       = $settings["private_key"] ?? '';
-
-		if ( ! empty( $live_subscriptions ) && ! empty( $live_gateway ) ) {
-			if ( $live_subscriptions != $live_gateway ) {
-				WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
-					sprintf(
-						wp_kses(
-							__( 'Reepay checkout live key must match with Reepay subscriptions live key, please <a href="%s">check settings</a>',
-								'reepay-subscriptions-for-woocommerce'
-							),
-							[
-								'a' => [
-									'href' => true
-								]
-							]
-						),
-						get_admin_url() . 'admin.php?page=wc-settings&tab=reepay_subscriptions'
-					)
-				);
-			}
 		}
 	}
 
@@ -376,7 +330,6 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function get_settings() {
-
 		$settings = [
 			'section_title'                              => [
 				'name' => __( 'Reepay Subscription', 'reepay-subscriptions-for-woocommerce' ),
@@ -384,12 +337,6 @@ class WooCommerce_Reepay_Subscriptions {
 				'desc' => '',
 				'id'   => 'reepay_section_title'
 			],
-			/*'test_mode'                              => [
-				'name' => __( 'Test mode', 'reepay-subscriptions-for-woocommerce' ),
-				'type' => 'checkbox',
-				'desc' => __( 'Enable test API mode', 'reepay-subscriptions-for-woocommerce' ),
-				'id'   => '_reepay_test_mode'
-			],*/
 			'debug'                                      => [
 				'name' => __( 'Enable logging', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
@@ -610,6 +557,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Sync();
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Memberships_Integrations();
+		new WC_Reepay_Woo_Blocks();
 	}
 
 
