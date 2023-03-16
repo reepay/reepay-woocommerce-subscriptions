@@ -178,8 +178,6 @@ class WC_Reepay_Import {
 
 				$cards_to_import[ $card['id'] ] = $card;
 			}
-
-			return $cards_to_import;
 		}
 
 		return $cards_to_import;
