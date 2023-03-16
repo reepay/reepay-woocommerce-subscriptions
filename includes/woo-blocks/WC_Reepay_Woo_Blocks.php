@@ -36,7 +36,7 @@ class WC_Reepay_Woo_Blocks {
 	 * @return array
 	 */
 	public function set_token_saving( $data ) {
-		if ( ! empty( $data['tokens'] ) ) {
+		if ( wcs_cart_have_subscription() || wcs_is_payment_change() ) {
 			$data['always_save_token'] = true;
 		}
 

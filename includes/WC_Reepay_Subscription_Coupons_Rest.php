@@ -17,11 +17,11 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 	 */
 	public function get_list( $request ) {
 		try {
-			$html = '<option value="">' . __( 'Select coupon', 'reepay-subscriptions-for-woocommerce' ) . '</option>';
+			$html   = '<option value="">' . __( 'Select coupon', 'reepay-subscriptions-for-woocommerce' ) . '</option>';
 			$addons = WC_Reepay_Discounts_And_Coupons::get_coupons();
 
 			foreach ( $addons ?? [] as $addon ) {
-				$html .= '<option value="' . $addon['handle'] . '">' . esc_attr( $addon['code'] ) . '</option>';
+				$html .= '<option value="' . $addon['handle'] . '">' . esc_attr( $addon['name'] ) . '</option>';
 			}
 
 			return new WP_REST_Response( [
