@@ -837,6 +837,11 @@ class WC_Reepay_Renewals {
 		if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
 			$new_items = [];
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
+				
+				if ( $invoice_lines['origin'] == 'discount' ) {
+					continue;
+				}
+
 				$is_exist = false;
 				foreach ( $items as $item ) {
 					if ( $item->is_type( 'line_item' ) ) {
