@@ -822,7 +822,7 @@ class WC_Reepay_Renewals {
 		}
 
 		$gateway      = rp_get_payment_method( $parent_order );
-		$invoice_data = $gateway->api->get_invoice_by_handle( $data['invoice'] );
+		$invoice_data = reepay()->api( $gateway )->get_invoice_by_handle( $data['invoice'] );
 		self::log( [
 			'log' => [
 				'source' => 'WC_Reepay_Renewals::create_child_invoice_data',
