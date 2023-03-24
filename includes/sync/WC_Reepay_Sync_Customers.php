@@ -97,6 +97,10 @@ class WC_Reepay_Sync_Customers {
 	 *     ] $data
 	 */
 	public function payment_method_added( $data ) {
+		//If the payment method added on current site, then we wait for the end of its creation
+		//Prevent payment methods duplication
+		sleep(5);
+
 		$user_id = rp_get_userid_by_handle( $data['customer'] );
 
 		$payment_token   = $data['payment_method'];
@@ -106,7 +110,24 @@ class WC_Reepay_Sync_Customers {
 			return;
 		}
 
-		WC_Reepay_Import_Helpers::add_card_to_user( $user_id, $payment_token );
+		try {
+			$res = reepay_s()->api()->request(
+				'customer/' . $data['customer'] . '/payment_method'
+			);
+		} catch (Exception $e) {
+
+		}
+
+		if ( empty( $res ) || empty( $result['cards'] ) ) {
+			return;
+		}
+
+		foreach ( $result['cards'] as $card ) {
+			if ( $card['id'] === $payment_token && 'active' === $card['state'] ) {
+				WC_Reepay_Import_Helpers::add_card_to_user( $user_id, $card );
+				return;
+			}
+		}
 	}
 
 	/**
