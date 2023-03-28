@@ -618,7 +618,7 @@ class WC_Reepay_Renewals {
 	 *
 	 * @param WC_Order $order
 	 *
-	 * @return WC_Payment_Token_Reepay|false
+	 * @return string|false
 	 * @todo refactor with while cycle
 	 *
 	 */
