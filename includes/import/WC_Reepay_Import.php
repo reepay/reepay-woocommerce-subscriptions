@@ -147,6 +147,10 @@ class WC_Reepay_Import {
 
 		$cards_to_import = [];
 
+		add_filter( 'woocommerce_get_customer_payment_tokens_limit', function () {
+			return PHP_INT_MAX;
+		} );
+
 		foreach ( $users as $user ) {
 			$reepay_user_id = rp_get_customer_handle( $user->ID );
 

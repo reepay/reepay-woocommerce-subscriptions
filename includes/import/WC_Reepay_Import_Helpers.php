@@ -87,7 +87,7 @@ class WC_Reepay_Import_Helpers {
 	public static function add_card_to_user( $user_id, $card ) {
 		if ( 'ms_' == substr( $card['id'], 0, 3 ) ) {
 			$token = new WC_Payment_Token_Reepay_MS();
-			$token->set_gateway_id( 'reepay_checkout' );
+			$token->set_gateway_id( 'reepay_mobilepay_subscriptions' );
 			$token->set_token( $card['id'] );
 			$token->set_user_id( $user_id );
 		} else {
