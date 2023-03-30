@@ -50,7 +50,7 @@ class WC_Reepay_Renewals {
 			if ( ! empty( $order ) ) {
 				foreach ( $order->get_items() as $item ) {
 					$product = $item->get_product();
-					if ( $product->is_type( [ 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ] ) ) {
+					if ( $product && $product->is_type( [ 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ] ) ) {
 						return true;
 					};
 				}
