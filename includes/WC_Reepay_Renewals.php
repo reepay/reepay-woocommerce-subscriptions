@@ -809,18 +809,6 @@ class WC_Reepay_Renewals {
 
 		$items = array();
 
-		if ( ! empty( $parent_order->get_items( 'fee' ) ) ) {
-			foreach ( $parent_order->get_items( 'fee' ) as $fee ) {
-				$items[] = $fee;
-			}
-		}
-
-		if ( ! empty( $parent_order->get_items( 'shipping' ) ) ) {
-			foreach ( $parent_order->get_items( 'shipping' ) as $shipping ) {
-				$items[] = $shipping;
-			}
-		}
-
 		$gateway      = rp_get_payment_method( $parent_order );
 
 		if ( function_exists( 'reepay' ) ) {
@@ -1053,6 +1041,10 @@ class WC_Reepay_Renewals {
 		}
 		$main_order->save();
 
+		$new_order->set_discount_tax('0');
+		$new_order->set_shipping_tax('0');
+		$new_order->set_cart_tax('0');
+		
 		$new_order->save();
 		$new_order->calculate_totals();
 
