@@ -50,7 +50,7 @@ class WC_Reepay_Renewals {
 			if ( ! empty( $order ) ) {
 				foreach ( $order->get_items() as $item ) {
 					$product = $item->get_product();
-					if ( $product->is_type( [ 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ] ) ) {
+					if ( $product && $product->is_type( [ 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ] ) ) {
 						return true;
 					};
 				}
@@ -618,7 +618,7 @@ class WC_Reepay_Renewals {
 	 *
 	 * @param WC_Order $order
 	 *
-	 * @return WC_Payment_Token_Reepay|false
+	 * @return string|false
 	 * @todo refactor with while cycle
 	 *
 	 */
@@ -807,7 +807,7 @@ class WC_Reepay_Renewals {
 
 		update_post_meta( $parent_order->get_id(), '_reepay_order', $data['invoice'] );
 
-		$items = $parent_order->get_items();
+		$items = array();
 
 		if ( ! empty( $parent_order->get_items( 'fee' ) ) ) {
 			foreach ( $parent_order->get_items( 'fee' ) as $fee ) {
@@ -822,7 +822,14 @@ class WC_Reepay_Renewals {
 		}
 
 		$gateway      = rp_get_payment_method( $parent_order );
-		$invoice_data = $gateway->api->get_invoice_by_handle( $data['invoice'] );
+
+		if ( function_exists( 'reepay' ) ) {
+			$invoice_data = reepay()->api( $gateway )->get_invoice_by_handle( $data['invoice'] );
+		} else {
+			//ToDo remove in next major update
+			$invoice_data = $gateway->api->get_invoice_by_handle( $data['invoice'] );
+		}
+
 		self::log( [
 			'log' => [
 				'source' => 'WC_Reepay_Renewals::create_child_invoice_data',
@@ -837,57 +844,42 @@ class WC_Reepay_Renewals {
 		if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
 			$new_items = [];
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
-				$is_exist = false;
-				foreach ( $items as $item ) {
-					if ( $item->is_type( 'line_item' ) ) {
-						$product = $item->get_product();
-						if ( $product && ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) ) {
-							if ( $product->get_meta( '_reepay_subscription_name' ) == $invoice_lines['ordertext'] ) {
-								$is_exist    = true;
-								$new_items[] = $item;
-							}
-						} else {
-							if ( $item['name'] == $invoice_lines['ordertext'] ) {
-								$is_exist    = true;
-								$new_items[] = $item;
-							}
-						}
-					} else {
-						if ( $item['name'] == $invoice_lines['ordertext'] ) {
-							$is_exist    = true;
-							$new_items[] = $item;
-						}
-					}
+				
+				if ( $invoice_lines['origin'] == 'discount' ) {
+					continue;
 				}
 
-				if ( ! $is_exist ) {
-					if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
-						$fees_item = new WC_Order_Item_Fee();
-						$fees_item->set_name( $invoice_lines['ordertext'] );
-						$fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
-						$fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
-						$new_items[] = $fees_item;
-					} else {
-						$product_item = new WC_Order_Item_Product();
-						$product_item->set_name( $invoice_lines['ordertext'] );
-						$product_item->set_quantity( $invoice_lines['quantity'] );
-						$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-						$product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
-						$new_items[] = $product_item;
-					}
+				if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
+					$fees_item = new WC_Order_Item_Fee();
+					$fees_item->set_name( $invoice_lines['ordertext'] );
+					$fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
+					$fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+					$fees_item->add_meta_data( '_is_card_fee', true );
+					$new_items[] = $fees_item;
+				} else {
+					$product_item = new WC_Order_Item_Product();
+					$product_item->set_name( $invoice_lines['ordertext'] );
+					$product_item->set_quantity( $invoice_lines['quantity'] );
+					$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
+					$product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
+					$new_items[] = $product_item;
 				}
 			}
 
 			$items = $new_items;
 		}
 
-
-		self::log( [
-			'log' => [
-				'source' => 'WC_Reepay_Renewals::create_child_order_items',
-				'data'   => $items,
+		self::log(
+			[
+				'log' => [
+					'source'        => 'WC_Reepay_Renewals::create_child_order_items',
+					'items_count'   => count( $items ),
+					'$parent_order' => $parent_order->get_id(),
+					'$data'         => $data,
+					'$invoice_data' => $invoice_data,
+				],
 			]
-		] );
+		);
 
 		return self::create_order_copy( [
 			'status'      => $status,
@@ -1060,7 +1052,6 @@ class WC_Reepay_Renewals {
 
 			$new_order->calculate_totals();
 		}
-
 		$main_order->save();
 
 		$new_order->save();

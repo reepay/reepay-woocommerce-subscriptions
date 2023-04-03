@@ -1,5 +1,8 @@
 <?php
 
+use Reepay\Checkout\Tokens\TokenReepay;
+use Reepay\Checkout\Tokens\TokenReepayMS;
+
 class WC_Reepay_Import_Helpers {
 
 	/**
@@ -86,14 +89,14 @@ class WC_Reepay_Import_Helpers {
 	 */
 	public static function add_card_to_user( $user_id, $card ) {
 		if ( 'ms_' == substr( $card['id'], 0, 3 ) ) {
-			$token = new WC_Payment_Token_Reepay_MS();
-			$token->set_gateway_id( 'reepay_checkout' );
+			$token = class_exists( TokenReepayMS::class ) ? new TokenReepayMS : new WC_Payment_Token_Reepay_MS();
+			$token->set_gateway_id( 'reepay_mobilepay_subscriptions' );
 			$token->set_token( $card['id'] );
 			$token->set_user_id( $user_id );
 		} else {
 			$expiryDate = explode( '-', $card['exp_date'] );
 
-			$token = new WC_Payment_Token_Reepay();
+			$token = class_exists( TokenReepay::class ) ? new TokenReepay : new WC_Payment_Token_Reepay();
 			$token->set_gateway_id( 'reepay_checkout' );
 			$token->set_token( $card['id'] );
 			$token->set_last4( substr( $card['masked_card'], - 4 ) );

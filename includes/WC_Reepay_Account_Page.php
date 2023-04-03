@@ -370,10 +370,16 @@ class WC_Reepay_Account_Page {
 		if ( $order->get_meta( '_reepay_subscription_handle' ) ) {
 			$type = __( 'Reepay subscription' );
 		} elseif ( class_exists( 'WC_Subscriptions_Product' ) ) {
-			$product = current( $order->get_items() )->get_product();
+			$order_items = $order->get_items();
 
-			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
-				$type = __( 'Subscription' );
+			if ( ! empty( $order_items ) ) {
+				$product = current( $order_items )->get_product();
+
+				if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+					$type = __( 'Subscription' );
+				} else {
+					$type = __( 'Order' );
+				}
 			} else {
 				$type = __( 'Order' );
 			}
