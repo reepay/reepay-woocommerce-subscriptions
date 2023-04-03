@@ -13,7 +13,7 @@ class WC_Reepay_Checkout {
 	public function __construct() {
 		add_filter( 'woocommerce_payment_gateways', [ $this, 'woocommerce_payment_gateways' ], PHP_INT_MAX );
 		add_filter( 'wcs_cart_have_subscription', [ $this, 'is_reepay_product_in_cart' ] );
-		add_filter( 'wcs_cart_only_subscriptions', [ $this, 'only_reepay_product_in_cart' ] );
+		add_filter( 'wcs_cart_only_subscriptions', [ $this, 'only_reepay_products_in_cart' ] );
 	}
 
 	/**
@@ -71,30 +71,22 @@ class WC_Reepay_Checkout {
 	/**
 	 * @return bool
 	 */
-	public static function only_reepay_product_in_cart( $is_only ) {
-
+	public static function only_reepay_products_in_cart( $is_only ) {
 		if ( $is_only ) {
 			return $is_only;
 		}
 
-		$have_product = false;
-
-		if ( self::is_reepay_product_in_cart() ) {
-			/**
-			 * @var $cart_item array Item data
-			 */
-			foreach ( WC()->cart->get_cart() as $cart_item ) {
-				if ( ! self::is_reepay_product( $cart_item['data'] ) ) {
-					$have_product = true;
-					break;
-				}
+		/**
+		 * @var $cart_item array Item data
+		 */
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			if ( ! self::is_reepay_product( $cart_item['data'] ) ) {
+				return false;
 			}
-		} else {
-			$have_product = true;
 		}
 
 
-		return ! $have_product;
+		return true;
 	}
 
 	/**
