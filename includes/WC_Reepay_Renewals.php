@@ -240,13 +240,16 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
-		$child_order = $this->get_child_order( $order, $data['invoice'] );
+		if ( ! empty( $data['invoice'] ) ) {
+			$child_order = $this->get_child_order( $order, $data['invoice'] );
+		}
 
 		self::log( [
 			'log' => [
-				'source' => 'WC_Reepay_Renewals::child_order',
-				'error'  => '',
-				'data'   => $child_order
+				'source'  => 'WC_Reepay_Renewals::child_order',
+				'error'   => '',
+				'data'    => $child_order ?? '-',
+				'invoice' => $data['invoice'] ?? 'empty'
 			],
 		] );
 
@@ -1058,7 +1061,7 @@ class WC_Reepay_Renewals {
 	 * @return true|WP_Error
 	 */
 	public static function change_user_role( $data ) {
-		$order = self::get_order_by_subscription_handle( $data['subscription'] );
+		$order = ! empty( $data['subscription'] ) ? self::get_order_by_subscription_handle( $data['subscription'] ) : '';
 
 		if ( empty( $order ) ) {
 			return new WP_Error( __( 'Order not found', 'reepay-subscriptions-for-woocommerce' ) );
@@ -1274,7 +1277,7 @@ class WC_Reepay_Renewals {
 				'description'   => $shm_data['reepay_shipping_addon_description'],
 				'type'          => 'on_off',
 				'fixed_amount ' => true,
-				'amount'        => $shm_data['reepay_shipping_addon_amount'],
+				'amount'        => $shm_data['reepay_shipping_addon_amount'] ?? 0,
 				'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
 				'vat_type'      => wc_prices_include_tax(),
 				'handle'        => $shm_data['reepay_shipping_addon'],
