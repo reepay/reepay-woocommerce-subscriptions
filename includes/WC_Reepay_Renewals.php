@@ -835,7 +835,7 @@ class WC_Reepay_Renewals {
 		if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
 			$new_items = [];
 			foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
-				
+
 				if ( $invoice_lines['origin'] == 'discount' ) {
 					continue;
 				}
@@ -852,7 +852,7 @@ class WC_Reepay_Renewals {
 					$product_item->set_name( $invoice_lines['ordertext'] );
 					$product_item->set_quantity( $invoice_lines['quantity'] );
 					$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-					$product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
+					$product_item->set_total( floatval( $invoice_lines['unit_amount'] ) / 100 );
 					$new_items[] = $product_item;
 				}
 			}
@@ -876,7 +876,7 @@ class WC_Reepay_Renewals {
 			'status'      => $status,
 			'parent'      => $parent_order->get_id(),
 			'customer_id' => $parent_order->get_customer_id(),
-		], $parent_order, $items );
+		], $parent_order, $items, false );
 	}
 
 	/**
@@ -940,12 +940,11 @@ class WC_Reepay_Renewals {
 	 *
 	 * @return WC_Order|WP_Error
 	 */
-	public static function create_order_copy( $order_args, $main_order, $items = [] ) {
+	public static function create_order_copy( $order_args, $main_order, $items = [], $calc_taxes = true ) {
 		$new_order = wc_create_order( $order_args );
 		$new_order->save();
 
 		$main_order = wc_get_order( $main_order );
-
 
 		$fields_to_copy = [
 			'_order_shipping',
@@ -1041,16 +1040,12 @@ class WC_Reepay_Renewals {
 			}
 
 
-			$new_order->calculate_totals();
+			$new_order->calculate_totals( $calc_taxes );
 		}
 		$main_order->save();
 
-		$new_order->set_discount_tax('0');
-		$new_order->set_shipping_tax('0');
-		$new_order->set_cart_tax('0');
-		
 		$new_order->save();
-		$new_order->calculate_totals();
+		$new_order->calculate_totals( $calc_taxes );
 
 		return $new_order;
 	}
