@@ -875,7 +875,7 @@ class WC_Reepay_Renewals {
 					$product_item->set_name( $invoice_lines['ordertext'] );
 					$product_item->set_quantity( $invoice_lines['quantity'] );
 					$product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-					$product_item->set_total( floatval( $invoice_lines['unit_amount'] ) / 100 );
+					$product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
 					$new_items[] = $product_item;
 				}
 			}
