@@ -39,7 +39,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param WC_Order|integer $order
+	 * @param  WC_Order|integer  $order
 	 *
 	 * @return bool
 	 */
@@ -50,7 +50,10 @@ class WC_Reepay_Renewals {
 			if ( ! empty( $order ) ) {
 				foreach ( $order->get_items() as $item ) {
 					$product = $item->get_product();
-					if ( $product && $product->is_type( [ 'reepay_simple_subscriptions', 'reepay_variable_subscriptions' ] ) ) {
+					if ( $product && $product->is_type( [
+							'reepay_simple_subscriptions',
+							'reepay_variable_subscriptions'
+						] ) ) {
 						return true;
 					};
 				}
@@ -133,7 +136,12 @@ class WC_Reepay_Renewals {
 		return $status;
 	}
 
-	public function status_manual_start_date( $order_id, $this_status_transition_from, $this_status_transition_to, $instance ) {
+	public function status_manual_start_date(
+		$order_id,
+		$this_status_transition_from,
+		$this_status_transition_to,
+		$instance
+	) {
 		$order          = wc_get_order( $order_id );
 		$payment_method = $order->get_payment_method();
 
@@ -150,7 +158,8 @@ class WC_Reepay_Renewals {
 			$sub_meta = $order->get_meta( '_reepay_subscription_handle' );
 
 			if ( ! empty( $sub_meta ) ) {
-				$params['next_period_start'] = date( 'Y-m-d\TH:i:s', strtotime( current_time( 'Y-m-d\TH:i:s' ) . "+60 seconds" ) );
+				$params['next_period_start'] = date( 'Y-m-d\TH:i:s',
+					strtotime( current_time( 'Y-m-d\TH:i:s' ) . "+60 seconds" ) );
 
 				try {
 					reepay_s()->api()->request( "subscription/{$sub_meta}/change_next_period_start", 'POST', $params );
@@ -165,7 +174,8 @@ class WC_Reepay_Renewals {
 					] );
 
 					$notice = sprintf(
-						__( 'Unable to change subscription period to %s. Error from acquire: %s', 'reepay-subscriptions-for-woocommerce' ),
+						__( 'Unable to change subscription period to %s. Error from acquire: %s',
+							'reepay-subscriptions-for-woocommerce' ),
 						$params['next_period_start'],
 						$e->getMessage()
 					);
@@ -198,7 +208,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -319,7 +329,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -330,7 +340,7 @@ class WC_Reepay_Renewals {
 	 *     'event_id' => string
 	 * ] $data
 	 *
-	 * @param WC_Order $main_order
+	 * @param  WC_Order  $main_order
 	 */
 	public function create_subscriptions( $data, $main_order ) {
 		$data['order_id'] = $main_order->get_id();
@@ -354,7 +364,8 @@ class WC_Reepay_Renewals {
 				)
 			] );
 
-			$main_order->add_order_note( __( "Unable to create subscription. Empty token", 'reepay-subscriptions-for-woocommerce' ) );
+			$main_order->add_order_note( __( "Unable to create subscription. Empty token",
+				'reepay-subscriptions-for-woocommerce' ) );
 
 			return;
 		}
@@ -371,7 +382,8 @@ class WC_Reepay_Renewals {
 				continue;
 			}
 
-			$new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(), '_reepay_subscription_customer_role', true );
+			$new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
+				'_reepay_subscription_customer_role', true );
 			if ( ! empty( $new_role_for_customer ) ) {
 				$main_order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
 			}
@@ -463,7 +475,16 @@ class WC_Reepay_Renewals {
 
 
 				if ( ! empty( $addons ) ) {
-					$sub_data['add_ons'] = array_unique( $addons );
+					$cleared_addons = [];
+
+					foreach ( $addons as $addon ) {
+						$handles = wp_list_pluck( $cleared_addons, 'handle' );
+						if ( ! in_array( $addon['handle'], $handles ) ) {
+							$cleared_addons[] = $addon;
+						}
+					}
+
+					$sub_data['add_ons'] = $cleared_addons;
 				}
 
 				if ( $main_order->get_id() !== $order->get_id() ) {
@@ -473,7 +494,8 @@ class WC_Reepay_Renewals {
 				$new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
 			} catch ( Exception $e ) {
 				$notice = sprintf(
-					__( 'Unable to create subscription. Error from acquire: %s', 'reepay-subscriptions-for-woocommerce' ),
+					__( 'Unable to create subscription. Error from acquire: %s',
+						'reepay-subscriptions-for-woocommerce' ),
 					$e->getMessage()
 				);
 
@@ -525,7 +547,8 @@ class WC_Reepay_Renewals {
 						'data'   => $data
 					],
 					'notice' => sprintf(
-						__( "Subscription %s - unable to assign payment method to subscription", 'reepay-subscriptions-for-woocommerce' ),
+						__( "Subscription %s - unable to assign payment method to subscription",
+							'reepay-subscriptions-for-woocommerce' ),
 						$data['order_id']
 					)
 				] );
@@ -550,7 +573,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -570,7 +593,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -586,7 +609,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -602,7 +625,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -619,7 +642,7 @@ class WC_Reepay_Renewals {
 	/**
 	 * Get payment token.
 	 *
-	 * @param WC_Order $order
+	 * @param  WC_Order  $order
 	 *
 	 * @return string|false
 	 * @todo refactor with while cycle
@@ -646,7 +669,7 @@ class WC_Reepay_Renewals {
 	/**
 	 * Get Payment Token by Token string.
 	 *
-	 * @param string $token
+	 * @param  string  $token
 	 *
 	 * @return null|bool|WC_Payment_Token
 	 */
@@ -663,7 +686,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param string $handle
+	 * @param  string  $handle
 	 *
 	 * @return WC_Order|false
 	 */
@@ -692,7 +715,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param mixed $order
+	 * @param  mixed  $order
 	 */
 	public static function is_order_subscription_active( $order ) {
 		$order = wc_get_order( $order );
@@ -729,8 +752,8 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param WC_Order $parent_order
-	 * @param string $invoice
+	 * @param  WC_Order  $parent_order
+	 * @param  string  $invoice
 	 *
 	 * @return WC_Order|false
 	 */
@@ -752,8 +775,8 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param array<string, string> $data
-	 * @param string $status
+	 * @param  array<string, string>  $data
+	 * @param  string  $status
 	 *
 	 * @return WC_Order|WP_Error
 	 */
@@ -812,7 +835,7 @@ class WC_Reepay_Renewals {
 
 		$items = array();
 
-		$gateway      = rp_get_payment_method( $parent_order );
+		$gateway = rp_get_payment_method( $parent_order );
 
 		if ( function_exists( 'reepay' ) ) {
 			$invoice_data = reepay()->api( $gateway )->get_invoice_by_handle( $data['invoice'] );
@@ -880,7 +903,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param array[
+	 * @param  array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -889,7 +912,7 @@ class WC_Reepay_Renewals {
 	 *     'event_type' => string
 	 *     'event_id' => string
 	 * ] $data
-	 * @param string $status
+	 * @param  string  $status
 	 *
 	 * @return bool|WP_Error
 	 */
@@ -934,9 +957,9 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param array $order_args Order arguments.
-	 * @param WC_Order $main_order Order arguments.
-	 * @param array<WC_Order_Item> $items
+	 * @param  array  $order_args  Order arguments.
+	 * @param  WC_Order  $main_order  Order arguments.
+	 * @param  array<WC_Order_Item>  $items
 	 *
 	 * @return WC_Order|WP_Error
 	 */
@@ -994,7 +1017,8 @@ class WC_Reepay_Renewals {
 		];
 
 		foreach ( $fields_to_copy as $field_name ) {
-			update_post_meta( $new_order->get_id(), $field_name, get_post_meta( $main_order->get_id(), $field_name, true ) );
+			update_post_meta( $new_order->get_id(), $field_name,
+				get_post_meta( $main_order->get_id(), $field_name, true ) );
 		}
 
 		foreach ( $items as $item ) {
@@ -1051,7 +1075,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param array $data @see self::renew_subscription
+	 * @param  array  $data  @see self::renew_subscription
 	 *
 	 * @return true|WP_Error
 	 */
@@ -1086,8 +1110,8 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param mixed $order
-	 * @param array[]|null $data - @see https://reference.reepay.com/api/#the-subscription-object
+	 * @param  mixed  $order
+	 * @param  array[]|null  $data  - @see https://reference.reepay.com/api/#the-subscription-object
 	 *
 	 * @return array|WP_Error - array of saved data or error
 	 */
@@ -1138,9 +1162,9 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param mixed $order
-	 * @param string $date_key
-	 * @param string $date_format
+	 * @param  mixed  $order
+	 * @param  string  $date_key
+	 * @param  string  $date_format
 	 *
 	 * @return string
 	 */
@@ -1173,8 +1197,8 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param WC_Order $order
-	 * @param string $customer_handle
+	 * @param  WC_Order  $order
+	 * @param  string  $customer_handle
 	 *
 	 *
 	 * @return array<string>
@@ -1202,7 +1226,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param WC_Order $order
+	 * @param  WC_Order  $order
 	 *
 	 *
 	 * @param $handle
@@ -1230,7 +1254,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param WC_Order_Item $order_item
+	 * @param  WC_Order_Item  $order_item
 	 *
 	 * @return array
 	 */
@@ -1248,7 +1272,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param WC_Order $order
+	 * @param  WC_Order  $order
 	 *
 	 * @return array
 	 */
@@ -1285,7 +1309,7 @@ class WC_Reepay_Renewals {
 	/**
 	 * Lock the order.
 	 *
-	 * @param mixed $order_id
+	 * @param  mixed  $order_id
 	 *
 	 * @return void
 	 */
@@ -1296,7 +1320,7 @@ class WC_Reepay_Renewals {
 	/**
 	 * Unlock the order.
 	 *
-	 * @param mixed $order_id
+	 * @param  mixed  $order_id
 	 *
 	 * @return void
 	 */
@@ -1316,7 +1340,7 @@ class WC_Reepay_Renewals {
 	}
 
 	/**
-	 * @param array $data
+	 * @param  array  $data
 	 */
 	public static function log( $data ) {
 		if ( ! empty( $data['log'] ) ) {
