@@ -873,11 +873,11 @@ class WC_Reepay_Renewals
         if ( ! empty($invoice_data) && ! empty($invoice_data['order_lines'])) {
             $new_items = [];
             foreach ($invoice_data['order_lines'] as $invoice_lines) {
-                if ($invoice_lines['origin'] == 'discount') {
+                /*if ($invoice_lines['origin'] == 'discount') {
                     continue;
-                }
+                }*/
 
-                if ($invoice_lines['origin'] == 'surcharge_fee') {
+                if ($invoice_lines['origin'] == 'surcharge_fee' || $invoice_lines['origin'] == 'discount') {
                     $fees_item = new WC_Order_Item_Fee();
                     $fees_item->set_name($invoice_lines['ordertext']);
                     $fees_item->set_amount(floatval($invoice_lines['unit_amount']) / 100);
