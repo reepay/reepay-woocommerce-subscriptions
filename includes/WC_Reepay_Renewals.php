@@ -854,8 +854,9 @@ class WC_Reepay_Renewals
 
         if (function_exists('reepay')) {
             $invoice_data = reepay()->api($gateway)->get_invoice_by_handle($data['invoice']);
-        } else {
-            //ToDo remove in next major update
+        }
+
+        if (empty($invoice_data)) {
             $invoice_data = $gateway->api->get_invoice_by_handle($data['invoice']);
         }
 
