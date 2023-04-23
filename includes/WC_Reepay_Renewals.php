@@ -378,11 +378,12 @@ class WC_Reepay_Renewals
 
         $orders         = [$main_order];
         $order_items    = $main_order->get_items();
+        $order_fee      = $main_order->get_items('fee');
         $created_orders = [];
         foreach ($order_items as $order_item_key => $order_item) {
-	        /**
-	         * @var WC_Order_Item_Product $order_item
-	         */
+            /**
+             * @var WC_Order_Item_Product $order_item
+             */
             $product = $order_item->get_product();
 
             if ( ! WC_Reepay_Checkout::is_reepay_product($product)) {
@@ -395,7 +396,7 @@ class WC_Reepay_Renewals
                 $main_order->add_meta_data('_reepay_subscription_customer_role', $new_role_for_customer);
             }
 
-            if (count($order_items) <= 1) {
+            if (count($order_items) + count($order_fee) <= 1) {
                 break;
             }
 
@@ -403,7 +404,7 @@ class WC_Reepay_Renewals
 
             $fee = $product->get_meta('_reepay_subscription_fee');
             if ( ! empty($fee) && ! empty($fee['enabled']) && $fee['enabled'] == 'yes') {
-                foreach ($main_order->get_items('fee') as $item_id => $item) {
+                foreach ($order_fee as $item_id => $item) {
                     if ($product->get_name().' - '.$fee["text"] === $item['name']) {
                         $items_to_create[] = $item;
                         $main_order->remove_item($item_id);
@@ -1036,32 +1037,32 @@ class WC_Reepay_Renewals
         ];
 
         $additional_fields_to_copy = [
-	        'is_vat_exempt',
-	        'reepay_card_type',
-	        'reepay_masked_card',
-	        'reepay_session_id',
-	        'reepay_token',
+            'is_vat_exempt',
+            'reepay_card_type',
+            'reepay_masked_card',
+            'reepay_session_id',
+            'reepay_token',
         ];
 
-	    foreach ( $fields_to_copy as $field_name ) {
-		    update_post_meta(
-			    $new_order->get_id(),
-			    $field_name,
-			    get_post_meta( $main_order->get_id(), $field_name, true )
-		    );
-	    }
+        foreach ($fields_to_copy as $field_name) {
+            update_post_meta(
+                $new_order->get_id(),
+                $field_name,
+                get_post_meta($main_order->get_id(), $field_name, true)
+            );
+        }
 
-	    foreach ( $additional_fields_to_copy as $field_name ) {
-		    $field_value = get_post_meta( $main_order->get_id(), $field_name, true );
+        foreach ($additional_fields_to_copy as $field_name) {
+            $field_value = get_post_meta($main_order->get_id(), $field_name, true);
 
-		    if ( ! empty( $field_value ) ) {
-			    update_post_meta(
-				    $new_order->get_id(),
-				    $field_name,
-				    $field_value
-			    );
-		    }
-	    }
+            if ( ! empty($field_value)) {
+                update_post_meta(
+                    $new_order->get_id(),
+                    $field_name,
+                    $field_value
+                );
+            }
+        }
 
         foreach ($items as $item) {
             if ($item->is_type('line_item')) {
