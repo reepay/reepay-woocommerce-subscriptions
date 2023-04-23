@@ -323,7 +323,7 @@ class WC_Reepay_Discounts_And_Coupons {
 			$data         = array_merge( $data, $discountData );
 		}
 
-		$data['_reepay_discount_name'] = sanitize_text_field( $_REQUEST['_reepay_discount_name'] );
+		$data['_reepay_discount_name'] = isset( $_REQUEST['_reepay_discount_name'] ) ? sanitize_text_field( $_REQUEST['_reepay_discount_name'] ) : '';
 
 		if ( ! empty( $data ) ) {
 			foreach ( self::$meta_fields as $key ) {
