@@ -378,7 +378,6 @@ class WC_Reepay_Renewals
 
         $orders         = [$main_order];
         $order_items    = $main_order->get_items();
-        $order_fee      = $main_order->get_items('fee');
         $created_orders = [];
         foreach ($order_items as $order_item_key => $order_item) {
             /**
@@ -396,7 +395,7 @@ class WC_Reepay_Renewals
                 $main_order->add_meta_data('_reepay_subscription_customer_role', $new_role_for_customer);
             }
 
-            if (count($order_items) + count($order_fee) <= 1) {
+            if (count($order_items) <= 1) {
                 break;
             }
 
@@ -404,7 +403,7 @@ class WC_Reepay_Renewals
 
             $fee = $product->get_meta('_reepay_subscription_fee');
             if ( ! empty($fee) && ! empty($fee['enabled']) && $fee['enabled'] == 'yes') {
-                foreach ($order_fee as $item_id => $item) {
+                foreach ($main_order->get_items('fee') as $item_id => $item) {
                     if ($product->get_name().' - '.$fee["text"] === $item['name']) {
                         $items_to_create[] = $item;
                         $main_order->remove_item($item_id);
