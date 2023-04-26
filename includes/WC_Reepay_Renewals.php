@@ -15,7 +15,7 @@ class WC_Reepay_Renewals
         add_action('reepay_webhook', [$this, 'create_subscriptions_handle']);
         add_action('reepay_create_subscription', [$this, 'create_subscriptions'], 10, 2);
 
-        add_action('reepay_webhook_invoice_created', [$this, 'renew_subscription'],);
+        add_action('reepay_webhook_invoice_created', [$this, 'renew_subscription']);
         add_action('reepay_webhook_raw_event_subscription_renewal', [$this, 'renew_subscription']);
         add_action('reepay_webhook_raw_event_subscription_on_hold', [$this, 'hold_subscription']);
         add_action('reepay_webhook_raw_event_subscription_cancelled', [$this, 'cancel_subscription']);
@@ -378,9 +378,11 @@ class WC_Reepay_Renewals
 
         $orders         = [$main_order];
         $order_items    = $main_order->get_items();
-        $created_orders = [$main_order->get_id()];
+        $created_orders = [];
         foreach ($order_items as $order_item_key => $order_item) {
-            //Get the WC_Product object
+            /**
+             * @var WC_Order_Item_Product $order_item
+             */
             $product = $order_item->get_product();
 
             if ( ! WC_Reepay_Checkout::is_reepay_product($product)) {
@@ -573,7 +575,7 @@ class WC_Reepay_Renewals
             $created_reepay_orders[] = $order->get_id();
         }
 
-        do_action('reepay_subscriptions_orders_created', $created_reepay_orders);
+        do_action('reepay_subscriptions_orders_created', $created_reepay_orders, $main_order);
     }
 
 
@@ -854,8 +856,9 @@ class WC_Reepay_Renewals
 
         if (function_exists('reepay')) {
             $invoice_data = reepay()->api($gateway)->get_invoice_by_handle($data['invoice']);
-        } else {
-            //ToDo remove in next major update
+        }
+
+        if (empty($invoice_data)) {
             $invoice_data = $gateway->api->get_invoice_by_handle($data['invoice']);
         }
 
@@ -1032,9 +1035,32 @@ class WC_Reepay_Renewals
             '_reepay_customer',
         ];
 
+        $additional_fields_to_copy = [
+            'is_vat_exempt',
+            'reepay_card_type',
+            'reepay_masked_card',
+            'reepay_session_id',
+            'reepay_token',
+        ];
+
         foreach ($fields_to_copy as $field_name) {
-            update_post_meta($new_order->get_id(), $field_name,
-                get_post_meta($main_order->get_id(), $field_name, true));
+            update_post_meta(
+                $new_order->get_id(),
+                $field_name,
+                get_post_meta($main_order->get_id(), $field_name, true)
+            );
+        }
+
+        foreach ($additional_fields_to_copy as $field_name) {
+            $field_value = get_post_meta($main_order->get_id(), $field_name, true);
+
+            if ( ! empty($field_value)) {
+                update_post_meta(
+                    $new_order->get_id(),
+                    $field_name,
+                    $field_value
+                );
+            }
         }
 
         foreach ($items as $item) {

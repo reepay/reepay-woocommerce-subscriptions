@@ -834,13 +834,25 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 	}
 
+	/**
+	 * @param array $total_rows
+	 * @param WC_Order $order
+	 * @param bool $tax_display
+	 *
+	 * @return mixed
+	 */
 	public function rework_total( $total_rows, $order, $tax_display ) {
 		$another_orders = get_post_meta( $order->get_id(), '_reepay_another_orders', true );
 		if ( ! empty( $another_orders ) ) {
-			$total = 0;
+			$total = $order->get_total();
+
 			foreach ( $another_orders as $order_id ) {
+				if( $order->get_id() === $order_id ) {
+					continue; // Backward compatibility
+				}
+
 				$order_another = wc_get_order( $order_id );
-				$total         += floatval( $order_another->get_total() );
+				$total         += $order_another->get_total();
 			}
 
 			$total_rows['cart_subtotal'] = [
