@@ -15,7 +15,7 @@ class WC_Reepay_Renewals
         add_action('reepay_webhook', [$this, 'create_subscriptions_handle']);
         add_action('reepay_create_subscription', [$this, 'create_subscriptions'], 10, 2);
 
-        add_action('reepay_webhook_invoice_created', [$this, 'renew_subscription'],);
+        add_action('reepay_webhook_invoice_created', [$this, 'renew_subscription']);
         add_action('reepay_webhook_raw_event_subscription_renewal', [$this, 'renew_subscription']);
         add_action('reepay_webhook_raw_event_subscription_on_hold', [$this, 'hold_subscription']);
         add_action('reepay_webhook_raw_event_subscription_cancelled', [$this, 'cancel_subscription']);
@@ -378,7 +378,6 @@ class WC_Reepay_Renewals
 
         $orders         = [$main_order];
         $order_items    = $main_order->get_items();
-        $order_fee      = $main_order->get_items('fee');
         $created_orders = [];
         foreach ($order_items as $order_item_key => $order_item) {
             /**
@@ -396,7 +395,7 @@ class WC_Reepay_Renewals
                 $main_order->add_meta_data('_reepay_subscription_customer_role', $new_role_for_customer);
             }
 
-            if (count($order_items) + count($order_fee) <= 1) {
+            if (count($order_items) <= 1) {
                 break;
             }
 
@@ -404,7 +403,7 @@ class WC_Reepay_Renewals
 
             $fee = $product->get_meta('_reepay_subscription_fee');
             if ( ! empty($fee) && ! empty($fee['enabled']) && $fee['enabled'] == 'yes') {
-                foreach ($order_fee as $item_id => $item) {
+                foreach ($main_order->get_items('fee') as $item_id => $item) {
                     if ($product->get_name().' - '.$fee["text"] === $item['name']) {
                         $items_to_create[] = $item;
                         $main_order->remove_item($item_id);
