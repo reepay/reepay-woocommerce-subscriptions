@@ -33,14 +33,14 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple
             return $price_html;
         }
 
-        $fee = $product->get_meta('_reepay_subscription_fee');
+        /*$fee = $product->get_meta('_reepay_subscription_fee');
         if ( ! empty($fee) && ! empty($fee['enabled']) && $fee['enabled'] == 'yes') {
             $schedule_type .= sprintf(
                 __(' and a %s %s',
                     'reepay-subscriptions-for-woocommerce'),
                 wc_price($fee["amount"]), $fee["text"]
             );
-        }
+        }*/
 
         return $price_html.' / '.$schedule_type;
     }
