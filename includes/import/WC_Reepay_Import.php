@@ -65,10 +65,11 @@ class WC_Reepay_Import {
 
 	/**
 	 * @param  array  $options
+	 * @param  bool  $debug
 	 *
 	 * @return array|WP_Error
 	 */
-	public static function get_reepay_customers( $options = array() ) {
+	public static function get_reepay_customers( $options = array(), $debug = false ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -94,13 +95,24 @@ class WC_Reepay_Import {
 			}
 
 			foreach ( $customers_data['content'] as $customer ) {
+				$customer['debug_message'] = '';
+
 				if ( $only_with_active_subscription && 0 === $customer['active_subscriptions'] ) {
-					continue;
+					if( ! $debug ) {
+						continue;
+					}
+
+					$customer['debug'] = true;
+					$customer['debug_message'] .= __( 'Active subscription not found', 'reepay-subscriptions-for-woocommerce' ) . ' ';
 				}
 
 				$wp_user_id = rp_get_userid_by_handle( $customer['handle'] );
 
 				if ( false === get_user_by( 'id', $wp_user_id ) ) {
+					$customers_to_import[ $customer['handle'] ] = $customer;
+				} else if( $debug ) {
+					$customer['debug'] = true;
+					$customer['debug_message'] .= __( 'Already imported', 'reepay-subscriptions-for-woocommerce' ) . ' ';
 					$customers_to_import[ $customer['handle'] ] = $customer;
 				}
 			}
@@ -137,10 +149,11 @@ class WC_Reepay_Import {
 
 	/**
 	 * @param  array  $options
+	 * @param  bool  $debug
 	 *
 	 * @return array
 	 */
-	public static function get_reepay_cards( $options = array() ) {
+	public static function get_reepay_cards( $options = array(), $debug = false  ) {
 		$users = get_users( [ 'fields' => [ 'ID', 'user_email' ] ] );
 
 		$only_active_cards = in_array( 'active', $options );
@@ -172,15 +185,26 @@ class WC_Reepay_Import {
 			$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user->ID );
 
 			foreach ( $res['cards'] as $card ) {
-				if ( in_array( $card['id'], $customer_tokens )
-				     || ( $only_active_cards && 'active' !== $card['state'] )
-				) {
-					continue;
-				}
-
 				$card['customer_email'] = $user->user_email;
 
-				$cards_to_import[ $card['id'] ] = $card;
+				if ( ! in_array( $card['id'], $customer_tokens )
+				     && ( ! $only_active_cards || 'active' === $card['state'] )
+				) {
+					$cards_to_import[ $card['id'] ] = $card;
+				} elseif ( $debug ) {
+					$card['debug']         = true;
+					$card['debug_message'] = '';
+
+					if ( in_array( $card['id'], $customer_tokens ) ) {
+						$card['debug_message'] = __( 'Already imported', 'reepay-subscriptions-for-woocommerce' ) . '<br> ';
+					}
+
+					if ( $only_active_cards && 'active' !== $card['state'] ) {
+						$card['debug_message'] = __( 'Wrong card status: ', 'reepay-subscriptions-for-woocommerce' ) . $card['state'] . '<br> ';
+					}
+
+					$cards_to_import[ $card['id'] ] = $card;
+				}
 			}
 		}
 
@@ -220,10 +244,11 @@ class WC_Reepay_Import {
 
 	/**
 	 * @param  array  $statuses
+	 * @param  bool  $debug
 	 *
 	 * @return array|WP_Error
 	 */
-	public static function get_reepay_subscriptions( $statuses = array() ) {
+	public static function get_reepay_subscriptions( $statuses = array(), $debug = false  ) {
 		$params = [
 			'from' => '1970-01-01',
 			'size' => 100,
@@ -263,6 +288,29 @@ class WC_Reepay_Import {
 
 					if ( $wp_user_data ) {
 						$subscription['customer_email'] = $wp_user_data->user_email ?: __( 'Email not set', 'reepay-subscriptions-for-woocommerce' );
+					}
+
+					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
+				} else if( $debug ) {
+					$subscription['debug'] = true;
+					$subscription['debug_message'] = '';
+
+					if( WC_Reepay_Import_Helpers::woo_reepay_subscription_exists( $subscription['handle'] ) ) {
+						$subscription['debug_message'] .= __( 'Subscription already exists in store', 'reepay-subscriptions-for-woocommerce' ) . '<br> ';
+					}
+
+					if ( ! $import_all_statuses ) {
+						if ( ! in_array( $subscription['state'], $statuses ) ) {
+							$subscription['debug_message'] .= __( 'Wrong status: ', 'reepay-subscriptions-for-woocommerce' ) . $subscription['state'] . '<br> ';
+						}
+
+						if ( $import_dunning && $subscription['dunning_invoices'] === 0 ) {
+							$subscription['debug_message'] .= __( 'No dunning invoice', 'reepay-subscriptions-for-woocommerce' ) . '<br> ';
+						}
+
+						if ( $import_cancelled && ! $subscription['is_cancelled'] ) {
+							$subscription['debug_message'] .= __( 'Subscription not canceled', 'reepay-subscriptions-for-woocommerce' ) . '<br> ';
+						}
 					}
 
 					$subscriptions_to_import[ $subscription['handle'] ] = $subscription;
