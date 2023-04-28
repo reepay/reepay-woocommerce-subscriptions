@@ -36,7 +36,7 @@ jQuery(function ($) {
             .filter('input[name$="[all]"]')
             .prop('checked', this.checked);
 
-        const $checkedCheckboxes = $formTables.find('.reepay-import__row--main input:checked');
+        const $checkedCheckboxes = $formTables.find('.reepay-import__row--main:not(.reepay-import__row--debug) input:checked');
         $submitBtn.prop('disabled', !$checkedCheckboxes.length);
 
     }).find('.reepay-import__row--main input').trigger('change');

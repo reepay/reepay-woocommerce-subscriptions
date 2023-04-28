@@ -22,9 +22,17 @@
         <% } %>
 
         <% _(rows).forEach(function(data, handle) { %>
-            <tr class="">
+            <tr class="<% if(data.debug) { %>skipped<% } %>">
                 <th scope="row" class="check-column">
-                    <input id="cb-select-<%= handle %>" type="checkbox" name="<%= handle %>" checked>
+                    <input id="cb-select-<%= handle %>"
+                           type="checkbox"
+                           name="<%= handle %>"
+                            <% if(data.debug) { %>
+                                disabled
+                            <% } else { %>
+                                checked
+                            <% } %>
+                           >
                 </th>
                 <td class="column-data column-name">
                     <%= data.first_name %> <%= data.last_name %>
@@ -35,7 +43,13 @@
                 <td class="column-data column-reepay-handle">
                     <%= handle %>
                 </td>
-                <td class="column-data column-message js-column-message"><?php _e('Ready to import', 'reepay-subscriptions-for-woocommerce') ?></td>
+                <td class="column-data column-message js-column-message">
+                    <% if(data.debug) { %>
+                        <%= data.debug_message %>
+                    <% } else { %>
+	                    <?php _e('Ready to import', 'reepay-subscriptions-for-woocommerce') ?>
+                    <% } %>
+                </td>
             </tr>
         <% }); %>
         </tbody>

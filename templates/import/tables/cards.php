@@ -24,10 +24,17 @@
         <% } %>
 
         <% _(rows).forEach(function(data, card_id) { %>
-            <tr class="">
+            <tr class="<% if(data.debug) { %>skipped<% } %>">
                 <th scope="row" class="check-column">
-                    <input id="cb-select-<%= card_id %>" type="checkbox" name="<%= card_id %>" checked>
-                </th>
+                    <input id="cb-select-<%= card_id %>"
+                           type="checkbox"
+                           name="<%= card_id %>"
+                            <% if(data.debug) { %>
+                                disabled
+                            <% } else { %>
+                                checked
+                            <% } %>
+                           >
 
                 <td class="column-data column-name">
                     <%= data.masked_card %>
@@ -49,7 +56,13 @@
                     <%= data.customer %>
                 </td>
 
-                <td class="column-data column-message js-column-message"><?php _e('Ready to import', 'reepay-subscriptions-for-woocommerce') ?></td>
+                <td class="column-data column-message js-column-message">
+                    <% if(data.debug) { %>
+                         <%= data.debug_message %>
+                    <% } else { %>
+		                <?php _e('Ready to import', 'reepay-subscriptions-for-woocommerce') ?>
+                    <% } %>
+                </td>
             </tr>
         <% }); %>
         </tbody>
