@@ -215,6 +215,12 @@ class WC_Reepay_Import_Helpers {
 		$order->save();
 		$order->calculate_totals();
 
+		if ( $order->get_total() >= 0 ) {
+			update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
+			$order->set_total( 0 );
+			$order->save();
+		}
+
 		return true;
 	}
 }
