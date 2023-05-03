@@ -197,6 +197,22 @@ class WC_Reepay_Import_Helpers {
 		$order->add_meta_data( '_reepay_subscription_handle', $subscription['handle'] );
 		$order->add_meta_data( '_reepay_imported', 1 );
 
+		$plan_data     = reepay_s()->plan()->get_remote_plan_meta( $subscription['plan'] );
+		$schedule_type = $plan_data['_reepay_subscription_schedule_type'];
+		$schedule_data = $plan_data[ $schedule_type ];
+
+		$order->add_meta_data(
+			'_reepay_billing_string',
+			WC_Reepay_Subscription_Plan_Simple::get_billing_plan(
+				array(
+					'type' => $schedule_type,
+					'type_data' => $schedule_data,
+					'interval' => ''
+				),
+				true
+			)
+		);
+
 		$order_item = new WC_Order_Item_Product();
 		$order_item->set_name( 'Plan ' . $plan['name'] );
 		$order_item->set_quantity( $plan['quantity'] );

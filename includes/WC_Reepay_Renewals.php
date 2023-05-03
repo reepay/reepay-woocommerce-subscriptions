@@ -196,17 +196,15 @@ class WC_Reepay_Renewals
         }
     }
 
-    public function display_real_total($formatted_total, $order, $tax_display, $display_refunded)
-    {
-        if (self::is_order_contain_subscription($order) && floatval($order->get_total()) == 0 && ! is_admin()) {
-            $real_total = get_post_meta($order->get_id(), '_real_total', true);
-            if ( ! empty($real_total)) {
-                return wc_price($real_total);
-            }
-        }
+	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
+		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
 
-        return $formatted_total;
-    }
+		if ( ! empty( $real_total ) && $order->get_total() <= 0 && ! is_admin() ) {
+			return wc_price( $real_total );
+		}
+
+		return $formatted_total;
+	}
 
     /**
      *
