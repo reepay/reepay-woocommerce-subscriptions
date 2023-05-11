@@ -97,6 +97,10 @@ class WC_Reepay_Checkout {
 	public static function is_reepay_product( $product = false ) {
 		$product = wc_get_product( $product );
 
+		if( empty( $product ) ) {
+			return false;
+		}
+
 		if ( $product->is_type( 'variation' ) ) {
 			$product = wc_get_product( $product->get_parent_id() );
 		}
