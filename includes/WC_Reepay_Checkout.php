@@ -14,6 +14,7 @@ class WC_Reepay_Checkout {
 		add_filter( 'woocommerce_payment_gateways', [ $this, 'woocommerce_payment_gateways' ], PHP_INT_MAX );
 		add_filter( 'wcs_cart_have_subscription', [ $this, 'is_reepay_product_in_cart' ] );
 		add_filter( 'wcs_cart_only_subscriptions', [ $this, 'only_subscriptions_in_cart' ] );
+		add_filter( 'wcr_cart_only_reepay_subscriptions', [ $this, 'only_reepay_products_in_cart' ] );
 	}
 
 	/**
@@ -81,6 +82,27 @@ class WC_Reepay_Checkout {
 		 */
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
 			if ( ! self::is_reepay_product( $cart_item['data'] ) && ! wcs_is_subscription_product( $cart_item['data'] ) ) {
+				return false;
+			}
+		}
+
+
+		return true;
+	}
+
+	/**
+	 * @return bool
+	 */
+	public static function only_reepay_products_in_cart( $is_only ) {
+		if ( $is_only ) {
+			return $is_only;
+		}
+
+		/**
+		 * @var $cart_item array Item data
+		 */
+		foreach ( WC()->cart->get_cart() as $cart_item ) {
+			if ( ! self::is_reepay_product( $cart_item['data'] ) ) {
 				return false;
 			}
 		}
