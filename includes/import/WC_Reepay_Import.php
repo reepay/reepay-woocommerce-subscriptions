@@ -22,7 +22,7 @@ class WC_Reepay_Import {
 	 * Constructor
 	 */
 	public function __construct() {
-		if ( ! session_id() ) {
+		if ( ! session_id() && ! headers_sent() ) {
 			session_start();
 		}
 

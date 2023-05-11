@@ -238,10 +238,6 @@ class WC_Reepay_Account_Page {
 			return $subscriptions;
 		}
 
-		$params['size'] = 100;
-		$params['page'] = 1;
-		$params['sort'] = 'created';
-
 		$reepay_subscriptions = wc_get_orders( [
 			'limit'        => - 1,
 			'meta_key'     => '_reepay_subscription_handle',
