@@ -111,14 +111,14 @@ class WC_Reepay_Sync_Customers {
 		}
 
 		try {
-			$res = reepay_s()->api()->request(
+			$result = reepay_s()->api()->request(
 				'customer/' . $data['customer'] . '/payment_method'
 			);
 		} catch (Exception $e) {
 
 		}
 
-		if ( empty( $res ) || empty( $result['cards'] ) ) {
+		if ( empty( $result ) || empty( $result['cards'] ) ) {
 			return;
 		}
 

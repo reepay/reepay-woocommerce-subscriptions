@@ -785,49 +785,58 @@ class WC_Reepay_Subscription_Plan_Simple
     }
 
     /**
-     * @param  WC_Product  $product
+     * @param  WC_Product|array  $product
      * @param  bool  $is_short
      *
      * @return string
      */
     public static function get_billing_plan($product, $is_short = false)
     {
-        if ($product) {
-            $type      = $product->get_meta('_reepay_subscription_schedule_type');
-            $type_data = $product->get_meta('_reepay_subscription_'.$type);
-            $interval  = self::get_interval($product->get_id(), $type, $type_data);
-            $types_arr = self::$types_info;
+	    if ( empty( $product ) ) {
+		    return '';
+	    }
 
-            if ($type == self::TYPE_MONTH_FIXED_DAY) {
-                $types_arr[$type] = sprintf(__('Billed every %s month on %s day of the month',
-                    'reepay-subscriptions-for-woocommerce'), $type_data['month'], $type_data['day']);
-            }
+	    if ( is_a( $product, 'WC_Product' ) ) {
+		    $type      = $product->get_meta('_reepay_subscription_schedule_type');
+		    $type_data = $product->get_meta('_reepay_subscription_'.$type);
+		    $interval  = self::get_interval($product->get_id(), $type, $type_data);
+	    } elseif ( is_array( $product ) ) {
+		    $type      = $product['type'];
+		    $type_data = $product['type_data'];
+		    $interval  = $product['interval'];
+	    } else {
+	    	return '';
+	    }
 
-            if ($type == self::TYPE_MONTH_LAST_DAY) {
-                $types_arr[$type] = sprintf(__('Billed every %s month on the last day of the month',
-                    'reepay-subscriptions-for-woocommerce'), $type_data['month']);
-            }
+	    $types_arr = self::$types_info;
 
-            if ($type == self::TYPE_MONTH_START_DATE) {
-                $types_arr[$type] = sprintf(__(' Every %s month on this day', 'reepay-subscriptions-for-woocommerce'),
-                    $type_data);
-            }
+	    if ($type == self::TYPE_MONTH_FIXED_DAY) {
+		    $types_arr[$type] = sprintf(__('Billed every %s month on %s day of the month',
+			    'reepay-subscriptions-for-woocommerce'), $type_data['month'], $type_data['day']);
+	    }
 
-            $types_info = $is_short ? self::$types_info_short : $types_arr;
+	    if ($type == self::TYPE_MONTH_LAST_DAY) {
+		    $types_arr[$type] = sprintf(__('Billed every %s month on the last day of the month',
+			    'reepay-subscriptions-for-woocommerce'), $type_data['month']);
+	    }
 
-            $type_str = $types_info[$interval > 1 ? $type.'_multiple' : $type] ?? $types_info[$type] ?? '';
-            $ret      = '';
-            if ( ! empty($type_str)) {
-                $ret = sprintf(
-                    $type_str,
-                    $interval
-                );
-            }
+	    if ($type == self::TYPE_MONTH_START_DATE) {
+		    $types_arr[$type] = sprintf(__(' Every %s month on this day', 'reepay-subscriptions-for-woocommerce'),
+			    $type_data);
+	    }
 
-            return $ret;
-        }
+	    $types_info = $is_short ? self::$types_info_short : $types_arr;
 
-        return '';
+	    $type_str = $types_info[$interval > 1 ? $type.'_multiple' : $type] ?? $types_info[$type] ?? '';
+	    $ret      = '';
+	    if ( ! empty($type_str)) {
+		    $ret = sprintf(
+			    $type_str,
+			    $interval
+		    );
+	    }
+
+	    return $ret;
     }
 
     /**

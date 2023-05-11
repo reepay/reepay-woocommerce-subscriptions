@@ -68,7 +68,13 @@ if ( ! defined( 'ABSPATH' ) ) {
                     </tr>
 				<?php elseif ( is_a( $subscription, 'WC_Order' ) )  :
 					$order_item = current( $subscription->get_items( 'line_item' ) );
-					$billing_type = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $order_item->get_product(), true );
+
+				    if( $order_item->get_product() ) {
+					    $billing_type = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $order_item->get_product(), true );
+                    } else {
+				        //imported product
+					    $billing_type = $subscription->get_meta( '_reepay_billing_string' );
+                    }
 
 					$link = wc_get_endpoint_url( 'view-subscription', $subscription->get_id(), wc_get_page_permalink( 'myaccount' ) );
 					?>
