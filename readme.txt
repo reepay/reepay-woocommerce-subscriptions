@@ -2,7 +2,7 @@
 Contributors: reepay
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress ecommerce, reepay
 Requires at least: 5.5
-Tested up to: 6.0.2
+Tested up to: 6.2
 Requires PHP: 7.4
 Stable tag: 1.0.19
 License: GPLv3
