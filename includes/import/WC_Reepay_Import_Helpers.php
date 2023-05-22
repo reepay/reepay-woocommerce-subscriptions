@@ -171,7 +171,8 @@ class WC_Reepay_Import_Helpers {
 
 		$order = wc_create_order(
 			[
-				'status' => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
+				'customer_id' => rp_get_userid_by_handle( $subscription['customer'] ) ?: null,
+				'status'      => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
 			]
 		);
 
@@ -196,6 +197,22 @@ class WC_Reepay_Import_Helpers {
 		$order->add_meta_data( '_reepay_subscription_handle', $subscription['handle'] );
 		$order->add_meta_data( '_reepay_imported', 1 );
 
+		$plan_data     = reepay_s()->plan()->get_remote_plan_meta( $subscription['plan'] );
+		$schedule_type = $plan_data['_reepay_subscription_schedule_type'];
+		$schedule_data = $plan_data[ $schedule_type ];
+
+		$order->add_meta_data(
+			'_reepay_billing_string',
+			WC_Reepay_Subscription_Plan_Simple::get_billing_plan(
+				array(
+					'type' => $schedule_type,
+					'type_data' => $schedule_data,
+					'interval' => ''
+				),
+				true
+			)
+		);
+
 		$order_item = new WC_Order_Item_Product();
 		$order_item->set_name( 'Plan ' . $plan['name'] );
 		$order_item->set_quantity( $plan['quantity'] );
@@ -214,6 +231,12 @@ class WC_Reepay_Import_Helpers {
 
 		$order->save();
 		$order->calculate_totals();
+
+		if ( $order->get_total() >= 0 ) {
+			update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
+			$order->set_total( 0 );
+			$order->save();
+		}
 
 		return true;
 	}

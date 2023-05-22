@@ -69,6 +69,25 @@ class WC_Reepay_Import_Menu {
 				);
 			}
 		}
+
+		add_settings_section(
+			"import_section_debug",
+			'',
+			'',
+			self::$menu_slug
+		);
+
+		add_settings_field(
+			"import_debug",
+			__( 'Show already imported entities' ),
+			[ $this, 'print_checkbox' ],
+			self::$menu_slug,
+			"import_section_debug",
+			[
+				'option_name' => [ 'debug' ],
+				'class'       => 'reepay-import__row reepay-import__row--main reepay-import__row--debug',
+			]
+		);
 	}
 
 	/**

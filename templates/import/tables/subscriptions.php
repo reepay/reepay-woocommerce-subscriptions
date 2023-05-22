@@ -1,5 +1,5 @@
 <script type="text/template" id="tmpl-reepay-subscriptions-import-data-table-subscriptions">
-    <h3> <?php _e('Customers', 'reepay-subscriptions-for-woocommerce') ?>Subscriptions (<%= amount %>)</h3>
+    <h3> <?php _e('Subscriptions', 'reepay-subscriptions-for-woocommerce') ?> (<%= amount %>)</h3>
     <table class="wp-list-table widefat fixed striped table-view-list reepay-import-table js-reepay-import-table" data-type="subscriptions">
         <thead>
         <tr>
@@ -24,9 +24,17 @@
         <% } %>
 
         <% _(rows).forEach(function(data, handle) { %>
-            <tr class="">
+            <tr class="<% if(data.debug) { %>skipped<% } %>">
                 <th scope="row" class="check-column">
-                    <input id="cb-select-<%= handle %>" type="checkbox" name="<%= handle %>" checked>
+                    <input id="cb-select-<%= handle %>"
+                           type="checkbox"
+                           name="<%= handle %>"
+                            <% if(data.debug) { %>
+                                disabled
+                            <% } else { %>
+                                checked
+                            <% } %>
+                           >
                 </th>
 
                 <td class="column-data column-subscription-handle">
@@ -78,7 +86,13 @@
 	                <?php _e('Next period start', 'reepay-subscriptions-for-woocommerce') ?>: <%= data.next_period_start %>
                 </td>
 
-                <td class="column-data column-message js-column-message"><?php _e('Ready to import', 'reepay-subscriptions-for-woocommerce') ?></td>
+                <td class="column-data column-message js-column-message">
+                    <% if(data.debug) { %>
+                        <%= data.debug_message %>
+                    <% } else { %>
+		                <?php _e('Ready to import', 'reepay-subscriptions-for-woocommerce') ?>
+                    <% } %>
+                </td>
             </tr>
         <% }); %>
         </tbody>
