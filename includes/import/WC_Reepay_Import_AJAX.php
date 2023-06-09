@@ -14,11 +14,6 @@ class WC_Reepay_Import_AJAX {
 	/**
 	 * @var string
 	 */
-	public static $session_key = 'reepay_subscriptions_import_data';
-
-	/**
-	 * @var string
-	 */
 	public static $ajax_nonce = 'reepay_subscriptions_import_nonce';
 
 	/**
@@ -90,21 +85,7 @@ class WC_Reepay_Import_AJAX {
 			}
 		}
 
-		$_SESSION[ self::$session_key ] = json_encode( $result );
-
 		wp_send_json_success( $result );
-	}
-
-	public function get_import_status() {
-		$this->chech_nonce();
-
-		$last_imported = WC_Reepay_Import::get_last_imported();
-
-		if ( empty( $last_imported ) ) {
-			wp_send_json_error();
-		}
-
-		wp_send_json_success( $last_imported );
 	}
 
 	/**
@@ -115,29 +96,17 @@ class WC_Reepay_Import_AJAX {
 
 		$res = [];
 
-		$objects_data = [];
-
-		try {
-			$objects_data = json_decode( $_SESSION[ self::$session_key ], true ) ?: [];
-		} catch ( Exception $e ) {
-		}
-
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
 			if ( empty( $_POST['selected'][ $object ] ) ) {
 				continue;
 			}
 
-			//if no data in session
-			if ( empty( $objects_data[ $object ] ) ) {
-				$objects_data[ $object ] = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
-			}
+			$objects_data = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
 
 			if ( ! empty( $objects_data[ $object ] ) ) {
-				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data[ $object ], $_POST['selected'][ $object ] );
+				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data, $_POST['selected'][ $object ] );
 			}
 		}
-
-		WC_Reepay_Import::clean_last_imported();
 
 		wp_send_json_success( $res );
 	}
