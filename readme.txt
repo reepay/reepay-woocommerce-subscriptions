@@ -2,7 +2,7 @@
 Contributors: reepay
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress ecommerce, reepay
 Requires at least: 5.5
-Tested up to: 6.0.2
+Tested up to: 6.2
 Requires PHP: 7.4
 Stable tag: 1.0.19
 License: GPLv3
@@ -63,6 +63,7 @@ Standard Reepay Subscription features:
 3. For correct plugin operation install and activate Reepay Checkout for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.0.23 - Fix rest API session error
 v 1.0.22 - Add sing-up fee to line item
 v 1.0.21 - Failed renewals status fixes
 v 1.0.20 - Addons fixes

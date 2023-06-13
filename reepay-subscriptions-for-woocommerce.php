@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.22
+ * Version: 1.0.23
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -108,7 +108,6 @@ class WooCommerce_Reepay_Subscriptions {
 	 * Constructor
 	 */
 	private function __construct() {
-
 		// Check if WooCommerce is active
 		include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
 		if ( ! is_plugin_active_for_network( 'woocommerce/woocommerce.php' ) && ! is_plugin_active( 'woocommerce/woocommerce.php' ) ) {
@@ -137,6 +136,7 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_orders_default_subscription_status' => get_option( '_reepay_orders_default_subscription_status' ) ?: 'wc-processing',
 			'_reepay_manual_start_date'                  => get_option( '_reepay_manual_start_date' ) === 'yes',
 			'_reepay_manual_start_date_status'           => get_option( '_reepay_manual_start_date_status' ) ?: 'wc-completed',
+			'_reepay_disable_sub_mails'                  => get_option( '_reepay_disable_sub_mails' ) === 'yes',
 		];
 
 		self::$compensation_methods = [
@@ -163,10 +163,31 @@ class WooCommerce_Reepay_Subscriptions {
 		add_action( 'init', [ $this, 'init' ] );
 		add_filter( 'woocommerce_locate_template', [ $this, 'override_woo_templates' ], 1, 3 );
 
+		add_filter( 'woocommerce_email_recipient_customer_on_hold_order', [ $this, 'disable_emails' ], 9999, 2 );
+		add_filter( 'woocommerce_email_recipient_customer_processing_order', [ $this, 'disable_emails' ], 9999, 2 );
+		add_filter( 'woocommerce_email_recipient_customer_completed_order', [ $this, 'disable_emails' ], 9999, 2 );
+		add_filter( 'woocommerce_email_recipient_new_order', [ $this, 'disable_emails' ], 9999, 2 );
+
 		if ( ! has_action( 'woocommerce_admin_field_hr' ) ) {
 			add_action( 'woocommerce_admin_field_hr', [ $this, 'hr_field' ] );
 		}
+	}
 
+	public function disable_emails( $recipient, $order ) {
+		if ( self::$settings['_reepay_disable_sub_mails'] ) {
+			$page = $_GET['page'] = $_GET['page'] ?? '';
+			if ( 'wc-settings' === $page ) {
+				return $recipient;
+			}
+
+			$handle = $order->get_meta( '_reepay_subscription_handle' );
+			if ( ! empty( $handle ) || ! empty( $order->get_meta( '_reepay_order' ) ) ) {
+				$recipient = '';
+			}
+		}
+
+
+		return $recipient;
 	}
 
 	public function hr_field() {
@@ -191,14 +212,14 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function init() {
-		load_plugin_textdomain( 'reepay-subscriptions-for-woocommerce', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+		load_plugin_textdomain( 'reepay-subscriptions-for-woocommerce', false,
+			dirname( plugin_basename( __FILE__ ) ) . '/languages' );
 
 		new WC_Reepay_Subscriptions_Update( self::$db_version );
 	}
 
 	public function reepay_admin_notices() {
 		if ( ! class_exists( 'WC_ReepayCheckout', false ) ) {
-
 			WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
 				sprintf(
 					wp_kses(
@@ -220,20 +241,21 @@ class WooCommerce_Reepay_Subscriptions {
 	/**
 	 * Show row meta on the plugin screen.
 	 *
-	 * @param mixed $links Plugin Row Meta.
-	 * @param mixed $file Plugin Base file.
+	 * @param  mixed  $links  Plugin Row Meta.
+	 * @param  mixed  $file  Plugin Base file.
 	 *
 	 * @return array
 	 */
 	public function plugin_row_meta( $links, $file ) {
-
 		if ( plugin_basename( __FILE__ ) !== $file ) {
 			return $links;
 		}
 
 		$row_meta = [
-			'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . __( 'Get free test account', 'reepay-subscriptions-for-woocommerce' ) . '</a>',
-			'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . __( 'Pricing', 'reepay-subscriptions-for-woocommerce' ) . '</a>',
+			'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . __( 'Get free test account',
+					'reepay-subscriptions-for-woocommerce' ) . '</a>',
+			'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . __( 'Pricing',
+					'reepay-subscriptions-for-woocommerce' ) . '</a>',
 		];
 
 
@@ -273,13 +295,14 @@ class WooCommerce_Reepay_Subscriptions {
 	/**
 	 * Add relevant links to plugins page
 	 *
-	 * @param array $links
+	 * @param  array  $links
 	 *
 	 * @return array
 	 */
 	public function plugin_action_links( $links ) {
 		$plugin_links = [
-			'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=reepay_subscriptions' ) . '">' . __( 'Settings', 'reepay-subscriptions-for-woocommerce' ) . '</a>'
+			'<a href="' . admin_url( 'admin.php?page=wc-settings&tab=reepay_subscriptions' ) . '">' . __( 'Settings',
+				'reepay-subscriptions-for-woocommerce' ) . '</a>'
 		];
 
 		return array_merge( $plugin_links, $links );
@@ -340,7 +363,8 @@ class WooCommerce_Reepay_Subscriptions {
 			'debug'                                      => [
 				'name' => __( 'Enable logging', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
-				'desc' => __( 'Enable API logging. Logs can be seen in WooCommerce > Status > Logs', 'reepay-subscriptions-for-woocommerce' ),
+				'desc' => __( 'Enable API logging. Logs can be seen in WooCommerce > Status > Logs',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'   => '_reepay_debug'
 			],
 			'hr_subscriptions'                           => [
@@ -357,7 +381,8 @@ class WooCommerce_Reepay_Subscriptions {
 				'name'    => __( 'Compensation method for On Hold', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => static::$compensation_methods,
-				'desc'    => __( 'Compensation method when setting a subscription to On Hold.', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Compensation method when setting a subscription to On Hold.',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_on_hold_compensation_method'
 			],
 			'_reepay_enable_cancel'                      => [
@@ -370,7 +395,8 @@ class WooCommerce_Reepay_Subscriptions {
 				'name'    => __( 'Compensation method for Cancel', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => static::$compensation_methods,
-				'desc'    => __( 'Compensation method when cancelling a subscription.', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Compensation method when cancelling a subscription.',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_cancel_compensation_method'
 			],
 			'hr_suborders'                               => [
@@ -378,17 +404,21 @@ class WooCommerce_Reepay_Subscriptions {
 				'id'   => 'hr_suborders',
 			],
 			'_reepay_orders_default_subscription_status' => [
-				'name'    => __( 'Subscription order default status after creation', 'reepay-subscriptions-for-woocommerce' ),
+				'name'    => __( 'Subscription order default status after creation',
+					'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Setting to control witch status the Reepay subscription order in WooCommerce gets.', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Setting to control witch status the Reepay subscription order in WooCommerce gets.',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_orders_default_subscription_status'
 			],
 			'_reepay_suborders_default_renew_status'     => [
-				'name'    => __( 'Renewal order default status after creation', 'reepay-subscriptions-for-woocommerce' ),
+				'name'    => __( 'Renewal order default status after creation',
+					'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Setting to control witch status the Reepay renewal order in WooCommerce gets.', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Setting to control witch status the Reepay renewal order in WooCommerce gets.',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_suborders_default_renew_status'
 			],
 			'hr_date'                                    => [
@@ -398,15 +428,24 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_manual_start_date'                  => [
 				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
-				'desc' => __( 'Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Reepay.</p>', 'reepay-subscriptions-for-woocommerce' ),
+				'desc' => __( 'Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Reepay.</p>',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'   => '_reepay_manual_start_date'
 			],
 			'_reepay_manual_start_date_status'           => [
 				'name'    => __( 'Manual start date order status', 'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Subscription will start when parent order get changed to this order status.', 'reepay-subscriptions-for-woocommerce' ),
+				'desc'    => __( 'Subscription will start when parent order get changed to this order status.',
+					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_manual_start_date_status'
+			],
+			'_reepay_disable_sub_mails'                  => [
+				'name' => __( 'Disable order mails', 'reepay-subscriptions-for-woocommerce' ),
+				'type' => 'checkbox',
+				'desc' => __( 'Disable order mails <p class="description">This option will disable order mails for subscriptions and renewals</p>',
+					'reepay-subscriptions-for-woocommerce' ),
+				'id'   => '_reepay_disable_sub_mails'
 			],
 			'section_end'                                => [
 				'type' => 'sectionend',
@@ -443,7 +482,7 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	/**
-	 * @param mixed|null $product Current product
+	 * @param  mixed|null  $product  Current product
 	 *
 	 * @return WC_Reepay_Subscription_Plan_Simple
 	 */
@@ -468,7 +507,7 @@ class WooCommerce_Reepay_Subscriptions {
 	/**
 	 * Return plugin settings
 	 *
-	 * @param string $property_name
+	 * @param  string  $property_name
 	 *
 	 * @return mixed
 	 */
@@ -529,7 +568,6 @@ class WooCommerce_Reepay_Subscriptions {
 
 	public function includes() {
 		include_once( $this->settings( 'plugin_path' ) . '/vendor/autoload.php' );
-
 	}
 
 	public function init_classes() {

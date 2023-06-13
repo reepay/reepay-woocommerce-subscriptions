@@ -11,8 +11,6 @@ class WC_Reepay_Import {
 	 */
 	public $menu_slug = 'reepay_import';
 
-	public static $session_key_last_imported = 'reepay_subscriptions_import_last_imported';
-
 	/**
 	 * @var array
 	 */
@@ -22,10 +20,6 @@ class WC_Reepay_Import {
 	 * Constructor
 	 */
 	public function __construct() {
-		if ( ! session_id() && ! headers_sent() ) {
-			session_start();
-		}
-
 		add_action( 'reepay_subscriptions_init', [ $this, 'init'] );
 	}
 
@@ -140,8 +134,6 @@ class WC_Reepay_Import {
 			$create_result = WC_Reepay_Import_Helpers::create_woo_customer( $customers[ $customer_handle ] );
 
 			$result[ $customer_handle ] = is_int( $create_result ) ? true : $create_result->get_error_message();
-
-			self::set_last_imported('customers', $customer_handle, $result[ $customer_handle ] );
 		}
 
 		return $result;
@@ -235,8 +227,6 @@ class WC_Reepay_Import {
 			$card_added = WC_Reepay_Import_Helpers::add_card_to_user( $wp_user_id, $cards[ $card_id ] );
 
 			$result[ $card_id ] = true === $card_added ? true : $card_added->get_error_message();
-
-			self::set_last_imported('cards', $card_id, $result[ $card_id ] );
 		}
 
 		return $result;
@@ -346,47 +336,8 @@ class WC_Reepay_Import {
 			}
 
 			$result[ $subscription_handle ] = true === $create_result ? true : $create_result->get_error_message();
-
-			self::set_last_imported('subscriptions', $subscription_handle, $result[ $subscription_handle ] );
 		}
 
 		return $result;
-	}
-
-	public static function set_last_imported( $object, $handle, $message ) {
-		if ( ! in_array( $object, array_keys( self::$import_objects ) ) ) {
-			return false;
-		}
-
-		if ( ! is_array( $_SESSION[ self::$session_key_last_imported ] ) ) {
-			$_SESSION[ self::$session_key_last_imported ] = [];
-		}
-
-		try {
-			$_SESSION[ self::$session_key_last_imported ][] =
-				[
-					'object'  => $object,
-					'handle'  => $handle,
-					'message' => $message,
-				];
-		} catch (Exception $e) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public static function get_last_imported( $clean = true ) {
-		$data = $_SESSION[ self::$session_key_last_imported ] ?? false;
-
-		if ( $clean ) {
-			self::clean_last_imported();
-		}
-
-		return $data;
-	}
-
-	public static function clean_last_imported() {
-		unset( $_SESSION[ self::$session_key_last_imported ] );
 	}
 }
