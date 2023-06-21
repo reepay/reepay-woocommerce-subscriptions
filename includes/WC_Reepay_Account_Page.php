@@ -15,7 +15,7 @@ class WC_Reepay_Account_Page {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'init' ] );
+		add_action( 'init', [ $this, 'rewrite_endpoint' ] );
 		add_action( 'template_redirect', [ $this, 'check_action' ] );
 		add_filter( 'wcs_get_users_subscriptions', [
 			$this,
@@ -53,6 +53,7 @@ class WC_Reepay_Account_Page {
 
 	public function payment_method_added( WC_Payment_Token $token ) {
 		$handle = sanitize_text_field( $_GET['reepay_subscription'] ) ?? '';
+
 		if ( ! empty( $handle ) ) {
 			try {
 				$payment_methods = reepay_s()->api()->request( 'subscription/' . $handle . '/pm', 'POST', [
@@ -64,12 +65,10 @@ class WC_Reepay_Account_Page {
 				wc_add_notice( $exception->getMessage() );
 			}
 		}
-		wp_redirect( wc_get_account_endpoint_url( 'subscriptions' ) );
-		exit;
-	}
 
-	public function init() {
-		$this->rewrite_endpoint();
+		wp_redirect( wc_get_account_endpoint_url( 'subscriptions' ) );
+
+		exit;
 	}
 
 	public function rewrite_endpoint() {
@@ -98,7 +97,7 @@ class WC_Reepay_Account_Page {
 
 			if ( $order && $order->get_customer_id() === get_current_user_id() ) {
 				try {
-					$result = reepay_s()->api()->request( "subscription/{$handle}/cancel", 'POST' );
+					reepay_s()->api()->request( "subscription/{$handle}/cancel", 'POST' );
 				} catch ( Exception $exception ) {
 					wc_add_notice( $exception->getMessage(), 'error' );
 				}
