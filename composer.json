@@ -16,7 +16,8 @@
       "includes/memberships",
       "includes/update",
       "includes/sync",
-      "includes/woo-blocks"
+      "includes/woo-blocks",
+      "includes/my-account"
     ]
   }
 }

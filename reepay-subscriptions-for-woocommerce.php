@@ -578,7 +578,7 @@ class WooCommerce_Reepay_Subscriptions {
 		$this->plan_variable = new WC_Reepay_Subscription_Plan_Variable();
 
 		new WC_Reepay_Subscription_Addons();
-		new WC_Reepay_Account_Page();
+		new WC_Reepay_My_Account();
 		new WC_Reepay_Admin_Frontend();
 		new WC_Reepay_Checkout();
 		new WC_Reepay_Discounts_And_Coupons();
@@ -616,6 +616,32 @@ class WooCommerce_Reepay_Subscriptions {
 		}
 
 		return $template;
+	}
+
+	/**
+	 * Wrapper of wc_get_template function
+	 *
+	 * @param string $template Template name.
+	 * @param  array $args     Arguments.
+	 * @param  bool  $return   Return or echo template.
+	 */
+	public function get_template( string $template, $args = array(), $return = false ) {
+		if ( $return ) {
+			ob_start();
+		}
+
+		wc_get_template(
+			$template,
+			$args,
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+
+		if ( $return ) {
+			return ob_get_clean();
+		}
+
+		return true;
 	}
 }
 
