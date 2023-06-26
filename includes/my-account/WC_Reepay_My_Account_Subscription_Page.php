@@ -104,4 +104,36 @@ class WC_Reepay_My_Account_Subscription_Page {
 			] );
 		}
 	}
+
+	public static function get_status( $subscription ) {
+		if ( $subscription['is_cancelled'] === true ) {
+			return __( 'Cancelled' );
+		}
+
+		if ( $subscription['state'] === 'expired' ) {
+			return __( 'Expired' );
+		}
+
+		if ( $subscription['state'] === 'on_hold' ) {
+			return __( 'On hold' );
+		}
+
+		if ( $subscription['state'] === 'is_cancelled' ) {
+			return __( 'Cancelled' );
+		}
+
+		if ( $subscription['state'] === 'active' ) {
+			if ( isset( $subscription['trial_end'] ) ) {
+				$now       = new DateTime();
+				$trial_end = new DateTime( $subscription['trial_end'] );
+				if ( $trial_end > $now ) {
+					return __( 'Trial' );
+				}
+			}
+
+			return __( 'Active' );
+		}
+
+		return $subscription['state'];
+	}
 }
