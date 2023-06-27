@@ -54,40 +54,46 @@ class WC_Reepay_My_Account_Subscriptions_Page {
 				throw new Exception( esc_html__( 'You have no active subscriptions.', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
-			$plans = $this->get_plans_from_subscriptions( $reepay_subscriptions );
-
-			$subscriptions_data = array_map( function ( $reepay_subscription ) use ( $plans ) {
-				$subscription_data = [
-					'id'                => explode( '_', $reepay_subscription['handle'] )[0],
-					'link'              => wc_get_endpoint_url( WC_Reepay_My_Account_Subscription_Page::$menu_item_slug, $reepay_subscription['handle'], wc_get_page_permalink( 'myaccount' ) ),
-					'state'             => $reepay_subscription['state'],
-					'is_cancelled'      => $reepay_subscription['is_cancelled'],
-					'trial_end'         => $reepay_subscription['trial_end'] ?? null,
-					'next_period_start' => $reepay_subscription['next_period_start'] ?? null,
-					'plan' => $reepay_subscription['plan'],
-					'amount'            => '',
-					'billing_period'    => ''
-				];
-
-				$plan = $plans[ $reepay_subscription['plan'] ] ?? null;
-
-				if ( ! empty( $plan ) ) {
-					$subscription_data['amount']         = wc_price( rp_make_initial_amount( $plan['amount'], $plan['currency'] ) );
-					$subscription_data['billing_period'] = $this->get_billing_period_for_plan( $plan );
-				}
-
-				return $subscription_data;
-			}, $reepay_subscriptions );
-
 			reepay()->get_template( 'myaccount/my-subscriptions.php', array(
-				'subscriptions' => $subscriptions_data,
-				'plans'         => $plans
+				'subscriptions' => $this->prepare_subscriptions_template_data( $reepay_subscriptions ),
 			) );
 		} catch ( Exception $e ) {
 			reepay()->get_template( 'myaccount/my-subscriptions-error.php', array(
 				'error' => $e->getMessage()
 			) );
 		}
+	}
+
+	/**
+	 * @param array $reepay_subscriptions Reepay subscriptions data
+	 *
+	 * @return array
+	 */
+	private function prepare_subscriptions_template_data( $reepay_subscriptions ) {
+		$plans = $this->get_plans_from_subscriptions( $reepay_subscriptions );
+
+		return array_map( function ( $reepay_subscription ) use ( $plans ) {
+			$subscription_data = [
+				'id'                => explode( '_', $reepay_subscription['handle'] )[0],
+				'link'              => wc_get_endpoint_url( WC_Reepay_My_Account_Subscription_Page::$menu_item_slug, $reepay_subscription['handle'], wc_get_page_permalink( 'myaccount' ) ),
+				'state'             => $reepay_subscription['state'],
+				'is_cancelled'      => $reepay_subscription['is_cancelled'],
+				'trial_end'         => $reepay_subscription['trial_end'] ?? null,
+				'next_period_start' => $reepay_subscription['next_period_start'] ?? null,
+				'plan' => $reepay_subscription['plan'],
+				'amount'            => '',
+				'billing_period'    => ''
+			];
+
+			$plan = $plans[ $reepay_subscription['plan'] ] ?? null;
+
+			if ( ! empty( $plan ) ) {
+				$subscription_data['amount']         = wc_price( rp_make_initial_amount( $plan['amount'], $plan['currency'] ) );
+				$subscription_data['billing_period'] = $this->get_billing_period_for_plan( $plan );
+			}
+
+			return $subscription_data;
+		}, $reepay_subscriptions );
 	}
 
 	/**
