@@ -13,15 +13,28 @@ class WC_Reepay_My_Account_Subscription_Page {
 	);
 
 	public function __construct() {
-		add_action( 'woocommerce_account_' . self::$menu_item_slug . '_endpoint', [ $this, 'subscription_endpoint' ] );
+		add_action( 'woocommerce_account_' . self::$menu_item_slug . '_endpoint', [ $this, 'subscription_endpoint' ], 10, 1 );
 		add_filter( 'woocommerce_endpoint_' . self::$menu_item_slug . '_title', function () {
 			return __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
 		} );
 		add_action( 'template_redirect', [ $this, 'do_action' ] );
 	}
 
-	public function subscription_endpoint() {
+	public function subscription_endpoint( $subscription_handle ) {
+		try {
+			$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
+			$customer_handle = rp_get_customer_handle( get_current_user_id() );
 
+			if( $subscription['customer'] !== $customer_handle ) {
+				throw new Exception();
+			}
+
+			
+		} catch (Exception $e) {
+			reepay()->get_template( 'myaccount/my-subscriptions-error.php', array(
+				'error' => __( 'Subscription not found', 'reepay-subscriptions-for-woocommerce' )
+			) );
+		}
 	}
 
 	public function do_action() {
