@@ -13,35 +13,15 @@ class WC_Reepay_My_Account_Subscription_Page {
 	);
 
 	public function __construct() {
-		add_action( 'woocommerce_account_' . self::$menu_item_slug . '_endpoint', [ $this, 'subscription_endpoint' ], 5, 1 );
+		add_action( 'woocommerce_account_' . self::$menu_item_slug . '_endpoint', [ $this, 'subscription_endpoint' ] );
+		add_filter( 'woocommerce_endpoint_' . self::$menu_item_slug . '_title', function () {
+			return __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
+		} );
 		add_action( 'template_redirect', [ $this, 'do_action' ] );
 	}
 
-	public function subscriptions_endpoint( $current_page = 1 ) {
-		if ( class_exists( 'WC_Subscriptions' ) ) {
-			$this->add_reepay_subscriptions_to_woo_subscriptions = true;
+	public function subscription_endpoint() {
 
-			return;
-		}
-
-		$all_subscriptions = apply_filters( 'wcs_get_users_subscriptions', [], get_current_user_id() );
-		$current_page      = empty( $current_page ) ? 1 : absint( $current_page );
-		$posts_per_page    = get_option( 'posts_per_page' );
-		$max_num_pages     = ceil( count( $all_subscriptions ) / $posts_per_page );
-		$subscriptions     = array_slice( $all_subscriptions, ( $current_page - 1 ) * $posts_per_page, $posts_per_page );
-
-
-		wc_get_template(
-			'myaccount/my-subscriptions.php',
-			array(
-				'subscriptions' => $subscriptions,
-				'current_page'  => $current_page,
-				'max_num_pages' => $max_num_pages,
-				'paginate'      => true,
-			),
-			'',
-			reepay_s()->settings( 'plugin_path' ) . 'templates/'
-		);
 	}
 
 	public function do_action() {

@@ -5,21 +5,11 @@ class WC_Reepay_My_Account_Subscriptions_Page {
 	public static $menu_item_slug = 'r-subscriptions';
 
 	public function __construct() {
-		add_action( 'init', [ $this, 'rewrite_endpoint' ] );
 		add_filter( 'woocommerce_account_menu_items', [ $this, 'add_subscriptions_menu_item' ] );
 		add_action( 'woocommerce_account_' . self::$menu_item_slug . '_endpoint', [ $this, 'subscriptions_endpoint' ] );
 		add_filter( 'woocommerce_endpoint_' . self::$menu_item_slug . '_title', function () {
 			return __( 'Subscriptions', 'reepay-subscriptions-for-woocommerce' );
 		} );
-	}
-
-	public function rewrite_endpoint() {
-		add_rewrite_endpoint( self::$menu_item_slug, EP_ROOT | EP_PAGES );
-
-		if ( get_transient( 'woocommerce_reepay_subscriptions_activated' ) ) {
-			flush_rewrite_rules();
-			delete_transient( 'woocommerce_reepay_subscriptions_activated' );
-		}
 	}
 
 	public function add_subscriptions_menu_item( $menu_items ) {
@@ -48,7 +38,7 @@ class WC_Reepay_My_Account_Subscriptions_Page {
 				throw new Exception( esc_html__( 'You have no active subscriptions.', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
-			$reepay_subscriptions = reepay_s()->api()->request( "list/subscription?customer=$reepay_customer_handle&size=100" )['content'];
+			$reepay_subscriptions = reepay_s()->api()->request( "list/subscription?customer=$reepay_customer_handle&size=10" )['content'];
 
 			if ( empty( $reepay_subscriptions ) ) {
 				throw new Exception( esc_html__( 'You have no active subscriptions.', 'reepay-subscriptions-for-woocommerce' ) );
