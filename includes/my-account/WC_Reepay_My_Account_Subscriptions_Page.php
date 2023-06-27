@@ -65,7 +65,7 @@ class WC_Reepay_My_Account_Subscriptions_Page {
 		return array_map( function ( $reepay_subscription ) use ( $plans ) {
 			$subscription_data = [
 				'id'                => explode( '_', $reepay_subscription['handle'] )[0],
-				'link'              => wc_get_endpoint_url( WC_Reepay_My_Account_Subscription_Page::$menu_item_slug, $reepay_subscription['handle'], wc_get_page_permalink( 'myaccount' ) ),
+				'link'              => wc_get_endpoint_url( WC_Reepay_My_Account_Subscription_Page::$menu_item_slug, $reepay_subscription['handle'] ),
 				'state'             => $reepay_subscription['state'],
 				'is_cancelled'      => $reepay_subscription['is_cancelled'],
 				'trial_end'         => $reepay_subscription['trial_end'] ?? null,
