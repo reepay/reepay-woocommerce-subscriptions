@@ -2,10 +2,6 @@
 /**
  * My Subscriptions section on the My Account page
  *
- * @author   Prospress
- * @category WooCommerce Subscriptions/Templates
- * @version  2.6.4
- *
  * @var array $subscriptions subscriptions data to output
  *
  * @see WC_Reepay_My_Account_Subscriptions_Page::subscriptions_endpoint

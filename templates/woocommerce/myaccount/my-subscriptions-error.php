@@ -2,10 +2,6 @@
 /**
  * My Subscriptions section on the My Account page
  *
- * @author   Prospress
- * @category WooCommerce Subscriptions/Templates
- * @version  2.6.4
- *
  * @var array $error error message to show
  * @var array $show_return_to_shop_btn
  */
