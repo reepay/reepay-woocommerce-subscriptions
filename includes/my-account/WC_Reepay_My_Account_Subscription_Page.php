@@ -29,7 +29,42 @@ class WC_Reepay_My_Account_Subscription_Page {
 				throw new Exception();
 			}
 
-			
+			$plan = reepay_s()->api()->request( "plan/{$subscription['plan']}/current" );
+			$payment_methods = reepay_s()->api()->request( "subscription/$subscription_handle/pm" );
+
+			$dates_to_display = [
+				'start_date'              => [
+					'label' => _x( 'Start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+					'value' => $subscription['first_period_start'] ?? '',
+				],
+				'last_order_date_created' => [
+					'label' => _x( 'Last payment date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+					'value' => $subscription['current_period_start'] ?? '',
+				],
+				'next_payment'            => [
+					'label' => _x( 'Next payment date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+					'value' => $subscription['next_period_start'] ?? '',
+				],
+				'end'                     => [
+					'label' => _x( 'End date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+					'value' => $subscription['expires'] ?? '',
+				],
+				'start_end'               => [
+					'label' => _x( 'Trial start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+					'value' => $subscription['trial_start'] ?? '',
+				],
+				'trial_end'               => [
+					'label' => _x( 'Trial end date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+					'value' => $subscription['trial_end'] ?? '',
+				],
+			];
+
+			reepay_s()->get_template( 'myaccount/my-subscription.php', array(
+				'subscription'     => $subscription,
+				'plan'             => $plan,
+				'payment_methods'  => $payment_methods,
+				'dates_to_display' => $dates_to_display
+			) );
 		} catch (Exception $e) {
 			reepay()->get_template( 'myaccount/my-subscriptions-error.php', array(
 				'error' => __( 'Subscription not found', 'reepay-subscriptions-for-woocommerce' )
