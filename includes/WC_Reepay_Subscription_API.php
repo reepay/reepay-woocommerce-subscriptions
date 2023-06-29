@@ -92,7 +92,7 @@ class WC_Reepay_Subscription_API {
 		$response  = wp_remote_request( $url, $args );
 		$body      = wp_remote_retrieve_body( $response );
 		$http_code = wp_remote_retrieve_response_code( $response );
-		$code      = round( $http_code / 100 );
+		$code      = is_numeric($http_code) ? round( $http_code / 100 ) : 0;
 
 		if ( $this->debug ) {
 			$time = microtime( true ) - $start;
@@ -102,7 +102,6 @@ class WC_Reepay_Subscription_API {
 		switch ( $code ) {
 			case 0:
 				if ( is_wp_error( $response ) ) {
-					wc_add_notice( $response->get_error_message(), 'error' );
 					throw new Exception( sprintf( __( 'Error: %s. Code: %s.', 'reepay-subscriptions-for-woocommerce' ), $response->get_error_message(), $code ) );
 				}
 			case 1:
