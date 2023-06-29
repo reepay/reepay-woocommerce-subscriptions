@@ -22,54 +22,82 @@ class WC_Reepay_My_Account_Subscription_Page {
 
 	public function subscription_endpoint( $subscription_handle ) {
 		try {
-			$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
-			$customer_handle = rp_get_customer_handle( get_current_user_id() );
+			$subscription    = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
 
-			if( $subscription['customer'] !== $customer_handle ) {
-				throw new Exception();
-			}
-
-			$plan = reepay_s()->api()->request( "plan/{$subscription['plan']}/current" );
-			$payment_methods = reepay_s()->api()->request( "subscription/$subscription_handle/pm" );
-
-			$dates_to_display = [
-				'start_date'              => [
-					'label' => _x( 'Start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
-					'value' => $subscription['first_period_start'] ?? '',
-				],
-				'last_order_date_created' => [
-					'label' => _x( 'Last payment date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
-					'value' => $subscription['current_period_start'] ?? '',
-				],
-				'next_payment'            => [
-					'label' => _x( 'Next payment date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
-					'value' => $subscription['next_period_start'] ?? '',
-				],
-				'end'                     => [
-					'label' => _x( 'End date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
-					'value' => $subscription['expires'] ?? '',
-				],
-				'start_end'               => [
-					'label' => _x( 'Trial start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
-					'value' => $subscription['trial_start'] ?? '',
-				],
-				'trial_end'               => [
-					'label' => _x( 'Trial end date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
-					'value' => $subscription['trial_end'] ?? '',
-				],
-			];
+			$this->can_customer_view_subscription( $subscription );
 
 			reepay_s()->get_template( 'myaccount/my-subscription.php', array(
 				'subscription'     => $subscription,
-				'plan'             => $plan,
-				'payment_methods'  => $payment_methods,
-				'dates_to_display' => $dates_to_display
+				'plan'             => reepay_s()->api()->request( "plan/{$subscription['plan']}/current" ),
+				'cards'            => $this->get_customer_cards( $subscription_handle ),
+				'dates_to_display' => $this->get_dates_to_display( $subscription )
 			) );
-		} catch (Exception $e) {
+		} catch ( Exception $e ) {
 			reepay()->get_template( 'myaccount/my-subscriptions-error.php', array(
 				'error' => __( 'Subscription not found', 'reepay-subscriptions-for-woocommerce' )
 			) );
 		}
+	}
+
+	public function can_customer_view_subscription( $subscription, $customer_handle = '' ) {
+		if( empty( $customer ) ) {
+			$customer_handle = rp_get_customer_handle( get_current_user_id() );
+		}
+
+		if ( $subscription['customer'] !== $customer_handle ) {
+			throw new Exception();
+		}
+	}
+
+	public function get_dates_to_display( $subscription ) {
+		return [
+			'start_date'              => [
+				'label' => _x( 'Start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+				'value' => $subscription['first_period_start'] ?? '',
+			],
+			'last_order_date_created' => [
+				'label' => _x( 'Last payment date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+				'value' => $subscription['current_period_start'] ?? '',
+			],
+			'next_payment'            => [
+				'label' => _x( 'Next payment date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+				'value' => $subscription['next_period_start'] ?? '',
+			],
+			'end'                     => [
+				'label' => _x( 'End date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+				'value' => $subscription['expires'] ?? '',
+			],
+			'start_end'               => [
+				'label' => _x( 'Trial start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+				'value' => $subscription['trial_start'] ?? '',
+			],
+			'trial_end'               => [
+				'label' => _x( 'Trial end date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
+				'value' => $subscription['trial_end'] ?? '',
+			],
+		];
+	}
+
+	public function get_customer_cards( $subscription_handle, $customer_handle = '' ) {
+		if ( empty( $customer ) ) {
+			$customer_handle = rp_get_customer_handle( get_current_user_id() );
+		}
+
+		$current_payment_method = reepay_s()->api()->request( "subscription/$subscription_handle/pm" )[0] ?? array();
+
+		if ( empty( $current_payment_method['card'] ) ) {
+			return array();
+		}
+
+		$payment_methods = reepay_s()->api()->request( "customer/$customer_handle/payment_method" )['cards'] ?? array();
+
+		$current_payment_method = array_merge( $current_payment_method, $current_payment_method['card'] );
+		unset( $current_payment_method['card'] );
+		$current_payment_method['current'] = true;
+
+		array_unshift( $payment_methods, $current_payment_method );
+
+		return $payment_methods;
 	}
 
 	public function do_action() {
@@ -78,7 +106,7 @@ class WC_Reepay_My_Account_Subscription_Page {
 				continue;
 			}
 
-			$handle = urlencode( sanitize_text_field( $_GET[$subscription_action] ) );
+			$handle = urlencode( sanitize_text_field( $_GET[ $subscription_action ] ) );
 
 			$order = wc_get_orders( [
 					'meta_key'   => '_reepay_subscription_handle',
@@ -123,7 +151,7 @@ class WC_Reepay_My_Account_Subscription_Page {
 	}
 
 	private function do_action_change_payment_method( $handle ) {
-		if( ! empty( $_GET['token_id'] ) ) {
+		if ( ! empty( $_GET['token_id'] ) ) {
 			$token_id = intval( $_GET['token_id'] );
 			$token    = WC_Payment_Tokens::get( $token_id );
 
