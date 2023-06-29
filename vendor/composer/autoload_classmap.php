@@ -19,6 +19,7 @@ return array(
     'WC_Reepay_Import_Menu' => $baseDir . '/includes/import/WC_Reepay_Import_Menu.php',
     'WC_Reepay_Memberships_Integrations' => $baseDir . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
     'WC_Reepay_My_Account' => $baseDir . '/includes/my-account/WC_Reepay_My_Account.php',
+    'WC_Reepay_My_Account_Add_Payment_Method_Page' => $baseDir . '/includes/my-account/WC_Reepay_My_Account_Add_Payment_Method_Page.php',
     'WC_Reepay_My_Account_Orders_Page' => $baseDir . '/includes/my-account/WC_Reepay_My_Account_Orders_Page.php',
     'WC_Reepay_My_Account_Payment_Method' => $baseDir . '/includes/my-account/WC_Reepay_My_Account_Payment_Method.php',
     'WC_Reepay_My_Account_Subscription_Actions' => $baseDir . '/includes/my-account/WC_Reepay_My_Account_Subscription_Actions.php',
