@@ -5,6 +5,7 @@ class WC_Reepay_My_Account {
 		new WC_Reepay_My_Account_Orders_Page();
 		new WC_Reepay_My_Account_Payment_Method();
 		new WC_Reepay_My_Account_Subscription_Page();
+		new WC_Reepay_My_Account_Subscription_Actions();
 		new WC_Reepay_My_Account_Subscriptions_Page();
 
 		add_action( 'init', [ $this, 'rewrite_endpoint' ] );

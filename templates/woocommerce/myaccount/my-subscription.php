@@ -71,16 +71,21 @@ if ( ! defined( 'ABSPATH' ) ) {
             <td><?php _e( 'Payment methods:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
             <td></td>
         </tr>
-		<?php foreach ( $cards as $card ):
+		<?php foreach ( $cards['all'] as $card ):
+			if ( $cards['current']['id'] === $card['id'] && empty( $card['current'] ) ) {
+				//skip duplicate of current card.
+				continue;
+			}
+
 			[ $month, $year ] = explode( '-', $card['exp_date'] );
 			?>
             <tr>
-                <td><?php echo $card['masked_card'] ?> <?php echo "$month/$year" ?></td>
+                <td><?php echo $card['masked_card'] ?><?php echo "$month/$year" ?></td>
                 <td>
-					<?php if ( !empty($card['current']) ): ?>
-						<?php _e( 'Current', 'reepay-subscriptions-for-woocommerce' ); ?>
+					<?php if ( ! empty( $card['current'] ) ): ?>
+						<?php _e( 'Current card', 'reepay-subscriptions-for-woocommerce' ); ?>
 					<?php else: ?>
-                        <a href="?change_payment_method=<?php _e( $subscription['handle'] ) ?>&token_id=<?php echo esc_html( $card['id']) ?>"
+                        <a href="?change_payment_method=<?php _e( $subscription['handle'] ) ?>&token_id=<?php esc_html_e( $card['id'] ) ?>"
                            class="button"><?php _e( 'Use this card', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php endif; ?>
                 </td>
