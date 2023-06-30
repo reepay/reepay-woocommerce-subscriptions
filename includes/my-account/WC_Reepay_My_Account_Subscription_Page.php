@@ -24,7 +24,7 @@ class WC_Reepay_My_Account_Subscription_Page {
 				'dates_to_display' => $this->get_dates_to_display( $subscription )
 			) );
 		} catch ( Exception $e ) {
-			reepay()->get_template( 'myaccount/my-subscriptions-error.php', array(
+			reepay_s()->get_template( 'myaccount/my-subscriptions-error.php', array(
 				'error' => __( 'Subscription not found', 'reepay-subscriptions-for-woocommerce' )
 			) );
 		}

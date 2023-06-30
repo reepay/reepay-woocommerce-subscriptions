@@ -38,17 +38,17 @@ class WC_Reepay_My_Account_Subscriptions_Page {
 				throw new Exception( esc_html__( 'You have no active subscriptions.', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
-			$reepay_subscriptions = reepay_s()->api()->request( "list/subscription?customer=$reepay_customer_handle&size=10" )['content'];
+			$reepay_subscriptions = reepay_s()->api()->request( "list/subscription?customer=$reepay_customer_handle&size=100" )['content'];
 
 			if ( empty( $reepay_subscriptions ) ) {
 				throw new Exception( esc_html__( 'You have no active subscriptions.', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
-			reepay()->get_template( 'myaccount/my-subscriptions.php', array(
+			reepay_s()->get_template( 'myaccount/my-subscriptions.php', array(
 				'subscriptions' => $this->prepare_subscriptions_template_data( $reepay_subscriptions ),
 			) );
 		} catch ( Exception $e ) {
-			reepay()->get_template( 'myaccount/my-subscriptions-error.php', array(
+			reepay_s()->get_template( 'myaccount/my-subscriptions-error.php', array(
 				'error' => $e->getMessage()
 			) );
 		}
