@@ -214,7 +214,7 @@ class WC_Reepay_Renewals
     public function create_subscriptions_handle($data)
     {
         if ($data['event_type'] == 'invoice_authorized' || $data['event_type'] == 'invoice_settled') {
-            $order = rp_get_order_by_handle($data['invoice']) ?: self::get_order_by_subscription_handle($data['subscription'] ?: '');
+            $order = rp_get_order_by_handle($data['invoice']);
         } elseif ($data['event_type'] == 'customer_payment_method_added') {
             $order = rp_get_order_by_session($data['payment_method_reference']);
         } else {
@@ -702,10 +702,6 @@ class WC_Reepay_Renewals
      */
     public static function get_order_by_subscription_handle($handle)
     {
-	    if ( empty( $handle ) ) {
-		    return false;
-	    }
-
         $orders = wc_get_orders(
             [
                 'limit'      => 1,
