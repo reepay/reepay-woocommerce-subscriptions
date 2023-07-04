@@ -31,13 +31,9 @@ class WC_Reepay_Renewals
 
         add_filter('show_reepay_metabox', array($this, 'disable_for_sub'), 10, 2);
 
-        add_filter('order_contains_reepay_subscription', function ($contains, $order) {
-            if ($this->reepay_order_contains_subscription($order)) {
-                return true;
-            }
-
-            return $contains;
-        }, 10, 2);
+	    add_filter( 'order_contains_reepay_subscription', function ( $contains, $order ) {
+		    return $this->reepay_order_contains_subscription( $order ) || $contains;
+	    }, 10, 2 );
     }
 
     /**
@@ -52,13 +48,9 @@ class WC_Reepay_Renewals
 
             if ( ! empty($order)) {
                 foreach ($order->get_items() as $item) {
-                    $product = $item->get_product();
-                    if ($product && $product->is_type([
-                            'reepay_simple_subscriptions',
-                            'reepay_variable_subscriptions'
-                        ])) {
-                        return true;
-                    };
+	                if ( WC_Reepay_Checkout::is_reepay_product( $item->get_product() ) ) {
+		                return true;
+	                }
                 }
             }
         }

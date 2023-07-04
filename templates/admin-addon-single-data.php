@@ -41,7 +41,7 @@ global $post;
 		echo wc_help_tip( __( 'Will display on the frontend', 'reepay-subscriptions-for-woocommerce' ) );
 		?>
     </label>
-    <span><?php echo ! empty( $addon['description'] ) ? esc_textarea( $addon['description'] ) : '' ?></span>
+    <span><?php echo ! empty( $addon['description'] ) ? esc_textarea( $addon['description'] ) : __( 'Not set', 'reepay-subscriptions-for-woocommerce' ) ?></span>
 </p>
 
 <p class="form-field">

@@ -16,12 +16,10 @@ jQuery(function ($) {
     function getReepaySelectedTab(selectedType = '') {
         const type = selectedType || $selectProductType.val();
 
-        if ('reepay_simple_subscriptions' === type || 'reepay_variable_subscriptions' === type) {
-            if ('reepay_simple_subscriptions' === type) {
-                return '#general_product_data';
-            } else if ('reepay_variable_subscriptions' === type) {
-                return '#variable_product_options';
-            }
+        if ('reepay_simple_subscriptions' === type) {
+            return '#general_product_data';
+        } else if ('reepay_variable_subscriptions' === type) {
+            return '#variable_product_options';
         }
 
         return false;
@@ -107,7 +105,7 @@ jQuery(function ($) {
                     }
                 });
 
-            let url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+            const url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
 
             $.ajax({
                 url,

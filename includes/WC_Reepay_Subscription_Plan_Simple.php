@@ -325,9 +325,7 @@ class WC_Reepay_Subscription_Plan_Simple
     public function get_plan($handle)
     {
         try {
-            $result = reepay_s()->api()->request("plan/".$handle."/current");
-
-            return $result;
+	        return reepay_s()->api()->request( "plan/" . $handle . "/current");
         } catch (Exception $e) {
             $this->plan_error($e->getMessage());
         }
@@ -509,13 +507,13 @@ class WC_Reepay_Subscription_Plan_Simple
     }
 
     /**
-     * @param  string  $handle  reepay plan handle
+     * @param  string|array $subscription reepay plan handle or reepay plan data https://reference.reepay.com/api/#the-plan-object
      *
      * @return array<string, mixed> meta fields to save
      */
-    public function get_remote_plan_meta($handle)
+    public function get_remote_plan_meta($subscription)
     {
-        $plan_data = $this->get_plan($handle);
+	    $plan_data = is_string( $subscription ) ? $this->get_plan( $subscription ) : $subscription;
         $plan_meta = [];
 
         if (empty($plan_data)) {
@@ -524,7 +522,7 @@ class WC_Reepay_Subscription_Plan_Simple
             return [];
         }
 
-        $plan_meta['_reepay_subscription_handle'] = $handle;
+        $plan_meta['_reepay_subscription_handle'] = $plan_data['handle'];
 
         $plan_meta['_regular_price'] = $plan_data['amount'] / 100;
         $plan_meta['_price']         = $plan_data['amount'] / 100;
