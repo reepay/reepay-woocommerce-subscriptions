@@ -67,7 +67,10 @@ class WC_Reepay_My_Account_Subscription_Page {
 		$current_payment_method = reepay_s()->api()->request( "subscription/$subscription_handle/pm" )[0] ?? array();
 
 		if ( empty( $current_payment_method['card'] ) ) {
-			return array();
+			return array(
+				'current' => null,
+				'all' => array()
+			);
 		}
 
 		$payment_methods = reepay_s()->api()->request( "customer/$customer_handle/payment_method" )['cards'] ?? array();
@@ -78,10 +81,10 @@ class WC_Reepay_My_Account_Subscription_Page {
 
 		array_unshift( $payment_methods, $current_payment_method );
 
-		return [
+		return array(
 			'current' => $current_payment_method,
 			'all' => $payment_methods
-		];
+		);
 	}
 
 	public static function get_status( $subscription ) {
