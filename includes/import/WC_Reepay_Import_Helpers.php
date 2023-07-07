@@ -16,13 +16,13 @@ class WC_Reepay_Import_Helpers {
 	 *
 	 * @return int|WP_Error created user id or error object
 	 */
-	public static function import_woo_customer( $customer_data ) {
-		$maybe_wp_user = ! empty( $full_data['customer_data']['email'] ) ? get_user_by_email( $full_data['customer_data']['email'] ) : false;
+	public static function import_reepay_customer( $customer_data ) {
+		$maybe_wp_user = ! empty( $customer_data['email'] ) ? get_user_by_email( $customer_data['email'] ) : false;
 
 		//Repay customer has email and customer with that email exists in Woo.
 		if ( ! empty( $maybe_wp_user ) ) {
-			update_user_meta( $maybe_wp_user->ID, 'reepay_customer_id', $full_data['customer_data']['handle'] );
-			return;
+			update_user_meta( $maybe_wp_user->ID, 'reepay_customer_id', $customer_data['handle'] );
+			return $maybe_wp_user->ID;
 		}
 
 		$user_id = wp_create_user(

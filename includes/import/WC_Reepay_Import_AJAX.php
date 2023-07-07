@@ -103,7 +103,7 @@ class WC_Reepay_Import_AJAX {
 
 			$objects_data = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
 
-			if ( ! empty( $objects_data[ $object ] ) ) {
+			if ( ! empty( $objects_data ) ) {
 				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data, $_POST['selected'][ $object ] );
 			}
 		}

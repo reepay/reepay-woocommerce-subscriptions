@@ -100,13 +100,6 @@ class WC_Reepay_Import {
 					$customer['debug_message'] .= __( 'Active subscription not found', 'reepay-subscriptions-for-woocommerce' ) . ' ';
 				}
 
-				$maybe_wp_user = ! empty( $full_data['customer_data']['email'] ) ? get_user_by_email( $full_data['customer_data']['email'] ) : false;
-
-				//Repay customer has email and customer with that email exists in Woo.
-				if( ! empty( $maybe_wp_user ) ) {
-					update_user_meta( $maybe_wp_user->ID, 'reepay_customer_id', $full_data['customer_data']['handle'] );
-				}
-
 				if ( empty( rp_get_userid_by_handle( $customer['handle'] ) ) ) {
 					$customers_to_import[ $customer['handle'] ] = $customer;
 				} else if( $debug ) {
@@ -136,7 +129,7 @@ class WC_Reepay_Import {
 				continue;
 			}
 
-			$create_result = WC_Reepay_Import_Helpers::import_woo_customer( $customers[ $customer_handle ] );
+			$create_result = WC_Reepay_Import_Helpers::import_reepay_customer( $customers[ $customer_handle ] );
 
 			$result[ $customer_handle ] = is_int( $create_result ) ? true : $create_result->get_error_message();
 		}
