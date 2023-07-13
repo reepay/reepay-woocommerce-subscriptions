@@ -23,8 +23,7 @@ class WC_Reepay_Admin_Frontend {
 		global $post;
 
 		$reepay_order = get_post_meta( $order->get_id(), '_reepay_order', true );
-		if ( ! empty( $reepay_order ) && ( ( ! empty( $post->post_parent ) && $post->post_parent !== 0 ) || ! empty( get_post_meta( $post->ID,
-					'_reepay_subscription_handle_parent', true ) ) ) ) {
+		if ( ! empty( $reepay_order ) && ! empty( $post->post_parent ) && $post->post_parent !== 0 ) {
 			return $reepay_order;
 		}
 
@@ -34,8 +33,8 @@ class WC_Reepay_Admin_Frontend {
 	/**
 	 * Adds css classes on admin shop order table
 	 *
-	 * @param  array  $classes
-	 * @param  int  $post_id
+	 * @param array $classes
+	 * @param int $post_id
 	 *
 	 * @return array
 	 * @global WP_Post $post
@@ -58,7 +57,7 @@ class WC_Reepay_Admin_Frontend {
 	/**
 	 * Adds custom column on admin shop order table
 	 *
-	 * @param  string  $col
+	 * @param string $col
 	 *
 	 * @return void
 	 */
@@ -87,44 +86,26 @@ class WC_Reepay_Admin_Frontend {
 				if ( $post->post_parent !== 0 ) {
 					$output = '<strong>&nbsp;';
 					$output .= __( 'Sub Order of', 'reepay-subscriptions-for-woocommerce' );
-					$output .= sprintf( ' <a href="%s">#%s</a>',
-						esc_url( admin_url( 'post.php?action=edit&post=' . $post->post_parent ) ),
+					$output .= sprintf( ' <a href="%s">#%s</a>', esc_url( admin_url( 'post.php?action=edit&post=' . $post->post_parent ) ),
 						esc_html( $post->post_parent ) );
 					$output .= '</strong>';
 				}
-
-				if ( ! empty( get_post_meta( $post->ID, '_reepay_subscription_handle_parent', true ) ) ) {
-					$output     = '<strong>&nbsp;';
-					$output     .= __( 'Sub Order of', 'reepay-subscriptions-for-woocommerce' );
-					$handle     = get_post_meta( $post->ID, '_reepay_subscription_handle_parent', true );
-					$admin_page = 'https://app.reepay.com/#/rp/';
-
-					$link = $admin_page . 'subscriptions/subscription/' . $handle;
-
-					$output .= sprintf( ' <a target="_blank" href="%s">%s</a>', $link, $handle );
-					$output .= '</strong>';
-				}
-
 				break;
 
 			case 'order_type':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+				$handle   = $the_order->get_meta( '_reepay_subscription_handle' );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
-					$output = __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
-				} elseif ( ! empty( $the_order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $the_order->get_meta( '_reepay_renewal' ) ) ) ) {
-					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce' );
+					$output = __( 'Subscription', 'reepay-subscriptions-for-woocommerce');
+				} elseif ( ! empty( $the_order->get_meta( '_reepay_order' ) ) && $post->post_parent != 0 ) {
+					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce');
 				} else {
-					$output = __( 'Regular', 'reepay-subscriptions-for-woocommerce' );
+					$output = __( 'Regular', 'reepay-subscriptions-for-woocommerce');
 				}
 
 				break;
 
 			case 'reepay_sub':
 				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
-
-				if ( empty( $handle ) ) {
-					$handle = $the_order->get_meta( '_reepay_subscription_handle_parent' );
-				}
 
 				if ( empty( $handle ) && ! empty( $the_order->get_parent_id() ) ) {
 					$handle = get_post_meta( $the_order->get_parent_id(), '_reepay_subscription_handle', true );
@@ -149,7 +130,7 @@ class WC_Reepay_Admin_Frontend {
 	/**
 	 * Change the columns shown in admin.
 	 *
-	 * @param  array  $existing_columns
+	 * @param array $existing_columns
 	 *
 	 * @return array
 	 */
@@ -171,6 +152,7 @@ class WC_Reepay_Admin_Frontend {
 	}
 
 	function modify_search_results_fields( $orderby, $query ) {
+
 		if ( is_admin() && $query->is_main_query() && $query->get( 'post_type' ) === 'shop_order' ) {
 			global $wpdb;
 			$orderby = "$wpdb->posts.*, $wpdb->posts.post_title";
