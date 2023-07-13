@@ -33,7 +33,7 @@ class WC_Reepay_My_Account_Orders_Page {
 				$product = current( $order_items )->get_product();
 				if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
 					$type = __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
-				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && $order->get_parent_id() != 0 ) {
+				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && ( $order->get_parent_id() != 0 || ! empty( $order->get_meta( '_reepay_renewal' ) ) ) ) {
 					$type = __( 'Renewal', 'reepay-subscriptions-for-woocommerce' );
 				} else {
 					$type = __( 'Order', 'reepay-subscriptions-for-woocommerce' );
