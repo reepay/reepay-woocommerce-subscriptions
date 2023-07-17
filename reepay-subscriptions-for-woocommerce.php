@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.23
+ * Version: 1.0.24
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -161,7 +161,6 @@ class WooCommerce_Reepay_Subscriptions {
 		add_filter( 'plugin_row_meta', [ $this, 'plugin_row_meta' ], 10, 2 );
 		add_action( 'admin_init', [ $this, 'reepay_admin_notices' ] );
 		add_action( 'init', [ $this, 'init' ] );
-		add_filter( 'woocommerce_locate_template', [ $this, 'override_woo_templates' ], 1, 3 );
 
 		add_filter( 'woocommerce_email_recipient_customer_on_hold_order', [ $this, 'disable_emails' ], 9999, 2 );
 		add_filter( 'woocommerce_email_recipient_customer_processing_order', [ $this, 'disable_emails' ], 9999, 2 );
@@ -578,7 +577,7 @@ class WooCommerce_Reepay_Subscriptions {
 		$this->plan_variable = new WC_Reepay_Subscription_Plan_Variable();
 
 		new WC_Reepay_Subscription_Addons();
-		new WC_Reepay_Account_Page();
+		new WC_Reepay_My_Account();
 		new WC_Reepay_Admin_Frontend();
 		new WC_Reepay_Checkout();
 		new WC_Reepay_Discounts_And_Coupons();
@@ -598,24 +597,30 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Woo_Blocks();
 	}
 
-
-	public function override_woo_templates( $template, $template_name, $template_path ) {
-		$plugin_path = reepay_s()->settings( 'plugin_path' ) . 'templates/woocommerce/';
-
-		if ( file_exists( $plugin_path . $template_name ) ) {
-			$theme_template = locate_template( array(
-				$template_path . $template_name,
-				$template_name,
-			) );
-
-			if ( empty( $theme_template ) ) {
-				return $plugin_path . $template_name;
-			} else {
-				return $theme_template;
-			}
+	/**
+	 * Wrapper of wc_get_template function
+	 *
+	 * @param  string  $template  Template name.
+	 * @param  array  $args  Arguments.
+	 * @param  bool  $return  Return or echo template.
+	 */
+	public function get_template( string $template, $args = array(), $return = false ) {
+		if ( $return ) {
+			ob_start();
 		}
 
-		return $template;
+		wc_get_template(
+			$template,
+			$args,
+			'',
+			reepay_s()->settings( 'plugin_path' ) . 'templates/'
+		);
+
+		if ( $return ) {
+			return ob_get_clean();
+		}
+
+		return true;
 	}
 }
 

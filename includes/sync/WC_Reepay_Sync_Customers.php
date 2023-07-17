@@ -39,7 +39,7 @@ class WC_Reepay_Sync_Customers {
 			return;
 		}
 
-		WC_Reepay_Import_Helpers::create_woo_customer( $full_data['customer_data'] );
+		WC_Reepay_Import_Helpers::import_reepay_customer( $full_data['customer_data'] );
 	}
 
 	/**

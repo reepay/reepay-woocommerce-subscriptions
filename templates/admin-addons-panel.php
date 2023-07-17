@@ -142,7 +142,15 @@
                             return;
                         }
 
-                        $container.append($(`<table style="width: 100%;padding:0;">${response_data.html}</table>`))
+                        $container
+                            .append($(`<table style="width: 100%;padding:0;">${response_data.html}</table>`))
+                            .find('.woocommerce-help-tip')
+                            .tipTip({
+                                'attribute': 'data-tip',
+                                'fadeIn': 50,
+                                'fadeOut': 50,
+                                'delay': 200
+                            });
                     },
                     error: function (request, status, error) {
 
