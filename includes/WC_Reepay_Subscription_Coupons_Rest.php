@@ -9,7 +9,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 	/**
 	 * Get all reepay coupons
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
+	 * @param  WP_REST_Request  $request  Full details about the request.
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @throws Exception
@@ -42,7 +42,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 	/**
 	 * Get reepay coupon info by handle
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
+	 * @param  WP_REST_Request  $request  Full details about the request.
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @throws Exception
@@ -64,7 +64,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 				array(
 					'meta'      => $coupon_data,
 					'plans'     => $plans,
-					'is_update' => true,
+					'is_update' => false,
 					'loop'      => - 1,
 				),
 				'',
