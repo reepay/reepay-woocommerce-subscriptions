@@ -50,9 +50,11 @@ class WC_Reepay_My_Account_Orders_Page {
 
 	public function show_zero_order_total_on_account_orders( $formatted_total, $order ) {
 		$order_items = $order->get_items();
-		$product     = current( $order_items )->get_product();
-		if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
-			return wc_price( 0 );
+		if ( ! empty( $order_items ) && ! empty( current( $order_items ) ) ) {
+			$product = current( $order_items )->get_product();
+			if ( WC_Subscriptions_Product::is_subscription( $product ) ) {
+				return wc_price( 0 );
+			}
 		}
 
 		return $formatted_total;
