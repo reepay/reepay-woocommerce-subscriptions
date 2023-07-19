@@ -21,9 +21,9 @@ class WC_Reepay_My_Account_Subscription_Actions {
 			}
 
 			$subscription_handle = urlencode( sanitize_text_field( $_GET[ $subscription_action ] ) );
-			$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
 
 			try {
+				$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
 				WC_Reepay_My_Account_Subscription_Page::customer_has_access_to_subscription( $subscription );
 				call_user_func( array( $this, "do_action_$subscription_action" ), $subscription_handle );
 			} catch ( Exception $exception ) {
