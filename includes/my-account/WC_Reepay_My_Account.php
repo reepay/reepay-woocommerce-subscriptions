@@ -7,6 +7,7 @@ class WC_Reepay_My_Account {
 		new WC_Reepay_My_Account_Subscription_Page();
 		new WC_Reepay_My_Account_Subscription_Actions();
 		new WC_Reepay_My_Account_Subscriptions_Page();
+		new WC_Reepay_My_Account_Payment_Methods_Actions();
 
 		add_action( 'init', [ $this, 'rewrite_endpoint' ] );
 		add_action( 'woocommerce_get_query_vars', [ $this, 'add_pages_to_woo_query_vars' ] );
