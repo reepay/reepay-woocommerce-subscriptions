@@ -63,6 +63,7 @@ Standard Reepay Subscription features:
 3. For correct plugin operation install and activate Reepay Checkout for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.0.25 - Error fixes, coupons changes
 v 1.0.24 - Subscriptions and renewals live fetch from API
 v 1.0.23 - Fix rest API session error
 v 1.0.22 - Add sing-up fee to line item
