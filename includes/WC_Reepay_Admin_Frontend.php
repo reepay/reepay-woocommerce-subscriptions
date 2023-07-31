@@ -23,9 +23,11 @@ class WC_Reepay_Admin_Frontend {
 		global $post;
 
 		$reepay_order = get_post_meta( $order->get_id(), '_reepay_order', true );
-		if ( ! empty( $reepay_order ) && ( ( ! empty( $post->post_parent ) && $post->post_parent !== 0 ) || ! empty( get_post_meta( $post->ID,
-					'_reepay_subscription_handle_parent', true ) ) ) ) {
-			return $reepay_order;
+		if ( ! empty( $post ) ) {
+			if ( ! empty( $reepay_order ) && ( ( ! empty( $post->post_parent ) && $post->post_parent !== 0 ) || ! empty( get_post_meta( $post->ID,
+						'_reepay_subscription_handle_parent', true ) ) ) ) {
+				return $reepay_order;
+			}
 		}
 
 		return $id;
