@@ -48,12 +48,6 @@ class WC_Reepay_My_Account_Orders_Page {
 		echo '<span>' . $type . '</span>';
 	}
 
-	/**
-	 * @param string $formatted_total
-	 * @param WC_Order $order
-	 *
-	 * @return string
-	 */
 	public function show_zero_order_total_on_account_orders( $formatted_total, $order ) {
 		if( !is_account_page() ) {
 			return $formatted_total;
