@@ -49,16 +49,18 @@ class WC_Reepay_My_Account_Orders_Page {
 	}
 
 	public function show_zero_order_total_on_account_orders( $formatted_total, $order ) {
-		$order_items = $order->get_items();
-
-		if( empty( $order_items ) ) {
-			return wc_price( 0 );
+		if( !is_account_page() ) {
+			return $formatted_total;
 		}
 
-		$product     = current( $order_items )->get_product();
+		$order_items = $order->get_items();
 
-		if ( $product && wcs_is_subscription_product( $product ) ) {
-			return wc_price( 0 );
+		if ( ! empty( $order_items ) ) {
+			$product = current( $order_items )->get_product();
+
+			if ( $product && wcs_is_subscription_product( $product ) ) {
+				$formatted_total =  wc_price( 0 );
+			}
 		}
 
 		return $formatted_total;

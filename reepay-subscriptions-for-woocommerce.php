@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: reepay
  * Author URI: https://reepay.com/
- * Version: 1.0.24
+ * Version: 1.0.25
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -166,9 +166,17 @@ class WooCommerce_Reepay_Subscriptions {
 		add_filter( 'woocommerce_email_recipient_customer_processing_order', [ $this, 'disable_emails' ], 9999, 2 );
 		add_filter( 'woocommerce_email_recipient_customer_completed_order', [ $this, 'disable_emails' ], 9999, 2 );
 		add_filter( 'woocommerce_email_recipient_new_order', [ $this, 'disable_emails' ], 9999, 2 );
+		add_action( 'before_woocommerce_init', [ $this, 'support_HPOS' ] );
 
 		if ( ! has_action( 'woocommerce_admin_field_hr' ) ) {
 			add_action( 'woocommerce_admin_field_hr', [ $this, 'hr_field' ] );
+		}
+	}
+
+	public function support_HPOS() {
+		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables',
+				__FILE__, true );
 		}
 	}
 

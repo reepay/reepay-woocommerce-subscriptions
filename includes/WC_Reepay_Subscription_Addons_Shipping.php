@@ -30,13 +30,12 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 	/**
 	 * Shipping Instance form add extra fields.
 	 *
-	 * @param array $settings Settings.
+	 * @param  array  $settings  Settings.
 	 *
 	 * @return array
 	 */
 	function reepay_shipping_instance_form_add_extra_fields( $settings ) {
-		$options['']    = __( 'Choose add-on', 'reepay-subscriptions-for-woocommerce' );
-		$options['new'] = __( 'New add-on', 'reepay-subscriptions-for-woocommerce' );
+		$options[''] = __( 'Choose add-on', 'reepay-subscriptions-for-woocommerce' );
 
 		$addons_list = self::get_reepay_addons_list();
 		if ( ! empty( $addons_list["content"] ) ) {
@@ -53,7 +52,8 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 			'default'     => '',
 			'class'       => 'wc-enhanced-select addon-shipping-choose',
 			'options'     => $options,
-			'description' => __( 'Only add-ons not related to plans are available.', 'reepay-subscriptions-for-woocommerce' ),
+			'description' => __( 'Only add-ons not related to plans are available.',
+				'reepay-subscriptions-for-woocommerce' ),
 			'desc_tip'    => true,
 		);
 
@@ -75,8 +75,8 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 	}
 
 	/**
-	 * @param array $instance_settings
-	 * @param WC_Shipping_Method $shipping_method
+	 * @param  array  $instance_settings
+	 * @param  WC_Shipping_Method  $shipping_method
 	 *
 	 * @return array
 	 */
@@ -103,7 +103,8 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 
 
 			if ( $instance_settings['reepay_shipping_addon'] == 'new' ) {
-				$created_addon                              = $this->save_to_reepay( $params, $shipping_method->get_instance_option_key() );
+				$created_addon                              = $this->save_to_reepay( $params,
+					$shipping_method->get_instance_option_key() );
 				$instance_settings['reepay_shipping_addon'] = $created_addon['handle'];
 			} else {
 				//get existing method
