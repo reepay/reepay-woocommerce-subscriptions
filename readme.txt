@@ -1,6 +1,6 @@
-=== Reepay Subscriptions ===
-Contributors: reepay
-Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress ecommerce, reepay
+=== Billwerk+ Subscriptions ===
+Contributors: billwerk+
+Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress ecommerce, reepay, billwerk+
 Requires at least: 5.5
 Tested up to: 6.2
 Requires PHP: 7.4
@@ -8,12 +8,12 @@ Stable tag: 1.0.24
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Reepay Subscription for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
+Billwerk+ Subscriptions for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
 
 == Description ==
-Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. Reepay Subscription for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
-WooCommerce Products And Reepay Plans
-Create a WooCommerce product and choose between Reepay Simple Subscription and Reepay Variable Subscription. Connect the product to either a new or existing Reepay subscription plan. Do you Reepay plan changes directly in WooCommerce.
+Get all the advanced subscription features from Billwerk+ while still keeping your usual WooCommerce tools. Billwerk+ Subscription for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
+WooCommerce Products And Billwerk+ Plans
+Create a WooCommerce product and choose between Billwerk+ Simple Subscription and Billwerk+ Variable Subscription. Connect the product to either a new or existing Billwerk+ subscription plan. Do you Billwerk+ plan changes directly in WooCommerce.
 - Flexible billing frequencies
 - Optional renewal reminder
 - Minimum contract period
@@ -24,15 +24,15 @@ Create a WooCommerce product and choose between Reepay Simple Subscription and R
 - Tax settings
 Use Add-Ons For Recurring Additional Sales
 Add-ons are additional products that can be attached to a plan and billed for in each billing cycle. Add-ons can be used to solve a wide range of use-cases. E.g. variable number of “user licenses” or “extended support”, in addition to the base subscription plan.
-WooCommerce Subscription View And Reepay Admin
-We added a WooCommece native subscription view to quickly find a subscription. All links will redirect you directly into the Reepay Admin for further subscription details. Links can also be found on orders and customers for you to quickly navigate to the Reepay Admin. The Reepay Admin is your powerful back office where all our subscription functionalities can be found.
+WooCommerce Subscription View And Billwerk+ Admin
+We added a WooCommece native subscription view to quickly find a subscription. All links will redirect you directly into the Billwerk+ Admin for further subscription details. Links can also be found on orders and customers for you to quickly navigate to the Billwerk+ Admin. The Billwerk+ Admin is your powerful back office where all our subscription functionalities can be found.
 Add-On Based WooCommerce Shipping
-Do you send subscription boxes to your customers on an ongoing basis? Connect your shipping rates in WooCommerce with Add-ons from Reepay and make sure to charge your customers for all ongoing shipping.
+Do you send subscription boxes to your customers on an ongoing basis? Connect your shipping rates in WooCommerce with Add-ons from Billwerk+ and make sure to charge your customers for all ongoing shipping.
 Choose between new or existing Add-ons and update your Add-ons directly in WooCommerce.
-Reepay Discounts & WooCommerce Coupons
-Link WooCommerce coupons with Discounts and Coupons in Reepay. Let your customers use their coupons easily in the WooCommerce checkout.
+Billwerk+ Discounts & WooCommerce Coupons
+Link WooCommerce coupons with Discounts and Coupons in Billwerk+. Let your customers use their coupons easily in the WooCommerce checkout.
 Define whether the discount should apply to setup fees, plans, additional costs, instant charges, or Add-ons, and select the subscription plans that the discount should work for.
-Standard Reepay Subscription features:
+Standard Billwerk+ Subscription features:
 - Plans - Setting up multiple subscription plans with different drawing range and price.
 - Termination and fixation period - Defining the notice period to guarantee a number of periods after subscription termination. Also define a binding period, to guarantee a number of periods for a subscription without closure.
 - Upgrading / Downgrading - Instant up or downgrade of subscriptions.
@@ -49,18 +49,18 @@ Standard Reepay Subscription features:
 - One time charges - One time charge using a saved card.
 - Trial end and renew email - Inform your customer on upcoming payments or at trial end.
 - Email templates - Templates for 20 different emails send based upon triggers: receipt, welcome mail and such.
-- Dunning - Upon failed payment Reepay will communicate with the customer to get updated card information. Setup of the dunning process can be done from within the Reepay admin.
-- Retrying - Reepay automatically retries failed payment attempts if they can be save the payment.
+- Dunning - Upon failed payment Billwerk+ will communicate with the customer to get updated card information. Setup of the dunning process can be done from within the Billwerk+ admin.
+- Retrying - Billwerk+ automatically retries failed payment attempts if they can be save the payment.
 - Customer, subscription and invoice handling - Search, list and handle customers, subscriptions and invoices.
-- Email log - Overview of all emails sent by Reepay to the customers
+- Email log - Overview of all emails sent by Billwerk+ to the customers
 - Refunding - Refund of invoices, either full or partial
 - Event log - Log of all events on customers, subscription and invoices.
 - Statistics - Advanced statistics and key numbers like: churn, avg. income per. customer, MMR and customer growth.
 
 == Installation ==
 1. Download the plugin from WordPress repository or install it directly from Plugins page.
-2. Activate the plugin and save Private Key Test and Private Key Live in \"Reepay Subscription Settings\" page.
-3. For correct plugin operation install and activate Reepay Checkout for WooCommerce. API keys for both plugins should be the same.
+2. Activate the plugin and save Private Key Test and Private Key Live in \"Billwerk+ Subscription Settings\" page.
+3. For correct plugin operation install and activate Billwerk+ Checkout for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
 v 1.0.25 - Error fixes, coupons changes

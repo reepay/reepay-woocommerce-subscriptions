@@ -1,11 +1,12 @@
-# Reepay Subscriptions for WooCommerce plugin
+# Billwerk+ Subscriptions for WooCommerce plugin
 
-The Official Reepay Woocommerce plugin has been made for you to use on your wordpress site. Click below to download and
+The Official Billwerk+ Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
+and
 install.
 
-Use the reepay plugin for:
+Use the billwerk+ plugin for:
 
-* Integration Woocommerce with Reepay subscriptions
+* Integration Woocommerce with Billwerk+ subscriptions
 
 # Supported versions
 

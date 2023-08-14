@@ -1,4 +1,5 @@
 <?php
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -15,10 +16,10 @@ class WC_Reepay_Subscriptions_Update {
 	public function __construct( $db_version ) {
 		// Show Upgrade notification
 		if ( version_compare(
-		        get_option( 'woocommerce_reepay_subscriptions_version', $db_version ),
-                $db_version,
+			get_option( 'woocommerce_reepay_subscriptions_version', $db_version ),
+			$db_version,
 			'<' )
-        ) {
+		) {
 			add_action( 'admin_notices', [ $this, 'upgrade_notice' ] );
 		}
 
@@ -44,7 +45,7 @@ class WC_Reepay_Subscriptions_Update {
             <div id="message" class="error">
                 <p>
 					<?php
-					echo esc_html__( 'Warning! WooCommerce Reepay Subscriptions plugin requires to update the database structure.',
+					echo esc_html__( 'Warning! WooCommerce Billwerk+ Subscriptions plugin requires to update the database structure.',
 						'reepay-checkout-gateway' );
 					echo ' ' . sprintf( esc_html__( 'Please click %s here %s to start upgrade.',
 							'reepay-checkout-gateway' ),
