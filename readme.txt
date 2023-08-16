@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce, wordpress eco
 Requires at least: 5.5
 Tested up to: 6.2
 Requires PHP: 7.4
-Stable tag: 1.0.24
+Stable tag: 1.0.26
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,6 +63,7 @@ Standard Billwerk+ Subscription features:
 3. For correct plugin operation install and activate Billwerk+ Checkout for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.0.26 - Billwerk+ naming changes
 v 1.0.25 - Error fixes, coupons changes
 v 1.0.24 - Subscriptions and renewals live fetch from API
 v 1.0.23 - Fix rest API session error
