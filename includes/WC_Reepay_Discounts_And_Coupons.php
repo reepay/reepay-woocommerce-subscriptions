@@ -522,7 +522,7 @@ class WC_Reepay_Discounts_And_Coupons {
 
 	public function add_coupon_types( $discount_types ) {
 		return array_merge( $discount_types, [
-			'reepay_type' => __( 'Reepay discount' ),
+			'reepay_type' => __( 'Billwerk+ discount' ),
 		] );
 	}
 

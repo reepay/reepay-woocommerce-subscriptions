@@ -58,9 +58,9 @@ class WC_Reepay_Subscription_API {
 	/**
 	 * Request
 	 *
-	 * @param string $method
-	 * @param string $endpoint
-	 * @param array $params
+	 * @param  string  $method
+	 * @param  string  $endpoint
+	 * @param  array  $params
 	 *
 	 * @return array|mixed|object
 	 * @throws Exception
@@ -69,7 +69,8 @@ class WC_Reepay_Subscription_API {
 		$start = microtime( true );
 		$url   = $this->url . $endpoint;
 
-		reepay_s()->log()->log( sprintf( 'Request: %s %s %s', $method, $url, json_encode( $params, JSON_PRETTY_PRINT ) ) );
+		reepay_s()->log()->log( sprintf( 'Request: %s %s %s', $method, $url,
+			json_encode( $params, JSON_PRETTY_PRINT ) ) );
 
 
 		$key = $this->test_mode ? $this->private_key_test : $this->private_key;
@@ -92,20 +93,23 @@ class WC_Reepay_Subscription_API {
 		$response  = wp_remote_request( $url, $args );
 		$body      = wp_remote_retrieve_body( $response );
 		$http_code = wp_remote_retrieve_response_code( $response );
-		$code      = is_numeric($http_code) ? round( $http_code / 100 ) : 0;
+		$code      = is_numeric( $http_code ) ? round( $http_code / 100 ) : 0;
 
 		if ( $this->debug ) {
 			$time = microtime( true ) - $start;
-			reepay_s()->log()->log( sprintf( '[%.4F] HTTP Code: %s. Response: %s', $time, wp_remote_retrieve_response_code( $response ), $body ) );
+			reepay_s()->log()->log( sprintf( '[%.4F] HTTP Code: %s. Response: %s', $time,
+				wp_remote_retrieve_response_code( $response ), $body ) );
 		}
 
 		switch ( $code ) {
 			case 0:
 				if ( is_wp_error( $response ) ) {
-					throw new Exception( sprintf( __( 'Error: %s. Code: %s.', 'reepay-subscriptions-for-woocommerce' ), $response->get_error_message(), $code ) );
+					throw new Exception( sprintf( __( 'Error: %s. Code: %s.', 'reepay-subscriptions-for-woocommerce' ),
+						$response->get_error_message(), $code ) );
 				}
 			case 1:
-				throw new Exception( sprintf( __( 'Invalid HTTP Code: %s', 'reepay-subscriptions-for-woocommerce' ), $http_code ) );
+				throw new Exception( sprintf( __( 'Invalid HTTP Code: %s', 'reepay-subscriptions-for-woocommerce' ),
+					$http_code ) );
 			case 2:
 			case 3:
 				return json_decode( $body, true );
@@ -114,7 +118,8 @@ class WC_Reepay_Subscription_API {
 				if ( mb_strpos( $body, 'Request rate limit exceeded', 0, 'UTF-8' ) !== false ) {
 					global $request_retry;
 					if ( $request_retry ) {
-						throw new Exception( __( 'Reepay: Request rate limit exceeded', 'reepay-subscriptions-for-woocommerce' ) );
+						throw new Exception( __( 'Billwerk+: Request rate limit exceeded',
+							'reepay-subscriptions-for-woocommerce' ) );
 					}
 
 					sleep( 10 );
@@ -132,14 +137,15 @@ class WC_Reepay_Subscription_API {
 				if ( ! empty( $body->message ) ) {
 					$error .= ' - ' . $body->message;
 				}
-				throw new Exception( sprintf( __( 'API Error (request): %s. HTTP Code: %s. Endpoint: %s', 'reepay-subscriptions-for-woocommerce' ), $error, $http_code, $url ) );
+				throw new Exception( sprintf( __( 'API Error (request): %s. HTTP Code: %s. Endpoint: %s',
+					'reepay-subscriptions-for-woocommerce' ), $error, $http_code, $url ) );
 			default:
 				if ( $this->debug ) {
 					throw new Exception( $body );
 				} else {
-					throw new Exception( sprintf( __( 'Invalid HTTP Code: %s', 'reepay-subscriptions-for-woocommerce' ), $http_code ) );
+					throw new Exception( sprintf( __( 'Invalid HTTP Code: %s', 'reepay-subscriptions-for-woocommerce' ),
+						$http_code ) );
 				}
-
 		}
 	}
 }

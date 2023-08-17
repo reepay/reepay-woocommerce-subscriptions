@@ -20,8 +20,8 @@ class WC_Reepay_Import_Menu {
 	function create_submenu() {
 		add_submenu_page(
 			'tools.php',
-			__( 'Reepay Import' ),
-			__( 'Reepay Import' ),
+			__( 'Billwerk+ Import' ),
+			__( 'Billwerk+ Import' ),
 			'manage_options',
 			self::$menu_slug,
 			[ $this, 'print_import_page' ],
@@ -33,7 +33,8 @@ class WC_Reepay_Import_Menu {
 	 * Register settings
 	 */
 	function create_settings_fields() {
-		register_setting( 'reepay_import_settings', WC_Reepay_Import::$option_name, [ $this, 'import_sanitize_checkbox' ] );
+		register_setting( 'reepay_import_settings', WC_Reepay_Import::$option_name,
+			[ $this, 'import_sanitize_checkbox' ] );
 
 		foreach ( WC_Reepay_Import::$import_objects as $object_key => $object ) {
 			add_settings_section(
@@ -114,7 +115,7 @@ class WC_Reepay_Import_Menu {
 	/**
 	 * Prepare name attribute and print setting checkbox
 	 *
-	 * @param array $args
+	 * @param  array  $args
 	 */
 	function print_checkbox( $args ) {
 		$args['option_name'] = '[' . implode( '][', $args['option_name'] ) . ']';

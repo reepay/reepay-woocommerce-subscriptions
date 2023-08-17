@@ -20,7 +20,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	public function add_subscription_product_type( $types ) {
-		$types['reepay_variable_subscriptions'] = __( 'Reepay Variable Subscription' );
+		$types['reepay_variable_subscriptions'] = __( 'Billwerk+ Variable Subscription' );
 
 		return $types;
 	}

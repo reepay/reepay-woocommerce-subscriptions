@@ -1,11 +1,11 @@
 <?php
 
 /*
- * Plugin Name: Reepay Subscriptions for WooCommerce
- * Description: Get all the advanced subscription features from Reepay while still keeping your usual WooCommerce tools. The Reepay Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
- * Author: reepay
- * Author URI: https://reepay.com/
- * Version: 1.0.25
+ * Plugin Name: Billwerk+ Subscriptions for WooCommerce
+ * Description: Get all the advanced subscription features from Billwerk+ while still keeping your usual WooCommerce tools. The Billwerk+ Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
+ * Author: Billwerk+
+ * Author URI: https://www.billwerk.plus/
+ * Version: 1.0.26
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -230,7 +230,7 @@ class WooCommerce_Reepay_Subscriptions {
 			WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
 				sprintf(
 					wp_kses(
-						__( 'The plugin Reepay Checkout for WooCommerce is required for Reepay Subscriptions for WooCommerce. <a target="_blank" href="%s">Please install and activate the plugin.</a>',
+						__( 'The plugin Billwerk+ Checkout for WooCommerce is required for Billwerk+ Subscriptions for WooCommerce. <a target="_blank" href="%s">Please install and activate the plugin.</a>',
 							'reepay-subscriptions-for-woocommerce'
 						), [
 							'a' => [
@@ -316,7 +316,8 @@ class WooCommerce_Reepay_Subscriptions {
 	}
 
 	public function add_settings_tab( $settings_tabs ) {
-		$settings_tabs['reepay_subscriptions'] = __( 'Reepay Subscriptions', 'reepay-subscriptions-for-woocommerce' );
+		$settings_tabs['reepay_subscriptions'] = __( 'Billwerk+ Subscriptions',
+			'reepay-subscriptions-for-woocommerce' );
 
 		return $settings_tabs;
 	}
@@ -362,7 +363,7 @@ class WooCommerce_Reepay_Subscriptions {
 	public function get_settings() {
 		$settings = [
 			'section_title'                              => [
-				'name' => __( 'Reepay Subscription', 'reepay-subscriptions-for-woocommerce' ),
+				'name' => __( 'Billwerk+ Subscription', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'title',
 				'desc' => '',
 				'id'   => 'reepay_section_title'
@@ -415,7 +416,7 @@ class WooCommerce_Reepay_Subscriptions {
 					'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Setting to control witch status the Reepay subscription order in WooCommerce gets.',
+				'desc'    => __( 'Setting to control witch status the Billwerk+ subscription order in WooCommerce gets.',
 					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_orders_default_subscription_status'
 			],
@@ -424,7 +425,7 @@ class WooCommerce_Reepay_Subscriptions {
 					'reepay-subscriptions-for-woocommerce' ),
 				'type'    => 'select',
 				'options' => wc_get_order_statuses(),
-				'desc'    => __( 'Setting to control witch status the Reepay renewal order in WooCommerce gets.',
+				'desc'    => __( 'Setting to control witch status the Billwerk+ renewal order in WooCommerce gets.',
 					'reepay-subscriptions-for-woocommerce' ),
 				'id'      => '_reepay_suborders_default_renew_status'
 			],
@@ -435,7 +436,7 @@ class WooCommerce_Reepay_Subscriptions {
 			'_reepay_manual_start_date'                  => [
 				'name' => __( 'Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce' ),
 				'type' => 'checkbox',
-				'desc' => __( 'Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Reepay.</p>',
+				'desc' => __( 'Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Billwerk+.</p>',
 					'reepay-subscriptions-for-woocommerce' ),
 				'id'   => '_reepay_manual_start_date'
 			],

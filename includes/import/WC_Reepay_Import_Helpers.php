@@ -22,6 +22,7 @@ class WC_Reepay_Import_Helpers {
 		//Repay customer has email and customer with that email exists in Woo.
 		if ( ! empty( $maybe_wp_user ) ) {
 			update_user_meta( $maybe_wp_user->ID, 'reepay_customer_id', $customer_data['handle'] );
+
 			return $maybe_wp_user->ID;
 		}
 
@@ -43,7 +44,7 @@ class WC_Reepay_Import_Helpers {
 	}
 
 	/**
-	 * @param  int    $user_id
+	 * @param  int  $user_id
 	 * @param  array  $customer_data  https://reference.reepay.com/api/#the-customer-object
 	 */
 	public static function import_user_data( $user_id, $customer_data ) {
@@ -90,7 +91,7 @@ class WC_Reepay_Import_Helpers {
 	}
 
 	/**
-	 * @param  int                   $user_id
+	 * @param  int  $user_id
 	 * @param  array<string, mixed>  $card
 	 *
 	 * @return bool|WP_Error
@@ -116,7 +117,7 @@ class WC_Reepay_Import_Helpers {
 		}
 
 		if ( ! $token->save() ) {
-			return new WP_Error( __( 'Unable to save bank card' ) .' - '. $card['masked_card'] . ', ' . $card['customer'] );
+			return new WP_Error( __( 'Unable to save bank card' ) . ' - ' . $card['masked_card'] . ', ' . $card['customer'] );
 		}
 
 		return true;
@@ -186,18 +187,18 @@ class WC_Reepay_Import_Helpers {
 
 		//import logic
 		$order->set_billing_city( $customer['city'] ?? '' );
-		$order->set_billing_postcode( $customer['postal_code']  ?? '' );
-		$order->set_billing_email( $customer['email']  ?? '' );
-		$order->set_billing_phone( $customer['phone']  ?? '' );
-		$order->set_billing_address_1( $customer['address']  ?? '' );
-		$order->set_billing_address_2( $customer['address2']  ?? '' );
-		$order->set_billing_country( $customer['country']  ?? '' );
-		$order->set_billing_first_name( $customer['first_name']  ?? '' );
-		$order->set_billing_last_name( $customer['last_name']  ?? '' );
-		$order->set_billing_company( $customer['company']  ?? '' );
+		$order->set_billing_postcode( $customer['postal_code'] ?? '' );
+		$order->set_billing_email( $customer['email'] ?? '' );
+		$order->set_billing_phone( $customer['phone'] ?? '' );
+		$order->set_billing_address_1( $customer['address'] ?? '' );
+		$order->set_billing_address_2( $customer['address2'] ?? '' );
+		$order->set_billing_country( $customer['country'] ?? '' );
+		$order->set_billing_first_name( $customer['first_name'] ?? '' );
+		$order->set_billing_last_name( $customer['last_name'] ?? '' );
+		$order->set_billing_company( $customer['company'] ?? '' );
 
 		$order->set_payment_method( 'reepay_checkout' );
-		$order->set_payment_method_title( 'Reepay Checkout' );
+		$order->set_payment_method_title( 'Billwerk+ Checkout' );
 		$order->set_currency( $plan['currency'] ?? '' );
 		$order->add_meta_data( '_reepay_state_authorized', 1 );
 
@@ -213,9 +214,9 @@ class WC_Reepay_Import_Helpers {
 			'_reepay_billing_string',
 			WC_Reepay_Subscription_Plan_Simple::get_billing_plan(
 				array(
-					'type' => $schedule_type,
+					'type'      => $schedule_type,
 					'type_data' => $schedule_data,
-					'interval' => ''
+					'interval'  => ''
 				),
 				true
 			)
