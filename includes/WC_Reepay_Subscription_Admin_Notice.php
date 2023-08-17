@@ -108,7 +108,7 @@ class WC_Reepay_Subscription_Admin_Notice {
 				'message' => $notice
 			);
 		} else {
-			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle_parent', true );
+			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle', true );
 			$reloaded   = get_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
 			$order      = wc_get_order( $order_id );
 			if ( empty( $reloaded ) ) {
