@@ -21,14 +21,13 @@ class WC_Reepay_Subscription_Admin_Notice {
 		add_action( 'post_updated_messages', array( $this, 'show_editor_message' ) );
 		add_action( 'admin_notices', array( $this, 'show_activation_message' ) );
 		add_filter( 'woocommerce_reepay_check_payment', array( $this, 'show_thankyou_message' ), 10, 2 );
-
 	}
 
 	/**
 	 * Show a notice.
 	 *
-	 * @param string $name Notice name.
-	 * @param bool $force_save Force saving inside this method instead of at the 'shutdown'.
+	 * @param  string  $name  Notice name.
+	 * @param  bool  $force_save  Force saving inside this method instead of at the 'shutdown'.
 	 */
 	public static function add_activation_notice( $notice ) {
 		self::$activation_notices = array_unique( array_merge( self::$activation_notices, array( $notice ) ) );
@@ -40,8 +39,8 @@ class WC_Reepay_Subscription_Admin_Notice {
 	/**
 	 * Show a notice.
 	 *
-	 * @param string $name Notice name.
-	 * @param bool $force_save Force saving inside this method instead of at the 'shutdown'.
+	 * @param  string  $name  Notice name.
+	 * @param  bool  $force_save  Force saving inside this method instead of at the 'shutdown'.
 	 */
 	public static function add_notice( $notice ) {
 		self::$notices = array_unique( array_merge( self::$notices, array( $notice ) ) );
@@ -52,8 +51,8 @@ class WC_Reepay_Subscription_Admin_Notice {
 	/**
 	 * Add a frontend notice.
 	 *
-	 * @param string $name Notice name.
-	 * @param bool $force_save Force saving inside this method instead of at the 'shutdown'.
+	 * @param  string  $name  Notice name.
+	 * @param  bool  $force_save  Force saving inside this method instead of at the 'shutdown'.
 	 */
 	public static function add_frontend_notice( $notice, $order_id ) {
 		self::store_frontend_notices( $notice, $order_id );
@@ -109,11 +108,10 @@ class WC_Reepay_Subscription_Admin_Notice {
 				'message' => $notice
 			);
 		} else {
-			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle', true );
+			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle_parent', true );
 			$reloaded   = get_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
-
+			$order      = wc_get_order( $order_id );
 			if ( empty( $reloaded ) ) {
-				$order = wc_get_order( $order_id );
 				if ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
 					$ret = array(
 						'state' => 'reload',
@@ -126,14 +124,16 @@ class WC_Reepay_Subscription_Admin_Notice {
 					if ( $sub['in_trial'] ) {
 						$ret = array(
 							'state'   => 'paid',
-							'message' => __( 'Subscription is activated in trial', 'reepay-subscriptions-for-woocommerce' )
+							'message' => __( 'Subscription is activated in trial',
+								'reepay-subscriptions-for-woocommerce' )
 						);
 					}
 
 					if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) && strtotime( $sub['next_period_start'] ) > strtotime( 'now' ) ) {
 						$ret = array(
 							'state'   => 'paid',
-							'message' => __( 'Subscription is activated in trial', 'reepay-subscriptions-for-woocommerce' )
+							'message' => __( 'Subscription is activated in trial',
+								'reepay-subscriptions-for-woocommerce' )
 						);
 					}
 
@@ -143,13 +143,17 @@ class WC_Reepay_Subscription_Admin_Notice {
 							'message' => __( 'Order has been paid', 'reepay-subscriptions-for-woocommerce' )
 						);
 					}
-
 				} catch ( Exception $exception ) {
 					$ret = array(
 						'state'   => 'failed',
 						'message' => $exception->getMessage()
 					);
 				}
+			} elseif ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
+				$ret = array(
+					'state'   => 'failed',
+					'message' => 'Payment has been failed'
+				);
 			}
 		}
 
