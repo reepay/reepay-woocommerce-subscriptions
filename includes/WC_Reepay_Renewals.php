@@ -581,7 +581,7 @@ class WC_Reepay_Renewals {
 	 */
 	public function renew_subscription( $data ) {
 		$status_main = reepay_s()->settings( '_reepay_orders_default_subscription_status' );
-		self::update_subscription_status( $data, $status_main, false );
+		//self::update_subscription_status( $data, $status_main, false );
 		self::create_child_order( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
 		self::change_user_role( $data );
 	}

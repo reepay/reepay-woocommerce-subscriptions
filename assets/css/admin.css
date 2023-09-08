@@ -311,34 +311,6 @@ p.form-field span.form-field_time-type {
     color: black;
 }
 
-.reepay-admin-section-li-small.reepay-invoice-status-created {
-    color: #abab00;
-}
-
-.reepay-admin-section-li-small.reepay-invoice-status-pending {
-    color: #abab00;
-}
-
-.reepay-admin-section-li-small.reepay-invoice-status-dunning {
-    color: #abab00;
-}
-
-.reepay-admin-section-li-small.reepay-invoice-status-settled {
-    color: green;
-}
-
-.reepay-admin-section-li-small.reepay-invoice-status-cancelled {
-    color: red;
-}
-
-.reepay-admin-section-li-small.reepay-invoice-status-authorized {
-    color: #abab00;
-}
-
-.reepay-admin-section-li-small.reepay-invoice-status-failed {
-    color: red;
-}
-
 .reepay_subscription_container .select2-container {
     width: 100% !important;
     max-width: 300px !important;
