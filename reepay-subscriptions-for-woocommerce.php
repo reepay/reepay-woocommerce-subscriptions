@@ -587,7 +587,6 @@ class WooCommerce_Reepay_Subscriptions {
 
 		new WC_Reepay_Subscription_Addons();
 		new WC_Reepay_My_Account();
-		new WC_Reepay_Admin_Frontend();
 		new WC_Reepay_Checkout();
 		new WC_Reepay_Discounts_And_Coupons();
 		new WC_Reepay_Renewals();
@@ -604,6 +603,10 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Memberships_Integrations();
 		new WC_Reepay_Woo_Blocks();
+
+		add_action( 'plugins_loaded', function () {
+			new WC_Reepay_Admin_Frontend();
+		} );
 	}
 
 	/**

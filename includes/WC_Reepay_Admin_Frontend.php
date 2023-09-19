@@ -1,5 +1,7 @@
 <?php
 
+use Automattic\WooCommerce\Utilities\OrderUtil;
+
 /**
  * Class WC_Reepay_Admin_Frontend
  *
@@ -11,8 +13,14 @@ class WC_Reepay_Admin_Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11 );
-		add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
+		if( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			add_action( 'manage_woocommerce_page_wc-orders_custom_column', [ $this, 'shop_order_custom_columns' ], 11, 2 );
+			add_filter( 'manage_woocommerce_page_wc-orders_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
+		} else {
+			add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11 );
+			add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
+		}
+
 		add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
 
 		add_filter( 'posts_fields', [ $this, 'modify_search_results_fields' ], 10, 2 );
@@ -60,31 +68,38 @@ class WC_Reepay_Admin_Frontend {
 	/**
 	 * Adds custom column on admin shop order table
 	 *
-	 * @param  string  $col
+	 * @param string        $column_id column id.
+	 * @param WC_Order|null $order     order object. For compatibility with WooCommerce HPOS orders table
 	 *
 	 * @return void
 	 */
-	public function shop_order_custom_columns( $col ) {
+	public function shop_order_custom_columns( $column_id, $order = null  ) {
 		/**
 		 * @global \WP_Post $post
 		 * @global \WC_Order $the_order
 		 */
 		global $post, $the_order;
 
-		if ( empty( $the_order ) || $the_order->get_id() !== $post->ID ) {
+		if ( ! is_null( $order ) ) {
+			$the_order = $order;
+		} else if ( empty( $the_order ) || ( ! is_null( $post ) && $the_order->get_id() !== $post->ID ) ) {
 			$the_order = new \WC_Order( $post->ID );
+		}
+
+		if ( is_null( $post ) && ! is_null( $the_order ) ) {
+			$post = get_post( $the_order->get_id() );
 		}
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 
-		if ( ! in_array( $col, [ 'order_number', 'order_type', 'reepay_sub' ], true ) ) {
+		if ( ! in_array( $column_id, [ 'order_number', 'order_type', 'reepay_sub' ], true ) ) {
 			return;
 		}
 
 		$output = '';
-		switch ( $col ) {
+		switch ( $column_id ) {
 			case 'order_number':
 				if ( $post->post_parent !== 0 ) {
 					$output = '<strong>&nbsp;';
