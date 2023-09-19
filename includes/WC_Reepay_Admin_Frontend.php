@@ -17,7 +17,7 @@ class WC_Reepay_Admin_Frontend {
 			add_action( 'manage_woocommerce_page_wc-orders_custom_column', [ $this, 'shop_order_custom_columns' ], 11, 2 );
 			add_filter( 'manage_woocommerce_page_wc-orders_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		} else {
-			add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11 );
+			add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11, 2 );
 			add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		}
 
@@ -74,21 +74,8 @@ class WC_Reepay_Admin_Frontend {
 	 * @return void
 	 */
 	public function shop_order_custom_columns( $column_id, $order = null  ) {
-		/**
-		 * @global \WP_Post $post
-		 * @global \WC_Order $the_order
-		 */
-		global $post, $the_order;
-
-		if ( ! is_null( $order ) ) {
-			$the_order = $order;
-		} else if ( empty( $the_order ) || ( ! is_null( $post ) && $the_order->get_id() !== $post->ID ) ) {
-			$the_order = new \WC_Order( $post->ID );
-		}
-
-		if ( is_null( $post ) && ! is_null( $the_order ) ) {
-			$post = get_post( $the_order->get_id() );
-		}
+		$order = wc_get_order( $order );
+		$post = get_post( !empty( $order ) ? $order->get_id() : null );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
@@ -125,26 +112,27 @@ class WC_Reepay_Admin_Frontend {
 				break;
 
 			case 'order_type':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+				$handle = $order->get_meta( '_reepay_subscription_handle' );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
 					$output = __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
-				} elseif ( ! empty( $the_order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $the_order->get_meta( '_reepay_renewal' ) ) ) ) {
+				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $order->get_meta( '_reepay_renewal' ) ) ) ) {
 					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce' );
 				} else {
-					$output = __( 'Regular', 'reepay-subscriptions-for-woocommerce' );
+					$output = __( 'Regular', 'reepay-subscriptions-for-woocom
+					erce' );
 				}
 
 				break;
 
 			case 'reepay_sub':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+				$handle = $order->get_meta( '_reepay_subscription_handle' );
 
 				if ( empty( $handle ) ) {
-					$handle = $the_order->get_meta( '_reepay_subscription_handle_parent' );
+					$handle = $order->get_meta( '_reepay_subscription_handle_parent' );
 				}
 
-				if ( empty( $handle ) && ! empty( $the_order->get_parent_id() ) ) {
-					$handle = get_post_meta( $the_order->get_parent_id(), '_reepay_subscription_handle', true );
+				if ( empty( $handle ) && ! empty( $order->get_parent_id() ) ) {
+					$handle = get_post_meta( $order->get_parent_id(), '_reepay_subscription_handle', true );
 				}
 
 				if ( ! empty( $handle ) ) {
