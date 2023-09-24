@@ -150,13 +150,6 @@ class WC_Reepay_Subscription_Admin_Notice {
 					);
 				}
 			}
-//			ToDo Remove or Fix https://trello.com/c/OB7Wib0s
-//			elseif ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
-//				$ret = array(
-//					'state'   => 'failed',
-//					'message' => 'Payment has been failed'
-//				);
-//			}
 		}
 
 
