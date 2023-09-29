@@ -13,8 +13,9 @@ class WC_Reepay_Admin_Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		if( OrderUtil::custom_orders_table_usage_is_enabled() ) {
-			add_action( 'manage_woocommerce_page_wc-orders_custom_column', [ $this, 'shop_order_custom_columns' ], 11, 2 );
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			add_action( 'manage_woocommerce_page_wc-orders_custom_column', [ $this, 'shop_order_custom_columns' ], 11,
+				2 );
 			add_filter( 'manage_woocommerce_page_wc-orders_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
 		} else {
 			add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11, 2 );
@@ -68,14 +69,14 @@ class WC_Reepay_Admin_Frontend {
 	/**
 	 * Adds custom column on admin shop order table
 	 *
-	 * @param string        $column_id column id.
-	 * @param WC_Order|null $order     order object. For compatibility with WooCommerce HPOS orders table
+	 * @param  string  $column_id  column id.
+	 * @param  WC_Order|null  $order  order object. For compatibility with WooCommerce HPOS orders table
 	 *
 	 * @return void
 	 */
-	public function shop_order_custom_columns( $column_id, $order = null  ) {
+	public function shop_order_custom_columns( $column_id, $order = null ) {
 		$order = wc_get_order( $order );
-		$post = get_post( !empty( $order ) ? $order->get_id() : null );
+		$post  = get_post( ! empty( $order ) ? $order->get_id() : null );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
@@ -101,7 +102,7 @@ class WC_Reepay_Admin_Frontend {
 					$output     = '<strong>&nbsp;';
 					$output     .= __( 'Sub Order of', 'reepay-subscriptions-for-woocommerce' );
 					$handle     = get_post_meta( $post->ID, '_reepay_subscription_handle_parent', true );
-					$admin_page = 'https://app.reepay.com/#/rp/';
+					$admin_page = 'https://admin.billwerk.plus/#/rp/';
 
 					$link = $admin_page . 'subscriptions/subscription/' . $handle;
 
@@ -136,7 +137,7 @@ class WC_Reepay_Admin_Frontend {
 				}
 
 				if ( ! empty( $handle ) ) {
-					$admin_page = 'https://app.reepay.com/#/rp/';
+					$admin_page = 'https://admin.billwerk.plus/#/rp/';
 
 					$link = $admin_page . 'subscriptions/subscription/' . $handle;
 

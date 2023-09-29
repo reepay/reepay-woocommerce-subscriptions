@@ -38,7 +38,7 @@ addFilter(
             //console.log(Object.keys(roles_list));
 
             const link = React.createElement("a", {
-                    href: "https://app.reepay.com/#/rp/customers/customers/customer/customer-" + customer.user_id,
+                    href: "https://admin.billwerk.plus/#/rp/customers/customers/customer/customer-" + customer.user_id,
                     target: "_blank"
                 },
                 'customer-' + customer.user_id

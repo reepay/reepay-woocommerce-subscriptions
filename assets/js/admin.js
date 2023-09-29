@@ -2,7 +2,7 @@ jQuery(function ($) {
     const $body = $('body');
 
     var linksToMenu = $('a[href="admin.php?page=reepay-subscriptions-for-woocommerce"]');
-    linksToMenu.attr("href", "https://app.reepay.com/#/rp/subscriptions")
+    linksToMenu.attr("href", "https://admin.billwerk.plus/#/rp/subscriptions")
     linksToMenu.attr("target", "_blank")
 
     const $invoiceMetaBox = $('#reepay_checkout_invoice');
@@ -68,7 +68,7 @@ jQuery(function ($) {
                         }
                         amount_field.val(response_data.amount);
                         if ($('.addon-notice').length <= 0) {
-                            amount_field.after('<p class="addon-notice">Add-on amount can be changed <a target="_blank" href="https://app.reepay.com/#/rp/config/addons/' + addon_field.val() + '">here</a></p>');
+                            amount_field.after('<p class="addon-notice">Add-on amount can be changed <a target="_blank" href="https://admin.billwerk.plus/#/rp/config/addons/' + addon_field.val() + '">here</a></p>');
                         }
                     },
                 })
@@ -133,7 +133,7 @@ jQuery(function ($) {
     $('[name$="reepay_shipping_addon"]')
         .parents('fieldset')
         .append($('<button class="button button-primary button-large js-refresh-addons-shipping-list">Refresh list</button>'))
-        .append($('<a class="button button-primary button-large" style="margin-left: 5px;" href="https://app.reepay.com/#/rp/config/addons/create" target="_blank">Create new addon</a>'))
+        .append($('<a class="button button-primary button-large" style="margin-left: 5px;" href="https://admin.billwerk.plus/#/rp/config/addons/create" target="_blank">Create new addon</a>'))
 
     $body.on('click', '.js-refresh-addons-shipping-list', function (e) {
         e.preventDefault();

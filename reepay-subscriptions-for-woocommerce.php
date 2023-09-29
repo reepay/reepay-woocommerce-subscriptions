@@ -259,9 +259,9 @@ class WooCommerce_Reepay_Subscriptions {
 		}
 
 		$row_meta = [
-			'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . __( 'Get free test account',
+			'account' => '<a target="_blank" href="https://signup.billwerk.plus/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . __( 'Get free test account',
 					'reepay-subscriptions-for-woocommerce' ) . '</a>',
-			'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . __( 'Pricing',
+			'pricing' => '<a target="_blank" href="https://billwerk.plus/pricing/">' . __( 'Pricing',
 					'reepay-subscriptions-for-woocommerce' ) . '</a>',
 		];
 

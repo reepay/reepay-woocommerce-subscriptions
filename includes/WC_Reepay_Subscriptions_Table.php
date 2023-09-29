@@ -18,13 +18,12 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	/**
 	 * @var string
 	 */
-	private $dashboard_url = 'https://app.reepay.com/#/rp/';
+	private $dashboard_url = 'https://admin.billwerk.plus/#/rp/';
 
 	/**
 	 * Draft_List_Table constructor.
 	 */
 	public function __construct() {
-
 		parent::__construct(
 			array(
 				'singular' => 'Subscription',
@@ -32,7 +31,6 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 				'ajax'     => false,
 			)
 		);
-
 	}
 
 	/**
@@ -41,7 +39,6 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	 * @return WP_Query Custom query object with passed arguments.
 	 */
 	protected function get_subscriptions() {
-
 		$params = [];
 		$search = esc_sql( filter_input( INPUT_GET, 's' ) );
 
@@ -102,7 +99,6 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	 * @return array $sortable_columns Return array of sortable columns.
 	 */
 	public function get_sortable_columns() {
-
 		return array(
 			'id'   => array( 'id', false ),
 			'date' => array( 'date', false ),
@@ -126,7 +122,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	/**
 	 * Return title column.
 	 *
-	 * @param array $item Item data.
+	 * @param  array  $item  Item data.
 	 *
 	 * @return string
 	 */
@@ -182,7 +178,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 			return '<mark class="active"><span>Active</span></mark>';
 		}
 
-		return '<mark class="'.$subscription['state'].'"><span>'.ucfirst($subscription['state']).'</span></mark>';
+		return '<mark class="' . $subscription['state'] . '"><span>' . ucfirst( $subscription['state'] ) . '</span></mark>';
 	}
 
 	/**
@@ -240,13 +236,14 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	/**
 	 * Generates the table navigation above or below the table
 	 *
-	 * @param string $which
+	 * @param  string  $which
 	 *
 	 * @since 3.1.0
 	 */
 	protected function display_tablenav( $which ) {
 		?>
-        <div class="tablenav <?php echo esc_attr( $which ); ?>">
+        <div class="tablenav <?php
+		echo esc_attr( $which ); ?>">
 
 			<?php
 			$this->pagination( $which );
