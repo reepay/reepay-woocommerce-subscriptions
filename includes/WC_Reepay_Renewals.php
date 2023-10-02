@@ -13,7 +13,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook', [ $this, 'create_subscriptions_handle' ] );
 		add_action( 'reepay_create_subscription', [ $this, 'create_subscriptions' ], 10, 2 );
 
-		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
+//		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
