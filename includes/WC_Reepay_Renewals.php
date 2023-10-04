@@ -184,6 +184,10 @@ class WC_Reepay_Renewals {
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
 		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
 
+		if ( is_wc_endpoint_url( 'order-received' ) ) {
+			return wc_price( $real_total );
+		}
+
 		if ( ! empty( $real_total ) && is_admin() ) {
 			return wc_price( 0 );
 		}
@@ -469,16 +473,6 @@ class WC_Reepay_Renewals {
 
 
 				if ( ! empty( $addons ) ) {
-					/*$cleared_addons = [];
-
-					foreach ( $addons as $addon ) {
-						$handles = wp_list_pluck( $cleared_addons, 'handle' );
-						if ( ! in_array( $addon['handle'], $handles ) ) {
-							$cleared_addons[] = $addon;
-						}
-					}
-
-					$sub_data['add_ons'] = $cleared_addons;*/
 					$sub_data['add_ons'] = $addons;
 				}
 
@@ -1046,6 +1040,7 @@ class WC_Reepay_Renewals {
 			'_reepay_token_id',
 			'_reepay_token',
 			'_reepay_customer',
+			'_reepay_another_orders',
 		];
 
 		$additional_fields_to_copy = [
