@@ -184,11 +184,15 @@ class WC_Reepay_Renewals {
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
 		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
 
+		if( empty( $real_total ) ) {
+			return $formatted_total;
+		}
+
 		if ( is_wc_endpoint_url( 'order-received' ) ) {
 			return wc_price( $real_total );
 		}
 
-		if ( ! empty( $real_total ) && is_admin() ) {
+		if ( is_admin() ) {
 			return wc_price( 0 );
 		}
 
