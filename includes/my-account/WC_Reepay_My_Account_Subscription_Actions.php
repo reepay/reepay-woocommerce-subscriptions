@@ -15,7 +15,7 @@ class WC_Reepay_My_Account_Subscription_Actions {
 	}
 
 	public function do_action() {
-		if ( empty( $_GET['reepay_subscriptions_action'] ) ) {
+		if ( ! isset( $_GET['reepay_subscriptions_action'] ) ) {
 			return;
 		}
 		
