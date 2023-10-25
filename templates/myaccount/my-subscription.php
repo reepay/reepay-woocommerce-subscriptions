@@ -43,22 +43,22 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <td><?php _e( 'Actions:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
                 <td>
 					<?php if ( $subscription['state'] === 'on_hold' ): ?>
-                        <a href="?reactivate=<?php echo esc_attr( $subscription['handle'] ) ?>"
+                        <a href="?reepay_subscriptions_action&reactivate=<?php echo esc_attr( $subscription['handle'] ) ?>"
                            class="button"><?php _e( 'Reactivate', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php else: ?>
 						<?php if ( reepay_s()->settings( '_reepay_enable_on_hold' ) ): ?>
-                            <a href="?put_on_hold=<?php echo esc_attr( $subscription['handle'] ) ?>"
+                            <a href="?reepay_subscriptions_action&put_on_hold=<?php echo esc_attr( $subscription['handle'] ) ?>"
                                class="button"><?php _e( 'Put on hold', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 						<?php endif; ?>
 					<?php endif; ?>
 
 					<?php if ( $subscription['state'] !== 'on_hold' ): ?>
 						<?php if ( $subscription['is_cancelled'] === true ): ?>
-                            <a href="?uncancel_subscription=<?php echo esc_attr( $subscription['handle'] ) ?>"
+                            <a href="?reepay_subscriptions_action&uncancel_subscription=<?php echo esc_attr( $subscription['handle'] ) ?>"
                                class="button"><?php _e( 'Uncancel', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 						<?php else: ?>
 							<?php if ( reepay_s()->settings( '_reepay_enable_cancel' ) ): ?>
-                                <a href="?cancel_subscription=<?php echo esc_attr( $subscription['handle'] ) ?>"
+                                <a href="?reepay_subscriptions_action&cancel_subscription=<?php echo esc_attr( $subscription['handle'] ) ?>"
                                    class="button"><?php _e( 'Cancel Subscription', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 							<?php endif; ?>
 						<?php endif; ?>
@@ -86,7 +86,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                         <?php if ( ! empty( $card['current'] ) ): ?>
                             <?php _e( 'Current card', 'reepay-subscriptions-for-woocommerce' ); ?>
                         <?php else: ?>
-                            <a href="?change_payment_method=<?php _e( $subscription['handle'] ) ?>&token_id=<?php esc_html_e( $card['id'] ) ?>"
+                            <a href="?reepay_subscriptions_action&change_payment_method=<?php _e( $subscription['handle'] ) ?>&token_id=<?php esc_html_e( $card['id'] ) ?>"
                                class="button"><?php _e( 'Use this card', 'reepay-subscriptions-for-woocommerce' ); ?></a>
                         <?php endif; ?>
                     </td>
@@ -105,3 +105,4 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<?php endif; ?>
     </tbody>
 </table>
+
