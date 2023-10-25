@@ -32,6 +32,16 @@ class WC_Reepay_Renewals {
 		add_filter( 'order_contains_reepay_subscription', function ( $contains, $order ) {
 			return $this->reepay_order_contains_subscription( $order ) || $contains;
 		}, 10, 2 );
+
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'check_need_payment' ), 10, 2 );
+	}
+
+	public function check_need_payment( $need_payment, $cart ) {
+		if ( WC_Reepay_Checkout::is_reepay_product_in_cart() ) {
+			return true;
+		}
+
+		return $need_payment;
 	}
 
 	/**
