@@ -74,6 +74,17 @@ class WC_Reepay_Subscription_API {
 
 
 		$key = $this->test_mode ? $this->private_key_test : $this->private_key;
+
+		if( empty( $key ) ) {
+			throw new Exception(
+				sprintf(
+					__( 'Billwerk+: API key not specified. Specify it in <a href="%s" target="_blank">gateway settings</a>', 'reepay-checkout-gateway' ),
+					admin_url( 'admin.php?page=wc-settings&tab=checkout&section=reepay_checkout' )
+				),
+				401
+			);
+		}
+
 		$key = base64_encode( $key . ':' );
 
 		$args = [

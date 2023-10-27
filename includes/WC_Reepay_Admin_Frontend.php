@@ -1,5 +1,7 @@
 <?php
 
+use Automattic\WooCommerce\Utilities\OrderUtil;
+
 /**
  * Class WC_Reepay_Admin_Frontend
  *
@@ -11,8 +13,15 @@ class WC_Reepay_Admin_Frontend {
 	 * Constructor
 	 */
 	public function __construct() {
-		add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11 );
-		add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
+		if ( OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			add_action( 'manage_woocommerce_page_wc-orders_custom_column', [ $this, 'shop_order_custom_columns' ], 11,
+				2 );
+			add_filter( 'manage_woocommerce_page_wc-orders_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
+		} else {
+			add_action( 'manage_shop_order_posts_custom_column', [ $this, 'shop_order_custom_columns' ], 11, 2 );
+			add_filter( 'manage_edit-shop_order_columns', [ $this, 'admin_shop_order_edit_columns' ], 11 );
+		}
+
 		add_filter( 'post_class', [ $this, 'admin_shop_order_row_classes' ], 10, 2 );
 
 		add_filter( 'posts_fields', [ $this, 'modify_search_results_fields' ], 10, 2 );
@@ -60,31 +69,25 @@ class WC_Reepay_Admin_Frontend {
 	/**
 	 * Adds custom column on admin shop order table
 	 *
-	 * @param  string  $col
+	 * @param  string  $column_id  column id.
+	 * @param  WC_Order|null  $order  order object. For compatibility with WooCommerce HPOS orders table
 	 *
 	 * @return void
 	 */
-	public function shop_order_custom_columns( $col ) {
-		/**
-		 * @global \WP_Post $post
-		 * @global \WC_Order $the_order
-		 */
-		global $post, $the_order;
-
-		if ( empty( $the_order ) || $the_order->get_id() !== $post->ID ) {
-			$the_order = new \WC_Order( $post->ID );
-		}
+	public function shop_order_custom_columns( $column_id, $order = null ) {
+		$order = wc_get_order( $order );
+		$post  = get_post( ! empty( $order ) ? $order->get_id() : null );
 
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 
-		if ( ! in_array( $col, [ 'order_number', 'order_type', 'reepay_sub' ], true ) ) {
+		if ( ! in_array( $column_id, [ 'order_number', 'order_type', 'reepay_sub' ], true ) ) {
 			return;
 		}
 
 		$output = '';
-		switch ( $col ) {
+		switch ( $column_id ) {
 			case 'order_number':
 				if ( $post->post_parent !== 0 ) {
 					$output = '<strong>&nbsp;';
@@ -99,7 +102,7 @@ class WC_Reepay_Admin_Frontend {
 					$output     = '<strong>&nbsp;';
 					$output     .= __( 'Sub Order of', 'reepay-subscriptions-for-woocommerce' );
 					$handle     = get_post_meta( $post->ID, '_reepay_subscription_handle_parent', true );
-					$admin_page = 'https://app.reepay.com/#/rp/';
+					$admin_page = 'https://admin.billwerk.plus/#/rp/';
 
 					$link = $admin_page . 'subscriptions/subscription/' . $handle;
 
@@ -110,30 +113,31 @@ class WC_Reepay_Admin_Frontend {
 				break;
 
 			case 'order_type':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+				$handle = $order->get_meta( '_reepay_subscription_handle' );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
 					$output = __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
-				} elseif ( ! empty( $the_order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $the_order->get_meta( '_reepay_renewal' ) ) ) ) {
+				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $order->get_meta( '_reepay_renewal' ) ) ) ) {
 					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce' );
 				} else {
-					$output = __( 'Regular', 'reepay-subscriptions-for-woocommerce' );
+					$output = __( 'Regular', 'reepay-subscriptions-for-woocom
+					erce' );
 				}
 
 				break;
 
 			case 'reepay_sub':
-				$handle = $the_order->get_meta( '_reepay_subscription_handle' );
+				$handle = $order->get_meta( '_reepay_subscription_handle' );
 
 				if ( empty( $handle ) ) {
-					$handle = $the_order->get_meta( '_reepay_subscription_handle_parent' );
+					$handle = $order->get_meta( '_reepay_subscription_handle_parent' );
 				}
 
-				if ( empty( $handle ) && ! empty( $the_order->get_parent_id() ) ) {
-					$handle = get_post_meta( $the_order->get_parent_id(), '_reepay_subscription_handle', true );
+				if ( empty( $handle ) && ! empty( $order->get_parent_id() ) ) {
+					$handle = get_post_meta( $order->get_parent_id(), '_reepay_subscription_handle', true );
 				}
 
 				if ( ! empty( $handle ) ) {
-					$admin_page = 'https://app.reepay.com/#/rp/';
+					$admin_page = 'https://admin.billwerk.plus/#/rp/';
 
 					$link = $admin_page . 'subscriptions/subscription/' . $handle;
 

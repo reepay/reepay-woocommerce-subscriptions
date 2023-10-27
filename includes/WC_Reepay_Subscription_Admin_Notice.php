@@ -149,11 +149,6 @@ class WC_Reepay_Subscription_Admin_Notice {
 						'message' => $exception->getMessage()
 					);
 				}
-			} elseif ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
-				$ret = array(
-					'state'   => 'failed',
-					'message' => 'Payment has been failed'
-				);
 			}
 		}
 

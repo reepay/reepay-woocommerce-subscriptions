@@ -13,7 +13,7 @@ class WC_Reepay_Renewals {
 		add_action( 'reepay_webhook', [ $this, 'create_subscriptions_handle' ] );
 		add_action( 'reepay_create_subscription', [ $this, 'create_subscriptions' ], 10, 2 );
 
-		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
+//		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
 		add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
@@ -32,6 +32,16 @@ class WC_Reepay_Renewals {
 		add_filter( 'order_contains_reepay_subscription', function ( $contains, $order ) {
 			return $this->reepay_order_contains_subscription( $order ) || $contains;
 		}, 10, 2 );
+
+		add_filter( 'woocommerce_cart_needs_payment', array( $this, 'check_need_payment' ), 10, 2 );
+	}
+
+	public function check_need_payment( $need_payment, $cart ) {
+		if ( WC_Reepay_Checkout::is_reepay_product_in_cart() ) {
+			return true;
+		}
+
+		return $need_payment;
 	}
 
 	/**
@@ -184,7 +194,15 @@ class WC_Reepay_Renewals {
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
 		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
 
-		if ( ! empty( $real_total ) && is_admin() ) {
+		if( empty( $real_total ) ) {
+			return $formatted_total;
+		}
+
+		if ( is_wc_endpoint_url( 'order-received' ) ) {
+			return wc_price( $real_total );
+		}
+
+		if ( is_admin() ) {
 			return wc_price( 0 );
 		}
 
@@ -469,16 +487,6 @@ class WC_Reepay_Renewals {
 
 
 				if ( ! empty( $addons ) ) {
-					/*$cleared_addons = [];
-
-					foreach ( $addons as $addon ) {
-						$handles = wp_list_pluck( $cleared_addons, 'handle' );
-						if ( ! in_array( $addon['handle'], $handles ) ) {
-							$cleared_addons[] = $addon;
-						}
-					}
-
-					$sub_data['add_ons'] = $cleared_addons;*/
 					$sub_data['add_ons'] = $addons;
 				}
 
@@ -1046,6 +1054,7 @@ class WC_Reepay_Renewals {
 			'_reepay_token_id',
 			'_reepay_token',
 			'_reepay_customer',
+			'_reepay_another_orders',
 		];
 
 		$additional_fields_to_copy = [

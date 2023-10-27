@@ -103,6 +103,10 @@ class WC_Reepay_Sync_Customers {
 
 		$user_id = rp_get_userid_by_handle( $data['customer'] );
 
+		if( empty( $user_id ) ) {
+			return;
+		}
+		
 		$payment_token   = $data['payment_method'];
 		$customer_tokens = WC_Reepay_Import_Helpers::get_customer_tokens( $user_id );
 

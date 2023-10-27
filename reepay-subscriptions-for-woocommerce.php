@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Billwerk+ while still keeping your usual WooCommerce tools. The Billwerk+ Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: Billwerk+
  * Author URI: https://www.billwerk.plus/
- * Version: 1.1.0
+ * Version: 1.2.0
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -52,7 +52,7 @@ class WooCommerce_Reepay_Subscriptions {
 	/**
 	 * @var string
 	 */
-	public static $version = '1.0.1';
+	public static $version = '1.2.0';
 
 	/**
 	 * @var string
@@ -259,9 +259,9 @@ class WooCommerce_Reepay_Subscriptions {
 		}
 
 		$row_meta = [
-			'account' => '<a target="_blank" href="https://signup.reepay.com/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . __( 'Get free test account',
+			'account' => '<a target="_blank" href="https://signup.billwerk.plus/?_gl=1*1iccm28*_gcl_aw*R0NMLjE2NTY1ODI3MTQuQ2p3S0NBandrX1dWQmhCWkVpd0FVSFFDbVJaNDJmVmVQWFc4LUlpVDRndE83bWRmaW5NNG5wZDhkaG12dVJFOEZkbDR4eXVMNlZpMTRSb0N1b2NRQXZEX0J3RQ..*_ga*MjA3MDA3MTk4LjE2NTM2MzgwNjY.*_ga_F82PFFEF3F*MTY2Mjk2NTEwNS4xOS4xLjE2NjI5NjUxODkuMC4wLjA.&_ga=2.98685660.319325710.1662963483-207007198.1653638066#/en">' . __( 'Get free test account',
 					'reepay-subscriptions-for-woocommerce' ) . '</a>',
-			'pricing' => '<a target="_blank" href="https://reepay.com/pricing/">' . __( 'Pricing',
+			'pricing' => '<a target="_blank" href="https://billwerk.plus/pricing/">' . __( 'Pricing',
 					'reepay-subscriptions-for-woocommerce' ) . '</a>',
 		];
 
@@ -587,7 +587,6 @@ class WooCommerce_Reepay_Subscriptions {
 
 		new WC_Reepay_Subscription_Addons();
 		new WC_Reepay_My_Account();
-		new WC_Reepay_Admin_Frontend();
 		new WC_Reepay_Checkout();
 		new WC_Reepay_Discounts_And_Coupons();
 		new WC_Reepay_Renewals();
@@ -604,6 +603,10 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Memberships_Integrations();
 		new WC_Reepay_Woo_Blocks();
+
+		add_action( 'plugins_loaded', function () {
+			new WC_Reepay_Admin_Frontend();
+		} );
 	}
 
 	/**
