@@ -633,7 +633,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 
-		$plan_meta['_reepay_subscription_currency'] = ! empty( $plan_meta['currency'] ) ? $plan_meta['currency'] : get_woocommerce_currency();
+		$plan_meta['_reepay_subscription_currency'] = ! empty( $plan_data['currency'] ) ? $plan_data['currency'] : get_woocommerce_currency();
 
 		return $plan_meta;
 	}
