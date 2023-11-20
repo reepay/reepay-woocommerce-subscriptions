@@ -31,6 +31,22 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		add_action( 'woocommerce_save_product_variation', [ $this, 'save_subscription_meta' ], 10, 2 );
 		add_filter( 'woocommerce_add_to_cart_handler', [ $this, 'variable_add_to_cart_fix' ], 10, 2 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'register_scripts' ] );
+		add_filter( 'woocommerce_get_price_html', [ $this, 'change_currency_symbol_variation' ], 10, 2 );
+	}
+
+	public function change_currency_symbol_variation( $price, $product ) {
+		if ( WC_Reepay_Checkout::is_reepay_product( $product ) && get_class( $product ) == 'WC_Product_Variation' ) {
+			$currency_product = WC_Product_Reepay_Variable_Subscription::get_currency( $product );
+			if ( $currency_product != get_woocommerce_currency() ) {
+				$args['currency'] = $currency_product;
+				$price            = wc_price( wc_get_price_to_display( $product ),
+						$args ) . $product->get_price_suffix();
+
+				return $price;
+			}
+		}
+
+		return $price;
 	}
 
 	public function variable_add_to_cart_fix( $type, $adding_to_cart ) {
@@ -42,14 +58,14 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	/**
-	 * @param int $post_id
+	 * @param  int  $post_id
 	 *
 	 * @return array<string, mixed>
 	 */
 	public function get_subscription_template_data( $post_id ) {
 		$data = parent::get_subscription_template_data( $post_id );
 
-		$data['loop']     = $this->loop;
+		$data['loop'] = $this->loop;
 
 		$data['data_plan'] = json_encode( [
 			'product_id' => $data['post_id'],
@@ -60,7 +76,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	/**
-	 * @param array $data
+	 * @param  array  $data
 	 *
 	 * @return false|string
 	 */
@@ -83,8 +99,9 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 		parent::save_subscription_meta( $post_id );
 
-		if ( ! empty( $_POST['_reepay_subscription_customer_role'][$i] ) && $_POST['_reepay_subscription_customer_role'][$i] !== 'without_changes' ) {
-			update_post_meta( $post_id, '_reepay_subscription_customer_role', $_POST['_reepay_subscription_customer_role'][$i] );
+		if ( ! empty( $_POST['_reepay_subscription_customer_role'][ $i ] ) && $_POST['_reepay_subscription_customer_role'][ $i ] !== 'without_changes' ) {
+			update_post_meta( $post_id, '_reepay_subscription_customer_role',
+				$_POST['_reepay_subscription_customer_role'][ $i ] );
 		} else {
 			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
 		}
@@ -107,9 +124,9 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 
 	/**
-	 * @param int $loop Position in the loop.
-	 * @param array $variation_data Variation data.
-	 * @param WP_Post $variation Post data.
+	 * @param  int  $loop  Position in the loop.
+	 * @param  array  $variation_data  Variation data.
+	 * @param  WP_Post  $variation  Post data.
 	 */
 	public function add_custom_field_to_variations( $loop, $variation_data, $variation ) {
 		global $post;
@@ -122,7 +139,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	/**
-	 * @param string $handle reepay plan handle
+	 * @param  string  $handle  reepay plan handle
 	 *
 	 * @return array<string, mixed> meta fields to save
 	 */
@@ -143,7 +160,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	/**
-	 * @param WC_Product $product
+	 * @param  WC_Product  $product
 	 */
 	public function enqueue_variable_product_script( $product ) {
 		$variable_template         = static::$frontend_template;

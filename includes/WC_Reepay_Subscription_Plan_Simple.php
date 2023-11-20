@@ -98,6 +98,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		add_action( 'save_post', [ $this, 'save_subscription_meta' ], 11 );
 		add_filter( 'woocommerce_cart_item_name', [ $this, 'checkout_subscription_info' ], 10, 3 );
 		add_action( 'woocommerce_before_order_itemmeta', [ $this, 'admin_order_subscription_info' ], 10, 3 );
+		add_filter( 'woocommerce_currency', [ $this, 'change_currency_symbol' ], 10000, 1 );
 	}
 
 	protected function set_text_properties() {
@@ -219,6 +220,40 @@ class WC_Reepay_Subscription_Plan_Simple {
 			6 => __( 'Saturday' ),
 			7 => __( 'Sunday' ),
 		];
+	}
+
+	public function change_currency_symbol( $currency ) {
+		if ( did_action( 'wp_loaded' ) && did_action( 'init' ) ) {
+			if ( is_cart() || is_checkout() ) {
+				return self::get_real_currency( $currency );
+			}
+		}
+
+		return $currency;
+	}
+
+
+	public static function get_real_currency( $currency ) {
+		if ( ! empty( WC() ) && ! empty( WC()->cart ) ) {
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				$product = $cart_item['data'];
+				if ( WC_Reepay_Checkout::is_reepay_product( $product ) ) {
+					if ( get_class( $product ) == 'WC_Product_Variation' ) {
+						$currency_product = WC_Product_Reepay_Variable_Subscription::get_currency( $product,
+							$currency );
+						if ( $currency_product != $currency ) {
+							return $currency_product;
+						}
+					} else {
+						if ( $product->get_currency( $currency ) != $currency ) {
+							return $product->get_currency( $currency );
+						}
+					}
+				}
+			}
+		}
+
+		return $currency;
 	}
 
 	public function checkout_subscription_info( $name, $cart_item, $cart_item_key ) {
