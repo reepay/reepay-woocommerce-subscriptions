@@ -9,7 +9,7 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	/**
 	 * Get all reepay addons
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
+	 * @param  WP_REST_Request  $request  Full details about the request.
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @throws Exception
@@ -17,11 +17,12 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	 */
 	public function get_list( $request ) {
 		try {
-			$html = '<option value="">' . __( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ) . '</option>';
+			$html   = '<option value="">' . __( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ) . '</option>';
 			$addons = WC_Reepay_Subscription_Addons::get_reepay_addons_list( false, true );
 
 			foreach ( $addons['content'] ?? [] as $addon ) {
-				$html .= '<option value="' . $addon['handle'] . '" ' . selected( $addon['handle'], $request['handle'], false ) . '>' . esc_attr( $addon['name'] ) . '</option>';
+				$html .= '<option value="' . $addon['handle'] . '" ' . selected( $addon['handle'], $request['handle'],
+						false ) . '>' . esc_attr( $addon['name'] ) . '</option>';
 			}
 
 			return new WP_REST_Response( [
@@ -42,7 +43,7 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	/**
 	 * Get reepay addon info by handle
 	 *
-	 * @param WP_REST_Request $request Full details about the request.
+	 * @param  WP_REST_Request  $request  Full details about the request.
 	 *
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 * @throws Exception
@@ -51,6 +52,13 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 	public function get_info( $request ) {
 		try {
 			$addon_data = reepay_s()->api()->request( "add_on/{$request['handle']}" );
+			if ( ! empty( $addon_data['currency'] ) && ! empty( $request['product_id'] ) ) {
+				$product = wc_get_product( $request['product_id'] );
+				if ( $product->get_currency() !== $addon_data['currency'] ) {
+					return new WP_Error( 400, 'You are cannot choose addon with another currency' );
+				}
+			}
+
 
 			if ( isset( $request['amount'] ) ) {
 				return new WP_REST_Response( [
@@ -67,8 +75,8 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 			wc_get_template(
 				'admin-addon-single-data.php',
 				array(
-					'addon'  => $addon_data,
-					'loop'   => - 1,
+					'addon' => $addon_data,
+					'loop'  => - 1,
 				),
 				'',
 				reepay_s()->settings( 'plugin_path' ) . 'templates/'

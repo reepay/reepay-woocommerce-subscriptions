@@ -194,16 +194,16 @@ class WC_Reepay_Renewals {
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
 		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
 
-		if( empty( $real_total ) ) {
+		if ( empty( $real_total ) ) {
 			return $formatted_total;
 		}
 
 		if ( is_wc_endpoint_url( 'order-received' ) ) {
-			return wc_price( $real_total );
+			return wc_price( $real_total, array( 'currency' => $order->get_currency() ) );
 		}
 
 		if ( is_admin() ) {
-			return wc_price( 0 );
+			return wc_price( 0, array( 'currency' => $order->get_currency() ) );
 		}
 
 		return $formatted_total;
@@ -1085,6 +1085,7 @@ class WC_Reepay_Renewals {
 					);
 				}
 			}
+			$new_order->set_currency( $main_order->get_currency() ?? '' );
 		} elseif ( ! empty( $invoice_data ) && ! empty( $invoice_data['customer'] ) ) {
 			try {
 				$customer = $invoice_data['customer'];
@@ -1107,8 +1108,9 @@ class WC_Reepay_Renewals {
 
 			$new_order->set_payment_method( 'reepay_checkout' );
 			$new_order->set_payment_method_title( 'Reepay Checkout' );
-			$new_order->set_currency( $plan['currency'] ?? '' );
 			$new_order->add_meta_data( '_reepay_state_authorized', 1 );
+			$new_order->set_currency( $invoice_data['currency'] );
+			update_post_meta( $new_order->get_id(), '_order_currency', $invoice_data['currency'] );
 
 			if ( ! empty( $order_args['subscription'] ) ) {
 				$subscription = reepay_s()->api()->request( "subscription/{$order_args['subscription']}" );

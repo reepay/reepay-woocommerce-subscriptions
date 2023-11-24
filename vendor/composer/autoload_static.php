@@ -34,6 +34,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Subscription_Addons_Shipping' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Addons_Shipping.php',
         'WC_Reepay_Subscription_Admin_Notice' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Admin_Notice.php',
         'WC_Reepay_Subscription_Coupons_Rest' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Coupons_Rest.php',
+        'WC_Reepay_Subscription_Currency' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Currency.php',
         'WC_Reepay_Subscription_Discounts_Rest' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Discounts_Rest.php',
         'WC_Reepay_Subscription_Plan_Simple' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Plan_Simple.php',
         'WC_Reepay_Subscription_Plan_Simple_Rest' => __DIR__ . '/../..' . '/includes/WC_Reepay_Subscription_Plan_Simple_Rest.php',

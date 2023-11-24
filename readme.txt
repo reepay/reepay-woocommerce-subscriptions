@@ -63,6 +63,7 @@ Standard Billwerk+ Subscription features:
 3. For correct plugin operation install and activate Billwerk+ Checkout for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.1 - Multi-currency feature
 v 1.2.0 - Error fixes
 v 1.1.0 - Billwerk+ version and thankyou fixes
 v 1.0.26 - Billwerk+ naming changes

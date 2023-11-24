@@ -6,11 +6,14 @@
 
 ?>
 <div id="product_addons_data" class="panel woocommerce_options_panel wc-metaboxes-wrapper">
-	<?php do_action( 'woocommerce-product-addons_panel_start' ); ?>
+	<?php
+	do_action( 'woocommerce-product-addons_panel_start' ); ?>
 
     <p class="woocommerce-product-add-ons-toolbar woocommerce-product-add-ons-toolbar--open-close toolbar">
-        <a href="#" class="close_all"><?php _e( 'Close all', 'reepay-subscriptions-for-woocommerce' ); ?></a> / <a href="#"
-                                                                                                   class="expand_all"><?php _e( 'Expand all', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+        <a href="#" class="close_all"><?php
+			_e( 'Close all', 'reepay-subscriptions-for-woocommerce' ); ?></a> / <a href="#"
+                                                                                   class="expand_all"><?php
+			_e( 'Expand all', 'reepay-subscriptions-for-woocommerce' ); ?></a>
     </p>
 
     <div class="woocommerce_product_addons wc-metaboxes">
@@ -38,8 +41,10 @@
 
     <div class="woocommerce-product-add-ons-toolbar woocommerce-product-add-ons-toolbar--add-import-export toolbar">
         <button type="submit"
-                class="button button-primary save-addons-button hidden"><?php _e( 'Save changes', 'reepay-subscriptions-for-woocommerce' ); ?></button>
-        <button type="button" class="button add_new_addon"><?php _e( 'New add-on', 'reepay-subscriptions-for-woocommerce' ); ?></button>
+                class="button button-primary save-addons-button hidden"><?php
+			_e( 'Save changes', 'reepay-subscriptions-for-woocommerce' ); ?></button>
+        <button type="button" class="button add_new_addon"><?php
+			_e( 'New add-on', 'reepay-subscriptions-for-woocommerce' ); ?></button>
     </div>
 
 </div>
@@ -98,7 +103,8 @@
                 return false;
             })
             .on('click', '.remove_addon', function () {
-                const answer = confirm('<?php _e( 'Are you sure you want remove this add-on?', 'reepay-subscriptions-for-woocommerce' ); ?>');
+                const answer = confirm('<?php _e( 'Are you sure you want remove this add-on?',
+					'reepay-subscriptions-for-woocommerce' ); ?>');
 
                 if (answer) {
                     const addon = $(this).closest('.woocommerce_product_addon');
@@ -132,7 +138,8 @@
                     .html('');
 
                 $.ajax({
-                    url: '<?php echo get_rest_url( 0, reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . '?product_id=' . ( intval( $_GET['post'] ?? 0) ) ?>' + `&handle=${handle}`,
+                    url: '<?php echo get_rest_url( 0,
+							reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . '?product_id=' . ( intval( $_GET['post'] ?? 0 ) ) ?>' + `&handle=${handle}`,
                     method: 'GET',
                     beforeSend: function (xhr) {
 
@@ -153,7 +160,7 @@
                             });
                     },
                     error: function (request, status, error) {
-
+                        alert(request.responseJSON.message);
                     },
                     complete: function () {
                         $this.parent().unblock();
