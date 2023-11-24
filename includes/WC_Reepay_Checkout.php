@@ -112,14 +112,14 @@ class WC_Reepay_Checkout {
 	}
 
 	/**
-	 * @param mixed $product
+	 * @param  mixed  $product
 	 *
 	 * @return bool
 	 */
 	public static function is_reepay_product( $product = false ) {
 		$product = wc_get_product( $product );
 
-		if( empty( $product ) ) {
+		if ( empty( $product ) ) {
 			return false;
 		}
 

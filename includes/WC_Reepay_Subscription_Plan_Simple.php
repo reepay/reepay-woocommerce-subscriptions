@@ -220,6 +220,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			7 => __( 'Sunday' ),
 		];
 	}
+	
 
 	public function checkout_subscription_info( $name, $cart_item, $cart_item_key ) {
 		if ( ! empty( $cart_item['data'] ) && WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
@@ -633,7 +634,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 
-		$plan_meta['_reepay_subscription_currency'] = ! empty( $plan_meta['currency'] ) ? $plan_meta['currency'] : get_woocommerce_currency();
+		$plan_meta['_reepay_subscription_currency'] = ! empty( $plan_data['currency'] ) ? $plan_data['currency'] : get_woocommerce_currency();
 
 		return $plan_meta;
 	}

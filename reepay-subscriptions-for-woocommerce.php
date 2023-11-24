@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Billwerk+ while still keeping your usual WooCommerce tools. The Billwerk+ Subscription for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: Billwerk+
  * Author URI: https://www.billwerk.plus/
- * Version: 1.2.0
+ * Version: 1.2.1
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -603,6 +603,7 @@ class WooCommerce_Reepay_Subscriptions {
 		new WC_Reepay_Woocommerce_Subscription_Extension();
 		new WC_Reepay_Memberships_Integrations();
 		new WC_Reepay_Woo_Blocks();
+		new WC_Reepay_Subscription_Currency();
 
 		add_action( 'plugins_loaded', function () {
 			new WC_Reepay_Admin_Frontend();

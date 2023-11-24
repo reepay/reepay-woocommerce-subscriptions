@@ -33,6 +33,7 @@ return array(
     'WC_Reepay_Subscription_Addons_Shipping' => $baseDir . '/includes/WC_Reepay_Subscription_Addons_Shipping.php',
     'WC_Reepay_Subscription_Admin_Notice' => $baseDir . '/includes/WC_Reepay_Subscription_Admin_Notice.php',
     'WC_Reepay_Subscription_Coupons_Rest' => $baseDir . '/includes/WC_Reepay_Subscription_Coupons_Rest.php',
+    'WC_Reepay_Subscription_Currency' => $baseDir . '/includes/WC_Reepay_Subscription_Currency.php',
     'WC_Reepay_Subscription_Discounts_Rest' => $baseDir . '/includes/WC_Reepay_Subscription_Discounts_Rest.php',
     'WC_Reepay_Subscription_Plan_Simple' => $baseDir . '/includes/WC_Reepay_Subscription_Plan_Simple.php',
     'WC_Reepay_Subscription_Plan_Simple_Rest' => $baseDir . '/includes/WC_Reepay_Subscription_Plan_Simple_Rest.php',

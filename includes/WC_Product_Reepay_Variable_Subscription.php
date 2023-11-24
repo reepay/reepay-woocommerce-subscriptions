@@ -1,94 +1,104 @@
 <?php
 
-class WC_Product_Reepay_Variable_Subscription extends WC_Product_Variable
-{
-    public function __construct($product)
-    {
-        parent::__construct($product);
+class WC_Product_Reepay_Variable_Subscription extends WC_Product_Variable {
+	public function __construct( $product ) {
+		parent::__construct( $product );
 
-        $this->data_store = WC_Data_Store::load('product-variable');
-    }
+		$this->data_store = WC_Data_Store::load( 'product-variable' );
+	}
 
-    public function get_type()
-    {
-        return 'reepay_variable_subscriptions';
-    }
+	public function get_type() {
+		return 'reepay_variable_subscriptions';
+	}
 
-    /**
-     * Auto-load in-accessible properties on demand.
-     *
-     * @param mixed $key
-     * @return mixed
-     */
-    public function __get($key)
-    {
+	/**
+	 * Auto-load in-accessible properties on demand.
+	 *
+	 * @param  mixed  $key
+	 *
+	 * @return mixed
+	 */
+	public function __get( $key ) {
+		$value = wcs_product_deprecated_property_handler( $key, $this );
 
-        $value = wcs_product_deprecated_property_handler($key, $this);
+		// No matching property found in wcs_product_deprecated_property_handler()
+		if ( is_null( $value ) ) {
+			$value = parent::__get( $key );
+		}
 
-        // No matching property found in wcs_product_deprecated_property_handler()
-        if (is_null($value)) {
-            $value = parent::__get($key);
-        }
+		return $value;
+	}
 
-        return $value;
-    }
+	/**
+	 * Returns the price in html format.
+	 *
+	 * @param  string  $price  Price (default: '').
+	 *
+	 * @return string
+	 */
+	public function get_price_html( $price = '' ) {
+		$prices = $this->get_min_max_price_variations();
 
-    /**
-     * Returns the price in html format.
-     *
-     * @param string $price Price (default: '').
-     *
-     * @return string
-     */
-    public function get_price_html($price = '')
-    {
-        $prices = $this->get_min_max_price_variations();
+		if ( is_null( $prices['min'] ) ) {
+			$price = apply_filters( 'woocommerce_variable_empty_price_html', '', $this );
+		} else {
+			if ( $prices['min'] !== $prices['max'] ) {
+				$price = wc_format_price_range(
+					wc_price( $prices['min'],
+						array( 'currency' => $prices['min_currency'] ) ) . ' / ' . $prices['min_schedule_type'],
+					wc_price( $prices['max'],
+						array( 'currency' => $prices['max_currency'] ) ) . ' / ' . $prices['max_schedule_type']
+				);
+			} else {
+				$price = wc_price( $prices['min'] ) . ' / ' . $prices['min_schedule_type'];
+			}
 
-        if (is_null($prices['min'])) {
-            $price = apply_filters('woocommerce_variable_empty_price_html', '', $this);
-        } else {
-            if ($prices['min'] !== $prices['max']) {
-                $price = wc_format_price_range(
-                    wc_price($prices['min']) . ' / ' . $prices['min_schedule_type'],
-                    wc_price($prices['max']) . ' / ' . $prices['max_schedule_type']
-                );
-            } else {
-                $price = wc_price($prices['min']) . ' / ' . $prices['min_schedule_type'];
-            }
+			$price = apply_filters( 'woocommerce_variable_price_html', $price . $this->get_price_suffix(), $this );
+		}
 
-            $price = apply_filters('woocommerce_variable_price_html', $price . $this->get_price_suffix(), $this);
-        }
+		return apply_filters( 'woocommerce_get_price_html', $price, $this );
+	}
 
-        return apply_filters('woocommerce_get_price_html', $price, $this);
-    }
+	public static function get_currency( $variation, $currency = '' ) {
+		if ( empty( $currency ) ) {
+			$currency = get_woocommerce_currency();
+		}
 
-    protected function get_min_max_price_variations()
-    {
-        $result = [
-            'min' => null,
-            'max' => null,
-            'min_schedule_type' => '',
-            'max_schedule_type' => '',
-        ];
+		if ( ! empty( $variation->get_meta( '_reepay_subscription_currency' ) ) ) {
+			$currency = $variation->get_meta( '_reepay_subscription_currency' );
+		}
 
-        foreach ($this->get_visible_children() as $product_id) {
-            $variation = wc_get_product($product_id);
+		return $currency;
+	}
 
-            if (empty($variation)) {
-                continue;
-            }
+	protected function get_min_max_price_variations() {
+		$result = [
+			'min'               => null,
+			'max'               => null,
+			'min_schedule_type' => '',
+			'max_schedule_type' => '',
+		];
 
-            if (is_null($result['min']) || (float)$variation->get_price() < $result['min']) {
-                $result['min'] = (float)$variation->get_price();
-                $result['min_schedule_type'] = WC_Reepay_Subscription_Plan_Simple::get_billing_plan($variation, true);
-            }
+		foreach ( $this->get_visible_children() as $product_id ) {
+			$variation = wc_get_product( $product_id );
 
-            if (is_null($result['max']) || (float)$variation->get_price() > $result['max']) {
-                $result['max'] = (float)$variation->get_price();
-                $result['max_schedule_type'] = WC_Reepay_Subscription_Plan_Simple::get_billing_plan($variation, true);
-            }
-        }
+			if ( empty( $variation ) ) {
+				continue;
+			}
 
-        return $result;
-    }
+			if ( is_null( $result['min'] ) || (float) $variation->get_price() < $result['min'] ) {
+				$result['min']               = (float) $variation->get_price();
+				$result['min_schedule_type'] = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $variation, true );
+				$result['min_currency']      = self::get_currency( $variation );
+			}
+
+			if ( is_null( $result['max'] ) || (float) $variation->get_price() > $result['max'] ) {
+				$result['max']               = (float) $variation->get_price();
+				$result['max_schedule_type'] = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $variation, true );
+				$result['max_currency']      = self::get_currency( $variation );
+			}
+		}
+
+		return $result;
+	}
 }
