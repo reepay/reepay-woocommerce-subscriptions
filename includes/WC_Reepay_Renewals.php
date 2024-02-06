@@ -764,20 +764,20 @@ class WC_Reepay_Renewals {
 	 * @return WC_Order|false
 	 */
 	public function get_child_order( $parent_order, $invoice ) {
-		$query = new WP_Query( [
-			'post_parent'    => $parent_order->get_id(),
-			'post_type'      => 'shop_order',
-			'post_status'    => 'any',
-			'posts_per_page' => - 1,
-			'meta_query'     => [
+		$args = [
+			'meta_query' => [
 				[
 					'key'   => '_reepay_order',
 					'value' => $invoice,
 				]
 			]
-		] );
+		];
 
-		return ! empty( $query->posts ) ? wc_get_order( $query->posts[0] ) : false;
+		$args['parent'] = $parent_order->get_id();
+
+		$query = wc_get_orders( $args );
+
+		return ! empty( $query ) ? $query[0] : false;
 	}
 
 	/**
@@ -819,10 +819,7 @@ class WC_Reepay_Renewals {
 		}
 
 		$args = [
-			'post_type'      => 'shop_order',
-			'post_status'    => 'any',
-			'posts_per_page' => - 1,
-			'meta_query'     => [
+			'meta_query' => [
 				[
 					'key'   => '_reepay_order',
 					'value' => $data['invoice'],
@@ -831,12 +828,12 @@ class WC_Reepay_Renewals {
 		];
 
 		if ( ! empty( $parent_order ) ) {
-			$args['post_parent'] = $parent_order->get_id();
+			$args['parent'] = $parent_order->get_id();
 		}
 
-		$query = new WP_Query( $args );
+		$query = wc_get_orders( $args );
 
-		if ( ! empty( $query->posts ) ) {
+		if ( ! empty( $query ) ) {
 			self::log( [
 				'log' => [
 					'source' => 'WC_Reepay_Renewals::create_child_order',

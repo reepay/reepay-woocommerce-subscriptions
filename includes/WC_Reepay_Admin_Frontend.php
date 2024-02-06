@@ -59,7 +59,7 @@ class WC_Reepay_Admin_Frontend {
 			return $classes;
 		}
 
-		if ( $post->post_type == 'shop_order' && $post->post_parent != 0 ) {
+		if ( OrderUtil::get_order_type( $post_id ) == 'shop_order' && $post->post_parent != 0 ) {
 			$classes[] = 'sub-order parent-' . $post->post_parent;
 		}
 
