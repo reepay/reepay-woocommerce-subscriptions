@@ -810,12 +810,15 @@ class WC_Reepay_Renewals {
 		$parent_order = wc_get_order( $subscription_id );
 
 		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log' => [
-					'source' => 'WC_Reepay_Renewals::create_child_order',
-					'info'   => 'Undefined parent order'
-				]
-			] );
+			$parent_order = self::get_order_by_subscription_handle( $subscription_id );
+			if ( empty( $parent_order ) ) {
+				self::log( [
+					'log' => [
+						'source' => 'WC_Reepay_Renewals::create_child_order',
+						'info'   => 'Undefined parent order'
+					]
+				] );
+			}
 		}
 
 		$args = [
@@ -838,7 +841,7 @@ class WC_Reepay_Renewals {
 				'log' => [
 					'source' => 'WC_Reepay_Renewals::create_child_order',
 					'error'  => 'duplicate status - ' . $status,
-					'data'   => $data
+					'data'   => $query
 				]
 			] );
 
