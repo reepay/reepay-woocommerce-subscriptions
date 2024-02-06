@@ -1449,7 +1449,8 @@ class WC_Reepay_Renewals {
 	 * @return void
 	 */
 	private static function unlock_order( $order_id ) {
-		delete_post_meta( $order_id, '_reepay_subscriptions_locked' );
+		$order = wc_get_order( $order_id );
+		$order->delete_meta_data( '_reepay_subscriptions_locked' );
 	}
 
 	/**
