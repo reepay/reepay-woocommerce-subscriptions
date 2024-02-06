@@ -101,14 +101,14 @@ class WC_Reepay_Subscription_Admin_Notice {
 	}
 
 	public function show_thankyou_message( $ret, $order_id ) {
-		$notice = get_post_meta( $order_id, '_reepay_frontend_notices', true );
+		$order  = wc_get_order( $order_id );
+		$notice = $order->get_meta( '_reepay_frontend_notices' );
 		if ( ! empty( $notice ) ) {
 			$ret = array(
 				'state'   => 'failed',
 				'message' => $notice
 			);
 		} else {
-			$order      = wc_get_order( $order_id );
 			$reloaded   = $order->get_meta( '_reepay_thankyou_reloaded' );
 			$sub_handle = $order->get_meta( '_reepay_subscription_handle' );
 			if ( empty( $reloaded ) ) {

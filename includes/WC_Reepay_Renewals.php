@@ -192,7 +192,7 @@ class WC_Reepay_Renewals {
 	}
 
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
-		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
+		$real_total = $order->get_meta( '_real_total' );
 
 		if ( empty( $real_total ) ) {
 			return $formatted_total;
@@ -1070,12 +1070,12 @@ class WC_Reepay_Renewals {
 				update_post_meta(
 					$new_order->get_id(),
 					$field_name,
-					get_post_meta( $main_order->get_id(), $field_name, true )
+					$main_order->get_meta( $field_name )
 				);
 			}
 
 			foreach ( $additional_fields_to_copy as $field_name ) {
-				$field_value = get_post_meta( $main_order->get_id(), $field_name, true );
+				$field_value = $main_order->get_meta( $field_name );
 
 				if ( ! empty( $field_value ) ) {
 					update_post_meta(
@@ -1460,7 +1460,9 @@ class WC_Reepay_Renewals {
 	 * @return bool
 	 */
 	private static function is_locked( $order_id ) {
-		return (bool) get_post_meta( $order_id, '_reepay_subscriptions_locked', true );
+		$order = wc_get_order( $order_id );
+
+		return (bool) $order->get_meta( '_reepay_subscriptions_locked' );
 	}
 
 	/**
