@@ -108,9 +108,9 @@ class WC_Reepay_Subscription_Admin_Notice {
 				'message' => $notice
 			);
 		} else {
-			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle', true );
-			$reloaded   = get_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
 			$order      = wc_get_order( $order_id );
+			$reloaded   = $order->get_meta( '_reepay_thankyou_reloaded' );
+			$sub_handle = $order->get_meta( '_reepay_subscription_handle' );
 			if ( empty( $reloaded ) ) {
 				if ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
 					$ret = array(
