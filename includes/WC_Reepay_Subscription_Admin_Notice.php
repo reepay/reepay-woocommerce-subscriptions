@@ -69,7 +69,9 @@ class WC_Reepay_Subscription_Admin_Notice {
 	 * Store notices to DB
 	 */
 	public static function store_frontend_notices( $notice, $order_id ) {
-		update_post_meta( $order_id, '_reepay_frontend_notices', $notice );
+		$order = wc_get_order( $order_id );
+		$order->update_meta_data( '_reepay_frontend_notices', $notice );
+		$order->save_meta_data();
 	}
 
 	public function show_editor_message( $messages ) {
@@ -116,7 +118,9 @@ class WC_Reepay_Subscription_Admin_Notice {
 					$ret = array(
 						'state' => 'reload',
 					);
-					update_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
+
+					$order->update_meta_data( '_reepay_thankyou_reloaded', true );
+					$order->save_meta_data();
 				}
 			} elseif ( ! empty( $sub_handle ) ) {
 				try {
