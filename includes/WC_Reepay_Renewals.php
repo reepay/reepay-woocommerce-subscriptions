@@ -384,7 +384,19 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
+		$user = get_user_by( 'email', $main_order->get_billing_email() );
+		if ( $user ) {
+			$main_order->set_customer_id( $user->ID );
+			$main_order->save();
+		}
 
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::customer_id_connect',
+				'$data'  => $main_order->get_customer_id(),
+			]
+		] );
 		$orders         = [ $main_order ];
 		$order_items    = $main_order->get_items();
 		$created_orders = [];
@@ -427,6 +439,9 @@ class WC_Reepay_Renewals {
 				'status'      => $main_order->get_status( '' ),
 				'customer_id' => $main_order->get_customer_id(),
 			], $main_order, $items_to_create );
+
+			$created_order->set_customer_id( $main_order->get_customer_id() );
+			$created_order->save();
 
 			$orders[]         = $created_order;
 			$created_orders[] = $created_order->get_id();
