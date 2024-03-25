@@ -161,7 +161,9 @@ class WC_Reepay_Renewals {
 
 				try {
 					reepay_s()->api()->request( "subscription/{$sub_meta}/change_next_period_start", 'POST', $params );
-					update_post_meta( $order_id, '_reepay_subscription_period_started', true );
+
+					$order->update_meta_data( '_reepay_subscription_period_started', true );
+					$order->save_meta_data();
 				} catch ( Exception $e ) {
 					self::log( [
 						'log' => [
@@ -185,14 +187,15 @@ class WC_Reepay_Renewals {
 		}
 
 		if ( floatval( $order->get_total() ) != 0 && self::is_order_contain_subscription( $order ) ) {
-			update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
+			$order->update_meta_data( '_real_total', $order->get_total() );
+			$order->save_meta_data();
 			$order->set_total( 0 );
 			$order->save();
 		}
 	}
 
 	public function display_real_total( $formatted_total, $order, $tax_display, $display_refunded ) {
-		$real_total = get_post_meta( $order->get_id(), '_real_total', true );
+		$real_total = $order->get_meta( '_real_total' );
 
 		if ( empty( $real_total ) ) {
 			return $formatted_total;
@@ -381,7 +384,19 @@ class WC_Reepay_Renewals {
 			return;
 		}
 
+		$user = get_user_by( 'email', $main_order->get_billing_email() );
+		if ( $user ) {
+			$main_order->set_customer_id( $user->ID );
+			$main_order->save();
+		}
 
+
+		self::log( [
+			'log' => [
+				'source' => 'WC_Reepay_Renewals::customer_id_connect',
+				'$data'  => $main_order->get_customer_id(),
+			]
+		] );
 		$orders         = [ $main_order ];
 		$order_items    = $main_order->get_items();
 		$created_orders = [];
@@ -425,11 +440,16 @@ class WC_Reepay_Renewals {
 				'customer_id' => $main_order->get_customer_id(),
 			], $main_order, $items_to_create );
 
+			$created_order->set_customer_id( $main_order->get_customer_id() );
+			$created_order->save();
+
 			$orders[]         = $created_order;
 			$created_orders[] = $created_order->get_id();
 		}
 
-		update_post_meta( $main_order->get_id(), '_reepay_another_orders', $created_orders );
+
+		$main_order->update_meta_data( '_reepay_another_orders', $created_orders );
+		$main_order->save_meta_data();
 
 		$main_order->calculate_totals();
 
@@ -440,7 +460,8 @@ class WC_Reepay_Renewals {
 			}
 
 			if ( floatval( $order->get_total() ) != 0 ) {
-				update_post_meta( $order->get_id(), '_real_total', $order->get_total() );
+				$order->update_meta_data( '_real_total', $order->get_total() );
+				$order->save_meta_data();
 				$order->set_total( 0 );
 			}
 
@@ -758,20 +779,20 @@ class WC_Reepay_Renewals {
 	 * @return WC_Order|false
 	 */
 	public function get_child_order( $parent_order, $invoice ) {
-		$query = new WP_Query( [
-			'post_parent'    => $parent_order->get_id(),
-			'post_type'      => 'shop_order',
-			'post_status'    => 'any',
-			'posts_per_page' => - 1,
-			'meta_query'     => [
+		$args = [
+			'meta_query' => [
 				[
 					'key'   => '_reepay_order',
 					'value' => $invoice,
 				]
 			]
-		] );
+		];
 
-		return ! empty( $query->posts ) ? wc_get_order( $query->posts[0] ) : false;
+		$args['parent'] = $parent_order->get_id();
+
+		$query = wc_get_orders( $args );
+
+		return ! empty( $query ) ? $query[0] : false;
 	}
 
 	/**
@@ -804,19 +825,19 @@ class WC_Reepay_Renewals {
 		$parent_order = wc_get_order( $subscription_id );
 
 		if ( empty( $parent_order ) ) {
-			self::log( [
-				'log' => [
-					'source' => 'WC_Reepay_Renewals::create_child_order',
-					'info'   => 'Undefined parent order'
-				]
-			] );
+			$parent_order = self::get_order_by_subscription_handle( $subscription_id );
+			if ( empty( $parent_order ) ) {
+				self::log( [
+					'log' => [
+						'source' => 'WC_Reepay_Renewals::create_child_order',
+						'info'   => 'Undefined parent order'
+					]
+				] );
+			}
 		}
 
 		$args = [
-			'post_type'      => 'shop_order',
-			'post_status'    => 'any',
-			'posts_per_page' => - 1,
-			'meta_query'     => [
+			'meta_query' => [
 				[
 					'key'   => '_reepay_order',
 					'value' => $data['invoice'],
@@ -825,17 +846,17 @@ class WC_Reepay_Renewals {
 		];
 
 		if ( ! empty( $parent_order ) ) {
-			$args['post_parent'] = $parent_order->get_id();
+			$args['parent'] = $parent_order->get_id();
 		}
 
-		$query = new WP_Query( $args );
+		$query = wc_get_orders( $args );
 
-		if ( ! empty( $query->posts ) ) {
+		if ( ! empty( $query ) ) {
 			self::log( [
 				'log' => [
 					'source' => 'WC_Reepay_Renewals::create_child_order',
 					'error'  => 'duplicate status - ' . $status,
-					'data'   => $data
+					'data'   => $query
 				]
 			] );
 
@@ -850,7 +871,8 @@ class WC_Reepay_Renewals {
 		] );
 
 		if ( ! empty( $parent_order ) ) {
-			update_post_meta( $parent_order->get_id(), '_reepay_order', $data['invoice'] );
+			$parent_order->update_meta_data( '_reepay_order', $data['invoice'] );
+			$parent_order->save_meta_data();
 			$gateway = rp_get_payment_method( $parent_order );
 		}
 
@@ -1067,24 +1089,17 @@ class WC_Reepay_Renewals {
 
 		if ( $main_order ) {
 			foreach ( $fields_to_copy as $field_name ) {
-				update_post_meta(
-					$new_order->get_id(),
-					$field_name,
-					get_post_meta( $main_order->get_id(), $field_name, true )
-				);
+				$new_order->update_meta_data( $field_name, $main_order->get_meta( $field_name ) );
 			}
 
 			foreach ( $additional_fields_to_copy as $field_name ) {
-				$field_value = get_post_meta( $main_order->get_id(), $field_name, true );
+				$field_value = $main_order->get_meta( $field_name );
 
 				if ( ! empty( $field_value ) ) {
-					update_post_meta(
-						$new_order->get_id(),
-						$field_name,
-						$field_value
-					);
+					$new_order->update_meta_data( $field_name, $field_value );
 				}
 			}
+			$new_order->save_meta_data();
 			$new_order->set_currency( $main_order->get_currency() ?? '' );
 		} elseif ( ! empty( $invoice_data ) && ! empty( $invoice_data['customer'] ) ) {
 			try {
@@ -1110,7 +1125,10 @@ class WC_Reepay_Renewals {
 			$new_order->set_payment_method_title( 'Reepay Checkout' );
 			$new_order->add_meta_data( '_reepay_state_authorized', 1 );
 			$new_order->set_currency( $invoice_data['currency'] );
-			update_post_meta( $new_order->get_id(), '_order_currency', $invoice_data['currency'] );
+
+
+			$new_order->update_meta_data( '_order_currency', $invoice_data['currency'] );
+			$new_order->save_meta_data();
 
 			if ( ! empty( $order_args['subscription'] ) ) {
 				$subscription = reepay_s()->api()->request( "subscription/{$order_args['subscription']}" );
@@ -1438,7 +1456,9 @@ class WC_Reepay_Renewals {
 	 * @return void
 	 */
 	private static function lock_order( $order_id ) {
-		update_post_meta( $order_id, '_reepay_subscriptions_locked', '1' );
+		$order = wc_get_order( $order_id );
+		$order->update_meta_data( '_reepay_subscriptions_locked', '1' );
+		$order->save_meta_data();
 	}
 
 	/**
@@ -1449,7 +1469,8 @@ class WC_Reepay_Renewals {
 	 * @return void
 	 */
 	private static function unlock_order( $order_id ) {
-		delete_post_meta( $order_id, '_reepay_subscriptions_locked' );
+		$order = wc_get_order( $order_id );
+		$order->delete_meta_data( '_reepay_subscriptions_locked' );
 	}
 
 	/**
@@ -1460,7 +1481,9 @@ class WC_Reepay_Renewals {
 	 * @return bool
 	 */
 	private static function is_locked( $order_id ) {
-		return (bool) get_post_meta( $order_id, '_reepay_subscriptions_locked', true );
+		$order = wc_get_order( $order_id );
+
+		return (bool) $order->get_meta( '_reepay_subscriptions_locked' );
 	}
 
 	/**

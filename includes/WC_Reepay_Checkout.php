@@ -15,6 +15,24 @@ class WC_Reepay_Checkout {
 		add_filter( 'wcs_cart_have_subscription', [ $this, 'is_reepay_product_in_cart' ] );
 		add_filter( 'wcs_cart_only_subscriptions', [ $this, 'only_subscriptions_in_cart' ] );
 		add_filter( 'wcr_cart_only_reepay_subscriptions', [ $this, 'only_reepay_products_in_cart' ] );
+		add_filter( 'woocommerce_checkout_registration_required', [ $this, 'require_registration_during_checkout' ] );
+	}
+
+	/**
+	 * Enables the 'registeration required' (guest checkout) setting when purchasing subscriptions.
+	 *
+	 * @param  bool  $account_required  Whether an account is required to checkout.
+	 *
+	 * @return bool
+	 * @since 3.1.0
+	 *
+	 */
+	public static function require_registration_during_checkout( $account_required ): bool {
+		if ( self::is_reepay_product_in_cart() && ! is_user_logged_in() ) {
+			$account_required = true;
+		}
+
+		return $account_required;
 	}
 
 	/**

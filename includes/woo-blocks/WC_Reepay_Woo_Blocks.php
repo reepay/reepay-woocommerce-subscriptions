@@ -8,11 +8,13 @@ class WC_Reepay_Woo_Blocks {
 	}
 
 	public function add_gateways_filter() {
-		woocommerce_store_api_register_payment_requirements(
-			array(
-				'data_callback' => [ $this, 'filter_gateways' ],
-			)
-		);
+		if ( function_exists( 'woocommerce_store_api_register_payment_requirements' ) ) {
+			woocommerce_store_api_register_payment_requirements(
+				array(
+					'data_callback' => [ $this, 'filter_gateways' ],
+				)
+			);
+		}
 	}
 
 	/**
@@ -31,7 +33,7 @@ class WC_Reepay_Woo_Blocks {
 	/**
 	 * Set tokens' saving always on true
 	 *
-	 * @param array $data
+	 * @param  array  $data
 	 *
 	 * @return array
 	 */

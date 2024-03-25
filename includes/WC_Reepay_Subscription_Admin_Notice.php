@@ -69,7 +69,9 @@ class WC_Reepay_Subscription_Admin_Notice {
 	 * Store notices to DB
 	 */
 	public static function store_frontend_notices( $notice, $order_id ) {
-		update_post_meta( $order_id, '_reepay_frontend_notices', $notice );
+		$order = wc_get_order( $order_id );
+		$order->update_meta_data( '_reepay_frontend_notices', $notice );
+		$order->save_meta_data();
 	}
 
 	public function show_editor_message( $messages ) {
@@ -101,22 +103,24 @@ class WC_Reepay_Subscription_Admin_Notice {
 	}
 
 	public function show_thankyou_message( $ret, $order_id ) {
-		$notice = get_post_meta( $order_id, '_reepay_frontend_notices', true );
+		$order  = wc_get_order( $order_id );
+		$notice = $order->get_meta( '_reepay_frontend_notices' );
 		if ( ! empty( $notice ) ) {
 			$ret = array(
 				'state'   => 'failed',
 				'message' => $notice
 			);
 		} else {
-			$sub_handle = get_post_meta( $order_id, '_reepay_subscription_handle', true );
-			$reloaded   = get_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
-			$order      = wc_get_order( $order_id );
+			$reloaded   = $order->get_meta( '_reepay_thankyou_reloaded' );
+			$sub_handle = $order->get_meta( '_reepay_subscription_handle' );
 			if ( empty( $reloaded ) ) {
 				if ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
 					$ret = array(
 						'state' => 'reload',
 					);
-					update_post_meta( $order_id, '_reepay_thankyou_reloaded', true );
+
+					$order->update_meta_data( '_reepay_thankyou_reloaded', true );
+					$order->save_meta_data();
 				}
 			} elseif ( ! empty( $sub_handle ) ) {
 				try {
