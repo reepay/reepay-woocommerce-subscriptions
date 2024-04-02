@@ -2,7 +2,7 @@
 
 class WC_Reepay_My_Account_Subscription_Page {
 
-	public static $menu_item_slug = 'r-subscription-view';
+	public static string $menu_item_slug = 'r-subscription-view';
 
 	public function __construct() {
 		add_action( 'woocommerce_account_' . self::$menu_item_slug . '_endpoint', [ $this, 'subscription_endpoint' ], 10, 1 );
@@ -11,16 +11,16 @@ class WC_Reepay_My_Account_Subscription_Page {
 		} );
 	}
 
-	public function subscription_endpoint( $subscription_handle ) {
+	public function subscription_endpoint( string $subscription_handle ) {
 		try {
 			$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
 
 			self::customer_has_access_to_subscription( $subscription );
-
+			
 			reepay_s()->get_template( 'myaccount/my-subscription.php', array(
 				'subscription'     => $subscription,
 				'plan'             => reepay_s()->api()->request( "plan/{$subscription['plan']}/current" ),
-				'cards'            => $this->get_customer_cards( $subscription_handle ),
+				'payment_methods'            => $this->get_customer_payment_methods( $subscription_handle ),
 				'dates_to_display' => $this->get_dates_to_display( $subscription )
 			) );
 		} catch ( Exception $e ) {
@@ -30,7 +30,7 @@ class WC_Reepay_My_Account_Subscription_Page {
 		}
 	}
 
-	public function get_dates_to_display( $subscription ) {
+	public function get_dates_to_display( $subscription ): array {
 		return [
 			'start_date'              => [
 				'label' => _x( 'Start date', 'customer subscription table header', 'reepay-subscriptions-for-woocommerce' ),
@@ -59,31 +59,17 @@ class WC_Reepay_My_Account_Subscription_Page {
 		];
 	}
 
-	public function get_customer_cards( $subscription_handle, $customer_handle = '' ) {
+	public function get_customer_payment_methods( string $subscription_handle, string $customer_handle = '' ): array {
 		if ( empty( $customer ) ) {
 			$customer_handle = rp_get_customer_handle( get_current_user_id() );
 		}
 
 		$current_payment_method = reepay_s()->api()->request( "subscription/$subscription_handle/pm" )[0] ?? array();
-
-		if ( empty( $current_payment_method['card'] ) ) {
-			return array(
-				'current' => null,
-				'all' => array()
-			);
-		}
-
-		$payment_methods = reepay_s()->api()->request( "customer/$customer_handle/payment_method" )['cards'] ?? array();
-
-		$current_payment_method = array_merge( $current_payment_method, $current_payment_method['card'] );
-		unset( $current_payment_method['card'] );
-		$current_payment_method['current'] = true;
-
-		array_unshift( $payment_methods, $current_payment_method );
-
-		return array(
-			'current' => $current_payment_method,
-			'all' => $payment_methods
+		$payment_methods = reepay_s()->api()->request( "customer/$customer_handle/payment_method" ) ?? array();
+		
+		return array_merge(
+			['current' => $current_payment_method],
+			$payment_methods
 		);
 	}
 

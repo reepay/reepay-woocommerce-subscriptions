@@ -103,7 +103,7 @@ class WooCommerce_Reepay_Subscriptions
         "invoice_refund"
     ];
 
-    public static $db_version = '1.0.2';
+    public static string $db_version = '1.0.2';
 
     /**
      * Constructor
@@ -652,10 +652,10 @@ class WooCommerce_Reepay_Subscriptions
      * Wrapper of wc_get_template function
      *
      * @param  string  $template  Template name.
-     * @param  array  $args  Arguments.
-     * @param  bool  $return  Return or echo template.
+     * @param array $args  Arguments.
+     * @param bool $return  Return or echo template.
      */
-    public function get_template(string $template, $args = array(), $return = false)
+    public function get_template(string $template, array $args = array(), bool $return = false)
     {
         if ($return) {
             ob_start();
