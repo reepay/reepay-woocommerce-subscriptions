@@ -124,6 +124,8 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 
 	/**
+	 * Add Reepay fields plan in variable
+	 *
 	 * @param  int  $loop  Position in the loop.
 	 * @param  array  $variation_data  Variation data.
 	 * @param  WP_Post  $variation  Post data.
@@ -131,9 +133,16 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	public function add_custom_field_to_variations( $loop, $variation_data, $variation ) {
 		global $post;
 		$post = $variation;
-
+		
 		$this->loop = $loop;
-		$this->subscription_pricing_fields( $post->ID );
+		
+		$product_variation = wc_get_product( $post->ID );
+		if ( $product_variation->is_type( 'variation' ) ) {
+			$product = wc_get_product($product_variation->get_parent_id());
+			if ( $product->get_type() == 'reepay_variable_subscriptions' ) {
+				$this->subscription_pricing_fields( $post->ID );
+			}
+		}
 
 		wp_reset_postdata();
 	}
