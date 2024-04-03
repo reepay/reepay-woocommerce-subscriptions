@@ -119,8 +119,7 @@ class WC_Reepay_Admin_Frontend {
 				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $order->get_meta( '_reepay_renewal' ) ) ) ) {
 					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce' );
 				} else {
-					$output = __( 'Regular', 'reepay-subscriptions-for-woocom
-					erce' );
+					$output = __( 'Regular', 'reepay-subscriptions-for-woocomerce' );
 				}
 
 				break;
