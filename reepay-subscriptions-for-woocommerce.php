@@ -183,26 +183,38 @@ class WooCommerce_Reepay_Subscriptions
                 __FILE__, true);
         }
     }
-
-    public function disable_emails($recipient, $order)
+	
+	/**
+	 * @param $recipient string
+	 * @param $order WC_Order
+	 *
+	 * @return string
+	 */
+    public function disable_emails(string $recipient, $order): string
     {
-        if (self::$settings['_reepay_disable_sub_mails'] || self::$settings['_reepay_disable_sub_mails_renewals']) {
-            $page = $_GET['page'] = $_GET['page'] ?? '';
-            if ('wc-settings' === $page) {
-                return $recipient;
-            }
-
-            $is_renewal = $order->get_meta('_reepay_renewal');
-            if ( ! empty($is_renewal) && ! empty($order->get_meta('_reepay_order')) && self::$settings['_reepay_disable_sub_mails_renewals']) {
-                $recipient = '';
-            }
-
-            $is_subscription = $order->get_meta('_reepay_subscription_handle');
-            if ( ! empty($is_subscription) && $order->get_parent_id() == 0 && self::$settings['_reepay_disable_sub_mails_renewals']) {
-                $recipient = '';
+	    $page = $_GET['page'] = $_GET['page'] ?? '';
+	    if ('wc-settings' === $page) {
+		    return $recipient;
+	    }
+	    $parent_id = $order->get_parent_id();
+        $is_sub_order = $parent_id != 0;
+        if ( self::$settings['_reepay_disable_sub_mails'] ) {
+	        if ( ! $is_sub_order ) {
+		        $is_subscription = $order->get_meta('_reepay_is_subscription');
+		        if ( ! empty($is_subscription) ) {
+			        $recipient = '';
+		        }
+	        }
+        }
+        if ( self::$settings['_reepay_disable_sub_mails_renewals'] ) {
+            if ( $is_sub_order ) {
+                $parent_order = wc_get_order($parent_id);
+	            $is_subscription_parent_order = $parent_order->get_meta('_reepay_is_subscription');
+	            if ( ! empty($is_subscription_parent_order) ) {
+		            $recipient = '';
+	            }
             }
         }
-
 
         return $recipient;
     }

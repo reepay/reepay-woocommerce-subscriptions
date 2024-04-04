@@ -236,7 +236,7 @@ class WC_Reepay_Renewals {
 
 		self::log( [
 			'log' => [
-				'source'   => 'WC_Reepay_Renewals::create_subscription',
+				'source'   => 'WC_Reepay_Renewals::create_subscriptions_handle',
 				'error'    => 'Subscription create request',
 				'data'     => $data,
 				'order_id' => empty( $order ) ? 'false' : $order->get_id()
@@ -247,7 +247,7 @@ class WC_Reepay_Renewals {
 		if ( empty( $order ) ) {
 			self::log( [
 				'log' => [
-					'source' => 'WC_Reepay_Renewals::create_subscription',
+					'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
 					'error'  => 'Order not found',
 					'data'   => $data
 				],
@@ -308,8 +308,13 @@ class WC_Reepay_Renewals {
 
 		self::unlock_order( $order->get_id() );
 	}
-
-	public static function is_order_contain_subscription( $order ) {
+	
+	/**
+	 * @param WC_Order $order
+	 *
+	 * @return bool
+	 */
+	public static function is_order_contain_subscription( $order ): bool {
 		foreach ( $order->get_items() as $item_values ) {
 			$product = $item_values->get_product();
 
@@ -349,6 +354,7 @@ class WC_Reepay_Renewals {
 	 * @param  WC_Order  $main_order
 	 */
 	public function create_subscriptions( $data, $main_order ) {
+		$main_order->add_meta_data( '_reepay_is_subscription', 1 );
 		self::log( [
 			'log' => [
 				'source'     => 'WC_Reepay_Renewals::create_subscriptions',
@@ -1128,7 +1134,6 @@ class WC_Reepay_Renewals {
 
 
 			$new_order->update_meta_data( '_order_currency', $invoice_data['currency'] );
-			$new_order->save_meta_data();
 
 			if ( ! empty( $order_args['subscription'] ) ) {
 				$subscription = reepay_s()->api()->request( "subscription/{$order_args['subscription']}" );
@@ -1139,7 +1144,7 @@ class WC_Reepay_Renewals {
 				}
 
 				$new_order->add_meta_data( '_reepay_subscription_handle_parent', $subscription['handle'] );
-				$new_order->add_meta_data( '_reepay_renewal', 1 );
+				$new_order->add_meta_data('_reepay_is_renewal', 1);
 				$new_order->add_meta_data( '_reepay_imported', 1 );
 
 				$plan_data     = reepay_s()->plan()->get_remote_plan_meta( $subscription['plan'] );
@@ -1158,6 +1163,7 @@ class WC_Reepay_Renewals {
 					)
 				);
 			}
+			$new_order->save_meta_data();
 		}
 
 		foreach ( $items as $item ) {
