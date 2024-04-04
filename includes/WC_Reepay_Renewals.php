@@ -1144,7 +1144,6 @@ class WC_Reepay_Renewals {
 				}
 
 				$new_order->add_meta_data( '_reepay_subscription_handle_parent', $subscription['handle'] );
-				$new_order->add_meta_data( '_reepay_renewal', 1 );
 				$new_order->add_meta_data('_reepay_is_renewal', 1);
 				$new_order->add_meta_data( '_reepay_imported', 1 );
 
