@@ -98,7 +98,7 @@ if ( ! class_exists( 'WC_Reepay_Memberships_Integrations' ) ) {
 				$order = wc_get_order($order);
 
 				if ( empty( $order ) ||
-				     ! WC_Reepay_Renewals::is_order_contain_subscription_in_products( $order ) ||
+				     ! WC_Reepay_Renewals::is_order_contain_subscription( $order ) ||
 				     ! WC_Reepay_Renewals::is_order_subscription_active( $order ) ) {
 					continue;
 				}

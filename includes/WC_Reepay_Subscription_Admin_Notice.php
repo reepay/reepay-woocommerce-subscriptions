@@ -114,7 +114,7 @@ class WC_Reepay_Subscription_Admin_Notice {
 			$reloaded   = $order->get_meta( '_reepay_thankyou_reloaded' );
 			$sub_handle = $order->get_meta( '_reepay_subscription_handle' );
 			if ( empty( $reloaded ) ) {
-				if ( WC_Reepay_Renewals::is_order_contain_subscription_in_products( $order ) ) {
+				if ( WC_Reepay_Renewals::is_order_contain_subscription( $order ) ) {
 					$ret = array(
 						'state' => 'reload',
 					);
