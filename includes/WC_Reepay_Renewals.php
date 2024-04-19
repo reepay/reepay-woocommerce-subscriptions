@@ -1099,7 +1099,7 @@ class WC_Reepay_Renewals {
 		if ( ! empty( $parent_order ) ) {
 			$customer = $parent_order->get_customer_id();
 		} elseif ( $invoice_data['customer'] ) {
-			$customer = rp_get_userid_by_handle( $invoice_data['customer'] );
+			$customer = rp_get_user_id_by_handle( $invoice_data['customer'] );
 		} else {
 			$customer = $parent_order->get_customer_id();
 		}

@@ -180,7 +180,7 @@ class WC_Reepay_Import_Helpers {
 
 		$order = wc_create_order(
 			[
-				'customer_id' => rp_get_userid_by_handle( $subscription['customer'] ) ?: null,
+				'customer_id' => rp_get_user_id_by_handle( $subscription['customer'] ) ?: null,
 				'status'      => $reepay_to_woo_statuses[ $subscription['state'] ] ?? '',
 			]
 		);
