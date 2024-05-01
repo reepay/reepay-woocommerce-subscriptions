@@ -111,40 +111,48 @@ class WC_Reepay_Checkout {
 	/**
 	 * @return bool
 	 */
-	public static function only_reepay_products_in_cart( $is_only ) {
+	public static function only_reepay_products_in_cart( $is_only ): bool {
 		if ( $is_only ) {
 			return $is_only;
 		}
 
 		/**
-		 * @var $cart_item array Item data
+		 * @var array $cart_item item data.
 		 */
 		foreach ( WC()->cart->get_cart() as $cart_item ) {
-			if ( ! self::is_reepay_product( $cart_item['data'] ) ) {
+			// skip WPC Product Bundles
+			if ( ! self::is_reepay_product( $cart_item['data'], [ 'woosb' ] ) ) {
 				return false;
 			}
 		}
 
-
 		return true;
 	}
-
+	
 	/**
-	 * @param  mixed  $product
+	 * Check product is Reepay product
+	 *
+	 * @param mixed $product
+	 * @param string[] $skip_types
 	 *
 	 * @return bool
 	 */
-	public static function is_reepay_product( $product = false ) {
+	public static function is_reepay_product( $product = false, array $skip_types = [] ): bool {
 		$product = wc_get_product( $product );
-
+		
 		if ( empty( $product ) ) {
 			return false;
 		}
-
+		
+		$type = $product->get_type();
+		if ( in_array( $type, $skip_types ) ) {
+			return true;
+		}
+		
 		if ( $product->is_type( 'variation' ) ) {
 			$product = wc_get_product( $product->get_parent_id() );
 		}
-
-		return str_contains( $product->get_type(), 'reepay' );
+		
+		return str_contains( $type, 'reepay' );
 	}
 }

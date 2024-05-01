@@ -312,11 +312,11 @@ class WC_Reepay_Renewals {
 	/**
 	 * @param WC_Order $order
 	 *
-	 * @return bool
+	 * @return bool|WC_Order_Item
 	 */
-	public static function is_order_contain_subscription( $order ): bool {
-		foreach ( $order->get_items() as $item_values ) {
-			$product = $item_values->get_product();
+	public static function is_order_contain_subscription( $order ) {
+		foreach ( $order->get_items() as $item ) {
+			$product = $item->get_product();
 
 			//Imported subscriptions are empty
 			if ( empty( $product ) ) {
@@ -324,13 +324,13 @@ class WC_Reepay_Renewals {
 			}
 
 			if ( $product->is_type( 'reepay_variable_subscriptions' ) || $product->is_type( 'reepay_simple_subscriptions' ) ) {
-				return true;
+				return $item;
 			}
 
 			if ( $product->is_type( 'variation' ) && ! empty( $product->get_parent_id() ) ) {
 				$_product_main = wc_get_product( $product->get_parent_id() );
 				if ( $_product_main->is_type( 'reepay_variable_subscriptions' ) ) {
-					return true;
+					return $item;
 				}
 			}
 		}
@@ -398,7 +398,6 @@ class WC_Reepay_Renewals {
 			$main_order->save();
 		}
 
-
 		self::log( [
 			'log' => [
 				'source' => 'WC_Reepay_Renewals::customer_id_connect',
@@ -409,17 +408,17 @@ class WC_Reepay_Renewals {
 		$order_items = $main_order->get_items();
 		[ $new_orders, $created_order_ids ] = $this->get_division_of_products_into_orders( $order_items, $main_order );
 		$orders = array_merge( $orders, $new_orders );
-		var_dump( $orders );
 		
 		$main_order->update_meta_data( '_reepay_another_orders', $created_order_ids );
 		$main_order->save_meta_data();
 
 		$main_order->calculate_totals();
-		
+
 		// create sub-orders renewals
 		$created_reepay_order_ids = [];
 		foreach ( $orders as $order_key => $order ) {
-			if ( ! self::is_order_contain_subscription( $order ) ) {
+			$order_item = self::is_order_contain_subscription( $order );
+			if ( ! $order_item ) {
 				continue;
 			}
 
@@ -428,9 +427,6 @@ class WC_Reepay_Renewals {
 				$order->save_meta_data();
 				$order->set_total( 0 );
 			}
-
-			$order_items = $order->get_items();
-			$order_item  = reset( $order_items );
 
 			$product = $order_item->get_product();
 
@@ -512,13 +508,15 @@ class WC_Reepay_Renewals {
 			$product                    = $order_item->get_product();
 			$order_item_quantity        = $order_item->get_quantity();
 			$addons                     = $order_item->get_meta( 'addons' );
-			$is_exist_addon_type_on_off = $this::is_exist_addon_type_on_off_in_addons( $addons );
+			$is_exist_addon_type_on_off = self::is_exist_addon_type_on_off_in_addons( $addons );
 			$order_items_count          = count( $order_items );
 			
+			if ( $product->is_type('woosb') ) {
+				unset( $order_items[ $order_item_key ] );
+			}
 			if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
 				continue;
 			}
-			
 			$new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
 			                                        '_reepay_subscription_customer_role', true );
 			if ( ! empty( $new_role_for_customer ) ) {
@@ -538,47 +536,45 @@ class WC_Reepay_Renewals {
 			}
 			
 			$order_direct_quantity = $order_item_quantity;
-			if ( $order_item_quantity > 1 ) {
-				if ( $is_exist_addon_type_on_off ) {
-					$addons_amount = 0;
-					foreach ( $addons as $addon ) {
-						$addons_amount += (float) $addon['amount'];
+			if ( $order_item_quantity > 1 && $is_exist_addon_type_on_off ) {
+				$addons_amount = 0;
+				foreach ( $addons as $addon ) {
+					$addons_amount += (float) $addon['amount'];
+				}
+				for ( $i = 1; $i < $order_item_quantity; $i ++ ) {
+					$new_product_item = new WC_Order_Item_Product();
+					$new_product_item->set_name( $order_item->get_name() );
+					$new_product_item->set_quantity( 1 );
+					$new_product_item->set_product_id( $order_item->get_product_id() );
+					$product = wc_get_product( $order_item->get_product_id() );
+					$total   = (string) ( (float) $product->get_price() + $addons_amount );
+					$new_product_item->set_variation_id( $order_item->get_variation_id() );
+					$new_product_item->set_subtotal( $total );
+					$new_product_item->set_total( $total );
+					$order_direct_quantity --;
+					
+					foreach ( $order_item->get_formatted_meta_data() as $meta_data ) {
+						$new_product_item->add_meta_data( $meta_data->key, $meta_data->value );
 					}
-					for ( $i = 1; $i < $order_item_quantity; $i ++ ) {
-						$new_product_item = new WC_Order_Item_Product();
-						$new_product_item->set_name( $order_item->get_name() );
-						$new_product_item->set_quantity( 1 );
-						$new_product_item->set_product_id( $order_item->get_product_id() );
-						$product = wc_get_product( $order_item->get_product_id() );
-						$total   = (string) ( (float) $product->get_price() + $addons_amount );
-						$new_product_item->set_variation_id( $order_item->get_variation_id() );
-						$new_product_item->set_subtotal( $total );
-						$new_product_item->set_total( $total );
-						$order_direct_quantity --;
-						
-						foreach ( $order_item->get_formatted_meta_data() as $value ) {
-							$new_product_item->add_meta_data( $value->key, $value->value );
-						}
-						$new_product_item->add_meta_data( 'addons', $addons );
-						
-						$created_order = self::create_order_copy( [
-							                                          'status' => $main_order->get_status( '' ),
-							                                                                                                                                                                                                                                                                                                                              'customer_id' => $main_order->get_customer_id(),
-						                                          ], $main_order, $items_to_create );
-						$created_order->set_customer_id( $main_order->get_customer_id() );
-						$created_order->save();
-						
-						$new_product_item->set_order_id( $created_order->get_id() );
-						$new_product_item->save();
-						
-						$order_item->set_quantity( $order_direct_quantity );
-						$order_item->set_total( $order_item->get_total() - $total );
-						$order_item->set_subtotal( $order_item->get_subtotal() - $total );
-						$order_item->save();
-						
-						$orders[]            = wc_get_order( $created_order ); // otherwise cached
-						$created_order_ids[] = $created_order->get_id();
-					}
+					$new_product_item->add_meta_data( 'addons', $addons );
+					
+					$created_order = self::create_order_copy( [
+						                                          'status' => $main_order->get_status( '' ),
+						                                                                                                                                                                                                                                                                                                                              'customer_id' => $main_order->get_customer_id(),
+					                                          ], $main_order, $items_to_create );
+					$created_order->set_customer_id( $main_order->get_customer_id() );
+					$created_order->save();
+					
+					$new_product_item->set_order_id( $created_order->get_id() );
+					$new_product_item->save();
+					
+					$order_item->set_quantity( $order_direct_quantity );
+					$order_item->set_total( $order_item->get_total() - $total );
+					$order_item->set_subtotal( $order_item->get_subtotal() - $total );
+					$order_item->save();
+					
+					$orders[]            = wc_get_order( $created_order ); // otherwise cached
+					$created_order_ids[] = $created_order->get_id();
 				}
 			} else {
 				// if last order item
@@ -658,11 +654,12 @@ class WC_Reepay_Renewals {
 		 * @see https://reference.reepay.com/api/#create-subscription
 		 */
 		$product  = $order_item->get_product();
+		$order_item_quantity = $order_item->get_quantity();
 		$sub_data = [
 			'customer'        => $data['customer'],
 			'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
 			//					'amount' => null,
-			'quantity'        => $order_item->get_quantity(),
+			'quantity'        => $order_item_quantity,
 			'test'            => WooCommerce_Reepay_Subscriptions::settings( 'test_mode' ),
 			'handle'          => $data['handle'],
 			//					'metadata' => null,
@@ -691,6 +688,14 @@ class WC_Reepay_Renewals {
 		
 		if ( $main_order->get_id() !== $split_order->get_id() ) {
 			$sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $data['handle'] );
+		}
+		
+		// override amount if WPC Product Bundles for WooCommerce
+		if ( ! empty( $order_item->get_meta( '_woosb_parent_id' ) ) && function_exists('rp_prepare_amount') ) {
+			$order_item_data = $order_item->get_data();
+			$total = $order_item_data['total'];
+			$subtotal = $total / $order_item_quantity;
+			$sub_data['amount'] = rp_prepare_amount( $subtotal, $main_order->get_currency() );
 		}
 		
 		return $sub_data;
@@ -1098,7 +1103,7 @@ class WC_Reepay_Renewals {
 		if ( ! empty( $parent_order ) ) {
 			$customer = $parent_order->get_customer_id();
 		} elseif ( $invoice_data['customer'] ) {
-			$customer = rp_get_userid_by_handle( $invoice_data['customer'] );
+			$customer = rp_get_user_id_by_handle( $invoice_data['customer'] );
 		} else {
 			$customer = $parent_order->get_customer_id();
 		}
@@ -1245,7 +1250,8 @@ class WC_Reepay_Renewals {
 		];
 		
 		$product_item_fields_to_copy = [
-			'addons'
+			'addons',
+			'_woosb_parent_id',
 		];
 
 		if ( $main_order ) {

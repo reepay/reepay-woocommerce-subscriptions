@@ -100,7 +100,7 @@ class WC_Reepay_Import {
 					$customer['debug_message'] .= __( 'Active subscription not found', 'reepay-subscriptions-for-woocommerce' ) . ' ';
 				}
 
-				if ( empty( rp_get_userid_by_handle( $customer['handle'] ) ) ) {
+				if ( empty( rp_get_user_id_by_handle( $customer['handle'] ) ) ) {
 					$customers_to_import[ $customer['handle'] ] = $customer;
 				} else if( $debug ) {
 					$customer['debug'] = true;
@@ -215,7 +215,7 @@ class WC_Reepay_Import {
 				continue;
 			}
 
-			$wp_user_id = rp_get_userid_by_handle( $cards[ $card_id ]['customer'] );
+			$wp_user_id = rp_get_user_id_by_handle( $cards[ $card_id ]['customer'] );
 
 			if ( empty( $wp_user_id ) ) {
 				$result[ $card_id ] = __( 'User not found', 'reepay-subscriptions-for-woocommerce' );
@@ -271,7 +271,7 @@ class WC_Reepay_Import {
 				          || $import_cancelled && $subscription['is_cancelled'] )
 
 				) {
-					$wp_user_id   = rp_get_userid_by_handle( $subscription['customer'] );
+					$wp_user_id   = rp_get_user_id_by_handle( $subscription['customer'] );
 					$wp_user_data = get_userdata( $wp_user_id );
 
 					if ( $wp_user_data ) {
