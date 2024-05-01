@@ -196,6 +196,7 @@ class WooCommerce_Reepay_Subscriptions
 	    if ('wc-settings' === $page) {
 		    return $recipient;
 	    }
+
 	    $parent_id = $order->get_parent_id();
         $is_sub_order = $parent_id != 0;
         if ( self::$settings['_reepay_disable_sub_mails'] ) {

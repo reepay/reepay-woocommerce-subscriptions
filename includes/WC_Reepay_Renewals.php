@@ -1013,8 +1013,7 @@ class WC_Reepay_Renewals {
 			self::log( [
 				'log' => [
 					'source' => 'WC_Reepay_Renewals::create_child_order',
-					'error'  => 'duplicate status - ' . $status,
-					'data'   => $query
+					'error'  => 'duplicate status - ' . $status
 				]
 			] );
 
