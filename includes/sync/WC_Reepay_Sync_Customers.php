@@ -101,7 +101,7 @@ class WC_Reepay_Sync_Customers {
 		//Prevent payment methods duplication
 		sleep( 5 );
 
-		$user_id = rp_get_userid_by_handle( $data['customer'] );
+		$user_id = rp_get_user_id_by_handle( $data['customer'] );
 
 		if( empty( $user_id ) ) {
 			return;
@@ -141,7 +141,7 @@ class WC_Reepay_Sync_Customers {
 	 * @return false|array
 	 */
 	public static function get_customer_data( $handle ) {
-		$user_id       = rp_get_userid_by_handle( $handle );
+		$user_id       = rp_get_user_id_by_handle( $handle );
 		$customer_data = [];
 
 		try {

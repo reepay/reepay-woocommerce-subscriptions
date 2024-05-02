@@ -58,14 +58,14 @@ class WC_Reepay_Subscription_API {
 	/**
 	 * Request
 	 *
-	 * @param  string  $method
-	 * @param  string  $endpoint
+	 * @param string $method
+	 * @param string $endpoint
 	 * @param  array  $params
 	 *
 	 * @return array|mixed|object
 	 * @throws Exception
 	 */
-	public function request( $endpoint, $method = 'GET', $params = [] ) {
+	public function request( string $endpoint, string $method = 'GET', $params = [] ) {
 		$start = microtime( true );
 		$url   = $this->url . $endpoint;
 

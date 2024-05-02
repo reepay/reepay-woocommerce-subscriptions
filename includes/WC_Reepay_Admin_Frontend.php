@@ -31,7 +31,7 @@ class WC_Reepay_Admin_Frontend {
 	public function modify_order_id( $id, $order ) {
 		global $post;
 
-		$reepay_order = get_post_meta( $order->get_id(), '_reepay_order', true );
+		$reepay_order = $order->get_meta( '_reepay_order' );
 		if ( ! empty( $post ) ) {
 			if ( ! empty( $reepay_order ) && ( ( ! empty( $post->post_parent ) && $post->post_parent !== 0 ) || ! empty( get_post_meta( $post->ID,
 						'_reepay_subscription_handle_parent', true ) ) ) ) {
@@ -59,7 +59,7 @@ class WC_Reepay_Admin_Frontend {
 			return $classes;
 		}
 
-		if ( $post->post_type == 'shop_order' && $post->post_parent != 0 ) {
+		if ( OrderUtil::get_order_type( $post_id ) == 'shop_order' && $post->post_parent != 0 ) {
 			$classes[] = 'sub-order parent-' . $post->post_parent;
 		}
 
@@ -98,10 +98,10 @@ class WC_Reepay_Admin_Frontend {
 					$output .= '</strong>';
 				}
 
-				if ( ! empty( get_post_meta( $post->ID, '_reepay_subscription_handle_parent', true ) ) ) {
+				if ( ! empty( $order->get_meta( '_reepay_subscription_handle_parent' ) ) ) {
 					$output     = '<strong>&nbsp;';
 					$output     .= __( 'Sub Order of', 'reepay-subscriptions-for-woocommerce' );
-					$handle     = get_post_meta( $post->ID, '_reepay_subscription_handle_parent', true );
+					$handle     = $order->get_meta( '_reepay_subscription_handle_parent' );
 					$admin_page = 'https://admin.billwerk.plus/#/rp/';
 
 					$link = $admin_page . 'subscriptions/subscription/' . $handle;
@@ -116,11 +116,10 @@ class WC_Reepay_Admin_Frontend {
 				$handle = $order->get_meta( '_reepay_subscription_handle' );
 				if ( ! empty( $handle ) && $post->post_parent == 0 ) {
 					$output = __( 'Subscription', 'reepay-subscriptions-for-woocommerce' );
-				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $order->get_meta( '_reepay_renewal' ) ) ) ) {
+				} elseif ( ! empty( $order->get_meta( '_reepay_order' ) ) && ( $post->post_parent != 0 || ! empty( $order->get_meta( '_reepay_is_renewal' ) ) ) ) {
 					$output = __( 'Renewal', 'reepay-subscriptions-for-woocommerce' );
 				} else {
-					$output = __( 'Regular', 'reepay-subscriptions-for-woocom
-					erce' );
+					$output = __( 'Regular', 'reepay-subscriptions-for-woocomerce' );
 				}
 
 				break;
@@ -133,7 +132,8 @@ class WC_Reepay_Admin_Frontend {
 				}
 
 				if ( empty( $handle ) && ! empty( $order->get_parent_id() ) ) {
-					$handle = get_post_meta( $order->get_parent_id(), '_reepay_subscription_handle', true );
+					$parent_order = wc_get_order( $order->get_parent_id() );
+					$handle       = $parent_order->get_meta( '_reepay_subscription_handle' );
 				}
 
 				if ( ! empty( $handle ) ) {

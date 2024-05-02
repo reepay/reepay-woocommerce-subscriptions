@@ -220,7 +220,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 			7 => __( 'Sunday' ),
 		];
 	}
-	
+
 
 	public function checkout_subscription_info( $name, $cart_item, $cart_item_key ) {
 		if ( ! empty( $cart_item['data'] ) && WC_Reepay_Checkout::is_reepay_product( $cart_item['data'] ) ) {
@@ -913,7 +913,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	 * @return mixed
 	 */
 	public function rework_total( $total_rows, $order, $tax_display ) {
-		$another_orders = get_post_meta( $order->get_id(), '_reepay_another_orders', true );
+		$another_orders = $order->get_meta( '_reepay_another_orders' );
 		if ( ! empty( $another_orders ) ) {
 			$total = $order->get_total();
 
