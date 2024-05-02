@@ -214,7 +214,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param  array[
+	 * @param array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -224,6 +224,8 @@ class WC_Reepay_Renewals {
 	 *     'event_type' => string
 	 *     'event_id' => string
 	 * ] $data
+	 *
+	 * @throws WC_Data_Exception
 	 */
 	public function create_subscriptions_handle( $data ) {
 		if ( $data['event_type'] == 'invoice_authorized' || $data['event_type'] == 'invoice_settled' ) {
