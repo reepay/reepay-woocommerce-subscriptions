@@ -193,7 +193,7 @@ class WooCommerce_Reepay_Subscriptions
     public function disable_emails(string $recipient, $order): string
     {
 	    $page = $_GET['page'] = $_GET['page'] ?? '';
-	    if ('wc-settings' === $page) {
+	    if ( 'wc-settings' === $page || ! is_a( 'WC_Order', $order ) ) {
 		    return $recipient;
 	    }
 
