@@ -16,7 +16,7 @@ if ( empty( $post ) ) {
 
     <p class="form-field">
         <label for="#"><?php _e( 'Schedule type', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-        <span><?php echo WC_Reepay_Subscription_Plan_Simple::$schedule_types[ $_reepay_subscription_schedule_type ?? '' ] ?? 'undefined' ?></span>
+        <span><?php _e( WC_Reepay_Subscription_Plan_Simple::$schedule_types[ $_reepay_subscription_schedule_type ?? '' ] ?? 'undefined', 'reepay-subscriptions-for-woocommerce' ) ?></span>
     </p>
 
 	<?php if ( $_reepay_subscription_schedule_type === WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY ) : ?>
@@ -276,7 +276,7 @@ if ( empty( $post ) ) {
         <span>
             <?php
             if ( $_reepay_subscription_trial['type'] != 'customize' ) {
-	           echo WC_Reepay_Subscription_Plan_Simple::$trial[ $_reepay_subscription_trial['type'] ];
+	           _e( WC_Reepay_Subscription_Plan_Simple::$trial[ $_reepay_subscription_trial['type'] ], 'reepay-subscriptions-for-woocommerce' );
             } else {
 	           echo $_reepay_subscription_trial['length'] . ' ' . $_reepay_subscription_trial['unit'];
             }
