@@ -195,19 +195,19 @@ class WC_Reepay_Subscription_Plan_Simple {
 			WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY . '_multiple' => __( '%s Weeks',
 				'reepay-subscriptions-for-woocommerce' ),
 
-			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual' ),
+			WC_Reepay_Subscription_Plan_Simple::TYPE_MANUAL => __( 'Manual', 'reepay-subscriptions-for-woocommerce' ),
 		];
 
 		self::$bill_types = [
-			'bill_prorated'    => __( 'Bill prorated (Default)' ),
-			'bill_full'        => __( 'Bill for full period)' ),
-			'bill_zero_amount' => __( 'Bill a zero amount' ),
-			'no_bill'          => __( 'Do not consider the partial period a billing period' ),
+			'bill_prorated'    => __( 'Bill prorated (Default)', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_full'        => __( 'Bill for full period)', 'reepay-subscriptions-for-woocommerce' ),
+			'bill_zero_amount' => __( 'Bill a zero amount', 'reepay-subscriptions-for-woocommerce' ),
+			'no_bill'          => __( 'Do not consider the partial period a billing period', 'reepay-subscriptions-for-woocommerce' ),
 		];
 
 		self::$proration_types = [
-			'full_day'  => __( 'Full day proration' ),
-			'by_minute' => __( 'By the minute proration' ),
+			'full_day'  => __( 'Full day proration', 'reepay-subscriptions-for-woocommerce' ),
+			'by_minute' => __( 'By the minute proration', 'reepay-subscriptions-for-woocommerce' ),
 		];
 
 		self::$number_to_week_day = [
@@ -803,7 +803,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 		$types_info = $is_short ? self::$types_info_short : $types_arr;
 
-		$type_str = $types_info[ $interval > 1 ? $type . '_multiple' : $type ] ?? $types_info[ $type ] ?? '';
+		$type_str = __( $types_info[ $interval > 1 ? $type . '_multiple' : $type ] ?? $types_info[ $type ] ?? '',
+            'reepay-subscriptions-for-woocommerce' );
 		$ret      = '';
 		if ( ! empty( $type_str ) ) {
 			$ret = sprintf(
@@ -826,9 +827,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 		if ( ! empty( $trial['type'] ) ) {
 			if ( $trial['type'] != 'customize' ) {
-				$ret = 'Trial period: ' . WC_Reepay_Subscription_Plan_Simple::$trial[ $trial['type'] ];
+				$ret = __( 'Trial period:', 'reepay-subscriptions-for-woocommerce' ). ' ' . __( self::$trial[ $trial['type'] ], 'reepay-subscriptions-for-woocommerce' );
 			} else {
-				$ret = 'Trial period: ' . $trial['length'] . ' ' . $trial['unit'];
+				$ret = __( 'Trial period:', 'reepay-subscriptions-for-woocommerce' ) . ' ' . $trial['length'] . ' ' . $trial['unit'];
 			}
 		}
 
@@ -860,7 +861,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$plan    = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true );
 		$ret     = '';
 		if ( ! empty( $periods ) ) {
-			$ret = __( 'Contract Period' ) . ': ' . $periods . ' x ' . $plan;
+			$ret = __( 'Contract Period', 'reepay-subscriptions-for-woocommerce' ) . ': ' . $periods . ' x ' . $plan;
 		}
 
 		return $ret;
