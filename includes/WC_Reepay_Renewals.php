@@ -214,7 +214,7 @@ class WC_Reepay_Renewals {
 
 	/**
 	 *
-	 * @param  array[
+	 * @param array[
 	 *     'id' => string
 	 *     'timestamp' => string
 	 *     'signature' => string
@@ -224,6 +224,8 @@ class WC_Reepay_Renewals {
 	 *     'event_type' => string
 	 *     'event_id' => string
 	 * ] $data
+	 *
+	 * @throws WC_Data_Exception
 	 */
 	public function create_subscriptions_handle( $data ) {
 		if ( $data['event_type'] == 'invoice_authorized' || $data['event_type'] == 'invoice_settled' ) {
@@ -693,7 +695,7 @@ class WC_Reepay_Renewals {
 		// override amount if WPC Product Bundles for WooCommerce
 		if ( ! empty( $order_item->get_meta( '_woosb_parent_id' ) ) && function_exists('rp_prepare_amount') ) {
 			$order_item_data = $order_item->get_data();
-			$total = $order_item_data['total'];
+			$total = (float) $order_item_data['total'] + (float) ($order_item_data['total_tax'] ?? 0);
 			$subtotal = $total / $order_item_quantity;
 			$sub_data['amount'] = rp_prepare_amount( $subtotal, $main_order->get_currency() );
 		}
@@ -1171,13 +1173,14 @@ class WC_Reepay_Renewals {
 
 		return true;
 	}
-
+	
 	/**
-	 * @param  array  $order_args  Order arguments.
-	 * @param  WC_Order  $main_order  Order arguments.
-	 * @param  array<WC_Order_Item>  $items
+	 * @param array $order_args Order arguments.
+	 * @param WC_Order $main_order Order arguments.
+	 * @param array<WC_Order_Item> $items
 	 *
 	 * @return WC_Order|WP_Error
+	 * @throws WC_Data_Exception
 	 */
 	public static function create_order_copy(
 		$order_args,
