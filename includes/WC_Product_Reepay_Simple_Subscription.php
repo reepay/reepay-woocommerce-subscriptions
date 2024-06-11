@@ -8,15 +8,14 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 	/**
 	 * Returns the price in html format.
 	 *
-	 * @param  string  $deprecated  Deprecated param.
+	 * @param string $deprecated Deprecated param.
 	 *
 	 * @return string
 	 */
 	public function get_price_html( $deprecated = '' ) {
 		$args['currency'] = $this->get_currency();
 
-		$price = wc_price( wc_get_price_to_display( $this ),
-				$args ) . $this->get_price_suffix();
+		$price = wc_price( wc_get_price_to_display( $this ), $args ) . $this->get_price_suffix();
 
 		$price = apply_filters( 'woocommerce_get_price_html', $price, $this );
 
@@ -36,12 +35,12 @@ class WC_Product_Reepay_Simple_Subscription extends WC_Product_Simple {
 	}
 
 	/**
-	 * @param  string  $price_html
-	 * @param  WC_Product  $product
+	 * @param string $price_html
+	 * @param WC_Product $product
 	 *
 	 * @return string
 	 */
-	public static function format_price( $price_html, $product ) {
+	public static function format_price( string $price_html, WC_Product $product ): string {
 		$schedule_type = WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $product, true );
 
 		if ( empty( $schedule_type ) || empty( $price_html ) ) {

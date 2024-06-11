@@ -81,9 +81,9 @@ class WC_Reepay_Subscription_Plan_Simple {
 		add_action( 'save_post', [ $this, 'set_sold_individual' ], PHP_INT_MAX );
 		add_filter( 'woocommerce_get_order_item_totals', [ $this, 'rework_total' ], 10, 3 );
 
-		add_filter( 'woocommerce_cart_item_price', [ $this, 'format_price' ], 10, 2 );
-		add_filter( 'woocommerce_cart_item_subtotal', [ $this, 'format_price' ], 10, 2 );
-		add_filter( 'woocommerce_order_formatted_line_subtotal', [ $this, 'format_price' ], 10, 3 );
+		add_filter( 'woocommerce_cart_item_price', [ $this, 'cart_item_price_formatting' ], 10, 3 );
+		add_filter( 'woocommerce_cart_item_subtotal', [ $this, 'cart_item_price_formatting' ], 10, 3 );
+		add_filter( 'woocommerce_order_formatted_line_subtotal', [ $this, 'order_item_price_formatting' ], 10, 2 );
 
 		add_action( 'woocommerce_before_calculate_totals', [ $this, 'add_setup_fee' ] );
 
@@ -254,23 +254,62 @@ class WC_Reepay_Subscription_Plan_Simple {
 		return $types;
 	}
 
+    /**
+     * @param string $price
+     * @param array $cart_item
+     * @param string $cart_item_key
+     *
+     * @return string
+     */
+    public function cart_item_price_formatting(string $price, array $cart_item, string $cart_item_key): string
+    {
+        $product = $cart_item['data'];
+
+        if ( empty( $product ) || ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
+            return $price;
+        }
+
+        if ( $product->is_type( 'variation' ) ) {
+            return WC_Product_Reepay_Simple_Subscription::format_price( $product->get_price_html(), $product );
+        }
+
+        return $product->get_price_html();
+    }
+
 	/**
-	 * @param  string  $price
-	 * @param  array<string, mixed>  $product
+	 * @param string $subtotal
+	 * @param array|WC_Order_Item_Product $item
 	 *
 	 * @return string
 	 */
-	public function format_price( $price, $product ) {
-		$product = wc_get_product( $product['variation_id'] ?: $product['product_id'] );
+	public function order_item_price_formatting(string $subtotal, $item ): string {
+
+		if ( is_a( $item, 'WC_Order_Item_Product' ) ) {
+			$product = $item->get_product();
+		} else {
+			$product = wc_get_product( $item['variation_id'] ?: $item['product_id'] );
+		}
 
 		if ( empty( $product ) || ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
-			return $price;
+			return $subtotal;
 		}
 
 		if ( $product->is_type( 'variation' ) ) {
 			return WC_Product_Reepay_Simple_Subscription::format_price( $product->get_price_html(), $product );
 		}
 
+		if ( is_a( $product, 'WC_Product_Reepay_Simple_Subscription' ) ) {
+			$quantity         = $item->get_quantity();
+			$total = $item->get_total();
+			$tax = $item->get_total_tax();
+			$args['currency'] = $product->get_currency();
+			$price            = wc_price(
+				                    $quantity > 0 ? ($total + $tax) / $quantity : 0,
+				                    $args
+			                    ) . $product->get_price_suffix();
+
+			return $product::format_price( $price, $product );
+		}
 
 		return $product->get_price_html();
 	}
