@@ -300,9 +300,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 		if ( is_a( $product, 'WC_Product_Reepay_Simple_Subscription' ) ) {
 			$quantity         = $item->get_quantity();
+			$total = $item->get_total();
+			$tax = $item->get_total_tax();
 			$args['currency'] = $product->get_currency();
 			$price            = wc_price(
-				                    $quantity > 0 ? $item->get_total() / $quantity : 0,
+				                    $quantity > 0 ? ($total + $tax) / $quantity : 0,
 				                    $args
 			                    ) . $product->get_price_suffix();
 
