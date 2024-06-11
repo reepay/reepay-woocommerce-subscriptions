@@ -193,27 +193,25 @@ class WooCommerce_Reepay_Subscriptions
     public function disable_emails(string $recipient, $order): string
     {
 	    $page = $_GET['page'] = $_GET['page'] ?? '';
-	    if ( 'wc-settings' === $page || ! is_a( 'WC_Order', $order ) ) {
+	    if ( 'wc-settings' === $page || ! is_a( $order, 'WC_Order' ) ) {
 		    return $recipient;
 	    }
 
 	    $parent_id = $order->get_parent_id();
         $is_sub_order = $parent_id != 0;
-        if ( self::$settings['_reepay_disable_sub_mails'] ) {
-	        if ( ! $is_sub_order ) {
-		        $is_subscription = $order->get_meta('_reepay_is_subscription');
-		        if ( ! empty($is_subscription) ) {
-			        $recipient = '';
-		        }
-	        }
+
+        if ( ! $is_sub_order && self::$settings['_reepay_disable_sub_mails'] ) {
+            $is_subscription = $order->get_meta('_reepay_is_subscription');
+            if ( ! empty($is_subscription) ) {
+                $recipient = '';
+            }
         }
-        if ( self::$settings['_reepay_disable_sub_mails_renewals'] ) {
-            if ( $is_sub_order ) {
-                $parent_order = wc_get_order($parent_id);
-	            $is_subscription_parent_order = $parent_order->get_meta('_reepay_is_subscription');
-	            if ( ! empty($is_subscription_parent_order) ) {
-		            $recipient = '';
-	            }
+
+        if ( $is_sub_order && self::$settings['_reepay_disable_sub_mails_renewals'] ) {
+            $parent_order = wc_get_order($parent_id);
+            $is_subscription_parent_order = $parent_order->get_meta('_reepay_is_subscription');
+            if ( ! empty($is_subscription_parent_order) ) {
+                $recipient = '';
             }
         }
 

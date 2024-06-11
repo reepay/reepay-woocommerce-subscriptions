@@ -1049,6 +1049,7 @@ class WC_Reepay_Renewals {
 		}
 
 		if ( empty( $invoice_data ) ) {
+			// @TODO ?
 			$invoice_data = $gateway->api->get_invoice_by_handle( $data['invoice'] );
 		}
 
@@ -1189,8 +1190,9 @@ class WC_Reepay_Renewals {
 		$calc_taxes = true,
 		$invoice_data = false
 	) {
+		add_filter( 'woocommerce_email_enabled_new_order', '__return_false' );
+		add_filter( 'woocommerce_email_enabled_customer_completed_order', '__return_false' );
 		$new_order = wc_create_order( $order_args );
-		$new_order->save();
 
 		if ( $main_order ) {
 			$main_order = wc_get_order( $main_order );
@@ -1390,6 +1392,15 @@ class WC_Reepay_Renewals {
 
 		$new_order->save();
 		$new_order->calculate_totals( $calc_taxes );
+
+		remove_filter( 'woocommerce_email_enabled_new_order', '__return_false' );
+		remove_filter( 'woocommerce_email_enabled_customer_completed_order', '__return_false' );
+		// Send notifications manually
+		// Send notification of a new order
+		$new_order_email = WC()->mailer()->get_emails()['WC_Email_New_Order'];
+		if ( $new_order_email ) {
+			$new_order_email->trigger( $new_order->get_id() );
+		}
 
 		return $new_order;
 	}
