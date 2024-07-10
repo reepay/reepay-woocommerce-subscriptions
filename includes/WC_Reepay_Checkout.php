@@ -151,6 +151,7 @@ class WC_Reepay_Checkout {
 		
 		if ( $product->is_type( 'variation' ) ) {
 			$product = wc_get_product( $product->get_parent_id() );
+			$type = $product->get_type();
 		}
 		
 		return str_contains( $type, 'reepay' );
