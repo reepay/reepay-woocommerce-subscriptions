@@ -198,7 +198,7 @@ class WC_Reepay_Import_Helpers {
 		$order->set_billing_company( $customer['company'] ?? '' );
 
 		$order->set_payment_method( 'reepay_checkout' );
-		$order->set_payment_method_title( 'Billwerk+ Checkout' );
+		$order->set_payment_method_title( 'Billwerk+ Pay Checkout' );
 		$order->set_currency( $plan['currency'] ?? '' );
 		$order->add_meta_data( '_reepay_state_authorized', 1 );
 

@@ -45,7 +45,7 @@ class WC_Reepay_Subscriptions_Update {
             <div id="message" class="error">
                 <p>
 					<?php
-					echo esc_html__( 'Warning! WooCommerce Billwerk+ Subscriptions plugin requires to update the database structure.',
+					echo esc_html__( 'Warning! WooCommerce Billwerk+ Optimize plugin requires to update the database structure.',
 						'reepay-checkout-gateway' );
 					echo ' ' . sprintf( esc_html__( 'Please click %s here %s to start upgrade.',
 							'reepay-checkout-gateway' ),

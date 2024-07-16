@@ -78,7 +78,7 @@ class WC_Reepay_Subscription_API {
 		if( empty( $key ) ) {
 			throw new Exception(
 				sprintf(
-					__( 'Billwerk+: API key not specified. Specify it in <a href="%s" target="_blank">gateway settings</a>', 'reepay-checkout-gateway' ),
+					__( 'Billwerk+ Optimize: API key not specified. Specify it in <a href="%s" target="_blank">gateway settings</a>', 'reepay-checkout-gateway' ),
 					admin_url( 'admin.php?page=wc-settings&tab=checkout&section=reepay_checkout' )
 				),
 				401
@@ -129,7 +129,7 @@ class WC_Reepay_Subscription_API {
 				if ( mb_strpos( $body, 'Request rate limit exceeded', 0, 'UTF-8' ) !== false ) {
 					global $request_retry;
 					if ( $request_retry ) {
-						throw new Exception( __( 'Billwerk+: Request rate limit exceeded',
+						throw new Exception( __( 'Billwerk+ Optimize: Request rate limit exceeded',
 							'reepay-subscriptions-for-woocommerce' ) );
 					}
 
