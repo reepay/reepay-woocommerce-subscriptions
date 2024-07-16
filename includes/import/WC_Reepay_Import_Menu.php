@@ -20,8 +20,8 @@ class WC_Reepay_Import_Menu {
 	function create_submenu() {
 		add_submenu_page(
 			'tools.php',
-			__( 'Billwerk+ Import' ),
-			__( 'Billwerk+ Import' ),
+			__( 'Billwerk+ Optimize Import' ),
+			__( 'Billwerk+ Optimize Import' ),
 			'manage_options',
 			self::$menu_slug,
 			[ $this, 'print_import_page' ],

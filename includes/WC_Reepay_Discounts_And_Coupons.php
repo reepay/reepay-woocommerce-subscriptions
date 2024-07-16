@@ -456,7 +456,7 @@ class WC_Reepay_Discounts_And_Coupons
         if ( ! $coupon->is_type('reepay_type')) {
             foreach ($discounts->get_items_to_validate() as $item) {
                 if (WC_Reepay_Checkout::is_reepay_product($item->product)) {
-                    throw new Exception(__('Sorry, only Billwerk+ coupons available for this product.'),
+                    throw new Exception(__('Sorry, only Billwerk+ Optimize coupons available for this product.'),
                         113);
                 }
             }
@@ -553,7 +553,7 @@ class WC_Reepay_Discounts_And_Coupons
     public function add_coupon_types($discount_types)
     {
         return array_merge($discount_types, [
-            'reepay_type' => __('Billwerk+ discount'),
+            'reepay_type' => __('Billwerk+ Optimize discount'),
         ]);
     }
 

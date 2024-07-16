@@ -1,12 +1,12 @@
-# Billwerk+ Subscriptions for WooCommerce plugin
+# Billwerk+ Optimize
 
-The Official Billwerk+ Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
+The Official Billwerk+ Optimize Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
 and
 install.
 
 Use the billwerk+ plugin for:
 
-* Integration Woocommerce with Billwerk+ subscriptions
+* Integration Woocommerce with Billwerk+ Optimize
 
 # Supported versions
 
