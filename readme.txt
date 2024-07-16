@@ -63,7 +63,13 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
-v 1.2.6 - Change all mentions of "Billwerk+ Subscriptions" to "Billwerk+ Optimize".
+v 1.2.6 - 
+* [Improvement] Product name change to "Billwerk+ Subscriptions" to "Billwerk+ Optimize".
+* [Fix] - Subscription variable product coming in as regular orders.
+* [Fix] - Missing billing address on split-off subscription orders.
+* [Fix] - Mixed orders: Deactivating new order emails for subscriptions also deactivates emails for regular orders.
+* [Compatibility] - Billwerk+ Pay version 1.7.6
+
 v 1.2.5 - Add Bundles support
 v 1.2.4 - Add extra option for emails
 v 1.2.3 - HPOS support
