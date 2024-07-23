@@ -231,7 +231,7 @@ class WC_Reepay_Renewals {
         if ( $data['event_type'] == 'invoice_authorized' || $data['event_type'] == 'invoice_settled' ) {
             $order = rp_get_order_by_handle( $data['invoice'] );
         } elseif ( $data['event_type'] == 'customer_payment_method_added' ) {
-            $order = rp_get_order_by_session( $data['payment_method_reference'] );
+            $order = rp_get_order_by_session( $data['payment_method_reference'], $data['customer'] );
         } else {
             return;
         }
