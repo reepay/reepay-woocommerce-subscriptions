@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.5.3
 Requires PHP: 7.4
-Stable tag: 1.2.6
+Stable tag: 1.2.6.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,6 +63,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.6.1 - 
+* [Fix] - The Billwerk+ webhook customer_payment_method_added is missing the payment_method_reference data and create a new rule to address this issue.
+
 v 1.2.6 - 
 * [Improvement] Product name change to "Billwerk+ Subscriptions" to "Billwerk+ Optimize".
 * [Fix] - Subscription variable product coming in as regular orders.
