@@ -49,6 +49,8 @@ class WC_Reepay_Discounts_And_Coupons
         add_filter("woocommerce_coupon_error", [$this, "plugin_coupon_error_message"], 10, 3);
 
         add_action('woocommerce_after_order_object_save', [$this, "on_order_save"]);
+
+        add_action('reepay_subscriptions_orders_created', [$this,"remove_billwerk_coupon_main_order_after_subscriptions_orders_created"], 10, 2);
     }
 
     public function init()
@@ -453,55 +455,76 @@ class WC_Reepay_Discounts_And_Coupons
      */
     function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts)
     {
-        if ( ! $coupon->is_type('reepay_type')) {
+        if ( $coupon->is_type('reepay_type')) {
+            $has_reepay_product = false;
             foreach ($discounts->get_items_to_validate() as $item) {
                 if (WC_Reepay_Checkout::is_reepay_product($item->product)) {
-                    throw new Exception(__('Sorry, only Billwerk+ Optimize coupons available for this product.'),
-                        113);
+                    $has_reepay_product = true;
                 }
             }
 
-            return $valid;
-        }
+            if( $has_reepay_product === false ){
+                throw new Exception(__(sprintf('Sorry, This coupon "%s" available only Billwerk+ Optimize subscription',$coupon->get_code())), 113);
+            }
 
-        $apply_to_plans     = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
-        $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
-        $apply              = false;
-        if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
-            foreach ($discounts->get_items_to_validate() as $item) {
-                $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
-                if ($valid) {
-                    $apply = true;
-                    break;
+            if($has_reepay_product){
+                $apply_to_plans     = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
+                $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+                $apply              = false;
+                if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
+                    foreach ($discounts->get_items_to_validate() as $item) {
+                        $valid = $this->validate_applied_for_plans($item->product, $apply_to_plans);
+                        if ($valid) {
+                            $apply = true;
+                            break;
+                        }
+                    }
                 }
+
+                if ($apply_to_all_plans === '0' && ! $apply) {
+                    throw new Exception(__('Sorry, this coupon is not applicable to the products'), 113);
+                }
+
+                $coupon_code_real = static::get_coupon_code_real($coupon);
+
+                $check_coupon = self::coupon_can_be_applied($coupon_code_real);
+
+                if (true === $check_coupon) {
+                    return true;
+                }
+
+                throw new Exception($check_coupon->get_error_message());
             }
         }
 
-        if ($apply_to_all_plans === '0' && ! $apply) {
-            throw new Exception(__('Sorry, this coupon is not applicable to the products'), 113);
-        }
-
-        $coupon_code_real = static::get_coupon_code_real($coupon);
-
-        $check_coupon = self::coupon_can_be_applied($coupon_code_real);
-
-        if (true === $check_coupon) {
-            return true;
-        }
-
-        throw new Exception($check_coupon->get_error_message());
+        return $valid;
     }
 
     function validate_coupon_for_product($valid, WC_Product $product, WC_Coupon $coupon, $values)
     {
-        if ($coupon->is_type('reepay_type')) {
-            return true;
+        /**
+         * Check coupon is not reepay type and not allow to use with supscription.
+         */
+        if ( ! $coupon->is_type('reepay_type')) {
+            if (WC_Reepay_Checkout::is_reepay_product($product)) {
+                return false;
+            }
         }
 
-        $apply_to_plans     = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
-        $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
-        if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
-            if ( ! $this->validate_applied_for_plans($product, $apply_to_plans)) {
+        /**
+         * Check coupon is reepay type and allow to use with supscription.
+         */
+        if ( $coupon->is_type('reepay_type')) {
+            if (WC_Reepay_Checkout::is_reepay_product($product)) {
+                $apply_to_plans     = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
+                $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
+                if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
+                    if ( ! $this->validate_applied_for_plans($product, $apply_to_plans)) {
+                        return false;
+                    }
+                }
+                return true;
+            }else{
                 return false;
             }
         }
@@ -587,6 +610,20 @@ class WC_Reepay_Discounts_And_Coupons
             return true;
         } catch (Exception $e) {
             return new WP_Error(404, __('This coupon cannot be used. '.$e->getMessage()));
+        }
+    }
+
+    public function remove_billwerk_coupon_main_order_after_subscriptions_orders_created($created_reepay_order_ids, $main_order){
+        $order = new WC_Order( $main_order->get_id() );
+        $coupons = $order->get_items( 'coupon' );
+        if ( $coupons ){
+            foreach ( $coupons as $item_id => $item ){
+                $coupon = new WC_Coupon($item->get_code());
+                if ( $coupon->is_type('reepay_type')) {
+                    $order->remove_coupon($coupon->get_code());
+                }
+            }
+            $order->save();
         }
     }
 }
