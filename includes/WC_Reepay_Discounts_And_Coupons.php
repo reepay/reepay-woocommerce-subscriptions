@@ -614,16 +614,34 @@ class WC_Reepay_Discounts_And_Coupons
     }
 
     public function remove_billwerk_coupon_main_order_after_subscriptions_orders_created($created_reepay_order_ids, $main_order){
+        /**
+         * Check order is reepay product order
+         */
+        $has_reepay_product = false;
         $order = new WC_Order( $main_order->get_id() );
-        $coupons = $order->get_items( 'coupon' );
-        if ( $coupons ){
-            foreach ( $coupons as $item_id => $item ){
-                $coupon = new WC_Coupon($item->get_code());
-                if ( $coupon->is_type('reepay_type')) {
-                    $order->remove_coupon($coupon->get_code());
-                }
+        foreach ($order->get_items() as $order_item) {
+            $product = $order_item->get_product();
+            // Check for subscription product
+            if (WC_Reepay_Checkout::is_reepay_product($product)) {
+                $has_reepay_product= true;
+                break;
             }
-            $order->save();
+        }
+
+        /**
+         * Remove reepay coupon from simple product order in main order.
+         */
+        if( $has_reepay_product === false ){
+            $coupons = $order->get_items( 'coupon' );
+            if ( $coupons ){
+                foreach ( $coupons as $item_id => $item ){
+                    $coupon = new WC_Coupon($item->get_code());
+                    if ( $coupon->is_type('reepay_type')) {
+                        $order->remove_coupon($coupon->get_code());
+                    }
+                }
+                $order->save();
+            }
         }
     }
 }
