@@ -764,7 +764,7 @@ class WooCommerce_Reepay_Subscriptions
 
                 $page_subscription_terms = get_option('_reepay_page_subscription_terms');
                 if($page_subscription_terms !== '0'){
-                    $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="woocommerce-terms-and-conditions-link" target="_blank">'.get_the_title($page_subscription_terms).'<a>';
+                    $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="woocommerce-terms-and-conditions-link" target="_blank">subscription terms<a>';
                     $find_replace = array(
                         '[billwerk_optimize_terms]' => $billwerk_optimize_terms,
                     );
