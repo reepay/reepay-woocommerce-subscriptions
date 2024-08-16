@@ -65,6 +65,7 @@ Standard Billwerk+ Optimize features:
 == Changelog ==
 v 1.2.7.1
 * [Fix] - WC discount coupons don't work on mixed orders.
+* [Fix] - Shipping fee as add-on does not work
 * [Improvement] - Enable extra checkbox in WC standard checkout for Billwerk+ Optimize subscription conditions
 
 v 1.2.7 -
