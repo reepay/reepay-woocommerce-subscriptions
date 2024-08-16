@@ -63,17 +63,13 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
-<<<<<<< HEAD
-v 1.2.6.1 - 
-* [Fix] - The Billwerk+ webhook customer_payment_method_added is missing the payment_method_reference data and create a new rule to address this issue.
-=======
 v 1.2.7.1
 * [Fix] - WC discount coupons don't work on mixed orders.
+* [Improvement] - Enable extra checkbox in WC standard checkout for Billwerk+ Optimize subscription conditions
 
 v 1.2.7 -
 * [Fix] - Missing payment_method_reference data in the Billwerk+ customer_payment_method_added webhook could cause PHP fatal error. Subscriptions would not be created when this happened.
 * [Compatibility] - Billwerk+ Pay version 1.7.7
->>>>>>> BWSM-32
 
 v 1.2.6 - 
 * [Improvement] Product name change to "Billwerk+ Subscriptions" to "Billwerk+ Optimize".
