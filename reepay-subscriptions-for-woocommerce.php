@@ -820,23 +820,36 @@ class WooCommerce_Reepay_Subscriptions
      * Dispay subscripton terms value at order description
      */
     public function subscription_terms_display_admin_order_meta($order){
-        $subscription_terms = get_post_meta($order->get_id(), '_subscription_terms', true);
         $has_reepay_product = false;
-        foreach ( $order->get_items() as $item ) {
-            $product_id = $item->get_product_id();
-            if ($product_id === 0) {
-                $parent_id = $order->get_parent_id();
-                if ( $parent_id !== 0 ) {
-                    $order_parent = wc_get_order( $parent_id );
-                    foreach ( $order_parent->get_items() as $parent_item ) {
-                        $product_id = $parent_item->get_product_id();
-                    }
-				}
+        $subscription_terms = get_post_meta($order->get_id(), '_subscription_terms', true);
+        $parent_id = $order->get_parent_id();
+        if($parent_id !== 0){
+            $subscription_terms = get_post_meta($parent_id, '_subscription_terms', true);
+            $order_parent = wc_get_order( $parent_id );
+            foreach ( $order_parent->get_items() as $parent_item ) {
+                $product_id = $parent_item->get_product_id();
             }
-            
+
             if (WC_Reepay_Checkout::is_reepay_product($product_id)) {
                 $has_reepay_product= true;
-                break;
+            }
+        }else{
+            foreach ( $order->get_items() as $item ) {
+                $product_id = $item->get_product_id();
+                if ($product_id === 0) {
+                    $parent_id = $order->get_parent_id();
+                    if ( $parent_id !== 0 ) {
+                        $order_parent = wc_get_order( $parent_id );
+                        foreach ( $order_parent->get_items() as $parent_item ) {
+                            $product_id = $parent_item->get_product_id();
+                        }
+                    }
+                }
+                
+                if (WC_Reepay_Checkout::is_reepay_product($product_id)) {
+                    $has_reepay_product= true;
+                    break;
+                }
             }
         }
         if ($has_reepay_product){
