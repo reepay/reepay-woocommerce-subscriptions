@@ -527,25 +527,25 @@ class WooCommerce_Reepay_Subscriptions
                 'id'   => '_reepay_disable_sub_mails_renewals'
             ],
             '_reepay_enable_subscription_terms'         => [
-                'name' => __('Enabled terms conditions', 'reepay-subscriptions-for-woocommerce'),
+                'name' => __('Enable Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'checkbox',
-                'desc' => __('Enabled Billwerk+ Optimize terms conditions', 'reepay-subscriptions-for-woocommerce'),
+                'desc' => __('Enable Billwerk+ Optimize Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'id'   => '_reepay_enable_subscription_terms'
             ],
             '_reepay_page_subscription_terms'         => [
-                'name' => __('Page terms conditions', 'reepay-subscriptions-for-woocommerce'),
+                'name' => __('Page Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type'    => 'select',
                 'options' => static::$page_subscription_terms_options,
-                'desc' => sprintf(__('Select page for Billwerk+ Optimize terms conditions.<br><a href="%1$s">Check out our privacy policy guide</a> for recommendations on what content to include.', 'reepay-subscriptions-for-woocommerce'), 
+                'desc' => sprintf(__('Select the page for Billwerk+ Optimize terms and conditions.<br><a href="%1$s">Check out our privacy policy guide</a> for recommendations on what content to include.', 'reepay-subscriptions-for-woocommerce'), 
                     esc_url( admin_url( 'options-privacy.php?tab=policyguide' ) ) 
                 ),
                 'id'   => '_reepay_page_subscription_terms'
             ],
             '_reepay_subscription_terms'                => [
-                'name' => __('Checkout Billwerk+ Optimize terms conditions', 'reepay-subscriptions-for-woocommerce'),
+                'name' => __('Checkout Billwerk+ Optimize Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'textarea',
                 'placeholder' => 'I have read and agree to the [billwerk_optimize_terms]',
-                'desc' => __('<p class="description">Use this shortcode to automatically link to the Billwerk+ Optimize terms and conditions page. The short code : [billwerk_optimize_terms]', 'reepay-subscriptions-for-woocommerce'),
+                'desc' => __('<p class="description">Use this shortcode to automatically link to the Billwerk+ Optimize terms and conditions page : [billwerk_optimize_terms]', 'reepay-subscriptions-for-woocommerce'),
                 'id'   => '_reepay_subscription_terms',
                 'css' => "min-width: 50%; height: 75px;",
             ],
@@ -760,7 +760,7 @@ class WooCommerce_Reepay_Subscriptions
 
             // If the cart has the specific product type, display the checkbox
             if ($has_reepay_product) {
-                $label = get_option('_reepay_subscription_terms') ? get_option('_reepay_subscription_terms') : __('I have read and agree to the <a href="'.get_home_url().'/subscriptionterms" target="_blank">subscription terms</a>', 'reepay-subscriptions-for-woocommerce');
+                $label = get_option('_reepay_subscription_terms') ? get_option('_reepay_subscription_terms') : __('I have read and agree to the subscription terms', 'reepay-subscriptions-for-woocommerce');
 
                 $page_subscription_terms = get_option('_reepay_page_subscription_terms');
                 if($page_subscription_terms !== '0'){
