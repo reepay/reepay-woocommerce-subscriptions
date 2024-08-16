@@ -1622,7 +1622,7 @@ class WC_Reepay_Renewals {
                 'description'   => $shm_data['reepay_shipping_addon_description'],
                 'type'          => 'on_off',
                 'fixed_amount ' => true,
-                'amount'        => $shm_data['reepay_shipping_addon_amount'] ?? 0,
+                'amount'        => $shm_data['cost'] ? ($shm_data['cost'] * 100) :  0,
                 'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
                 'vat_type'      => wc_prices_include_tax(),
                 'handle'        => $shm_data['reepay_shipping_addon'],
