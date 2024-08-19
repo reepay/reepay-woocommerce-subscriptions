@@ -764,7 +764,7 @@ class WooCommerce_Reepay_Subscriptions
 
                 $page_subscription_terms = get_option('_reepay_page_subscription_terms');
                 if($page_subscription_terms !== '0'){
-                    $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="woocommerce-terms-and-conditions-link" target="_blank">subscription terms<a>';
+                    $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="woocommerce-terms-and-conditions-link" target="_blank">'.get_the_title($page_subscription_terms).'<a>';
                     $find_replace = array(
                         '[billwerk_optimize_terms]' => $billwerk_optimize_terms,
                     );
@@ -813,6 +813,19 @@ class WooCommerce_Reepay_Subscriptions
             $order->update_meta_data( '_subscription_terms', sanitize_text_field($_POST['subscription_terms']) );
             $order->save_meta_data();
             $order->save();
+        }
+    }
+
+    /**
+     * Add subscription terms meta to Billwerk+ optimize suborder
+     */
+    public function subscription_terms_checkbox_to_reepay_suborder($created_reepay_order_ids, $main_order){
+        if($created_reepay_order_ids){
+            $subscription_terms = get_post_meta($main_order->get_id(), '_subscription_terms', true);
+            foreach($created_reepay_order_ids as $created_reepay_order_id){
+                $order = new WC_Order( $created_reepay_order_id );
+                $order->add_meta_data( '_subscription_terms', $subscription_terms );
+            }
         }
     }
 
