@@ -456,8 +456,8 @@ class WC_Reepay_Discounts_And_Coupons
      */
     function validate_coupon($valid, WC_Coupon $coupon, WC_Discounts $discounts)
     {
+        $has_reepay_product = false;
         if ( $coupon->is_type('reepay_type')) {
-            $has_reepay_product = false;
             foreach ($discounts->get_items_to_validate() as $item) {
                 if (WC_Reepay_Checkout::is_reepay_product($item->product)) {
                     $has_reepay_product = true;
@@ -495,6 +495,15 @@ class WC_Reepay_Discounts_And_Coupons
                 }
 
                 throw new Exception($check_coupon->get_error_message());
+            }
+        }else{
+            foreach ($discounts->get_items_to_validate() as $item) {
+                if (WC_Reepay_Checkout::is_reepay_product($item->product)) {
+                    $has_reepay_product = true;
+                }
+            }
+            if( $has_reepay_product === true ){
+                throw new Exception(__(sprintf('Sorry, this coupon "%s" cannot be used with Billwerk+ Optimize subscriptions.',$coupon->get_code())), 113);
             }
         }
 
