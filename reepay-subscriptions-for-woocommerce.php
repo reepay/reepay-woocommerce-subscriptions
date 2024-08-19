@@ -817,6 +817,19 @@ class WooCommerce_Reepay_Subscriptions
     }
 
     /**
+     * Add subscription terms meta to Billwerk+ optimize suborder
+     */
+    public function subscription_terms_checkbox_to_reepay_suborder($created_reepay_order_ids, $main_order){
+        if($created_reepay_order_ids){
+            $subscription_terms = get_post_meta($main_order->get_id(), '_subscription_terms', true);
+            foreach($created_reepay_order_ids as $created_reepay_order_id){
+                $order = new WC_Order( $created_reepay_order_id );
+                $order->add_meta_data( '_subscription_terms', $subscription_terms );
+            }
+        }
+    }
+
+    /**
      * Dispay subscripton terms value at order description
      */
     public function subscription_terms_display_admin_order_meta($order){
