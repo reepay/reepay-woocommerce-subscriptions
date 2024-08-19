@@ -50,7 +50,8 @@ class WC_Reepay_Discounts_And_Coupons
 
         add_action('woocommerce_after_order_object_save', [$this, "on_order_save"]);
 
-        add_action('reepay_subscriptions_orders_created', [$this,"remove_billwerk_coupon_main_order_after_subscriptions_orders_created"], 10, 2);
+        // add_action('reepay_subscriptions_orders_created', [$this,"add_billwerk_coupon_to_reepay_sub_orders"], 10, 2);
+        add_action('reepay_subscriptions_orders_created', [$this,"remove_billwerk_coupon_main_order_after_subscriptions_orders_created"], 20, 2);
     }
 
     public function init()
@@ -613,6 +614,31 @@ class WC_Reepay_Discounts_And_Coupons
         }
     }
 
+    /**
+     * Assign coupon to billwerk subscription sub order, But not discount to order line need to investigate.
+     */
+    public function add_billwerk_coupon_to_reepay_sub_orders($created_reepay_order_ids, $main_order){
+        if($created_reepay_order_ids){
+            $coupons = $main_order->get_items( 'coupon' );
+            if ( $coupons ){
+                foreach($created_reepay_order_ids as $created_reepay_order_id){
+                    $order = new WC_Order( $created_reepay_order_id );
+                    foreach ( $coupons as $item_id => $item ){
+                        $coupon = new WC_Coupon($item->get_code());
+                        if ( $coupon->is_type('reepay_type')) {
+                            $order->apply_coupon($coupon->get_code());
+                            $order->calculate_totals( true );
+                            $order->save();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove billwerk coupon from mix order main order
+     */
     public function remove_billwerk_coupon_main_order_after_subscriptions_orders_created($created_reepay_order_ids, $main_order){
         /**
          * Check order is reepay product order
