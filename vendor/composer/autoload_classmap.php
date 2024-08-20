@@ -38,6 +38,7 @@ return array(
     'WC_Reepay_Subscription_Plan_Simple' => $baseDir . '/includes/WC_Reepay_Subscription_Plan_Simple.php',
     'WC_Reepay_Subscription_Plan_Simple_Rest' => $baseDir . '/includes/WC_Reepay_Subscription_Plan_Simple_Rest.php',
     'WC_Reepay_Subscription_Plan_Variable' => $baseDir . '/includes/WC_Reepay_Subscription_Plan_Variable.php',
+    'WC_Reepay_Subscription_Privacy' => $baseDir . '/includes/WC_Reepay_Subscription_Privacy.php',
     'WC_Reepay_Subscriptions_List' => $baseDir . '/includes/WC_Reepay_Subscriptions_List.php',
     'WC_Reepay_Subscriptions_Table' => $baseDir . '/includes/WC_Reepay_Subscriptions_Table.php',
     'WC_Reepay_Subscriptions_Update' => $baseDir . '/includes/update/WC_Reepay_Subscriptions_Update.php',
