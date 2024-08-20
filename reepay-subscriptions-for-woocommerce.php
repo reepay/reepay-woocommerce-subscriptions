@@ -205,6 +205,7 @@ class WooCommerce_Reepay_Subscriptions
         add_action('woocommerce_checkout_process', [$this, 'subscription_terms_checkbox_process'], 10);
         add_action('woocommerce_checkout_update_order_meta', [$this, 'subscription_terms_checkbox_order_meta'], 10);
         add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'subscription_terms_display_admin_order_meta'], 10, 1);
+        add_action('reepay_subscriptions_orders_created', [$this, 'subscription_terms_checkbox_to_reepay_suborder'], 10, 2);
     }
 
     public function support_HPOS()
@@ -851,6 +852,7 @@ class WooCommerce_Reepay_Subscriptions
             foreach($created_reepay_order_ids as $created_reepay_order_id){
                 $order = new WC_Order( $created_reepay_order_id );
                 $order->add_meta_data( '_subscription_terms', $subscription_terms );
+                $order->save();
             }
         }
     }
