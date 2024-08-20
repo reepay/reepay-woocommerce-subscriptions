@@ -2,9 +2,9 @@
 Contributors: reepaydenmark
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
-Tested up to: 6.5.3
+Tested up to: 6.6.1
 Requires PHP: 7.4
-Stable tag: 1.2.7.1
+Stable tag: 1.2.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,10 +63,10 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
-v 1.2.7.1
-* [Fix] - WC discount coupons don't work on mixed orders.
-* [Fix] - Shipping fee as add-on does not work
-* [Improvement] - Enable extra checkbox in WC standard checkout for Billwerk+ Optimize subscription conditions
+v 1.2.8 - 
+* [Fix] - Bug fix WC discount codes on mixed orders
+* [Fix] - Bug fix recurrent shipping fee for renewals
+* [Improvement] - Extra checkbox in WC standard checkout for subscription conditions
 
 v 1.2.7 -
 * [Fix] - Missing payment_method_reference data in the Billwerk+ customer_payment_method_added webhook could cause PHP fatal error. Subscriptions would not be created when this happened.
