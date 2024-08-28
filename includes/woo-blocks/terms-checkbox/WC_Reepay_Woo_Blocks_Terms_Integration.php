@@ -53,9 +53,10 @@ class WC_Reepay_Woo_Blocks_Terms_Integration implements IntegrationInterface {
 	 * @return void
 	 */
 	public function register_block_editor_scripts() {
-		$script_path       = '/build/index.js';
-		$script_url        = plugins_url( '/reepay-woocommerce-subscriptions/includes/woo-blocks/terms-checkbox' . $script_path );
-		$script_asset_path = plugins_url( 'includes/woo-blocks/terms-checkbox/build/index.asset.php' );
+		$script_path       = 'build/index.js';
+		$script_url 	   = plugin_dir_url( __FILE__ ).$script_path;
+		$script_asset_path = plugin_dir_path( __FILE__ ).'build/index.asset.php';
+
 		$script_asset      = file_exists( $script_asset_path )
 			? require $script_asset_path
 			: array(
@@ -78,9 +79,9 @@ class WC_Reepay_Woo_Blocks_Terms_Integration implements IntegrationInterface {
 	 * @return void
 	 */
 	public function register_block_frontend_scripts() {
-		$script_path       = '/build/wc-reepay-woo-blocks-terms.js';
-		$script_url        = plugins_url( '/reepay-woocommerce-subscriptions/includes/woo-blocks/terms-checkbox' . $script_path );
-		$script_asset_path = WP_PLUGIN_DIR . '/reepay-woocommerce-subscriptions/includes/woo-blocks/terms-checkbox/build/wc-reepay-woo-blocks-terms.asset.php';
+		$script_path       = 'build/wc-reepay-woo-blocks-terms.js';
+		$script_url 	   = plugin_dir_url( __FILE__ ).$script_path;
+		$script_asset_path = plugin_dir_path( __FILE__ ).'build/wc-reepay-woo-blocks-terms.asset.php';
 
 		$script_asset = file_exists( $script_asset_path )
 			? require $script_asset_path

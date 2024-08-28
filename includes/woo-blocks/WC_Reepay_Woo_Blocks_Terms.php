@@ -68,7 +68,7 @@ class WC_Reepay_Woo_Blocks_Terms {
 	 * Registers style to admin and front end.
 	 */
     public function wc_reepay_woo_blocks_terms_style(){
-        $style_path = plugins_url( '/reepay-woocommerce-subscriptions/includes/woo-blocks/terms-checkbox/build/style-index.css' );
+        $style_path = plugin_dir_url( __FILE__ ).'terms-checkbox/build/style-index.css';
         wp_enqueue_style(
             'wc-reepay-woo-blocks-terms-style',
             $style_path,
