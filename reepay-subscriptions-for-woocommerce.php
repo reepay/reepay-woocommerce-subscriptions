@@ -710,6 +710,7 @@ class WooCommerce_Reepay_Subscriptions
         new WC_Reepay_Memberships_Integrations();
         new WC_Reepay_Woo_Blocks();
         new WC_Reepay_Subscription_Currency();
+        new WC_Reepay_Woo_Blocks_Terms();
 
         add_action('plugins_loaded', function () {
             new WC_Reepay_Admin_Frontend();
@@ -779,7 +780,6 @@ class WooCommerce_Reepay_Subscriptions
             // If the cart has the specific product type, display the checkbox
             if ($has_reepay_product) {
                 echo '<div class="billwerk-optimize-terms-and-conditions-wrapper">';
-                $label = get_option('_reepay_subscription_terms') ? get_option('_reepay_subscription_terms') : __('I have read and agree to the subscription terms', 'reepay-subscriptions-for-woocommerce');
 
                 $page_subscription_terms = get_option('_reepay_page_subscription_terms');
                 if($page_subscription_terms !== '0'){
@@ -789,13 +789,9 @@ class WooCommerce_Reepay_Subscriptions
                     if ( $page && 'publish' === $page->post_status && $page->post_content && ! has_shortcode( $page->post_content, 'woocommerce_checkout' ) ) {
                         echo '<div class="billwerk-optimize-terms-and-conditions" style="display: none; max-height: 200px; overflow: auto; padding: 1em; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2); margin-bottom: 16px;background-color: rgba(0, 0, 0, .05);">' . wc_format_content( $sanitizer->styled_post_content( $page->post_content ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                     }
-
-                    $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="billwerk-optimize-terms-and-conditions-link" target="_blank">subscription terms<a>';
-                    $find_replace = array(
-                        '[billwerk_optimize_terms]' => $billwerk_optimize_terms,
-                    );
-                    $label = str_replace( array_keys( $find_replace ), array_values( $find_replace ), $label );
                 }
+
+                $label = $this->subscription_terms_checkbox_label();
 
                 woocommerce_form_field('subscription_terms', array(
                     'type'      => 'checkbox',
@@ -806,6 +802,22 @@ class WooCommerce_Reepay_Subscriptions
                 echo '<div>';
             }
         }
+    }
+
+    public static function subscription_terms_checkbox_label(){
+        $label = get_option('_reepay_subscription_terms') ? get_option('_reepay_subscription_terms') : __('I have read and agree to the subscription terms', 'reepay-subscriptions-for-woocommerce');
+        $page_subscription_terms = get_option('_reepay_page_subscription_terms');
+        if($page_subscription_terms !== '0'){
+            $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="billwerk-optimize-terms-and-conditions-link" target="_blank">'.__('subscription terms', 'reepay-subscriptions-for-woocommerce').'<a>';
+        } else {
+            $billwerk_optimize_terms = __('subscription terms', 'reepay-subscriptions-for-woocommerce');
+        }
+        $find_replace = array(
+            '[billwerk_optimize_terms]' => $billwerk_optimize_terms,
+        );
+        $label = str_replace( array_keys( $find_replace ), array_values( $find_replace ), $label );
+
+        return $label;
     }
 
     /**
