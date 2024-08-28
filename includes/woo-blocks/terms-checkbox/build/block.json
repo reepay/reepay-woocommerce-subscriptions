@@ -1,0 +1,29 @@
+{
+  "apiVersion": 3,
+  "name": "wc-reepay-woo-blocks-terms/checkbox",
+  "version": "1.0.0",
+  "title": "Subscription terms checkbox",
+  "description": "The subscription terms checkbox",
+  "parent": [
+    "woocommerce/checkout-fields-block"
+  ],
+  "category": "woocommerce",
+  "supports": {
+    "html": false,
+    "align": false,
+    "multiple": false,
+    "reusable": false
+  },
+  "attributes": {
+    "lock": {
+      "type": "object",
+      "default": {
+        "remove": true,
+        "move": true
+      }
+    }
+  },
+  "textdomain": "reepay-subscriptions-for-woocommerce",
+  "editorScript": "file:./build/index.js",
+  "editorStyle": "file:./build/style-index.css"
+}
