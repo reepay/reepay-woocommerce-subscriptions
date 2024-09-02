@@ -224,11 +224,12 @@ class WooCommerce_Reepay_Subscriptions
 	 */
     public function disable_emails(string $recipient, $order): string
     {
+        /*
 	    $page = $_GET['page'] = $_GET['page'] ?? '';
 	    if ( 'wc-settings' === $page || ! is_a( 'WC_Order', $order ) ) {
 		    return $recipient;
 	    }
-
+        */
 	    $parent_id = $order->get_parent_id();
         $is_sub_order = $parent_id != 0;
         if ( self::$settings['_reepay_disable_sub_mails'] ) {

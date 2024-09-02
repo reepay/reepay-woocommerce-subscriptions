@@ -332,3 +332,12 @@ woocommerce_wp_select(
 		'options'           => $roles,
 	]
 );
+
+woocommerce_wp_select(
+	[
+		'id'                => '_reepay_subscription_customer_role_expired' . ( isset( $loop ) ? "[$loop]" : '' ),
+		'value'             => $_reepay_subscription_customer_role_expired ?? '',
+		'label'             => __( 'Customer role after subscription expired', 'reepay-subscriptions-for-woocommerce' ),
+		'options'           => $roles,
+	]
+);
