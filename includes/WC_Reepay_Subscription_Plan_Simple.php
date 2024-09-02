@@ -54,6 +54,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		'_reepay_subscription_fee',
 		'_reepay_subscription_currency',
 		'_reepay_subscription_customer_role',
+		'_reepay_subscription_customer_role_expired',
 	];
 
 	/**
@@ -671,6 +672,13 @@ class WC_Reepay_Subscription_Plan_Simple {
 				$_POST['_reepay_subscription_customer_role'] );
 		} else {
 			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
+		}
+
+		if ( ! empty( $_POST['_reepay_subscription_customer_role_expired'] ) && $_POST['_reepay_subscription_customer_role_expired'] !== 'without_changes' ) {
+			update_post_meta( $post_id, '_reepay_subscription_customer_role_expired',
+				$_POST['_reepay_subscription_customer_role_expired'] );
+		} else {
+			delete_post_meta( $post_id, '_reepay_subscription_customer_role_expired' );
 		}
 	}
 
