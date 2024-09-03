@@ -230,26 +230,27 @@ class WooCommerce_Reepay_Subscriptions
 		    return $recipient;
 	    }
         */
-	    $parent_id = $order->get_parent_id();
-        $is_sub_order = $parent_id != 0;
-        if ( self::$settings['_reepay_disable_sub_mails'] ) {
-	        if ( ! $is_sub_order ) {
-		        $is_subscription = $order->get_meta('_reepay_is_subscription');
-		        if ( ! empty($is_subscription) ) {
-			        $recipient = '';
-		        }
-	        }
-        }
-        if ( self::$settings['_reepay_disable_sub_mails_renewals'] ) {
-            if ( $is_sub_order ) {
-                $parent_order = wc_get_order($parent_id);
-	            $is_subscription_parent_order = $parent_order->get_meta('_reepay_is_subscription');
-	            if ( ! empty($is_subscription_parent_order) ) {
-		            $recipient = '';
-	            }
+        if($order){
+            $parent_id = $order->get_parent_id();
+            $is_sub_order = $parent_id != 0;
+            if ( self::$settings['_reepay_disable_sub_mails'] ) {
+                if ( ! $is_sub_order ) {
+                    $is_subscription = $order->get_meta('_reepay_is_subscription');
+                    if ( ! empty($is_subscription) ) {
+                        $recipient = '';
+                    }
+                }
+            }
+            if ( self::$settings['_reepay_disable_sub_mails_renewals'] ) {
+                if ( $is_sub_order ) {
+                    $parent_order = wc_get_order($parent_id);
+                    $is_subscription_parent_order = $parent_order->get_meta('_reepay_is_subscription');
+                    if ( ! empty($is_subscription_parent_order) ) {
+                        $recipient = '';
+                    }
+                }
             }
         }
-
         return $recipient;
     }
 
