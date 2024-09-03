@@ -16,7 +16,6 @@ class WC_Reepay_Renewals {
 //		add_action( 'reepay_webhook_invoice_created', [ $this, 'renew_subscription' ] );
         add_action( 'reepay_webhook_raw_event_subscription_renewal', [ $this, 'renew_subscription' ] );
         add_action( 'reepay_webhook_raw_event_subscription_on_hold', [ $this, 'hold_subscription' ] );
-        add_action( 'reepay_webhook_raw_event_subscription_reactivated', [ $this, 'reactivated_subscription' ] );
         add_action( 'reepay_webhook_raw_event_subscription_cancelled', [ $this, 'cancel_subscription' ] );
         add_action( 'reepay_webhook_raw_event_subscription_uncancelled', [ $this, 'uncancel_subscription' ] );
 
@@ -813,25 +812,6 @@ class WC_Reepay_Renewals {
      */
     public function hold_subscription( $data ) {
         self::update_subscription_status( $data, 'wc-on-hold' );
-        self::change_user_role_expired( $data );
-    }
-
-    /**
-     *
-     * @param  array[
-     *     'id' => string
-     *     'timestamp' => string
-     *     'signature' => string
-     *     'subscription' => string
-     *     'customer' => string
-     *     'event_type' => string
-     *     'event_id' => string
-     * ] $data
-     */
-    public function reactivated_subscription( $data ) {
-        // self::update_subscription_status( $data, 'wc-completed' );
-        self::update_subscription_status( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
-        self::change_user_role( $data );
     }
 
     /**
@@ -848,7 +828,6 @@ class WC_Reepay_Renewals {
      */
     public function cancel_subscription( $data ) {
         self::update_subscription_status( $data, 'wc-cancelled' );
-        self::change_user_role_expired( $data );
     }
 
     /**
@@ -866,7 +845,6 @@ class WC_Reepay_Renewals {
     public function uncancel_subscription( $data ) {
         // self::update_subscription_status( $data, 'wc-completed' );
         self::update_subscription_status( $data, reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
-        self::change_user_role( $data );
     }
 
     /**
