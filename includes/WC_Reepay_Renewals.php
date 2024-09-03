@@ -490,6 +490,19 @@ class WC_Reepay_Renewals {
             }
 
             $order->add_meta_data( '_reepay_subscription_handle', $handle );
+
+            $new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
+                '_reepay_subscription_customer_role', true );
+            if ( ! empty( $new_role_for_customer ) ) {
+                $order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
+            }
+
+            $expired_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
+                '_reepay_subscription_customer_role_expired', true );
+            if ( ! empty( $expired_role_for_customer ) ) {
+                $order->add_meta_data( '_reepay_subscription_customer_role_expired', $expired_role_for_customer );
+            }
+
             $order->save();
 
             $created_reepay_order_ids[] = $order->get_id();
