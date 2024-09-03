@@ -533,7 +533,7 @@ class WooCommerce_Reepay_Subscriptions
             '_reepay_enable_subscription_terms'         => [
                 'name' => __('Enable Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'checkbox',
-                'desc' => __('Enable Billwerk+ Optimize Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
+                'desc' => __('Enable Billwerk+ Optimize Terms and Conditions', 'reepay-subscriptions-for-woocommerce').'<br>'.__('If you use WC "Blocks" for checkout please unlock in the front end and adjust the position and save and lock it again.', 'reepay-subscriptions-for-woocommerce'),
                 'id'   => '_reepay_enable_subscription_terms'
             ],
             '_reepay_page_subscription_terms'         => [
