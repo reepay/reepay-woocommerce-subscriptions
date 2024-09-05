@@ -491,18 +491,6 @@ class WC_Reepay_Renewals {
 
             $order->add_meta_data( '_reepay_subscription_handle', $handle );
 
-            $new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
-                '_reepay_subscription_customer_role', true );
-            if ( ! empty( $new_role_for_customer ) ) {
-                $order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
-            }
-
-            $expired_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
-                '_reepay_subscription_customer_role_expired', true );
-            if ( ! empty( $expired_role_for_customer ) ) {
-                $order->add_meta_data( '_reepay_subscription_customer_role_expired', $expired_role_for_customer );
-            }
-
             $order->save();
 
             $created_reepay_order_ids[] = $order->get_id();
@@ -539,17 +527,6 @@ class WC_Reepay_Renewals {
             }
             if ( ! WC_Reepay_Checkout::is_reepay_product( $product ) ) {
                 continue;
-            }
-            $new_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
-                '_reepay_subscription_customer_role', true );
-            if ( ! empty( $new_role_for_customer ) ) {
-                $main_order->add_meta_data( '_reepay_subscription_customer_role', $new_role_for_customer );
-            }
-
-            $expired_role_for_customer = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
-                '_reepay_subscription_customer_role_expired', true );
-            if ( ! empty( $expired_role_for_customer ) ) {
-                $main_order->add_meta_data( '_reepay_subscription_customer_role_expired', $expired_role_for_customer );
             }
 
             $items_to_create = [];
@@ -874,7 +851,7 @@ class WC_Reepay_Renewals {
      */
     public function expired_subscription( $data ) {
         self::update_subscription_status( $data, 'wc-cancelled' );
-        self::change_user_role_expired( $data );
+        self::change_user_role( $data );
     }
 
     /**
@@ -1455,7 +1432,24 @@ class WC_Reepay_Renewals {
             return new WP_Error( __( 'Order not found', 'reepay-subscriptions-for-woocommerce' ) );
         }
 
-        $new_role = $order->get_meta( '_reepay_subscription_customer_role' );
+        $order_item = self::is_order_contain_subscription( $order );
+        if ( ! $order_item ) {
+            return;
+        }
+        
+        if ( 'subscription_expired' === $data['event_type'] ) {
+            /**
+             * Set expired subscription user role
+             */
+            $new_role = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
+                '_reepay_subscription_customer_role_expired', true );
+        } else {
+            /**
+             * Set subscription user role
+             */
+            $new_role = get_post_meta( $order_item->get_variation_id() ?: $order_item->get_product_id(),
+                '_reepay_subscription_customer_role', true );
+        }
 
         if ( empty( $new_role ) || 'without_changes' === $new_role ) {
             return new WP_Error( __( 'Role change not required', 'reepay-subscriptions-for-woocommerce' ) );
@@ -1475,40 +1469,16 @@ class WC_Reepay_Renewals {
 
         $user->set_role( $new_role );
 
-        return true;
-    }
-
-    /**
-     * @param  array  $data  @see self::renew_subscription
-     *
-     * @return true|WP_Error
-     */
-    public static function change_user_role_expired( $data ){
-        $order = ! empty( $data['subscription'] ) ? self::get_order_by_subscription_handle( $data['subscription'] ) : '';
-
-        if ( empty( $order ) ) {
-            return new WP_Error( __( 'Order not found', 'reepay-subscriptions-for-woocommerce' ) );
-        }
-
-        $expired_role = $order->get_meta( '_reepay_subscription_customer_role_expired' );
-
-        if ( empty( $expired_role ) || 'without_changes' === $expired_role ) {
-            return new WP_Error( __( 'Role change not required', 'reepay-subscriptions-for-woocommerce' ) );
-        }
-
-        $customer_id = $order->get_customer_id();
-
-        if ( empty( $customer_id ) ) {
-            return new WP_Error( __( 'No customer in order', 'reepay-subscriptions-for-woocommerce' ) );
-        }
-
-        $user = get_userdata( $customer_id );
-
-        if ( empty( $user ) ) {
-            return new WP_Error( __( 'Wrong customer id', 'reepay-subscriptions-for-woocommerce' ) );
-        }
-
-        $user->set_role( $expired_role );
+        self::log( [
+            'log' => [
+                'source' => 'WC_Reepay_Renewals::change_user_role',
+                'subscription' => $data['subscription'],
+                'event_type' => $data['event_type'],
+                'order_id' => $order->get_id(),
+                'customer_id'   => $customer_id,
+                'new_role' => $new_role,
+            ]
+        ] );
 
         return true;
     }
