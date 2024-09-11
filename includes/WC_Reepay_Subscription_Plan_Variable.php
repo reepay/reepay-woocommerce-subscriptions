@@ -105,6 +105,13 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 		} else {
 			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
 		}
+
+		if ( ! empty( $_POST['_reepay_subscription_customer_role_expired'][ $i ] ) && $_POST['_reepay_subscription_customer_role_expired'][ $i ] !== 'without_changes' ) {
+			update_post_meta( $post_id, '_reepay_subscription_customer_role_expired',
+				$_POST['_reepay_subscription_customer_role_expired'][ $i ] );
+		} else {
+			delete_post_meta( $post_id, '_reepay_subscription_customer_role_expired' );
+		}
 	}
 
 	public function get_subscription_handle_from_request() {
