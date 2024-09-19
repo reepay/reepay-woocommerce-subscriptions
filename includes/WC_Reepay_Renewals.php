@@ -1142,7 +1142,7 @@ class WC_Reepay_Renewals {
                     $new_items[] = $fees_item;
                 } elseif( $invoice_lines['origin'] == 'discount' ) {
                     $discount_item = new WC_Order_Item_Coupon();
-                    $discount_item->set_code( $invoice_lines['origin_handle'] );
+                    $discount_item->set_code( $invoice_lines['ordertext'] );
                     $discount_item->set_discount( abs(floatval( $invoice_lines['unit_amount'] ) / 100) );
                     $new_items[] = $discount_item;
                 } else {
@@ -1447,15 +1447,16 @@ class WC_Reepay_Renewals {
 
             //coupon
             if ( $item->is_type( 'coupon' ) ) {
-                $item_coupon_origin_handle = $item->get_code();
-                $parts = explode('_', $item_coupon_origin_handle);
-                $item_coupon_code = $parts[0];
+                // $item_coupon_origin_handle = $item->get_code();
+                // $parts = explode('_', $item_coupon_origin_handle);
+                // $item_coupon_code = $parts[0];
+                $item_coupon_code = $item->get_code();
                 $coupon_item = new WC_Order_Item_Coupon();
                 
                 // To get coupon code from WP post type shop_coupon
                 $coupon_args = array(
                     'post_type'  => 'shop_coupon',
-                    'meta_key'   => '_reepay_coupon_handle',
+                    'meta_key'   => '_reepay_discount_handle',
                     'meta_value' => $item_coupon_code,
                     'fields'     => 'ids',
                 );
