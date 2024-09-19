@@ -723,9 +723,12 @@ class WC_Reepay_Renewals {
             $sub_data['add_ons'] = $data['addons'];
         }
 
+        // Disable add coupon discount double time in secound order.
+        /*
         if ( $main_order->get_id() !== $split_order->get_id() ) {
             $sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $data['handle'] );
         }
+        */
 
         // override amount if WPC Product Bundles for WooCommerce
         if ( ! empty( $order_item->get_meta( '_woosb_parent_id' ) ) && function_exists('rp_prepare_amount') ) {
