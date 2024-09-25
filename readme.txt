@@ -63,9 +63,12 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.9.1 - 
+* [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
+
 v 1.2.9 -
-- Enable extra checkbox in WC standard checkout for subscription conditions (BLOCKS checkout support)
-- Change user role for customers who stop subscribing to a product
+* [Improvement] – Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
+* [Improvement] – Change user role for customers who stop subscribing to a product
 
 v 1.2.8 - 
 * [Fix] - Bug fix WC discount codes on mixed orders
