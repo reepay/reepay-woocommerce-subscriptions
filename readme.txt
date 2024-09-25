@@ -64,11 +64,11 @@ Standard Billwerk+ Optimize features:
 
 == Changelog ==
 v 1.2.9.1 - 
-- Change the renewal order so that the saved discount is recorded as a negative order item fee, and save it as an order item discount instead.
+* [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
 
 v 1.2.9 -
-- Enable extra checkbox in WC standard checkout for subscription conditions (BLOCKS checkout support)
-- Change user role for customers who stop subscribing to a product
+* [Improvement] – Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
+* [Improvement] – Change user role for customers who stop subscribing to a product
 
 v 1.2.8 - 
 * [Fix] - Bug fix WC discount codes on mixed orders
