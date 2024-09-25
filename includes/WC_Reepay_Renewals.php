@@ -555,10 +555,15 @@ class WC_Reepay_Renewals {
                         $coupon_item->save();
                         $items_to_create[] = $coupon_item;
 
-                        $real_total = $main_order->get_meta( '_real_total' );
+                        $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
+                        $amount = $coupon->get_amount();
                         $discount = null;
-                        if( ! empty( $real_total ) ){
-                            $discount = $main_order->get_total() - $real_total;
+                        if ($amount >= 1) {
+                            if ($type === 'reepay_percentage') {
+                                $discount = $main_order->get_total() - ( $main_order->get_total() * ( $amount * 100 ) );
+                            } elseif ($type === 'reepay_fixed_product') {
+                                $discount = $main_order->get_total() - $amount;
+                            }
                         }
                     }
                 }
