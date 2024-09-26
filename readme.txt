@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.6.1
 Requires PHP: 7.4
-Stable tag: 1.2.9.1
+Stable tag: 1.2.9.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,6 +63,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.9.2 -
+* [Fix] - WebHook URL for plain permalink structure
+
 v 1.2.9.1 - 
 * [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
 
