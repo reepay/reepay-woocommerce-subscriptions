@@ -527,7 +527,7 @@ jQuery(function ($) {
             });
 
         $.ajax({
-            url: window.reepay.rest_urls.get_coupon + `?handle=${handle}`,
+            url: window.reepay.rest_urls.get_coupon + window.reepay.query_string + `handle=${handle}`,
             method: 'GET',
             beforeSend: function (xhr) {
 
@@ -701,7 +701,7 @@ jQuery(function ($) {
                     }
                 });
 
-            let url = `${window.reepay.rest_urls.get_coupon}?get_list=1`;
+            let url = `${window.reepay.rest_urls.get_coupon + window.reepay.query_string}get_list=1`;
 
             $.ajax({
                 url,
