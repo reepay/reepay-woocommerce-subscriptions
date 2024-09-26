@@ -676,6 +676,7 @@ class WooCommerce_Reepay_Subscriptions
                 'get_discount' => get_rest_url(0, reepay_s()->settings('rest_api_namespace')."/discount/"),
                 'get_addon'    => get_rest_url(0, reepay_s()->settings('rest_api_namespace')."/addon/"),
             ],
+            'query_string' => !empty(get_option( 'permalink_structure' )) ? '?' : '&',
             'i18n'                  => $i18n
         ]);
     }
