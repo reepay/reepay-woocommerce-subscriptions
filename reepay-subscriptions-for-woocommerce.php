@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Billwerk+ Optimize while still keeping your usual WooCommerce tools. The Billwerk+ Optimize for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: Billwerk+
  * Author URI: https://www.billwerk.plus/
- * Version: 1.2.9.1
+ * Version: 1.2.9.2
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -676,6 +676,7 @@ class WooCommerce_Reepay_Subscriptions
                 'get_discount' => get_rest_url(0, reepay_s()->settings('rest_api_namespace')."/discount/"),
                 'get_addon'    => get_rest_url(0, reepay_s()->settings('rest_api_namespace')."/addon/"),
             ],
+            'query_string' => !empty(get_option( 'permalink_structure' )) ? '?' : '&',
             'i18n'                  => $i18n
         ]);
     }
