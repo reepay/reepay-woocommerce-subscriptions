@@ -1323,6 +1323,7 @@ class WC_Reepay_Renewals {
             'reepay_masked_card',
             'reepay_session_id',
             'reepay_token',
+            '_reepay_coupon_code',
         ];
 
         $product_item_fields_to_copy = [
