@@ -541,6 +541,24 @@ class WC_Reepay_Renewals {
                 }
             }
 
+            // Add coupon to order
+            $discount = null;
+            $coupons = $main_order->get_items( 'coupon' );
+            if ( $coupons ){
+                foreach ( $coupons as $item_id => $item ){
+                    $coupon = new WC_Coupon($item->get_code());
+                    if ( $coupon->is_type('reepay_type')) {
+                        $items_to_create[] = $item;
+                        $main_order->add_meta_data( '_reepay_coupon_code', $item->get_code() );
+                        $main_order->save();
+                        $real_total = $main_order->get_meta( '_real_total' );
+                        if( ! empty( $real_total ) ){
+                            $discount = $main_order->get_total() - $real_total;
+                        }
+                    }
+                }
+            }
+
             $order_direct_quantity = $order_item_quantity;
             if ( $order_item_quantity > 1 && $is_exist_addon_type_on_off ) {
                 $addons_amount = 0;
@@ -556,7 +574,11 @@ class WC_Reepay_Renewals {
                     $total   = (string) ( (float) $product->get_price() + $addons_amount );
                     $new_product_item->set_variation_id( $order_item->get_variation_id() );
                     $new_product_item->set_subtotal( $total );
-                    $new_product_item->set_total( $total );
+                    if ( $discount !== null ) {
+                        $new_product_item->set_total( $total - $discount );
+                    } else {
+                        $new_product_item->set_total( $total );
+                    }
                     $order_direct_quantity --;
 
                     foreach ( $order_item->get_formatted_meta_data() as $meta_data ) {
@@ -696,9 +718,12 @@ class WC_Reepay_Renewals {
             $sub_data['add_ons'] = $data['addons'];
         }
 
+        // Disable add coupon discount double time in secound order.
+        /*
         if ( $main_order->get_id() !== $split_order->get_id() ) {
             $sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $data['handle'] );
         }
+        */
 
         // override amount if WPC Product Bundles for WooCommerce
         if ( ! empty( $order_item->get_meta( '_woosb_parent_id' ) ) && function_exists('rp_prepare_amount') ) {
@@ -1091,24 +1116,46 @@ class WC_Reepay_Renewals {
 
         if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
             $new_items = [];
+
+            // Get discount from order_lines
+            $discount_amount = null;
+            foreach ($invoice_data['order_lines'] as $discount_line) {
+                if ($discount_line['origin'] === 'discount') {
+                    $discount_amount = abs(floatval( $discount_line['amount'] ) / 100);
+                    break;
+                }
+            }
+
             foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
                 /*if ($invoice_lines['origin'] == 'discount') {
                     continue;
                 }*/
 
-                if ( $invoice_lines['origin'] == 'surcharge_fee' || $invoice_lines['origin'] == 'discount' ) {
+                if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
                     $fees_item = new WC_Order_Item_Fee();
                     $fees_item->set_name( $invoice_lines['ordertext'] );
                     $fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
                     $fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                     $fees_item->add_meta_data( '_is_card_fee', true );
                     $new_items[] = $fees_item;
+                } elseif( $invoice_lines['origin'] == 'discount' ) {
+                    $discount_item = new WC_Order_Item_Coupon();
+                    // $discount_item->set_code( $invoice_lines['ordertext'] );
+                    $discount_item->set_code( $invoice_lines['origin_handle'] );
+                    $discount_item->set_discount( abs(floatval( $invoice_lines['unit_amount'] ) / 100) );
+                    $new_items[] = $discount_item;
                 } else {
                     $product_item = new WC_Order_Item_Product();
                     $product_item->set_name( $invoice_lines['ordertext'] );
                     $product_item->set_quantity( $invoice_lines['quantity'] );
                     $product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-                    $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+                    if ( $discount_amount !== null ){
+                        $total = floatval( $invoice_lines['amount'] ) / 100;
+                        $total_with_discount = $total - $discount_amount;
+                        $product_item->set_total( $total_with_discount );
+                    }else{
+                        $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+                    }
                     $new_items[] = $product_item;
                 }
             }
@@ -1395,6 +1442,29 @@ class WC_Reepay_Renewals {
                 $fees_item->set_amount( $item->get_amount() );
                 $fees_item->set_total( $item->get_total() );
                 $new_order->add_item( $fees_item );
+            }
+
+            //coupon
+            if ( $item->is_type( 'coupon' ) ) {
+                $reepay_coupon_code = $main_order->get_meta( '_reepay_coupon_code' );
+                $coupon = new WC_Coupon($reepay_coupon_code);
+                $coupon_item = new WC_Order_Item_Coupon();
+                if ( $coupon->is_type('reepay_type')) {
+                    // WC version < 8.7
+                    if (defined('WC_VERSION') && version_compare(WC_VERSION, '8.7', '<')) {
+                        $coupon_data = $coupon->get_data();
+                        $coupon_item->add_meta_data( 'coupon_data', $coupon_data );
+                    } else {
+                        $coupon_info = $coupon->get_short_info();
+                        $coupon_item->add_meta_data( 'coupon_info', $coupon_info );
+                    }
+                    $coupon_item->set_code( $reepay_coupon_code );
+                $coupon_item->set_discount( $item->get_discount() );
+                // $coupon_item->set_discount_tax( 0 ); // If there is no tax
+
+                $coupon_item->save();
+                $new_order->add_item( $coupon_item );
+                }
             }
 
             //shipping

@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.6.1
 Requires PHP: 7.4
-Stable tag: 1.2.8.1
+Stable tag: 1.2.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,9 +63,12 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
-v 1.2.8.1 -
-* [Improvement] - Extra checkbox in WC block checkout for subscription conditions
-* [Improvement] - Able to change user role on a customer/WP member when a subscription is no longer active (expires)
+v 1.2.9.1 - 
+- Change the renewal order so that the saved discount is recorded as a negative order item fee, and save it as an order item discount instead.
+
+v 1.2.9 -
+- Enable extra checkbox in WC standard checkout for subscription conditions (BLOCKS checkout support)
+- Change user role for customers who stop subscribing to a product
 
 v 1.2.8 - 
 * [Fix] - Bug fix WC discount codes on mixed orders
