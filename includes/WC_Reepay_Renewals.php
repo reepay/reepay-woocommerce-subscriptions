@@ -574,9 +574,13 @@ class WC_Reepay_Renewals {
                     $total   = (string) ( (float) $product->get_price() + $addons_amount );
                     $new_product_item->set_variation_id( $order_item->get_variation_id() );
                     $new_product_item->set_subtotal( $total );
+                    if (WC_Reepay_Checkout::is_reepay_product($product)) {
                     if ( $discount !== null ) {
                         $new_product_item->set_total( $total - $discount );
                     } else {
+                            $new_product_item->set_total( $total );
+                        }
+                    }else{
                         $new_product_item->set_total( $total );
                     }
                     $order_direct_quantity --;
@@ -1149,11 +1153,15 @@ class WC_Reepay_Renewals {
                     $product_item->set_name( $invoice_lines['ordertext'] );
                     $product_item->set_quantity( $invoice_lines['quantity'] );
                     $product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
+                    if($invoice_lines['origin'] == 'plan'){
                     if ( $discount_amount !== null ){
                         $total = floatval( $invoice_lines['amount'] ) / 100;
                         $total_with_discount = $total - $discount_amount;
                         $product_item->set_total( $total_with_discount );
-                    }else{
+                        } else {
+                            $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+                        }
+                    } else {
                         $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                     }
                     $new_items[] = $product_item;
