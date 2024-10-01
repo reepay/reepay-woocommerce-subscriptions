@@ -427,9 +427,18 @@ class WC_Reepay_Discounts_And_Coupons
             }
         }
 
+        /*
         if ( ! $this->applied_fixed_coupon && $type === 'reepay_fixed_product') {
             $discount                   = $coupon->get_amount() / $cart_item['quantity'];
             $this->applied_fixed_coupon = true;
+        }
+        */
+
+        if ( $type === 'reepay_fixed_product') {
+            $product = $cart_item['data'];
+            if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
+                $discount = $coupon->get_amount() / $cart_item['quantity'];
+            }
         }
 
         return $discount;
