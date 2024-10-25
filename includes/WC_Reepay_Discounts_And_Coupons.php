@@ -44,6 +44,7 @@ class WC_Reepay_Discounts_And_Coupons
         add_action('woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2);
         add_filter('woocommerce_coupon_is_valid', [$this, 'validate_coupon'], 10, 4);
         add_filter('woocommerce_coupon_is_valid_for_product', [$this, 'validate_coupon_for_product'], 10, 4);
+        add_filter('woocommerce_coupon_get_items_to_apply', [$this, 'items_to_apply'], 10, 3);
         add_filter('woocommerce_coupon_get_discount_amount', [$this, 'apply_discount'], 10, 5);
 
         add_filter("woocommerce_coupon_error", [$this, "plugin_coupon_error_message"], 10, 3);
@@ -379,19 +380,6 @@ class WC_Reepay_Discounts_And_Coupons
             $coupon->set_amount(floatval($data['_reepay_discount_amount']));
         }
 
-
-//		if ( empty( $discountHandle ) ) {
-//			$discount       = $this->create_discount( $coupon, $data );
-//		} else {
-//			$this->update_discount( $coupon );
-//		}
-//
-//		if ( empty( $couponHandle ) && ! empty( $discountHandle ) ) {
-//			$this->create_coupon( $coupon, $discountHandle, $data );
-//		} else if ( ! empty( $couponHandle ) ) {
-//			$this->update_coupon( $coupon );
-//		}
-
         $coupon->save();
     }
 
@@ -418,19 +406,31 @@ class WC_Reepay_Discounts_And_Coupons
 
     function apply_discount($discount, $discounting_amount, $cart_item, $single, WC_Coupon $coupon)
     {
-        $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
+        $product = wc_get_product( $cart_item['product_id'] );
 
-        if ($type === 'reepay_percentage') {
-            $product = $cart_item['data'];
-            if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
-                $discount = $coupon->get_amount() * ($discounting_amount / 100);
+        if ( ! $coupon->is_type('reepay_type')) {
+            if (WC_Reepay_Checkout::is_reepay_product($product)) {
+                $discount = 0.00;
             }
         }
+        
+        if ( $coupon->is_type('reepay_type')) {
+            if (WC_Reepay_Checkout::is_reepay_product($product)) {
+                $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
 
-        /*
-        if ( ! $this->applied_fixed_coupon && $type === 'reepay_fixed_product') {
-            $discount                   = $coupon->get_amount() / $cart_item['quantity'];
-            $this->applied_fixed_coupon = true;
+                if ($type === 'reepay_percentage') {
+                    if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
+                        $discount = $coupon->get_amount() * ($discounting_amount / 100);
+                    }
+                }
+
+                if ( $type === 'reepay_fixed_product') {
+                    if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
+                        $discount = $coupon->get_amount() / $cart_item['quantity'];
+                    }
+                }
+
+            }
         }
         */
 
@@ -505,15 +505,6 @@ class WC_Reepay_Discounts_And_Coupons
 
                 throw new Exception($check_coupon->get_error_message());
             }
-        }else{
-            foreach ($discounts->get_items_to_validate() as $item) {
-                if (WC_Reepay_Checkout::is_reepay_product($item->product)) {
-                    $has_reepay_product = true;
-                }
-            }
-            if( $has_reepay_product === true ){
-                throw new Exception(__(sprintf('Sorry, this coupon "%s" cannot be used with Billwerk+ Optimize subscriptions.',$coupon->get_code())), 113);
-            }
         }
 
         return $valid;
@@ -549,6 +540,22 @@ class WC_Reepay_Discounts_And_Coupons
         }
 
         return $valid;
+    }
+
+    /**
+     * Fix Fixed Cart Discount assign discunt to subscription with hook woocommerce_coupon_get_items_to_apply 
+     */
+    function items_to_apply( $items_to_apply, WC_Coupon $coupon, WC_Discounts $discount ){
+        if ( ! $coupon->is_type('reepay_type')) {
+            if( $items_to_apply ){
+                foreach( $items_to_apply as $key => $items){
+                    if (WC_Reepay_Checkout::is_reepay_product($items->product)) {
+                        unset($items_to_apply[$key]);
+                    }
+                }
+            }
+        }
+        return $items_to_apply;
     }
 
     function add_coupon_text_field()
