@@ -63,6 +63,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.9.3 -
+* [Fix] - WC discount coupons don't work on mixed orders
+
 v 1.2.9.2 -
 * [Fix] - WebHook URL for plain permalink structure
 
