@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.6.1
 Requires PHP: 7.4
-Stable tag: 1.2.9.2
+Stable tag: 1.2.10
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,31 +63,35 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.10 -
+- [Fix] - WooCommerce versions before 8.7 got critical error about "Call to undefined function" when applying coupons.
+- [Fix] - Fixed amount discount from Billwerk coupon did not appear in the initial order of a subscription.
+
 v 1.2.9.2 -
-* [Fix] - WebHook URL for plain permalink structure
+- [Fix] - WebHook URL for plain permalink structure
 
 v 1.2.9.1 - 
-* [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
+- [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
 
 v 1.2.9 -
-* [Improvement] – Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
-* [Improvement] – Change user role for customers who stop subscribing to a product
+- [Improvement] – Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
+- [Improvement] – Change user role for customers who stop subscribing to a product
 
 v 1.2.8 - 
-* [Fix] - Bug fix WC discount codes on mixed orders
-* [Fix] - Bug fix recurrent shipping fee for renewals
-* [Improvement] - Extra checkbox in WC standard checkout for subscription conditions
+- [Fix] - Bug fix WC discount codes on mixed orders
+- [Fix] - Bug fix recurrent shipping fee for renewals
+- [Improvement] - Extra checkbox in WC standard checkout for subscription conditions
 
 v 1.2.7 -
-* [Fix] - Missing payment_method_reference data in the Billwerk+ customer_payment_method_added webhook could cause PHP fatal error. Subscriptions would not be created when this happened.
-* [Compatibility] - Billwerk+ Pay version 1.7.7
+- [Fix] - Missing payment_method_reference data in the Billwerk+ customer_payment_method_added webhook could cause PHP fatal error. Subscriptions would not be created when this happened.
+- [Compatibility] - Billwerk+ Pay version 1.7.7
 
 v 1.2.6 - 
-* [Improvement] Product name change to "Billwerk+ Subscriptions" to "Billwerk+ Optimize".
-* [Fix] - Subscription variable product coming in as regular orders.
-* [Fix] - Missing billing address on split-off subscription orders.
-* [Fix] - Mixed orders: Deactivating new order emails for subscriptions also deactivates emails for regular orders.
-* [Compatibility] - Billwerk+ Pay version 1.7.6
+- [Improvement] Product name change to "Billwerk+ Subscriptions" to "Billwerk+ Optimize".
+- [Fix] - Subscription variable product coming in as regular orders.
+- [Fix] - Missing billing address on split-off subscription orders.
+- [Fix] - Mixed orders: Deactivating new order emails for subscriptions also deactivates emails for regular orders.
+- [Compatibility] - Billwerk+ Pay version 1.7.6
 
 v 1.2.5 - Add Bundles support
 v 1.2.4 - Add extra option for emails
