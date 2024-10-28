@@ -433,6 +433,13 @@ class WC_Reepay_Discounts_And_Coupons
             }
         }
 
+        if ( $type === 'reepay_fixed_product') {
+            $product = $cart_item['data'];
+            if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
+                $discount = $coupon->get_amount() / $cart_item['quantity'];
+            }
+        }
+
         return $discount;
     }
 
