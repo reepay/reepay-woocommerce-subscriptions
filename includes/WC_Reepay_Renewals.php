@@ -436,6 +436,10 @@ class WC_Reepay_Renewals {
                 $order->update_meta_data( '_real_total', $order->get_total() );
                 $order->save_meta_data();
                 $order->set_total( 0 );
+            } elseif ( floatval( $order->get_subtotal() ) != 0 ){
+                $order->update_meta_data( '_real_total', $order->get_subtotal() );
+                $order->save_meta_data();
+                $order->set_total( 0 );
             }
 
             $product = $order_item->get_product();
