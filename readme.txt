@@ -2,9 +2,9 @@
 Contributors: reepaydenmark
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
-Tested up to: 6.6.1
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.10
+Stable tag: 1.2.11
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -63,6 +63,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.11 -
+- [Improvement] - Support WordPress version 6.7
+
 v 1.2.10 -
 - [Fix] - WooCommerce versions before 8.7 got critical error about "Call to undefined function" when applying coupons.
 - [Fix] - Fixed amount discount from Billwerk coupon did not appear in the initial order of a subscription.
