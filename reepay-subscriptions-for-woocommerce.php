@@ -147,6 +147,7 @@ class WooCommerce_Reepay_Subscriptions
             '_reepay_manual_start_date_status'           => get_option('_reepay_manual_start_date_status') ?: 'wc-completed',
             '_reepay_disable_sub_mails'                  => get_option('_reepay_disable_sub_mails') === 'yes',
             '_reepay_disable_sub_mails_renewals'         => get_option('_reepay_disable_sub_mails_renewals') === 'yes',
+            'query_string' => !empty(get_option( 'permalink_structure' )) ? '?' : '&',
         ];
 
         self::$compensation_methods = [

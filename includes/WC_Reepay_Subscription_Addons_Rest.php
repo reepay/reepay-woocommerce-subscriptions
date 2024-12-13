@@ -54,7 +54,13 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 			$addon_data = reepay_s()->api()->request( "add_on/{$request['handle']}" );
 			if ( ! empty( $addon_data['currency'] ) && ! empty( $request['product_id'] ) ) {
 				$product = wc_get_product( $request['product_id'] );
-				if ( $product->get_currency() !== $addon_data['currency'] ) {
+				if( $product->is_type('reepay_variable_subscriptions') ){
+					$product_currency = $product->get_currency($product);
+				}else{
+					$product_currency = $product->get_currency();
+				}
+				
+				if ( $product_currency !== $addon_data['currency'] ) {
 					return new WP_Error( 400, 'You are cannot choose addon with another currency' );
 				}
 			}
