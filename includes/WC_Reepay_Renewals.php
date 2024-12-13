@@ -436,6 +436,10 @@ class WC_Reepay_Renewals {
                 $order->update_meta_data( '_real_total', $order->get_total() );
                 $order->save_meta_data();
                 $order->set_total( 0 );
+            } elseif ( floatval( $order->get_subtotal() ) != 0 ){
+                $order->update_meta_data( '_real_total', $order->get_subtotal() );
+                $order->save_meta_data();
+                $order->set_total( 0 );
             }
 
             $product = $order_item->get_product();
@@ -1341,7 +1345,96 @@ class WC_Reepay_Renewals {
 
         if ( $main_order ) {
             foreach ( $fields_to_copy as $field_name ) {
-                $new_order->update_meta_data( $field_name, $main_order->get_meta( $field_name ) );
+                if ( $field_name == '_order_key' ) {
+                    $main_order_key = $main_order->get_order_key();
+                    $new_order->set_order_key( $main_order_key );
+                } elseif ( $field_name == '_order_currency' ) {
+                    $main_order_currency = $main_order->get_currency();
+                    $new_order->set_currency( $main_order_currency );
+                } elseif ( $field_name == '_prices_include_tax' ) {
+                    $main_order_tax_status = $main_order->get_prices_include_tax();
+                    $new_order->set_prices_include_tax( $main_order_tax_status );
+                } elseif ( $field_name == '_customer_ip_address' ) {
+                    $customer_ip_address = $main_order->get_customer_ip_address();
+                    $new_order->set_customer_ip_address( $customer_ip_address );
+                } elseif ( $field_name == '_customer_user_agent' ) {
+                    $customer_user_agent = $main_order->get_customer_user_agent();
+                    $new_order->set_customer_user_agent( $customer_user_agent );
+                } elseif ( $field_name == '_billing_city' ) {
+                    $customer_billing_city = $main_order->get_billing_city();
+                    $new_order->set_billing_city( $customer_billing_city );
+                } elseif ( $field_name == '_billing_state' ) {
+                    $customer_billing_state = $main_order->get_billing_state();
+                    $new_order->set_billing_state( $customer_billing_state );
+                } elseif ( $field_name == '_billing_postcode' ) {
+                    $customer_billing_postcode = $main_order->get_billing_postcode();
+                    $new_order->set_billing_postcode( $customer_billing_postcode );
+                } elseif ( $field_name == '_billing_email' ) {
+                    $customer_billing_email = $main_order->get_billing_email();
+                    $new_order->set_billing_email( $customer_billing_email );
+                } elseif ( $field_name == '_billing_phone' ) {
+                    $customer_billing_phone = $main_order->get_billing_phone();
+                    $new_order->set_billing_phone( $customer_billing_phone );
+                } elseif ( $field_name == '_billing_address_1' ) {
+                    $customer_billing_address_1 = $main_order->get_billing_address_1();
+                    $new_order->set_billing_address_1( $customer_billing_address_1 );
+                } elseif ( $field_name == '_billing_address_2' ) {
+                    $customer_billing_address_2 = $main_order->get_billing_address_2();
+                    $new_order->set_billing_address_2( $customer_billing_address_2 );
+                } elseif ( $field_name == '_billing_country' ) {
+                    $customer_billing_country = $main_order->get_billing_country();
+                    $new_order->set_billing_country( $customer_billing_country );
+                } elseif ( $field_name == '_billing_first_name' ) {
+                    $customer_billing_first_name = $main_order->get_billing_first_name();
+                    $new_order->set_billing_first_name( $customer_billing_first_name );
+                } elseif ( $field_name == '_billing_last_name' ) {
+                    $customer_billing_last_name = $main_order->get_billing_last_name();
+                    $new_order->set_billing_last_name( $customer_billing_last_name );
+                } elseif ( $field_name == '_billing_company' ) {
+                    $customer_billing_company = $main_order->get_billing_company();
+                    $new_order->set_billing_company( $customer_billing_company );
+                } elseif ( $field_name == '_billing_first_name' ) {
+                    $customer_billing_first_name = $main_order->get_billing_first_name();
+                    $new_order->set_billing_first_name( $customer_billing_first_name );
+                } elseif ( $field_name == '_billing_last_name' ) {
+                    $customer_billing_last_name = $main_order->get_billing_last_name();
+                    $new_order->set_billing_last_name( $customer_billing_last_name );
+                } elseif ( $field_name == '_shipping_country' ) {
+                    $customer_shipping_country = $main_order->get_shipping_country();
+                    $new_order->set_shipping_country( $customer_shipping_country );
+                } elseif ( $field_name == '_shipping_first_name' ) {
+                    $customer_shipping_first_name = $main_order->get_shipping_first_name();
+                    $new_order->set_shipping_first_name( $customer_shipping_first_name );
+                } elseif ( $field_name == '_shipping_last_name' ) {
+                    $customer_shipping_last_name = $main_order->get_shipping_last_name();
+                    $new_order->set_shipping_last_name( $customer_shipping_last_name );
+                } elseif ( $field_name == '_shipping_company' ) {
+                    $customer_shipping_company = $main_order->get_shipping_company();
+                    $new_order->set_shipping_company( $customer_shipping_company );
+                } elseif ( $field_name == '_shipping_address_1' ) {
+                    $customer_shipping_address_1 = $main_order->get_shipping_address_1();
+                    $new_order->set_shipping_address_1( $customer_shipping_address_1 );
+                } elseif ( $field_name == '_shipping_address_2' ) {
+                    $customer_shipping_address_2 = $main_order->get_shipping_address_2();
+                    $new_order->set_shipping_address_2( $customer_shipping_address_2 );
+                } elseif ( $field_name == '_shipping_city' ) {
+                    $customer_shipping_city = $main_order->get_shipping_city();
+                    $new_order->set_shipping_city( $customer_shipping_city );
+                } elseif ( $field_name == '_shipping_state' ) {
+                    $customer_shipping_state = $main_order->get_shipping_state();
+                    $new_order->set_shipping_state( $customer_shipping_state );
+                } elseif ( $field_name == '_shipping_postcode' ) {
+                    $customer_shipping_postcode = $main_order->get_shipping_postcode();
+                    $new_order->set_shipping_postcode( $customer_shipping_postcode );
+                } elseif ( $field_name == '_payment_method' ) {
+                    $customer_payment_method = $main_order->get_payment_method();
+                    $new_order->set_payment_method( $customer_payment_method );
+                } elseif ( $field_name == '_payment_method_title' ) {
+                    $customer_payment_method_title = $main_order->get_payment_method_title();
+                    $new_order->set_payment_method_title( $customer_payment_method_title );
+                } else {
+                    $new_order->update_meta_data( $field_name, $main_order->get_meta( $field_name ) );
+                }
             }
 
             foreach ( $additional_fields_to_copy as $field_name ) {

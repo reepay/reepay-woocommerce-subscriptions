@@ -43,7 +43,7 @@ class WC_Reepay_Discounts_And_Coupons
         add_action('woocommerce_coupon_options', [$this, 'add_coupon_text_field'], 10);
         add_action('woocommerce_coupon_options_save', [$this, 'save_coupon_text_field'], 10, 2);
         add_filter('woocommerce_coupon_is_valid', [$this, 'validate_coupon'], 10, 4);
-        add_filter('woocommerce_coupon_is_valid_for_product', [$this, 'validate_coupon_for_product'], 10, 4);
+        add_filter('woocommerce_coupon_is_valid_for_product', [$this, 'validate_coupon_for_product'], 999, 4);
         add_filter('woocommerce_coupon_get_items_to_apply', [$this, 'items_to_apply'], 10, 3);
         add_filter('woocommerce_coupon_get_discount_amount', [$this, 'apply_discount'], 10, 5);
 
@@ -496,6 +496,10 @@ class WC_Reepay_Discounts_And_Coupons
                 }
 
                 throw new Exception($check_coupon->get_error_message());
+            }
+        }else{
+            if(WC_Reepay_Checkout::only_reepay_products_in_cart('')){
+                throw new Exception(__('Sorry, this coupon is not applicable to selected products.'), 113);
             }
         }
 
