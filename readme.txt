@@ -63,6 +63,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.11.1 -
+- [Fix] - Subscription and addon lists updates with plain URL permalink structure.
+
 v 1.2.11 -
 - [Improvement] - Support WordPress version 6.7
 
