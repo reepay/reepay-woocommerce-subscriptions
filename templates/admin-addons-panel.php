@@ -139,7 +139,7 @@
 
                 $.ajax({
                     url: '<?php echo get_rest_url( 0,
-							reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . '?product_id=' . ( intval( $_GET['post'] ?? 0 ) ) ?>' + `&handle=${handle}`,
+							reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . reepay_s()->settings( 'query_string' ) . 'product_id=' . ( intval( $_GET['post'] ?? 0 ) ) ?>' + `&handle=${handle}`,
                     method: 'GET',
                     beforeSend: function (xhr) {
 

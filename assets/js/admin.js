@@ -59,7 +59,7 @@ jQuery(function ($) {
             if (addon_field.val() !== 'new' && addon_field.val() !== '') {
                 amount_field.prop("disabled", true);
                 $.ajax({
-                    url: window.reepay.rest_urls.get_addon + `?amount=true&handle=${addon_field.val()}`,
+                    url: window.reepay.rest_urls.get_addon + window.reepay.query_string + `amount=true&handle=${addon_field.val()}`,
                     method: 'GET',
                     success: function (response_data) {
                         if (!response_data && !response_data.success) {
@@ -105,7 +105,7 @@ jQuery(function ($) {
                     }
                 });
 
-            const url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+            const url = `${window.reepay.rest_urls.get_addon}${window.reepay.query_string}handle=${$select.val()}&get_list=1`;
 
             $.ajax({
                 url,
@@ -152,7 +152,7 @@ jQuery(function ($) {
                     }
                 });
 
-            let url = `${window.reepay.rest_urls.get_addon}?&handle=${$select.val()}&get_list=1`;
+            let url = `${window.reepay.rest_urls.get_addon}${window.reepay.query_string}handle=${$select.val()}&get_list=1`;
 
             $.ajax({
                 url,
@@ -472,7 +472,7 @@ jQuery(function ($) {
         const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
         const product_id = dataPlan.product_id || window.reepay.product.id
 
-        let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${handle}`;
+        let url = `${window.reepay.rest_urls.get_plan}${window.reepay.query_string}product_id=${product_id}&handle=${handle}`;
 
         if (dataPlan.loop !== undefined) {
             url += `&loop=${dataPlan.loop}`
@@ -551,11 +551,12 @@ jQuery(function ($) {
     }
 
     function load_discount(handle, $container) {
+        console.log('load_discount');
         if (!handle) {
             return;
         }
-
-        $.get(window.reepay.rest_urls.get_discount + `?handle=${handle}`)
+        
+        $.get(window.reepay.rest_urls.get_discount + window.reepay.query_string + `handle=${handle}`)
             .then(function (response_data) {
                 if (!response_data.success) {
                     return;
@@ -607,7 +608,7 @@ jQuery(function ($) {
 
         //const dataPlan = JSON.parse($(this).attr('data-plan') || '{}');
         const product_id = window.reepay.product.id
-        let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$(this).val()}&get_info=1`;
+        let url = `${window.reepay.rest_urls.get_plan}${window.reepay.query_string}product_id=${product_id}&handle=${$(this).val()}&get_info=1`;
 
         $.ajax({
             url,
@@ -655,7 +656,7 @@ jQuery(function ($) {
             const dataPlan = JSON.parse($select.attr('data-plan') || '{}');
             const product_id = dataPlan.product_id || window.reepay.product.id
 
-            let url = `${window.reepay.rest_urls.get_plan}?product_id=${product_id}&handle=${$select.val()}&get_list=1`;
+            let url = `${window.reepay.rest_urls.get_plan}${window.reepay.query_string}product_id=${product_id}&handle=${$select.val()}&get_list=1`;
 
             if (dataPlan.loop !== undefined) {
                 url += `&loop=${dataPlan.loop}`

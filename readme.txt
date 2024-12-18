@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.11
+Stable tag: 1.2.12
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,8 +12,11 @@ Billwerk+ Optimize for WooCommerce plugin gives you the best prerequisites to su
 
 == Description ==
 Get all the advanced subscription features from Billwerk+ Optimize while still keeping your usual WooCommerce tools. Billwerk+ Optimize for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
-WooCommerce Products And Billwerk+ Optimize Plans
-Create a WooCommerce product and choose between Billwerk+ Optimize Simple Subscription and Billwerk+ Optimize Variable Subscription. Connect the product to either a new or existing Billwerk+ Optimize plan. Do you Billwerk+ Optimize plan changes directly in WooCommerce.
+
+= WooCommerce Products And Billwerk+ Optimize Plans =
+
+Create a WooCommerce product and choose between Billwerk+ Optimize Simple Subscription and Billwerk+ Optimize Variable Subscription. Connect the product to either a new or existing Billwerk+ Optimize plan. Make your Billwerk+ Optimize plan changes directly in WooCommerce.
+
 - Flexible billing frequencies
 - Optional renewal reminder
 - Minimum contract period
@@ -22,19 +25,27 @@ Create a WooCommerce product and choose between Billwerk+ Optimize Simple Subscr
 - Advanced trial options
 - Setup fee
 - Tax settings
-Use Add-Ons For Recurring Additional Sales
+
+= Use Add-Ons For Recurring Additional Sales =
+
 Add-ons are additional products that can be attached to a plan and billed for in each billing cycle. Add-ons can be used to solve a wide range of use-cases. E.g. variable number of “user licenses” or “extended support”, in addition to the base subscription plan.
-WooCommerce Subscription View And Billwerk+ Optimize Admin
+
+= WooCommerce Subscription View And Billwerk+ Optimize Admin =
+
 We added a WooCommece native subscription view to quickly find a subscription. All links will redirect you directly into the Billwerk+ Optimize Admin for further subscription details. Links can also be found on orders and customers for you to quickly navigate to the Billwerk+ Optimize Admin. The Billwerk+ Optimize Admin is your powerful back office where all our subscription functionalities can be found.
-Add-On Based WooCommerce Shipping
+
+= Add-On Based WooCommerce Shipping =
 Do you send subscription boxes to your customers on an ongoing basis? Connect your shipping rates in WooCommerce with Add-ons from Billwerk+ Optimize and make sure to charge your customers for all ongoing shipping.
 Choose between new or existing Add-ons and update your Add-ons directly in WooCommerce.
-Billwerk+ Optimize Discounts & WooCommerce Coupons
+
+= Billwerk+ Optimize Discounts & WooCommerce Coupons =
+
 Link WooCommerce coupons with Discounts and Coupons in Billwerk+ Optimize. Let your customers use their coupons easily in the WooCommerce checkout.
 Define whether the discount should apply to setup fees, plans, additional costs, instant charges, or Add-ons, and select the subscription plans that the discount should work for.
 Standard Billwerk+ Optimize features:
-- Plans - Setting up multiple subscription plans with different drawing range and price.
-- Termination and fixation period - Defining the notice period to guarantee a number of periods after subscription termination. Also define a binding period, to guarantee a number of periods for a subscription without closure.
+
+- Plans - Setting up multiple subscription plans with various billing intervals and prices.
+- Termination and Minimum Contract Period - Defining the notice period to guarantee a number of periods after subscription termination. Also define a binding period, to guarantee a number of periods for a subscription without closure.
 - Upgrading / Downgrading - Instant up or downgrade of subscriptions.
 - Termination - Automatic termination of subscription, now or by end of period. Many options.
 - Parallel price adjusting - Many options on adjusting prices, eg. new price for new subscribers and old for old.
@@ -63,6 +74,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.12 - 
+- [Fix] - Lists updates with plain URL permalink structure.
+
 v 1.2.11 -
 - [Improvement] - Support WordPress version 6.7
 
@@ -74,11 +88,11 @@ v 1.2.9.2 -
 - [Fix] - WebHook URL for plain permalink structure
 
 v 1.2.9.1 - 
-- [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
+- [Fix] - Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
 
 v 1.2.9 -
-- [Improvement] – Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
-- [Improvement] – Change user role for customers who stop subscribing to a product
+- [Improvement] - Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
+- [Improvement] - Change user role for customers who stop subscribing to a product
 
 v 1.2.8 - 
 - [Fix] - Bug fix WC discount codes on mixed orders

@@ -7,7 +7,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 	 */
 	public function __construct() {
 		// Add shipping method addons
-		add_action( 'woocommerce_settings_shipping', array( $this, 'reepay_shipping_instance_form_fields_filters' ) );
+		add_action( 'woocommerce_init', array( $this, 'reepay_shipping_instance_form_fields_filters' ) );
 	}
 
 	/**
