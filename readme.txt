@@ -44,7 +44,7 @@ Link WooCommerce coupons with Discounts and Coupons in Billwerk+ Optimize. Let y
 Define whether the discount should apply to setup fees, plans, additional costs, instant charges, or Add-ons, and select the subscription plans that the discount should work for.
 Standard Billwerk+ Optimize features:
 
-- Plans – Setting up multiple subscription plans with various billing intervals and prices.
+- Plans - Setting up multiple subscription plans with various billing intervals and prices.
 - Termination and Minimum Contract Period - Defining the notice period to guarantee a number of periods after subscription termination. Also define a binding period, to guarantee a number of periods for a subscription without closure.
 - Upgrading / Downgrading - Instant up or downgrade of subscriptions.
 - Termination - Automatic termination of subscription, now or by end of period. Many options.
@@ -88,11 +88,11 @@ v 1.2.9.2 -
 - [Fix] - WebHook URL for plain permalink structure
 
 v 1.2.9.1 - 
-- [Fix] – Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
+- [Fix] - Discounts on renewal order was recorded as a negative fee order item. Now, as a discount order item.
 
 v 1.2.9 -
-- [Improvement] – Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
-- [Improvement] – Change user role for customers who stop subscribing to a product
+- [Improvement] - Enable extra checkbox in WC standard checkout for subscription conditions (WooCommerce Blocks checkout support)
+- [Improvement] - Change user role for customers who stop subscribing to a product
 
 v 1.2.8 - 
 - [Fix] - Bug fix WC discount codes on mixed orders
