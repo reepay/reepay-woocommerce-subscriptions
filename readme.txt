@@ -74,6 +74,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.12.1 -
+- [Fix] - BWPM-127 : Fix response data 'proration' to 'partial_proration_days' from API get plan.
+
 v 1.2.12 - 
 - [Fix] - Lists updates with plain URL permalink structure.
 
