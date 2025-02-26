@@ -612,7 +612,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 				'month'             => $plan_data['interval_length'],
 				'day'               => ! empty( $plan_data['schedule_fixed_day'] ) ? $plan_data['schedule_fixed_day'] : '',
 				'period'            => ! empty( $plan_data['partial_period_handling'] ) ? $plan_data['partial_period_handling'] : '',
-				'proration'         => ! empty( $plan_data['proration'] ) ? 'full_day' : 'by_minute',
+				'proration'         => $plan_data['partial_proration_days'] ? 'full_day' : 'by_minute',
 				'proration_minimum' => ! empty( $plan_data['minimum_prorated_amount'] ) ? $plan_data['minimum_prorated_amount'] : '',
 
 			];
