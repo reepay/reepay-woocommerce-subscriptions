@@ -1003,14 +1003,22 @@ class WC_Reepay_Renewals {
      * @return WC_Order|false
      */
     public function get_child_order( $parent_order, $invoice ) {
-        $args = [
-            'meta_query' => [
-                [
-                    'key'   => '_reepay_order',
-                    'value' => $invoice,
+        if ( rp_hpos_enabled() ) {
+            $args = [
+                'meta_query' => [
+                    [
+                        'key'   => '_reepay_order',
+                        'value' => $invoice,
+                    ]
                 ]
-            ]
-        ];
+            ];
+        } else {
+            $args = [
+                'meta_key'  => '_reepay_order',
+                'meta_value' => $invoice,
+                'meta_compare' => '=',
+            ];
+        }
 
         $args['parent'] = $parent_order->get_id();
 
@@ -1060,14 +1068,22 @@ class WC_Reepay_Renewals {
             }
         }
 
-        $args = [
-            'meta_query' => [
-                [
-                    'key'   => '_reepay_order',
-                    'value' => $data['invoice'],
+        if ( rp_hpos_enabled() ) {
+            $args = [
+                'meta_query' => [
+                    [
+                        'key'   => '_reepay_order',
+                        'value' => $data['invoice'],
+                    ]
                 ]
-            ]
-        ];
+            ];
+        } else {
+            $args = [
+                'meta_key'  => '_reepay_order',
+                'meta_value' => $data['invoice'],
+                'meta_compare' => '=',
+            ];
+        }
 
         if ( ! empty( $parent_order ) ) {
             $args['parent'] = $parent_order->get_id();

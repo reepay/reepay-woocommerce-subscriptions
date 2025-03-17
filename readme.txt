@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.2.12
+Stable tag: 1.2.13
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,12 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.13.1 -
+- [Fix] - Support WordPress posts storage (legacy).
+
+v 1.2.13 -
+- [Fix] - Proration setting display in WooCommerce Billwerk+ Optimize product.
+
 v 1.2.12.1 -
 - [Fix] - BWPM-127 : Fix response data 'proration' to 'partial_proration_days' from API get plan.
 
