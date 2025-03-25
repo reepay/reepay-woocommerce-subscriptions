@@ -74,6 +74,9 @@ Standard Billwerk+ Optimize features:
 3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.14 -
+- [Fix] - Support for WordPress posts storage (legacy) as WooCommerce Order data storage setting.
+
 v 1.2.13 -
 - [Fix] - Proration setting display in WooCommerce Billwerk+ Optimize product.
 
