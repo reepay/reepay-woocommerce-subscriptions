@@ -14,6 +14,7 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Admin_Frontend' => __DIR__ . '/../..' . '/includes/WC_Reepay_Admin_Frontend.php',
         'WC_Reepay_Checkout' => __DIR__ . '/../..' . '/includes/WC_Reepay_Checkout.php',
         'WC_Reepay_Discounts_And_Coupons' => __DIR__ . '/../..' . '/includes/WC_Reepay_Discounts_And_Coupons.php',
+        'WC_Reepay_Email_order' => __DIR__ . '/../..' . '/includes/email-order/WC_Reepay_Email_order.php',
         'WC_Reepay_Import' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import.php',
         'WC_Reepay_Import_AJAX' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import_AJAX.php',
         'WC_Reepay_Import_Helpers' => __DIR__ . '/../..' . '/includes/import/WC_Reepay_Import_Helpers.php',
@@ -48,6 +49,9 @@ class ComposerStaticInit20a39eae146d0eddfc4743659342a91f
         'WC_Reepay_Sync_Subscriptions' => __DIR__ . '/../..' . '/includes/sync/WC_Reepay_Sync_Subscriptions.php',
         'WC_Reepay_Woo_Blocks' => __DIR__ . '/../..' . '/includes/woo-blocks/WC_Reepay_Woo_Blocks.php',
         'WC_Reepay_Woo_Blocks_Terms' => __DIR__ . '/../..' . '/includes/woo-blocks/WC_Reepay_Woo_Blocks_Terms.php',
+        'WC_Reepay_Woo_Blocks_Terms_Extend_Store_Endpoint' => __DIR__ . '/../..' . '/includes/woo-blocks/terms-checkbox/WC_Reepay_Woo_Blocks_Terms_Extend_Store_Endpoint.php',
+        'WC_Reepay_Woo_Blocks_Terms_Extend_Woo_Core' => __DIR__ . '/../..' . '/includes/woo-blocks/terms-checkbox/WC_Reepay_Woo_Blocks_Terms_Extend_Woo_Core.php',
+        'WC_Reepay_Woo_Blocks_Terms_Integration' => __DIR__ . '/../..' . '/includes/woo-blocks/terms-checkbox/WC_Reepay_Woo_Blocks_Terms_Integration.php',
         'WC_Reepay_Woocommerce_Subscription_Extension' => __DIR__ . '/../..' . '/includes/WC_Reepay_Woocommerce_Subscription_Extension.php',
         'WC_Subscription' => __DIR__ . '/../..' . '/includes/memberships/WC_Reepay_Memberships_Integrations.php',
     );
