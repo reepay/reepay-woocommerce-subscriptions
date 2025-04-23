@@ -1290,6 +1290,10 @@ class WC_Reepay_Renewals {
         $calc_taxes = true,
         $invoice_data = false
     ) {
+        // clean status to avoid creating order with status 'null' to fix send email new order with empty order items.
+        $status_to_set = $order_args['status'];
+        $order_args['status'] = 'null';
+
         $new_order = wc_create_order( $order_args );
         $new_order->save();
 
@@ -1602,6 +1606,7 @@ class WC_Reepay_Renewals {
             $main_order->save();
         }
 
+        $new_order->set_status( $status_to_set );
         $new_order->save();
         $new_order->calculate_totals( $calc_taxes );
 
