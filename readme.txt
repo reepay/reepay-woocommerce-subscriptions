@@ -76,6 +76,7 @@ Standard Billwerk+ Optimize features:
 == Changelog ==
 v 1.2.14.1 -
 - [Fix] - Warning message in the WooCommerce Blocks.
+- [Fix] - Order confirmation of pro-rated subscriptions.
 
 v 1.2.14 -
 - [Fix] - Support for WordPress posts storage (legacy) as WooCommerce Order data storage setting.
