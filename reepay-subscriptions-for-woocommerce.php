@@ -252,27 +252,6 @@ class WooCommerce_Reepay_Subscriptions
                 }
             }
         }
-        /*
-        if ( ! empty($recipient) ) {
-            // Add retry logic for invoice data
-            $max_attempts = 10;
-            $attempts = 0;
-            $invoice_data = null;
-            
-            while ($attempts < $max_attempts) {
-                $invoice_data = reepay()->api($order)->get_invoice_data($order);
-                
-                if (!is_wp_error($invoice_data) ){
-                    break;
-                }
-                
-                $attempts++;
-                if ($attempts < $max_attempts) {
-                    sleep(2);
-                }
-            }
-        }
-        */
         return $recipient;
     }
 
@@ -736,7 +715,6 @@ class WooCommerce_Reepay_Subscriptions
         new WC_Reepay_Woo_Blocks();
         new WC_Reepay_Subscription_Currency();
         new WC_Reepay_Woo_Blocks_Terms();
-        // new WC_Reepay_Email_order();
 
         add_action('plugins_loaded', function () {
             new WC_Reepay_Admin_Frontend();

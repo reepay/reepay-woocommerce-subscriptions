@@ -13,7 +13,6 @@ return array(
     'WC_Reepay_Admin_Frontend' => $baseDir . '/includes/WC_Reepay_Admin_Frontend.php',
     'WC_Reepay_Checkout' => $baseDir . '/includes/WC_Reepay_Checkout.php',
     'WC_Reepay_Discounts_And_Coupons' => $baseDir . '/includes/WC_Reepay_Discounts_And_Coupons.php',
-    'WC_Reepay_Email_order' => $baseDir . '/includes/email-order/WC_Reepay_Email_order.php',
     'WC_Reepay_Import' => $baseDir . '/includes/import/WC_Reepay_Import.php',
     'WC_Reepay_Import_AJAX' => $baseDir . '/includes/import/WC_Reepay_Import_AJAX.php',
     'WC_Reepay_Import_Helpers' => $baseDir . '/includes/import/WC_Reepay_Import_Helpers.php',
