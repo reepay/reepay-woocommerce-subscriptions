@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles Billwerk+ optimize subscription privacy
+ * Handles Frisbii optimize subscription privacy
  */
 if ( ! class_exists( 'WC_Abstract_Privacy' ) ) {
 	return;
@@ -8,7 +8,7 @@ if ( ! class_exists( 'WC_Abstract_Privacy' ) ) {
 
 class WC_Reepay_Subscription_Privacy extends WC_Abstract_Privacy {
     public function __construct() {
-        parent::__construct( __( 'Billwerk+ Optimize Terms & Conditions', 'reepay-subscriptions-for-woocommerce'), 5, 10);
+        parent::__construct( __( 'Frisbii Optimize Terms & Conditions', 'reepay-subscriptions-for-woocommerce'), 5, 10);
     }
 
     public function get_privacy_message() {

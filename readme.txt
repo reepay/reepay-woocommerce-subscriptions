@@ -1,21 +1,21 @@
-=== Billwerk+ Optimize ===
+=== Frisbii Optimize ===
 Contributors: reepaydenmark
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.14
+Stable tag: 1.2.15
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-Billwerk+ Optimize for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
+Frisbii Optimize for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
 
 == Description ==
-Get all the advanced subscription features from Billwerk+ Optimize while still keeping your usual WooCommerce tools. Billwerk+ Optimize for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
+Get all the advanced subscription features from Frisbii Optimize while still keeping your usual WooCommerce tools. Frisbii Optimize for WooCommerce plugin gives you the best prerequisites to succeed with your subscription business.
 
-= WooCommerce Products And Billwerk+ Optimize Plans =
+= WooCommerce Products And Frisbii Optimize Plans =
 
-Create a WooCommerce product and choose between Billwerk+ Optimize Simple Subscription and Billwerk+ Optimize Variable Subscription. Connect the product to either a new or existing Billwerk+ Optimize plan. Make your Billwerk+ Optimize plan changes directly in WooCommerce.
+Create a WooCommerce product and choose between Frisbii Optimize Simple Subscription and Frisbii Optimize Variable Subscription. Connect the product to either a new or existing Frisbii Optimize plan. Make your Frisbii Optimize plan changes directly in WooCommerce.
 
 - Flexible billing frequencies
 - Optional renewal reminder
@@ -30,19 +30,19 @@ Create a WooCommerce product and choose between Billwerk+ Optimize Simple Subscr
 
 Add-ons are additional products that can be attached to a plan and billed for in each billing cycle. Add-ons can be used to solve a wide range of use-cases. E.g. variable number of “user licenses” or “extended support”, in addition to the base subscription plan.
 
-= WooCommerce Subscription View And Billwerk+ Optimize Admin =
+= WooCommerce Subscription View And Frisbii Optimize Admin =
 
-We added a WooCommece native subscription view to quickly find a subscription. All links will redirect you directly into the Billwerk+ Optimize Admin for further subscription details. Links can also be found on orders and customers for you to quickly navigate to the Billwerk+ Optimize Admin. The Billwerk+ Optimize Admin is your powerful back office where all our subscription functionalities can be found.
+We added a WooCommece native subscription view to quickly find a subscription. All links will redirect you directly into the Frisbii Optimize Admin for further subscription details. Links can also be found on orders and customers for you to quickly navigate to the Frisbii Optimize Admin. The Frisbii Optimize Admin is your powerful back office where all our subscription functionalities can be found.
 
 = Add-On Based WooCommerce Shipping =
-Do you send subscription boxes to your customers on an ongoing basis? Connect your shipping rates in WooCommerce with Add-ons from Billwerk+ Optimize and make sure to charge your customers for all ongoing shipping.
+Do you send subscription boxes to your customers on an ongoing basis? Connect your shipping rates in WooCommerce with Add-ons from Frisbii Optimize and make sure to charge your customers for all ongoing shipping.
 Choose between new or existing Add-ons and update your Add-ons directly in WooCommerce.
 
-= Billwerk+ Optimize Discounts & WooCommerce Coupons =
+= Frisbii Optimize Discounts & WooCommerce Coupons =
 
-Link WooCommerce coupons with Discounts and Coupons in Billwerk+ Optimize. Let your customers use their coupons easily in the WooCommerce checkout.
+Link WooCommerce coupons with Discounts and Coupons in Frisbii Optimize. Let your customers use their coupons easily in the WooCommerce checkout.
 Define whether the discount should apply to setup fees, plans, additional costs, instant charges, or Add-ons, and select the subscription plans that the discount should work for.
-Standard Billwerk+ Optimize features:
+Standard Frisbii Optimize features:
 
 - Plans - Setting up multiple subscription plans with various billing intervals and prices.
 - Termination and Minimum Contract Period - Defining the notice period to guarantee a number of periods after subscription termination. Also define a binding period, to guarantee a number of periods for a subscription without closure.
@@ -60,20 +60,25 @@ Standard Billwerk+ Optimize features:
 - One time charges - One time charge using a saved card.
 - Trial end and renew email - Inform your customer on upcoming payments or at trial end.
 - Email templates - Templates for 20 different emails send based upon triggers: receipt, welcome mail and such.
-- Dunning - Upon failed payment Billwerk+ Optimize will communicate with the customer to get updated card information. Setup of the dunning process can be done from within the Billwerk+ Optimize admin.
-- Retrying - Billwerk+ Optimize automatically retries failed payment attempts if they can be save the payment.
+- Dunning - Upon failed payment Frisbii Optimize will communicate with the customer to get updated card information. Setup of the dunning process can be done from within the Frisbii Optimize admin.
+- Retrying - Frisbii Optimize automatically retries failed payment attempts if they can be save the payment.
 - Customer, subscription and invoice handling - Search, list and handle customers, subscriptions and invoices.
-- Email log - Overview of all emails sent by Billwerk+ Optimize to the customers
+- Email log - Overview of all emails sent by Frisbii Optimize to the customers
 - Refunding - Refund of invoices, either full or partial
 - Event log - Log of all events on customers, subscription and invoices.
 - Statistics - Advanced statistics and key numbers like: churn, avg. income per. customer, MMR and customer growth.
 
 == Installation ==
 1. Download the plugin from WordPress repository or install it directly from Plugins page.
-2. Activate the plugin and save Private Key Test and Private Key Live in \"Billwerk+ Optimize Settings\" page.
-3. For correct plugin operation install and activate Billwerk+ Pay for WooCommerce. API keys for both plugins should be the same.
+2. Activate the plugin and save Private Key Test and Private Key Live in \"Frisbii Optimize Settings\" page.
+3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.2.15 - 
+- [Fix] - Order confirmation of pro-rated subscriptions.
+- [Improvement] - Product name change to "Frisbii".
+- [Improvement] - WordPress support version 6.8 and WooCommerce version 9.8.1.
+
 v 1.2.14 -
 - [Fix] - Support for WordPress posts storage (legacy) as WooCommerce Order data storage setting.
 
