@@ -75,9 +75,9 @@ Standard Frisbii Optimize features:
 
 == Changelog ==
 v 1.2.15 - 
-- [Fix] - Order confirmation of pro-rated subscriptions.
-- [Improvement] - Product name change to "Frisbii".
-- [Improvement] - WordPress support version 6.8 and WooCommerce version 9.8.1.
+- [Fix] - Amounts for pro-rated subscriptions on order confirmation page and mail.
+- [Improvement] - Product name change to "Frisbii Optimize".
+- [Improvement] - Tested up to WordPress version 6.8 and WooCommerce version 9.8.1.
 
 v 1.2.14 -
 - [Fix] - Support for WordPress posts storage (legacy) as WooCommerce Order data storage setting.
