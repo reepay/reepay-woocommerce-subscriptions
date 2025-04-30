@@ -11,5 +11,5 @@ Use the Frisbii plugin for:
 # Supported versions
 
 * WordPress Version: 4.0 or higher
-* Tested up to: 5.3.2
+* Tested up to: 6.8
 
