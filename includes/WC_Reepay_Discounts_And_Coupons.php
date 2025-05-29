@@ -430,7 +430,6 @@ class WC_Reepay_Discounts_And_Coupons
                 }
 
                 if ( $type === 'reepay_fixed_product') {
-                    error_log('check reepay_fixed_product : true');
                     if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $cart_item)) {
                         $discount = $coupon->get_amount() / $cart_item['quantity'];
                     }
