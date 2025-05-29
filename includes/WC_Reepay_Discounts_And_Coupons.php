@@ -466,7 +466,7 @@ class WC_Reepay_Discounts_And_Coupons
             }
 
             if( $has_reepay_product === false ){
-                throw new Exception(__(sprintf('Sorry, This coupon "%s" available only Frisbii Optimize subscription',$coupon->get_code())), 113);
+                throw new Exception(__(sprintf('Sorry, This coupon "%s" available only Frisbii Billing subscription',$coupon->get_code())), 113);
             }
 
             if($has_reepay_product){
@@ -598,7 +598,7 @@ class WC_Reepay_Discounts_And_Coupons
     public function add_coupon_types($discount_types)
     {
         return array_merge($discount_types, [
-            'reepay_type' => __('Frisbii Optimize discount'),
+            'reepay_type' => __('Frisbii Billing discount'),
         ]);
     }
 
