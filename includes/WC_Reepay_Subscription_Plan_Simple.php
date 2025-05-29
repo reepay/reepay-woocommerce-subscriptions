@@ -250,7 +250,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 	}
 
 	public function add_subscription_product_type( $types ) {
-		$types['reepay_simple_subscriptions'] = __( 'Frisbii Optimize Simple Subscription' );
+		$types['reepay_simple_subscriptions'] = __( 'Frisbii Billing Simple Subscription' );
 
 		return $types;
 	}

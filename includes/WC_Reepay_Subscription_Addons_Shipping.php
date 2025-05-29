@@ -48,7 +48,7 @@ class WC_Reepay_Subscription_Addons_Shipping extends WC_Reepay_Subscription_Addo
 		}
 
 		$settings['reepay_shipping_addon'] = array(
-			'title'       => __( 'Frisbii Optimize Add-on', 'reepay-subscriptions-for-woocommerce' ),
+			'title'       => __( 'Frisbii Billing Add-on', 'reepay-subscriptions-for-woocommerce' ),
 			'type'        => 'select',
 			'default'     => '',
 			'class'       => 'wc-enhanced-select addon-shipping-choose',
