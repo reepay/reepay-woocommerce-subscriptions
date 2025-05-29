@@ -383,7 +383,7 @@ class WC_Reepay_Discounts_And_Coupons
         $coupon->save();
     }
 
-    function is_coupon_applied_for_plans($coupon, WC_Product $product)
+    function is_coupon_applied_for_plans($coupon, $cart_item)
     {
         $apply_to_plans     = get_post_meta($coupon->get_id(), '_reepay_discount_eligible_plans', true) ?: [];
         $apply_to_all_plans = get_post_meta($coupon->get_id(), '_reepay_discount_all_plans', true);
@@ -391,7 +391,12 @@ class WC_Reepay_Discounts_And_Coupons
             return true;
         }
         if ($apply_to_all_plans === '0' && count($apply_to_plans) > 0) {
-            $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
+            $product = wc_get_product( $cart_item['product_id'] );
+            if ($product->is_type('reepay_variable_subscriptions')) {
+                $plan_handle = get_post_meta($cart_item['variation_id'], '_reepay_subscription_handle', true);
+            } else {
+                $plan_handle = get_post_meta($product->get_id(), '_reepay_subscription_handle', true);
+            }
 
             return in_array($plan_handle, $apply_to_plans);
         }
@@ -419,13 +424,14 @@ class WC_Reepay_Discounts_And_Coupons
                 $type = get_post_meta($coupon->get_id(), '_reepay_discount_type', true);
 
                 if ($type === 'reepay_percentage') {
-                    if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
+                    if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $cart_item)) {
                         $discount = $coupon->get_amount() * ($discounting_amount / 100);
                     }
                 }
 
                 if ( $type === 'reepay_fixed_product') {
-                    if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $product)) {
+                    error_log('check reepay_fixed_product : true');
+                    if ( ! empty($product) && $this->is_coupon_applied_for_plans($coupon, $cart_item)) {
                         $discount = $coupon->get_amount() / $cart_item['quantity'];
                     }
                 }
