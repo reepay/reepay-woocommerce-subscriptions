@@ -1,15 +1,15 @@
-# Billwerk+ Optimize
+# Frisbii Billing
 
-The Official Billwerk+ Optimize Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
+The Official Frisbii Billing Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
 and
 install.
 
-Use the billwerk+ plugin for:
+Use the Frisbii plugin for:
 
-* Integration Woocommerce with Billwerk+ Optimize
+* Integration Woocommerce with Frisbii Billing
 
 # Supported versions
 
 * WordPress Version: 4.0 or higher
-* Tested up to: 5.3.2
+* Tested up to: 6.8
 

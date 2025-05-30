@@ -20,7 +20,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	}
 
 	public function add_subscription_product_type( $types ) {
-		$types['reepay_variable_subscriptions'] = __( 'Billwerk+ Optimize Variable Subscription' );
+		$types['reepay_variable_subscriptions'] = __( 'Frisbii Billing Variable Subscription' );
 
 		return $types;
 	}

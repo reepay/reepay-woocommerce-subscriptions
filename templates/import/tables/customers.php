@@ -16,7 +16,7 @@
             <th scope="col" class="manage-column column-email"><?php
 				_e( 'Email', 'reepay-subscriptions-for-woocommerce' ) ?></th>
             <th scope="col" class="manage-column column-reepay-handle"><?php
-				_e( 'Billwerk+ Optimize Handle', 'reepay-subscriptions-for-woocommerce' ) ?></th>
+				_e( 'Frisbii Billing Handle', 'reepay-subscriptions-for-woocommerce' ) ?></th>
 
             <th scope="col" class="manage-column column-message"><?php
 				_e( 'Import Message', 'reepay-subscriptions-for-woocommerce' ) ?></th>
@@ -78,7 +78,7 @@
             <th scope="col" class="manage-column column-email"><?php
 				_e( 'Email', 'reepay-subscriptions-for-woocommerce' ) ?></th>
             <th scope="col" class="manage-column column-reepay-handle"><?php
-				_e( 'Billwerk+ Optimize Handle', 'reepay-subscriptions-for-woocommerce' ) ?></th>
+				_e( 'Frisbii Billing Handle', 'reepay-subscriptions-for-woocommerce' ) ?></th>
 
             <th scope="col" class="manage-column column-message"><?php
 				_e( 'Import Message', 'reepay-subscriptions-for-woocommerce' ) ?></th>

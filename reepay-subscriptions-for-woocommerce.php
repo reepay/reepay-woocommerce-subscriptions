@@ -1,15 +1,15 @@
 <?php
 
 /*
- * Plugin Name: Billwerk+ Optimize
- * Description: Get all the advanced subscription features from Billwerk+ Optimize while still keeping your usual WooCommerce tools. The Billwerk+ Optimize for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
- * Author: Billwerk+
- * Author URI: https://www.billwerk.plus/
- * Version: 1.2.14.1
+ * Plugin Name: Frisbii Billing
+ * Description: Get all the advanced subscription features from Frisbii Billing while still keeping your usual WooCommerce tools. The Frisbii Billing for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
+ * Author: Frisbii
+ * Author URI: https://frisbii.com
+ * Version: 1.3
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
- * WC tested up to: 9.3.3
+ * WC tested up to: 9.8.1
  */
 
 if ( ! defined('ABSPATH')) {
@@ -199,7 +199,7 @@ class WooCommerce_Reepay_Subscriptions
         }
 
         /**
-         * Billwerk+ Optimize check out page terms and condtion checkbox hook
+         * Frisbii Billing check out page terms and condtion checkbox hook
          */
         add_action('wp_enqueue_scripts', [$this, 'subscription_terms_checkbox_script'], 10);
         add_action('woocommerce_review_order_before_submit', [$this, 'subscription_terms_checkbox'], 10);
@@ -293,7 +293,7 @@ class WooCommerce_Reepay_Subscriptions
             WC_Reepay_Subscription_Admin_Notice::add_activation_notice(
                 sprintf(
                     wp_kses(
-                        __('The plugin Billwerk+ Pay is required for Billwerk+ Optimize for WooCommerce. <a target="_blank" href="%s">Please install and activate the plugin.</a>',
+                        __('The plugin Frisbii Pay is required for Frisbii Billing for WooCommerce. <a target="_blank" href="%s">Please install and activate the plugin.</a>',
                             'reepay-subscriptions-for-woocommerce'
                         ), [
                             'a' => [
@@ -383,7 +383,7 @@ class WooCommerce_Reepay_Subscriptions
 
     public function add_settings_tab($settings_tabs)
     {
-        $settings_tabs['reepay_subscriptions'] = __('Billwerk+ Optimize',
+        $settings_tabs['reepay_subscriptions'] = __('Frisbii Billing',
             'reepay-subscriptions-for-woocommerce');
 
         return $settings_tabs;
@@ -434,7 +434,7 @@ class WooCommerce_Reepay_Subscriptions
     {
         $settings = [
             'section_title'                              => [
-                'name' => __('Billwerk+ Optimize', 'reepay-subscriptions-for-woocommerce'),
+                'name' => __('Frisbii Billing', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'title',
                 'desc' => '',
                 'id'   => 'reepay_section_title'
@@ -487,7 +487,7 @@ class WooCommerce_Reepay_Subscriptions
                     'reepay-subscriptions-for-woocommerce'),
                 'type'    => 'select',
                 'options' => wc_get_order_statuses(),
-                'desc'    => __('Setting to control witch status the Billwerk+ Optimize order in WooCommerce gets.',
+                'desc'    => __('Setting to control witch status the Frisbii Billing order in WooCommerce gets.',
                     'reepay-subscriptions-for-woocommerce'),
                 'id'      => '_reepay_orders_default_subscription_status'
             ],
@@ -496,7 +496,7 @@ class WooCommerce_Reepay_Subscriptions
                     'reepay-subscriptions-for-woocommerce'),
                 'type'    => 'select',
                 'options' => wc_get_order_statuses(),
-                'desc'    => __('Setting to control witch status the Billwerk+ Optimize renewal order in WooCommerce gets.',
+                'desc'    => __('Setting to control witch status the Frisbii Billing renewal order in WooCommerce gets.',
                     'reepay-subscriptions-for-woocommerce'),
                 'id'      => '_reepay_suborders_default_renew_status'
             ],
@@ -507,7 +507,7 @@ class WooCommerce_Reepay_Subscriptions
             '_reepay_manual_start_date'                  => [
                 'name' => __('Enable manual subscription start date', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'checkbox',
-                'desc' => __('Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Billwerk+ Optimize.</p>',
+                'desc' => __('Enable manual subscription start date <p class="description">This will set a temporary start date for the subscription that is far in the future. We recommend removing the start date tag from your sign up emails in Frisbii Billing.</p>',
                     'reepay-subscriptions-for-woocommerce'),
                 'id'   => '_reepay_manual_start_date'
             ],
@@ -536,23 +536,23 @@ class WooCommerce_Reepay_Subscriptions
             '_reepay_enable_subscription_terms'         => [
                 'name' => __('Enable Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'checkbox',
-                'desc' => __('Enable Billwerk+ Optimize Terms and Conditions', 'reepay-subscriptions-for-woocommerce').'<br>'.__('If you use WC "Blocks" for checkout please unlock in the front end and adjust the position and save and lock it again.', 'reepay-subscriptions-for-woocommerce'),
+                'desc' => __('Enable Frisbii Billing Terms and Conditions', 'reepay-subscriptions-for-woocommerce').'<br>'.__('If you use WC "Blocks" for checkout please unlock in the front end and adjust the position and save and lock it again.', 'reepay-subscriptions-for-woocommerce'),
                 'id'   => '_reepay_enable_subscription_terms'
             ],
             '_reepay_page_subscription_terms'         => [
                 'name' => __('Page Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type'    => 'select',
                 'options' => static::$page_subscription_terms_options,
-                'desc' => sprintf(__('Select the page for Billwerk+ Optimize terms and conditions.<br><a href="%1$s">Check out our privacy policy guide</a> for recommendations on what content to include.', 'reepay-subscriptions-for-woocommerce'), 
+                'desc' => sprintf(__('Select the page for Frisbii Billing terms and conditions.<br><a href="%1$s">Check out our privacy policy guide</a> for recommendations on what content to include.', 'reepay-subscriptions-for-woocommerce'),
                     esc_url( admin_url( 'options-privacy.php?tab=policyguide' ) ) 
                 ),
                 'id'   => '_reepay_page_subscription_terms'
             ],
             '_reepay_subscription_terms'                => [
-                'name' => __('Checkout Billwerk+ Optimize Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
+                'name' => __('Checkout Frisbii Billing Terms and Conditions', 'reepay-subscriptions-for-woocommerce'),
                 'type' => 'textarea',
-                'placeholder' => 'I have read and agree to the [billwerk_optimize_terms]',
-                'desc' => __('<p class="description">Use this shortcode to automatically link to the Billwerk+ Optimize terms and conditions page : [billwerk_optimize_terms]', 'reepay-subscriptions-for-woocommerce'),
+                'placeholder' => 'I have read and agree to the [frisbii_billing_terms]',
+                'desc' => __('<p class="description">Use this shortcode to automatically link to the Frisbii Billing terms and conditions page : [frisbii_billing_terms]', 'reepay-subscriptions-for-woocommerce'),
                 'id'   => '_reepay_subscription_terms',
                 'css' => "min-width: 50%; height: 75px;",
             ],
@@ -799,7 +799,9 @@ class WooCommerce_Reepay_Subscriptions
 
                 woocommerce_form_field('subscription_terms', array(
                     'type'      => 'checkbox',
-                    'class'     => array('form-row custom-checkbox'),
+                    'class'     => array('form-row', 'custom-checkbox'),
+                    'label_class' => array('woocommerce-form__label', 'woocommerce-form__label-for-checkbox', 'checkbox'),
+                    'input_class' => array('woocommerce-form__input-checkbox'),
                     'label'     => $label,
                     'required'  => true,
                 ));
@@ -812,12 +814,13 @@ class WooCommerce_Reepay_Subscriptions
         $label = get_option('_reepay_subscription_terms') ? get_option('_reepay_subscription_terms') : __('I have read and agree to the subscription terms', 'reepay-subscriptions-for-woocommerce');
         $page_subscription_terms = get_option('_reepay_page_subscription_terms');
         if($page_subscription_terms !== '0'){
-            $billwerk_optimize_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="billwerk-optimize-terms-and-conditions-link" target="_blank">'.__('subscription terms', 'reepay-subscriptions-for-woocommerce').'<a>';
+            $billwerk_billing_terms = '<a href="' . esc_url( get_permalink( $page_subscription_terms ) ) . '" class="billwerk-optimize-terms-and-conditions-link" target="_blank">'.__('subscription terms', 'reepay-subscriptions-for-woocommerce').'</a>';
         } else {
-            $billwerk_optimize_terms = __('subscription terms', 'reepay-subscriptions-for-woocommerce');
+            $billwerk_billing_terms = __('subscription terms', 'reepay-subscriptions-for-woocommerce');
         }
         $find_replace = array(
-            '[billwerk_optimize_terms]' => $billwerk_optimize_terms,
+            '[billwerk_optimize_terms]' => $billwerk_billing_terms,
+            '[frisbii_billing_terms]' => $billwerk_billing_terms,
         );
         $label = str_replace( array_keys( $find_replace ), array_values( $find_replace ), $label );
 
@@ -860,7 +863,7 @@ class WooCommerce_Reepay_Subscriptions
     }
 
     /**
-     * Add subscription terms meta to Billwerk+ optimize suborder
+     * Add subscription terms meta to Frisbii Billing suborder
      */
     public function subscription_terms_checkbox_to_reepay_suborder($created_reepay_order_ids, $main_order){
         if($created_reepay_order_ids){

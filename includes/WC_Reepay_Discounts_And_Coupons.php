@@ -466,7 +466,7 @@ class WC_Reepay_Discounts_And_Coupons
             }
 
             if( $has_reepay_product === false ){
-                throw new Exception(__(sprintf('Sorry, This coupon "%s" available only Billwerk+ Optimize subscription',$coupon->get_code())), 113);
+                throw new Exception(__(sprintf('Sorry, This coupon "%s" available only Frisbii Billing subscription',$coupon->get_code())), 113);
             }
 
             if($has_reepay_product){
@@ -598,7 +598,7 @@ class WC_Reepay_Discounts_And_Coupons
     public function add_coupon_types($discount_types)
     {
         return array_merge($discount_types, [
-            'reepay_type' => __('Billwerk+ Optimize discount'),
+            'reepay_type' => __('Frisbii Billing discount'),
         ]);
     }
 
@@ -636,7 +636,7 @@ class WC_Reepay_Discounts_And_Coupons
     }
 
     /**
-     * Assign coupon to billwerk subscription sub order, But not discount to order line need to investigate.
+     * Assign coupon to Frisbii subscription sub order, But not discount to order line need to investigate.
      */
     public function add_billwerk_coupon_to_reepay_sub_orders($created_reepay_order_ids, $main_order){
         if($created_reepay_order_ids){
@@ -658,7 +658,7 @@ class WC_Reepay_Discounts_And_Coupons
     }
 
     /**
-     * Remove billwerk coupon from mix order main order
+     * Remove Frisbii coupon from mix order main order
      */
     public function remove_billwerk_coupon_main_order_after_subscriptions_orders_created($created_reepay_order_ids, $main_order){
         /**
