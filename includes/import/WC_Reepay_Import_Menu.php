@@ -20,8 +20,8 @@ class WC_Reepay_Import_Menu {
 	function create_submenu() {
 		add_submenu_page(
 			'tools.php',
-			__( 'Frisbii Optimize Import' ),
-			__( 'Frisbii Optimize Import' ),
+			__( 'Frisbii Billing Import' ),
+			__( 'Frisbii Billing Import' ),
 			'manage_options',
 			self::$menu_slug,
 			[ $this, 'print_import_page' ],

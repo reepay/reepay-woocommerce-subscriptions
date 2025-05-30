@@ -1,12 +1,12 @@
-# Frisbii Optimize
+# Frisbii Billing
 
-The Official Frisbii Optimize Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
+The Official Frisbii Billing Woocommerce plugin has been made for you to use on your wordpress site. Click below to download
 and
 install.
 
 Use the Frisbii plugin for:
 
-* Integration Woocommerce with Frisbii Optimize
+* Integration Woocommerce with Frisbii Billing
 
 # Supported versions
 
