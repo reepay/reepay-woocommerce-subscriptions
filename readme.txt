@@ -70,7 +70,7 @@ Standard Frisbii Billing features:
 
 == Installation ==
 1. Download the plugin from WordPress repository or install it directly from Plugins page.
-2. Activate the plugin and save Private Key Test and Private Key Live in \"Frisbii Billing Settings\" page.
+2. Activate the plugin and save Private Key Test and Private Key Live in "Frisbii Billing Settings" page.
 3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
