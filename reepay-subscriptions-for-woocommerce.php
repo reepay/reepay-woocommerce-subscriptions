@@ -150,31 +150,10 @@ class WooCommerce_Reepay_Subscriptions
             'query_string' => !empty(get_option( 'permalink_structure' )) ? '?' : '&',
         ];
 
-        self::$compensation_methods = [
-            'none'            => __('None', 'reepay-subscriptions-for-woocommerce'),
-            'full_refund'     => __('Full refund', 'reepay-subscriptions-for-woocommerce'),
-            'prorated_refund' => __('Prorated refund', 'reepay-subscriptions-for-woocommerce'),
-            'full_credit'     => __('Full credit', 'reepay-subscriptions-for-woocommerce'),
-            'prorated_credit' => __('Prorated credit', 'reepay-subscriptions-for-woocommerce'),
-        ];
-
-        $list_page = get_pages(
-            array(
-                'post_status' => array( 'draft', 'publish' ),
-            )
-        );
-        
-        $list_page_array = array();
-        if( $list_page ){
-            $list_page_array[0] = __('— Select —', 'reepay-subscriptions-for-woocommerce');
-            foreach( $list_page as $page ){
-                $list_page_array[$page->ID] = $page->post_title;
-            }
-        }
-        self::$page_subscription_terms_options = $list_page_array;
+        // Translation-dependent arrays will be initialized in init() method after load_plugin_textdomain()
 
         $this->includes();
-        $this->init_classes();
+        // init_classes() moved to init() method to ensure translations are loaded first
 
         register_activation_hook(REEPAY_PLUGIN_FILE, __CLASS__.'::install');
         register_deactivation_hook(REEPAY_PLUGIN_FILE, __CLASS__.'::deactivate');
@@ -283,6 +262,33 @@ class WooCommerce_Reepay_Subscriptions
     {
         load_plugin_textdomain('reepay-subscriptions-for-woocommerce', false,
             dirname(plugin_basename(__FILE__)).'/languages');
+
+        // Initialize translation-dependent arrays after load_plugin_textdomain()
+        self::$compensation_methods = [
+            'none'            => __('None', 'reepay-subscriptions-for-woocommerce'),
+            'full_refund'     => __('Full refund', 'reepay-subscriptions-for-woocommerce'),
+            'prorated_refund' => __('Prorated refund', 'reepay-subscriptions-for-woocommerce'),
+            'full_credit'     => __('Full credit', 'reepay-subscriptions-for-woocommerce'),
+            'prorated_credit' => __('Prorated credit', 'reepay-subscriptions-for-woocommerce'),
+        ];
+
+        $list_page = get_pages(
+            array(
+                'post_status' => array( 'draft', 'publish' ),
+            )
+        );
+
+        $list_page_array = array();
+        if( $list_page ){
+            $list_page_array[0] = __('— Select —', 'reepay-subscriptions-for-woocommerce');
+            foreach( $list_page as $page ){
+                $list_page_array[$page->ID] = $page->post_title;
+            }
+        }
+        self::$page_subscription_terms_options = $list_page_array;
+
+        // Initialize classes after translations are loaded
+        $this->init_classes();
 
         new WC_Reepay_Subscriptions_Update(self::$db_version);
     }
