@@ -722,6 +722,9 @@ class WooCommerce_Reepay_Subscriptions
         new WC_Reepay_Subscription_Currency();
         new WC_Reepay_Woo_Blocks_Terms();
         new WC_Reepay_Admin_Frontend();
+        if ( class_exists( 'WC_Abstract_Privacy' ) ) {
+            new WC_Reepay_Subscription_Privacy();
+        }
     }
 
     /**
