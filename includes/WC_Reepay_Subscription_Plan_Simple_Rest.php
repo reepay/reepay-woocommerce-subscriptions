@@ -2,7 +2,9 @@
 
 class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	public function __construct() {
-		add_action( 'init', array( $this, 'init' ) );
+		// Call init() directly instead of using 'init' hook
+		// because this class may be instantiated after the 'init' hook has already fired
+		$this->init();
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
 	}
 
@@ -16,6 +18,11 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 	}
 
 	public function register_routes() {
+		// Ensure namespace is set before registering routes
+		if ( empty( $this->namespace ) ) {
+			$this->init();
+		}
+
 		register_rest_route( $this->namespace, $this->rest_base, [
 			"methods"             => WP_REST_Server::READABLE,
 			"callback"            => array( $this, "get_item" ),
