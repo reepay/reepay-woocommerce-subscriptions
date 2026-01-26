@@ -1141,49 +1141,104 @@ class WC_Reepay_Renewals {
         if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
             $new_items = [];
 
-            // Get discount from order_lines
+            // Check if invoice has VAT data at invoice level
+            $invoice_has_vat = isset( $invoice_data['amount_vat'] ) 
+                && floatval( $invoice_data['amount_vat'] ) > 0;
+
+            // Get discount from order_lines (both with and without VAT)
             $discount_amount = null;
+            $discount_amount_ex_vat = null;
+            $discount_amount_vat = null;
             foreach ($invoice_data['order_lines'] as $discount_line) {
                 if ($discount_line['origin'] === 'discount') {
                     $discount_amount = abs(floatval( $discount_line['amount'] ) / 100);
+                    if ( $invoice_has_vat && isset( $discount_line['amount_ex_vat'] ) && isset( $discount_line['amount_vat'] ) ) {
+                        $discount_amount_ex_vat = abs(floatval( $discount_line['amount_ex_vat'] ) / 100);
+                        $discount_amount_vat = abs(floatval( $discount_line['amount_vat'] ) / 100);
+                    }
                     break;
                 }
             }
 
             foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
-                /*if ($invoice_lines['origin'] == 'discount') {
-                    continue;
-                }*/
+                // Check if this line item has VAT data
+                $line_has_vat = $invoice_has_vat
+                    && isset( $invoice_lines['vat'] ) 
+                    && floatval( $invoice_lines['vat'] ) > 0
+                    && isset( $invoice_lines['amount_vat'] )
+                    && isset( $invoice_lines['amount_ex_vat'] );
 
                 if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
                     $fees_item = new WC_Order_Item_Fee();
                     $fees_item->set_name( $invoice_lines['ordertext'] );
-                    $fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
-                    $fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+                    
+                    if ( $line_has_vat ) {
+                        // Use ex-VAT amounts and set tax separately
+                        $fees_item->set_amount( floatval( $invoice_lines['unit_amount_ex_vat'] ) / 100 );
+                        $fees_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
+                        $fees_item->set_total_tax( floatval( $invoice_lines['amount_vat'] ) / 100 );
+                    } else {
+                        // Fallback: original behavior without VAT
+                        $fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
+                        $fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+                    }
+                    
                     $fees_item->add_meta_data( '_is_card_fee', true );
                     $new_items[] = $fees_item;
+                    
                 } elseif( $invoice_lines['origin'] == 'discount' ) {
                     $discount_item = new WC_Order_Item_Coupon();
-                    // $discount_item->set_code( $invoice_lines['ordertext'] );
                     $discount_item->set_code( $invoice_lines['origin_handle'] );
-                    $discount_item->set_discount( abs(floatval( $invoice_lines['unit_amount'] ) / 100) );
+                    
+                    if ( $line_has_vat ) {
+                        // Use ex-VAT amount and set discount tax
+                        $discount_item->set_discount( abs(floatval( $invoice_lines['amount_ex_vat'] ) / 100) );
+                        $discount_item->set_discount_tax( abs(floatval( $invoice_lines['amount_vat'] ) / 100) );
+                    } else {
+                        // Fallback: original behavior without VAT
+                        $discount_item->set_discount( abs(floatval( $invoice_lines['unit_amount'] ) / 100) );
+                    }
+                    
                     $new_items[] = $discount_item;
+                    
                 } else {
                     $product_item = new WC_Order_Item_Product();
                     $product_item->set_name( $invoice_lines['ordertext'] );
                     $product_item->set_quantity( $invoice_lines['quantity'] );
-                    $product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-                    if($invoice_lines['origin'] == 'plan'){
-                    if ( $discount_amount !== null ){
-                        $total = floatval( $invoice_lines['amount'] ) / 100;
-                        $total_with_discount = $total - $discount_amount;
-                        $product_item->set_total( $total_with_discount );
+                    
+                    if ( $line_has_vat ) {
+                        // Set subtotal with VAT data
+                        $product_item->set_subtotal( floatval( $invoice_lines['unit_amount_ex_vat'] ) / 100 );
+                        $product_item->set_subtotal_tax( floatval( $invoice_lines['unit_amount_vat'] ) / 100 );
+                        
+                        // Handle total (with or without discount)
+                        if ( $invoice_lines['origin'] == 'plan' && $discount_amount_ex_vat !== null ) {
+                            // Calculate total after discount
+                            $total_ex_vat = floatval( $invoice_lines['amount_ex_vat'] ) / 100 - $discount_amount_ex_vat;
+                            $total_vat = floatval( $invoice_lines['amount_vat'] ) / 100 - $discount_amount_vat;
+                            $product_item->set_total( $total_ex_vat );
+                            $product_item->set_total_tax( $total_vat );
+                        } else {
+                            $product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
+                            $product_item->set_total_tax( floatval( $invoice_lines['amount_vat'] ) / 100 );
+                        }
+                    } else {
+                        // Fallback: original behavior without VAT
+                        $product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
+                        
+                        if ( $invoice_lines['origin'] == 'plan' ) {
+                            if ( $discount_amount !== null ) {
+                                $total = floatval( $invoice_lines['amount'] ) / 100;
+                                $total_with_discount = $total - $discount_amount;
+                                $product_item->set_total( $total_with_discount );
+                            } else {
+                                $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
+                            }
                         } else {
                             $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                         }
-                    } else {
-                        $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                     }
+                    
                     $new_items[] = $product_item;
                 }
             }
@@ -1600,6 +1655,57 @@ class WC_Reepay_Renewals {
 
 
             $new_order->calculate_totals( $calc_taxes );
+        }
+
+        // Add Tax Line Item if invoice has VAT data (BWSM-87 fix)
+        if ( ! empty( $invoice_data ) && isset( $invoice_data['amount_vat'] ) && floatval( $invoice_data['amount_vat'] ) > 0 ) {
+            $total_tax = floatval( $invoice_data['amount_vat'] ) / 100;
+            
+            // Get tax rate from first order line with VAT
+            $tax_rate = 0;
+            $tax_rate_label = __( 'Taxes', 'woocommerce' );
+            if ( ! empty( $invoice_data['order_lines'] ) ) {
+                foreach ( $invoice_data['order_lines'] as $line ) {
+                    if ( isset( $line['vat'] ) && floatval( $line['vat'] ) > 0 ) {
+                        $tax_rate = floatval( $line['vat'] ) * 100; // Convert 0.25 to 25%
+                        break;
+                    }
+                }
+            }
+            
+            // Create Tax Line Item
+            $tax_item = new WC_Order_Item_Tax();
+            $tax_item->set_name( $tax_rate_label );
+            $tax_item->set_rate_percent( $tax_rate );
+            $tax_item->set_tax_total( $total_tax );
+            $tax_item->set_shipping_tax_total( 0 );
+            
+            // Try to find matching tax rate ID from WooCommerce
+            $tax_rates = WC_Tax::get_rates();
+            if ( ! empty( $tax_rates ) ) {
+                foreach ( $tax_rates as $rate_id => $rate ) {
+                    if ( abs( floatval( $rate['rate'] ) - $tax_rate ) < 0.01 ) {
+                        $tax_item->set_rate_id( $rate_id );
+                        $tax_item->set_label( $rate['label'] );
+                        break;
+                    }
+                }
+            }
+            
+            $new_order->add_item( $tax_item );
+            
+            // Update order totals to include tax
+            $new_order->set_cart_tax( $total_tax );
+            $new_order->set_total( floatval( $invoice_data['amount'] ) / 100 );
+            
+            self::log( [
+                'log' => [
+                    'source' => 'WC_Reepay_Renewals::create_order_copy::tax_item_added',
+                    'total_tax' => $total_tax,
+                    'tax_rate' => $tax_rate,
+                    'order_total' => floatval( $invoice_data['amount'] ) / 100,
+                ]
+            ] );
         }
 
         if ( $main_order ) {
