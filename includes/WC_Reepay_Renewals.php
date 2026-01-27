@@ -1266,12 +1266,19 @@ class WC_Reepay_Renewals {
             $customer = $parent_order->get_customer_id();
         }
 
+        // Determine whether to let WooCommerce calculate taxes
+        // If invoice has VAT data, we will set (calc_taxes = truet)
+        $invoice_has_vat = ! empty( $invoice_data ) 
+            && isset( $invoice_data['amount_vat'] ) 
+            && floatval( $invoice_data['amount_vat'] ) > 0;
+        $calc_taxes = $invoice_has_vat;
+
         self::create_order_copy( [
             'status'       => $status,
             'parent'       => ! empty( $parent_order ) ? $parent_order->get_id() : null,
             'customer_id'  => $customer,
             'subscription' => ! empty( $data['subscription'] ) ? $data['subscription'] : null,
-        ], ! empty( $parent_order ) ? $parent_order : false, $items, false, $invoice_data );
+        ], ! empty( $parent_order ) ? $parent_order : false, $items, $calc_taxes, $invoice_data );
     }
 
     /**
@@ -1655,57 +1662,6 @@ class WC_Reepay_Renewals {
 
 
             $new_order->calculate_totals( $calc_taxes );
-        }
-
-        // Add Tax Line Item if invoice has VAT data (BWSM-87 fix)
-        if ( ! empty( $invoice_data ) && isset( $invoice_data['amount_vat'] ) && floatval( $invoice_data['amount_vat'] ) > 0 ) {
-            $total_tax = floatval( $invoice_data['amount_vat'] ) / 100;
-            
-            // Get tax rate from first order line with VAT
-            $tax_rate = 0;
-            $tax_rate_label = __( 'Taxes', 'woocommerce' );
-            if ( ! empty( $invoice_data['order_lines'] ) ) {
-                foreach ( $invoice_data['order_lines'] as $line ) {
-                    if ( isset( $line['vat'] ) && floatval( $line['vat'] ) > 0 ) {
-                        $tax_rate = floatval( $line['vat'] ) * 100; // Convert 0.25 to 25%
-                        break;
-                    }
-                }
-            }
-            
-            // Create Tax Line Item
-            $tax_item = new WC_Order_Item_Tax();
-            $tax_item->set_name( $tax_rate_label );
-            $tax_item->set_rate_percent( $tax_rate );
-            $tax_item->set_tax_total( $total_tax );
-            $tax_item->set_shipping_tax_total( 0 );
-            
-            // Try to find matching tax rate ID from WooCommerce
-            $tax_rates = WC_Tax::get_rates();
-            if ( ! empty( $tax_rates ) ) {
-                foreach ( $tax_rates as $rate_id => $rate ) {
-                    if ( abs( floatval( $rate['rate'] ) - $tax_rate ) < 0.01 ) {
-                        $tax_item->set_rate_id( $rate_id );
-                        $tax_item->set_label( $rate['label'] );
-                        break;
-                    }
-                }
-            }
-            
-            $new_order->add_item( $tax_item );
-            
-            // Update order totals to include tax
-            $new_order->set_cart_tax( $total_tax );
-            $new_order->set_total( floatval( $invoice_data['amount'] ) / 100 );
-            
-            self::log( [
-                'log' => [
-                    'source' => 'WC_Reepay_Renewals::create_order_copy::tax_item_added',
-                    'total_tax' => $total_tax,
-                    'tax_rate' => $tax_rate,
-                    'order_total' => floatval( $invoice_data['amount'] ) / 100,
-                ]
-            ] );
         }
 
         if ( $main_order ) {
