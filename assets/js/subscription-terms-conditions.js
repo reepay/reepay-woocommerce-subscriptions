@@ -2,6 +2,10 @@ jQuery( function( $ ) {
     var billwerk_terms_toggle = {
         init: function() {
             $( document.body ).on( 'click', 'a.billwerk-optimize-terms-and-conditions-link', this.toggle_terms );
+            $('a.billwerk-optimize-terms-and-conditions-link').on('click',function(e){
+                e.preventDefault();
+                billwerk_terms_toggle.toggle_terms();
+            });
         },
 
         toggle_terms: function() {
