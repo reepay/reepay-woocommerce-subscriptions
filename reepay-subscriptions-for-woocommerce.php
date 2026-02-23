@@ -190,6 +190,8 @@ class WooCommerce_Reepay_Subscriptions
         // Order Pay page hooks
         add_action('woocommerce_pay_order_before_submit', [$this, 'subscription_terms_checkbox_order_pay'], 10);
         add_action('woocommerce_before_pay_action', [$this, 'subscription_terms_checkbox_process_order_pay'], 10, 1);
+
+        add_action('woocommerce_blocks_enqueue_checkout_block_scripts_after', [$this, 'subscription_terms_blocks_checkout_script']);
     }
 
     public function support_HPOS()
@@ -770,6 +772,44 @@ class WooCommerce_Reepay_Subscriptions
 
             wp_enqueue_script( 'subscription-terms-conditions' );
         }
+    }
+
+    public function subscription_terms_blocks_checkout_script() {
+        if ( get_option( '_reepay_enable_subscription_terms' ) !== 'yes' ) {
+            return;
+        }
+
+        if ( ! WC_Reepay_Checkout::is_reepay_product_in_cart() ) {
+            return;
+        }
+
+        $terms_html = '';
+        $page_subscription_terms = get_option( '_reepay_page_subscription_terms' );
+        if ( $page_subscription_terms !== '0' ) {
+            $sanitizer = wc_get_container()->get( HtmlSanitizer::class );
+            $page      = get_post( $page_subscription_terms );
+
+            if ( $page && 'publish' === $page->post_status && $page->post_content && ! has_shortcode( $page->post_content, 'woocommerce_checkout' ) ) {
+                $terms_html = wc_format_content( $sanitizer->styled_post_content( $page->post_content ) );
+            }
+        }
+
+        $label = self::subscription_terms_checkbox_label();
+
+        wp_enqueue_script(
+            'subscription-terms-blocks',
+            $this->settings( 'plugin_url' ) . 'assets/js/subscription-terms-blocks.js',
+            array( 'jquery', 'wp-data', 'wp-api-fetch' ),
+            $this->settings( 'version' ),
+            true
+        );
+
+        wp_localize_script( 'subscription-terms-blocks', 'reepayBlocksTermsData', array(
+            'label'        => $label,
+            'termsHtml'    => $terms_html,
+            'errorMessage' => __( 'Please read and accept the subscription terms to proceed', 'reepay-subscriptions-for-woocommerce' ),
+        ) );
+
     }
 
     /**
