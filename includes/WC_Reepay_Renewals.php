@@ -424,6 +424,61 @@ class WC_Reepay_Renewals {
 
         $main_order->calculate_totals();
 
+        // Determine the tax country: shipping address takes priority (matches main payment plugin behavior).
+        $tax_country = '';
+        $shipping_country = $main_order->get_shipping_country();
+        $billing_country  = $main_order->get_billing_country();
+        if ( ! empty( $shipping_country ) ) {
+            $tax_country = $shipping_country;
+        } elseif ( ! empty( $billing_country ) ) {
+            $tax_country = $billing_country;
+        }
+
+        // Ensure customer country is set in Frisbii for correct Tax Management VAT calculation.
+        if ( ! empty( $tax_country ) ) {
+            $update_data = [ 'country' => $tax_country ];
+
+            // Use shipping address fields if available, otherwise billing.
+            if ( ! empty( $shipping_country ) ) {
+                $update_data['address']     = $main_order->get_shipping_address_1();
+                $update_data['address2']    = $main_order->get_shipping_address_2();
+                $update_data['city']        = $main_order->get_shipping_city();
+                $update_data['postal_code'] = $main_order->get_shipping_postcode();
+            } else {
+                $update_data['address']     = $main_order->get_billing_address_1();
+                $update_data['address2']    = $main_order->get_billing_address_2();
+                $update_data['city']        = $main_order->get_billing_city();
+                $update_data['postal_code'] = $main_order->get_billing_postcode();
+            }
+
+            try {
+                reepay_s()->api()->request(
+                    'customer/' . $data['customer'],
+                    'PUT',
+                    $update_data
+                );
+            } catch ( Exception $e ) {
+                self::log( [
+                    'log' => [
+                        'source'   => 'WC_Reepay_Renewals::create_subscriptions',
+                        'warning'  => 'Failed to update customer country in Frisbii',
+                        'error'    => $e->getMessage(),
+                        'customer' => $data['customer'],
+                        'country'  => $tax_country,
+                    ]
+                ] );
+            }
+        } else {
+            self::log( [
+                'log' => [
+                    'source'   => 'WC_Reepay_Renewals::create_subscriptions',
+                    'warning'  => 'Both shipping and billing country are empty - VAT may default to account rate',
+                    'order_id' => $main_order->get_id(),
+                    'customer' => $data['customer'],
+                ]
+            ] );
+        }
+
         // create sub-orders renewals
         $created_reepay_order_ids = [];
         foreach ( $orders as $order_key => $order ) {
@@ -451,6 +506,17 @@ class WC_Reepay_Renewals {
                 'log' => [
                     'source'  => 'WC_Reepay_Renewals::create_subscriptions',
                     '$addons' => $addons,
+                ]
+            ] );
+
+            self::log( [
+                'log' => [
+                    'source'            => 'WC_Reepay_Renewals::vat_debug',
+                    'tax_country_used'  => $tax_country,
+                    'billing_country'   => $order->get_billing_country(),
+                    'shipping_country'  => $order->get_shipping_country(),
+                    'customer_handle'   => $data['customer'],
+                    'addon_vat_values'  => array_map( function ( $a ) { return $a['vat'] ?? 'not set'; }, $addons ),
                 ]
             ] );
 
@@ -695,28 +761,43 @@ class WC_Reepay_Renewals {
          */
         $product  = $order_item->get_product();
         $order_item_quantity = $order_item->get_quantity();
+
+        // Calculate the excl. VAT per-unit price from the WC order item.
+        // This ensures Frisbii Tax Management applies the correct country-specific VAT
+        // instead of using the plan's default amount (which may include the store's base VAT).
+        $order_item_data   = $order_item->get_data();
+        $item_subtotal     = (float) ( $order_item_data['subtotal'] ?? 0 ); // excl. tax total
+        $per_unit_excl_vat = $order_item_quantity > 0 ? $item_subtotal / $order_item_quantity : $item_subtotal;
+
         $sub_data = [
             'customer'        => $data['customer'],
             'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
-            //					'amount' => null,
             'quantity'        => $order_item_quantity,
             'test'            => WooCommerce_Reepay_Subscriptions::settings( 'test_mode' ),
             'handle'          => $data['handle'],
-            //					'metadata' => null,
             'source'          => $data['source'],
-            //					'create_customer' => null,
-            //					'plan_version'    => null,
-            'amount_incl_vat' => wc_prices_include_tax(),
-            //					'generate_handle' => null,
+            'amount_incl_vat' => false,
             'grace_duration'  => 172800,
-            //					'no_trial' => null,
-            //					'no_setup_fee' => null,
-            //					'trial_period' => null,
-            //					'subscription_discounts' => null,
             'coupon_codes'    => self::get_reepay_coupons( $split_order, $data['customer'] ),
-            //					'additional_costs' => null,
             'signup_method'   => 'source',
         ];
+
+        // Override amount with excl. VAT price so Frisbii Tax Management adds the correct VAT.
+        if ( function_exists( 'rp_prepare_amount' ) && $per_unit_excl_vat > 0 ) {
+            $sub_data['amount'] = rp_prepare_amount( $per_unit_excl_vat, $main_order->get_currency() );
+
+            self::log( [
+                'log' => [
+                    'source'              => 'WC_Reepay_Renewals::subscription_amount_override',
+                    'per_unit_excl_vat'   => $per_unit_excl_vat,
+                    'amount_cents'        => $sub_data['amount'],
+                    'amount_incl_vat'     => false,
+                    'order_item_subtotal' => $item_subtotal,
+                    'quantity'            => $order_item_quantity,
+                    'currency'            => $main_order->get_currency(),
+                ]
+            ] );
+        }
 
         if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) ) {
             $sub_data['start_date'] = date( 'Y-m-d\TH:i:s', strtotime( "+100 years" ) );
@@ -726,19 +807,12 @@ class WC_Reepay_Renewals {
             $sub_data['add_ons'] = $data['addons'];
         }
 
-        // Disable add coupon discount double time in secound order.
-        /*
-        if ( $main_order->get_id() !== $split_order->get_id() ) {
-            $sub_data['subscription_discounts'] = self::get_reepay_discounts( $main_order, $data['handle'] );
-        }
-        */
-
         // override amount if WPC Product Bundles for WooCommerce
         if ( ! empty( $order_item->get_meta( '_woosb_parent_id' ) ) && function_exists('rp_prepare_amount') ) {
-            $order_item_data = $order_item->get_data();
             $total = (float) $order_item_data['total'] + (float) ($order_item_data['total_tax'] ?? 0);
             $subtotal = $total / $order_item_quantity;
-            $sub_data['amount'] = rp_prepare_amount( $subtotal, $main_order->get_currency() );
+            $sub_data['amount']          = rp_prepare_amount( $subtotal, $main_order->get_currency() );
+            $sub_data['amount_incl_vat'] = true; // Bundle amount already includes tax.
         }
 
         return $sub_data;
@@ -1141,104 +1215,49 @@ class WC_Reepay_Renewals {
         if ( ! empty( $invoice_data ) && ! empty( $invoice_data['order_lines'] ) ) {
             $new_items = [];
 
-            // Check if invoice has VAT data at invoice level
-            $invoice_has_vat = isset( $invoice_data['amount_vat'] ) 
-                && floatval( $invoice_data['amount_vat'] ) > 0;
-
-            // Get discount from order_lines (both with and without VAT)
+            // Get discount from order_lines
             $discount_amount = null;
-            $discount_amount_ex_vat = null;
-            $discount_amount_vat = null;
             foreach ($invoice_data['order_lines'] as $discount_line) {
                 if ($discount_line['origin'] === 'discount') {
                     $discount_amount = abs(floatval( $discount_line['amount'] ) / 100);
-                    if ( $invoice_has_vat && isset( $discount_line['amount_ex_vat'] ) && isset( $discount_line['amount_vat'] ) ) {
-                        $discount_amount_ex_vat = abs(floatval( $discount_line['amount_ex_vat'] ) / 100);
-                        $discount_amount_vat = abs(floatval( $discount_line['amount_vat'] ) / 100);
-                    }
                     break;
                 }
             }
 
             foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
-                // Check if this line item has VAT data
-                $line_has_vat = $invoice_has_vat
-                    && isset( $invoice_lines['vat'] ) 
-                    && floatval( $invoice_lines['vat'] ) > 0
-                    && isset( $invoice_lines['amount_vat'] )
-                    && isset( $invoice_lines['amount_ex_vat'] );
+                /*if ($invoice_lines['origin'] == 'discount') {
+                    continue;
+                }*/
 
                 if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
                     $fees_item = new WC_Order_Item_Fee();
                     $fees_item->set_name( $invoice_lines['ordertext'] );
-                    
-                    if ( $line_has_vat ) {
-                        // Use ex-VAT amounts and set tax separately
-                        $fees_item->set_amount( floatval( $invoice_lines['unit_amount_ex_vat'] ) / 100 );
-                        $fees_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
-                        $fees_item->set_total_tax( floatval( $invoice_lines['amount_vat'] ) / 100 );
-                    } else {
-                        // Fallback: original behavior without VAT
-                        $fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
-                        $fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
-                    }
-                    
+                    $fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
+                    $fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                     $fees_item->add_meta_data( '_is_card_fee', true );
                     $new_items[] = $fees_item;
-                    
                 } elseif( $invoice_lines['origin'] == 'discount' ) {
                     $discount_item = new WC_Order_Item_Coupon();
+                    // $discount_item->set_code( $invoice_lines['ordertext'] );
                     $discount_item->set_code( $invoice_lines['origin_handle'] );
-                    
-                    if ( $line_has_vat ) {
-                        // Use ex-VAT amount and set discount tax
-                        $discount_item->set_discount( abs(floatval( $invoice_lines['amount_ex_vat'] ) / 100) );
-                        $discount_item->set_discount_tax( abs(floatval( $invoice_lines['amount_vat'] ) / 100) );
-                    } else {
-                        // Fallback: original behavior without VAT
-                        $discount_item->set_discount( abs(floatval( $invoice_lines['unit_amount'] ) / 100) );
-                    }
-                    
+                    $discount_item->set_discount( abs(floatval( $invoice_lines['unit_amount'] ) / 100) );
                     $new_items[] = $discount_item;
-                    
                 } else {
                     $product_item = new WC_Order_Item_Product();
                     $product_item->set_name( $invoice_lines['ordertext'] );
                     $product_item->set_quantity( $invoice_lines['quantity'] );
-                    
-                    if ( $line_has_vat ) {
-                        // Set subtotal with VAT data
-                        $product_item->set_subtotal( floatval( $invoice_lines['unit_amount_ex_vat'] ) / 100 );
-                        $product_item->set_subtotal_tax( floatval( $invoice_lines['unit_amount_vat'] ) / 100 );
-                        
-                        // Handle total (with or without discount)
-                        if ( $invoice_lines['origin'] == 'plan' && $discount_amount_ex_vat !== null ) {
-                            // Calculate total after discount
-                            $total_ex_vat = floatval( $invoice_lines['amount_ex_vat'] ) / 100 - $discount_amount_ex_vat;
-                            $total_vat = floatval( $invoice_lines['amount_vat'] ) / 100 - $discount_amount_vat;
-                            $product_item->set_total( $total_ex_vat );
-                            $product_item->set_total_tax( $total_vat );
-                        } else {
-                            $product_item->set_total( floatval( $invoice_lines['amount_ex_vat'] ) / 100 );
-                            $product_item->set_total_tax( floatval( $invoice_lines['amount_vat'] ) / 100 );
-                        }
-                    } else {
-                        // Fallback: original behavior without VAT
-                        $product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
-                        
-                        if ( $invoice_lines['origin'] == 'plan' ) {
-                            if ( $discount_amount !== null ) {
-                                $total = floatval( $invoice_lines['amount'] ) / 100;
-                                $total_with_discount = $total - $discount_amount;
-                                $product_item->set_total( $total_with_discount );
-                            } else {
-                                $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
-                            }
+                    $product_item->set_subtotal( floatval( $invoice_lines['unit_amount'] ) / 100 );
+                    if($invoice_lines['origin'] == 'plan'){
+                    if ( $discount_amount !== null ){
+                        $total = floatval( $invoice_lines['amount'] ) / 100;
+                        $total_with_discount = $total - $discount_amount;
+                        $product_item->set_total( $total_with_discount );
                         } else {
                             $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                         }
+                    } else {
+                        $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                     }
-                    
                     $new_items[] = $product_item;
                 }
             }
@@ -1266,19 +1285,12 @@ class WC_Reepay_Renewals {
             $customer = $parent_order->get_customer_id();
         }
 
-        // Determine whether to let WooCommerce calculate taxes
-        // If invoice has VAT data, we will set (calc_taxes = truet)
-        $invoice_has_vat = ! empty( $invoice_data ) 
-            && isset( $invoice_data['amount_vat'] ) 
-            && floatval( $invoice_data['amount_vat'] ) > 0;
-        $calc_taxes = $invoice_has_vat;
-
         self::create_order_copy( [
             'status'       => $status,
             'parent'       => ! empty( $parent_order ) ? $parent_order->get_id() : null,
             'customer_id'  => $customer,
             'subscription' => ! empty( $data['subscription'] ) ? $data['subscription'] : null,
-        ], ! empty( $parent_order ) ? $parent_order : false, $items, $calc_taxes, $invoice_data );
+        ], ! empty( $parent_order ) ? $parent_order : false, $items, false, $invoice_data );
     }
 
     /**
@@ -1918,6 +1930,10 @@ class WC_Reepay_Renewals {
             return [];
         }
 
+        // Use shipping country for tax lookup (priority), billing country as fallback.
+        $shipping_country = $order->get_shipping_country();
+        $tax_country      = ! empty( $shipping_country ) ? $shipping_country : $order->get_billing_country();
+
         return [
             [
                 'name'          => $shm_data['reepay_shipping_addon_name'],
@@ -1925,7 +1941,7 @@ class WC_Reepay_Renewals {
                 'type'          => 'on_off',
                 'fixed_amount ' => true,
                 'amount'        => $shm_data['cost'] ? ($shm_data['cost'] * 100) :  0,
-                'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
+                'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping( $tax_country ),
                 'vat_type'      => wc_prices_include_tax(),
                 'handle'        => $shm_data['reepay_shipping_addon'],
                 'exist'         => $shm_data['reepay_shipping_addon'],
