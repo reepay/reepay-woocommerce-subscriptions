@@ -244,6 +244,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'   => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                'line'     => __LINE__,
                 'event'    => 'Subscription create request',
                 'data'     => $data,
                 'order_id' => empty( $order ) ? 'false' : $order->get_id()
@@ -255,6 +256,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                    'line'   => __LINE__,
                     'error'  => 'Order not found',
                     'data'   => $data
                 ],
@@ -270,6 +272,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'  => 'WC_Reepay_Renewals::child_order',
+                'line'    => __LINE__,
                 'error'   => '',
                 'data'    => $child_order ?? '-',
                 'invoice' => $data['invoice'] ?? 'empty'
@@ -296,7 +299,8 @@ class WC_Reepay_Renewals {
         if ( ! self::is_order_contain_subscription( $order ) ) {
             self::log( [
                 'log' => [
-                    'source' => 'WC_Reepay_Renewals::create_subscription',
+                    'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                    'line'   => __LINE__,
                     'error'  => 'Order not contain subscription',
                     'data'   => $data
                 ],
@@ -367,7 +371,9 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'     => 'WC_Reepay_Renewals::create_subscriptions',
+                'line'       => __LINE__,
                 'main_order' => $main_order->get_id(),
+                'info'        => 'Creating subscriptions for order',
                 'data'       => $data,
             ]
         ] );
@@ -384,6 +390,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log'    => [
                     'source' => 'WC_Reepay_Renewals::create_subscriptions',
+                    'line'   => __LINE__,
                     'error'  => 'Empty token',
                     'data'   => $data
                 ],
@@ -408,6 +415,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source' => 'WC_Reepay_Renewals::customer_id_connect',
+                'line'   => __LINE__,
                 '$data'  => $main_order->get_customer_id(),
             ]
         ] );
@@ -520,6 +528,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log' => [
                     'source'  => 'WC_Reepay_Renewals::create_subscriptions',
+                    'line'    => __LINE__,
                     '$addons' => $addons,
                 ]
             ] );
@@ -556,6 +565,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log'    => [
                         'source' => 'WC_Reepay_Renewals::create_subscriptions',
+                        'line'   => __LINE__,
                         'error'  => 'set-payment-method',
                         'data'   => $data
                     ],
@@ -717,6 +727,14 @@ class WC_Reepay_Renewals {
             }
         }
 
+        self::log( [
+        'log' => [
+            'source'  => 'WC_Reepay_Renewals::get_division_of_products_into_orders',
+            'line'    => __LINE__,
+            '$created_order_ids' => $created_order_ids,
+            ]
+        ] );
+
         return array( $orders, $created_order_ids );
     }
 
@@ -745,6 +763,13 @@ class WC_Reepay_Renewals {
                 'handle' => $handle,
                 'source' => $token,
             ] );
+            self::log( [
+            'log' => [
+                'source'  => 'WC_Reepay_Renewals::create_payment_method',
+                'line'    => __LINE__,
+                'handle'  => $handle,
+                ]
+            ]);
         } catch ( Exception $e ) {
             self::log( [
                 'notice' => $e->getMessage()
@@ -880,6 +905,14 @@ class WC_Reepay_Renewals {
                 $order_item,
                 $data
             );
+            self::log( [
+            'log' => [
+                'source'  => 'WC_Reepay_Renewals::create_subscription_from_order_item',
+                'line'    => __LINE__,
+                'data'    => $sub_data,
+                'plan'    => $product->get_meta( '_reepay_subscription_handle' )
+                ]
+            ]);
             $new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
         } catch ( Exception $e ) {
             $notice = sprintf(
@@ -895,7 +928,8 @@ class WC_Reepay_Renewals {
         if ( empty( $new_subscription ) ) {
             self::log( [
                 'log'    => [
-                    'source' => 'WC_Reepay_Renewals::create_subscriptions',
+                    'source' => 'WC_Reepay_Renewals::create_subscription_from_order_item',
+                    'line'   => __LINE__,
                     'error'  => 'create-subscription',
                     'data'   => $sub_data ?? 'empty',
                     'plan'   => $product->get_meta( '_reepay_subscription_handle' )
@@ -1145,6 +1179,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'  => 'WC_Reepay_Renewals::create_child_order',
+                'line'    => __LINE__,
                 '$data'   => $data,
                 '$status' => $status
             ]
@@ -1158,6 +1193,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log' => [
                         'source' => 'WC_Reepay_Renewals::create_child_order',
+                        'line'   => __LINE__,
                         'error'  => 'Empty subscription id'
                     ]
                 ] );
@@ -1172,6 +1208,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log' => [
                         'source' => 'WC_Reepay_Renewals::create_child_order',
+                        'line'   => __LINE__,
                         'info'   => 'Undefined parent order'
                     ]
                 ] );
@@ -1205,6 +1242,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_child_order',
+                    'line'   => __LINE__,
                     'error'  => 'duplicate status - ' . $status
                 ]
             ] );
@@ -1215,6 +1253,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source' => 'WC_Reepay_Renewals::create_child_order',
+                'line'   => __LINE__,
                 'data'   => $data,
             ]
         ] );
@@ -1239,7 +1278,8 @@ class WC_Reepay_Renewals {
 
         self::log( [
             'log' => [
-                'source' => 'WC_Reepay_Renewals::create_child_invoice_data',
+                'source' => 'WC_Reepay_Renewals::create_child_order',
+                'line'   => __LINE__,
                 'data'   => $invoice_data,
             ]
         ] );
@@ -1360,6 +1400,7 @@ class WC_Reepay_Renewals {
             [
                 'log' => [
                     'source'        => 'WC_Reepay_Renewals::create_child_order_items',
+                    'line'          => __LINE__,
                     'items_count'   => count( $items ),
                     '$parent_order' => ! empty( $parent_order ) ? $parent_order->get_id() : null,
                     '$data'         => $data,
@@ -1409,6 +1450,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'  => 'WC_Reepay_Renewals::update_subscription_status',
+                'line'    => __LINE__,
                 '$data'   => $data,
                 '$status' => $status
             ]
@@ -1777,6 +1819,14 @@ class WC_Reepay_Renewals {
         if ( $main_order ) {
             $main_order->save();
         }
+
+        self::log( [
+            'log' => [
+                'source'    => 'WC_Reepay_Renewals::create_order_copy',
+                'line'      => __LINE__,
+                'order_id'  => $new_order->get_id(),
+            ]
+        ] );
 
         $new_order->set_status( $status_to_set );
         $new_order->save();
