@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Frisbii Billing while still keeping your usual WooCommerce tools. The Frisbii Billing for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: Frisbii
  * Author URI: https://frisbii.com
- * Version: 1.3.3
+ * Version: 1.3.4
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -186,6 +186,12 @@ class WooCommerce_Reepay_Subscriptions
         add_action('woocommerce_checkout_update_order_meta', [$this, 'subscription_terms_checkbox_order_meta'], 10);
         add_action('woocommerce_admin_order_data_after_billing_address', [$this, 'subscription_terms_display_admin_order_meta'], 10, 1);
         add_action('reepay_subscriptions_orders_created', [$this, 'subscription_terms_checkbox_to_reepay_suborder'], 10, 2);
+        
+        // Order Pay page hooks
+        add_action('woocommerce_pay_order_before_submit', [$this, 'subscription_terms_checkbox_order_pay'], 10);
+        add_action('woocommerce_before_pay_action', [$this, 'subscription_terms_checkbox_process_order_pay'], 10, 1);
+
+        add_action('woocommerce_blocks_enqueue_checkout_block_scripts_after', [$this, 'subscription_terms_blocks_checkout_script']);
     }
 
     public function support_HPOS()
@@ -755,7 +761,7 @@ class WooCommerce_Reepay_Subscriptions
     }
 
     public function subscription_terms_checkbox_script(){
-        if ( is_checkout() ) {
+        if ( is_checkout() || is_wc_endpoint_url('order-pay') ) {
             wp_register_script(
                 'subscription-terms-conditions', 
                 $this->settings('plugin_url').'assets/js/subscription-terms-conditions.js',
@@ -766,6 +772,44 @@ class WooCommerce_Reepay_Subscriptions
 
             wp_enqueue_script( 'subscription-terms-conditions' );
         }
+    }
+
+    public function subscription_terms_blocks_checkout_script() {
+        if ( get_option( '_reepay_enable_subscription_terms' ) !== 'yes' ) {
+            return;
+        }
+
+        if ( ! WC_Reepay_Checkout::is_reepay_product_in_cart() ) {
+            return;
+        }
+
+        $terms_html = '';
+        $page_subscription_terms = get_option( '_reepay_page_subscription_terms' );
+        if ( $page_subscription_terms !== '0' ) {
+            $sanitizer = wc_get_container()->get( HtmlSanitizer::class );
+            $page      = get_post( $page_subscription_terms );
+
+            if ( $page && 'publish' === $page->post_status && $page->post_content && ! has_shortcode( $page->post_content, 'woocommerce_checkout' ) ) {
+                $terms_html = wc_format_content( $sanitizer->styled_post_content( $page->post_content ) );
+            }
+        }
+
+        $label = self::subscription_terms_checkbox_label();
+
+        wp_enqueue_script(
+            'subscription-terms-blocks',
+            $this->settings( 'plugin_url' ) . 'assets/js/subscription-terms-blocks.js',
+            array( 'jquery', 'wp-data', 'wp-api-fetch' ),
+            $this->settings( 'version' ),
+            true
+        );
+
+        wp_localize_script( 'subscription-terms-blocks', 'reepayBlocksTermsData', array(
+            'label'        => $label,
+            'termsHtml'    => $terms_html,
+            'errorMessage' => __( 'Please read and accept the subscription terms to proceed', 'reepay-subscriptions-for-woocommerce' ),
+        ) );
+
     }
 
     /**
@@ -921,6 +965,94 @@ class WooCommerce_Reepay_Subscriptions
             } else {
                 echo '<p><strong>' . __('Subscription Terms Accepted:') . ' :</strong> ' . __('No') . '</p>';
             }
+        }
+    }
+
+    /**
+     * Add subscription terms checkbox to Order Pay page
+     * Hooked to woocommerce_pay_order_before_submit
+     */
+    public function subscription_terms_checkbox_order_pay(){
+        if(get_option('_reepay_enable_subscription_terms') !== 'yes'){
+            return;
+        }
+
+        global $wp;
+        $order_id = absint( $wp->query_vars['order-pay'] );
+        $order = wc_get_order( $order_id );
+
+        if ( ! $order ) {
+            return;
+        }
+
+        // Check if order has subscription product
+        $has_reepay_product = false;
+        foreach ( $order->get_items() as $item ) {
+            $product_id = $item->get_product_id();
+            if ( WC_Reepay_Checkout::is_reepay_product($product_id) ) {
+                $has_reepay_product = true;
+                break;
+            }
+        }
+
+        // If the order has subscription product, display the checkbox
+        if ( $has_reepay_product ) {
+            echo "<style>
+            .woocommerce-terms-and-conditions-wrapper .form-row{margin-bottom:0;}
+            #subscription_terms_field{padding-top:0 !important;}
+            </style>";
+            echo '<div class="billwerk-optimize-terms-and-conditions-wrapper">';
+
+            $page_subscription_terms = get_option('_reepay_page_subscription_terms');
+            if($page_subscription_terms !== '0'){
+                $sanitizer = wc_get_container()->get( HtmlSanitizer::class );
+                $page      = get_post( $page_subscription_terms );
+
+                if ( $page && 'publish' === $page->post_status && $page->post_content && ! has_shortcode( $page->post_content, 'woocommerce_checkout' ) ) {
+                    echo '<div class="billwerk-optimize-terms-and-conditions" style="display: none; max-height: 200px; overflow: auto; padding: 1em; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2); margin-bottom: 16px;background-color: rgba(0, 0, 0, .05);">' . wc_format_content( $sanitizer->styled_post_content( $page->post_content ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                }
+            }
+
+            $label = $this->subscription_terms_checkbox_label();
+
+            woocommerce_form_field('subscription_terms', array(
+                'type'      => 'checkbox',
+                'class'     => array('form-row', 'custom-checkbox'),
+                'label_class' => array('woocommerce-form__label', 'woocommerce-form__label-for-checkbox', 'checkbox'),
+                'input_class' => array('woocommerce-form__input-checkbox'),
+                'label'     => $label,
+                'required'  => true,
+            ));
+            echo '</div>';
+        }
+    }
+
+    /**
+     * Validate subscription terms checkbox on Order Pay page
+     * Hooked to woocommerce_before_pay_action
+     */
+    public function subscription_terms_checkbox_process_order_pay($order){
+        if(get_option('_reepay_enable_subscription_terms') !== 'yes'){
+            return;
+        }
+
+        // Check if order has subscription product
+        $has_reepay_product = false;
+        foreach ( $order->get_items() as $item ) {
+            $product_id = $item->get_product_id();
+            if ( WC_Reepay_Checkout::is_reepay_product($product_id) ) {
+                $has_reepay_product = true;
+                break;
+            }
+        }
+
+        // If the order has subscription product and the checkbox is not checked, throw an error
+        if ( $has_reepay_product && !isset($_POST['subscription_terms']) ) {
+            wc_add_notice(__('Please read and accept the subscription terms to proceed', 'reepay-subscriptions-for-woocommerce'), 'error');
+        } else if ( $has_reepay_product && isset($_POST['subscription_terms']) ) {
+            // Save the subscription terms acceptance to order meta
+            $order->update_meta_data( '_subscription_terms', sanitize_text_field($_POST['subscription_terms']) );
+            $order->save();
         }
     }
 }

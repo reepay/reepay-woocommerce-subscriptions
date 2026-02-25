@@ -690,12 +690,20 @@ class WC_Reepay_Subscription_Plan_Simple {
 		return ! empty( $_REQUEST ) && ! empty( $_REQUEST['product-type'] ) && $_REQUEST['product-type'] == 'reepay_simple_subscriptions';
 	}
 
-	public static function get_vat( $post_id ) {
+	/**
+	 * Get VAT rate for a product, optionally for a specific country.
+	 *
+	 * @param int    $post_id Product/post ID.
+	 * @param string $country Optional ISO 2-letter country code (e.g. 'TH', 'DK'). Uses wildcard if empty.
+	 *
+	 * @return float VAT rate as decimal (e.g. 0.07 for 7%).
+	 */
+	public static function get_vat( $post_id, $country = '' ) {
 		$product = wc_get_product( $post_id );
 		$vat     = 0;
 		if ( 'taxable' == $product->get_tax_status() && wc_tax_enabled() ) {
 			$calculate_tax_for              = [
-				'country'  => '*',
+				'country'  => ! empty( $country ) ? $country : '*',
 				'state'    => '*',
 				'city'     => '*',
 				'postcode' => '*',
@@ -714,7 +722,14 @@ class WC_Reepay_Subscription_Plan_Simple {
 		return $vat;
 	}
 
-	public static function get_vat_shipping() {
+	/**
+	 * Get shipping VAT rate, optionally for a specific country.
+	 *
+	 * @param string $country Optional ISO 2-letter country code (e.g. 'TH', 'DK'). Uses wildcard if empty.
+	 *
+	 * @return float VAT rate as decimal (e.g. 0.07 for 7%).
+	 */
+	public static function get_vat_shipping( $country = '' ) {
 		$vat                = 0;
 		$shipping_tax_class = get_option( 'woocommerce_shipping_tax_class' );
 
@@ -723,7 +738,7 @@ class WC_Reepay_Subscription_Plan_Simple {
 		if ( ! is_null( $tax_class ) ) {
 			$matched_tax_rates = WC_Tax::find_shipping_rates(
 				[
-					'country'   => '*',
+					'country'   => ! empty( $country ) ? $country : '*',
 					'state'     => '*',
 					'city'      => '*',
 					'postcode'  => '*',

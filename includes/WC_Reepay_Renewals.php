@@ -244,6 +244,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'   => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                'line'     => __LINE__,
                 'event'    => 'Subscription create request',
                 'data'     => $data,
                 'order_id' => empty( $order ) ? 'false' : $order->get_id()
@@ -255,6 +256,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                    'line'   => __LINE__,
                     'error'  => 'Order not found',
                     'data'   => $data
                 ],
@@ -270,6 +272,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'  => 'WC_Reepay_Renewals::child_order',
+                'line'    => __LINE__,
                 'error'   => '',
                 'data'    => $child_order ?? '-',
                 'invoice' => $data['invoice'] ?? 'empty'
@@ -296,7 +299,8 @@ class WC_Reepay_Renewals {
         if ( ! self::is_order_contain_subscription( $order ) ) {
             self::log( [
                 'log' => [
-                    'source' => 'WC_Reepay_Renewals::create_subscription',
+                    'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                    'line'   => __LINE__,
                     'error'  => 'Order not contain subscription',
                     'data'   => $data
                 ],
@@ -367,7 +371,9 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'     => 'WC_Reepay_Renewals::create_subscriptions',
+                'line'       => __LINE__,
                 'main_order' => $main_order->get_id(),
+                'info'        => 'Creating subscriptions for order',
                 'data'       => $data,
             ]
         ] );
@@ -384,6 +390,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log'    => [
                     'source' => 'WC_Reepay_Renewals::create_subscriptions',
+                    'line'   => __LINE__,
                     'error'  => 'Empty token',
                     'data'   => $data
                 ],
@@ -408,6 +415,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source' => 'WC_Reepay_Renewals::customer_id_connect',
+                'line'   => __LINE__,
                 '$data'  => $main_order->get_customer_id(),
             ]
         ] );
@@ -423,6 +431,76 @@ class WC_Reepay_Renewals {
         $main_order->save_meta_data();
 
         $main_order->calculate_totals();
+
+         // Determine the tax country: shipping address takes priority (matches main payment plugin behavior).
+        $tax_country = '';
+        $shipping_country = $main_order->get_shipping_country();
+        $billing_country  = $main_order->get_billing_country();
+        if ( ! empty( $shipping_country ) ) {
+            $tax_country = $shipping_country;
+        } elseif ( ! empty( $billing_country ) ) {
+            $tax_country = $billing_country;
+        }
+
+        // Ensure customer country is set in Frisbii for correct Tax Management VAT calculation.
+        $billing_country = $main_order->get_billing_country();
+        if ( ! empty( $tax_country ) && function_exists( 'reepay' ) ) {
+             $update_data = [ 'country' => $tax_country ];
+
+            // Use shipping address fields if available, otherwise billing.
+            if ( ! empty( $shipping_country ) ) {
+                $update_data['address']     = $main_order->get_shipping_address_1();
+                $update_data['address2']    = $main_order->get_shipping_address_2();
+                $update_data['city']        = $main_order->get_shipping_city();
+                $update_data['postal_code'] = $main_order->get_shipping_postcode();
+            } else {
+                $update_data['address']     = $main_order->get_billing_address_1();
+                $update_data['address2']    = $main_order->get_billing_address_2();
+                $update_data['city']        = $main_order->get_billing_city();
+                $update_data['postal_code'] = $main_order->get_billing_postcode();
+            }
+             // try {
+            //     reepay()->api( 'reepay_subscriptions' )->request(
+            //         'PUT',
+            //         'https://api.reepay.com/v1/customer/' . $data['customer'],
+            //         // [
+            //         //     'country'     => $billing_country,
+            //         //     'address'     => $main_order->get_billing_address_1(),
+            //         //     'address2'    => $main_order->get_billing_address_2(),
+            //         //     'city'        => $main_order->get_billing_city(),
+            //         //     'postal_code' => $main_order->get_billing_postcode(),
+            //         // ]
+            //         $update_data
+            //     );
+            // } 
+            try {
+                reepay_s()->api()->request(
+                    'customer/' . $data['customer'],
+                    'PUT',
+                    $update_data
+                );
+            } catch ( Exception $e ) {
+                self::log( [
+                    'log' => [
+                        'source'   => 'WC_Reepay_Renewals::create_subscriptions',
+                        'warning'  => 'Failed to update customer country in Frisbii',
+                        'error'    => $e->getMessage(),
+                        'customer' => $data['customer'],
+                        'country'  => $tax_country,
+                    ]
+                ] );
+            }
+        } else {
+            self::log( [
+                'log' => [
+                    'source'   => 'WC_Reepay_Renewals::create_subscriptions',
+                    'warning'  => 'Both shipping and billing country are empty - VAT may default to account rate',
+                    'order_id' => $main_order->get_id(),
+                    'customer' => $data['customer'],
+                ]
+            ] );
+        }
+
 
         // create sub-orders renewals
         $created_reepay_order_ids = [];
@@ -450,7 +528,19 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log' => [
                     'source'  => 'WC_Reepay_Renewals::create_subscriptions',
+                    'line'    => __LINE__,
                     '$addons' => $addons,
+                ]
+            ] );
+
+            self::log( [
+                'log' => [
+                    'source'            => 'WC_Reepay_Renewals::vat_debug',
+                    'tax_country_used'  => $tax_country,
+                    'billing_country'   => $order->get_billing_country(),
+                    'shipping_country'  => $order->get_shipping_country(),
+                    'customer_handle'   => $data['customer'],
+                    'addon_vat_values'  => array_map( function ( $a ) { return $a['vat'] ?? 'not set'; }, $addons ),
                 ]
             ] );
 
@@ -475,6 +565,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log'    => [
                         'source' => 'WC_Reepay_Renewals::create_subscriptions',
+                        'line'   => __LINE__,
                         'error'  => 'set-payment-method',
                         'data'   => $data
                     ],
@@ -636,6 +727,14 @@ class WC_Reepay_Renewals {
             }
         }
 
+        self::log( [
+        'log' => [
+            'source'  => 'WC_Reepay_Renewals::get_division_of_products_into_orders',
+            'line'    => __LINE__,
+            '$created_order_ids' => $created_order_ids,
+            ]
+        ] );
+
         return array( $orders, $created_order_ids );
     }
 
@@ -664,6 +763,13 @@ class WC_Reepay_Renewals {
                 'handle' => $handle,
                 'source' => $token,
             ] );
+            self::log( [
+            'log' => [
+                'source'  => 'WC_Reepay_Renewals::create_payment_method',
+                'line'    => __LINE__,
+                'handle'  => $handle,
+                ]
+            ]);
         } catch ( Exception $e ) {
             self::log( [
                 'notice' => $e->getMessage()
@@ -695,6 +801,13 @@ class WC_Reepay_Renewals {
          */
         $product  = $order_item->get_product();
         $order_item_quantity = $order_item->get_quantity();
+          // Calculate the excl. VAT per-unit price from the WC order item.
+        // This ensures Frisbii Tax Management applies the correct country-specific VAT
+        // instead of using the plan's default amount (which may include the store's base VAT).
+        $order_item_data   = $order_item->get_data();
+        $item_subtotal     = (float) ( $order_item_data['subtotal'] ?? 0 ); // excl. tax total
+        $per_unit_excl_vat = $order_item_quantity > 0 ? $item_subtotal / $order_item_quantity : $item_subtotal;
+
         $sub_data = [
             'customer'        => $data['customer'],
             'plan'            => $product->get_meta( '_reepay_subscription_handle' ),
@@ -706,7 +819,8 @@ class WC_Reepay_Renewals {
             'source'          => $data['source'],
             //					'create_customer' => null,
             //					'plan_version'    => null,
-            'amount_incl_vat' => wc_prices_include_tax(),
+            // 'amount_incl_vat' => wc_prices_include_tax(),
+            'amount_incl_vat' => false,
             //					'generate_handle' => null,
             'grace_duration'  => 172800,
             //					'no_trial' => null,
@@ -717,6 +831,25 @@ class WC_Reepay_Renewals {
             //					'additional_costs' => null,
             'signup_method'   => 'source',
         ];
+
+        
+        // Override amount with excl. VAT price so Frisbii Tax Management adds the correct VAT.
+        if ( function_exists( 'rp_prepare_amount' ) && $per_unit_excl_vat > 0 ) {
+            $sub_data['amount'] = rp_prepare_amount( $per_unit_excl_vat, $main_order->get_currency() );
+
+            self::log( [
+                'log' => [
+                    'source'              => 'WC_Reepay_Renewals::subscription_amount_override',
+                    'per_unit_excl_vat'   => $per_unit_excl_vat,
+                    'amount_cents'        => $sub_data['amount'],
+                    'amount_incl_vat'     => false,
+                    'order_item_subtotal' => $item_subtotal,
+                    'quantity'            => $order_item_quantity,
+                    'currency'            => $main_order->get_currency(),
+                ]
+            ] );
+        }
+
 
         if ( WooCommerce_Reepay_Subscriptions::settings( '_reepay_manual_start_date' ) ) {
             $sub_data['start_date'] = date( 'Y-m-d\TH:i:s', strtotime( "+100 years" ) );
@@ -735,10 +868,12 @@ class WC_Reepay_Renewals {
 
         // override amount if WPC Product Bundles for WooCommerce
         if ( ! empty( $order_item->get_meta( '_woosb_parent_id' ) ) && function_exists('rp_prepare_amount') ) {
-            $order_item_data = $order_item->get_data();
+            // $order_item_data = $order_item->get_data();
             $total = (float) $order_item_data['total'] + (float) ($order_item_data['total_tax'] ?? 0);
             $subtotal = $total / $order_item_quantity;
-            $sub_data['amount'] = rp_prepare_amount( $subtotal, $main_order->get_currency() );
+            // $sub_data['amount'] = rp_prepare_amount( $subtotal, $main_order->get_currency() );
+            $sub_data['amount']          = rp_prepare_amount( $subtotal, $main_order->get_currency() );
+            $sub_data['amount_incl_vat'] = true; // Bundle amount already includes tax.
         }
 
         return $sub_data;
@@ -770,6 +905,14 @@ class WC_Reepay_Renewals {
                 $order_item,
                 $data
             );
+            self::log( [
+            'log' => [
+                'source'  => 'WC_Reepay_Renewals::create_subscription_from_order_item',
+                'line'    => __LINE__,
+                'data'    => $sub_data,
+                'plan'    => $product->get_meta( '_reepay_subscription_handle' )
+                ]
+            ]);
             $new_subscription = reepay_s()->api()->request( 'subscription', 'POST', $sub_data );
         } catch ( Exception $e ) {
             $notice = sprintf(
@@ -785,7 +928,8 @@ class WC_Reepay_Renewals {
         if ( empty( $new_subscription ) ) {
             self::log( [
                 'log'    => [
-                    'source' => 'WC_Reepay_Renewals::create_subscriptions',
+                    'source' => 'WC_Reepay_Renewals::create_subscription_from_order_item',
+                    'line'   => __LINE__,
                     'error'  => 'create-subscription',
                     'data'   => $sub_data ?? 'empty',
                     'plan'   => $product->get_meta( '_reepay_subscription_handle' )
@@ -1035,6 +1179,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'  => 'WC_Reepay_Renewals::create_child_order',
+                'line'    => __LINE__,
                 '$data'   => $data,
                 '$status' => $status
             ]
@@ -1048,6 +1193,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log' => [
                         'source' => 'WC_Reepay_Renewals::create_child_order',
+                        'line'   => __LINE__,
                         'error'  => 'Empty subscription id'
                     ]
                 ] );
@@ -1062,6 +1208,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log' => [
                         'source' => 'WC_Reepay_Renewals::create_child_order',
+                        'line'   => __LINE__,
                         'info'   => 'Undefined parent order'
                     ]
                 ] );
@@ -1095,6 +1242,7 @@ class WC_Reepay_Renewals {
             self::log( [
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_child_order',
+                    'line'   => __LINE__,
                     'error'  => 'duplicate status - ' . $status
                 ]
             ] );
@@ -1105,6 +1253,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source' => 'WC_Reepay_Renewals::create_child_order',
+                'line'   => __LINE__,
                 'data'   => $data,
             ]
         ] );
@@ -1129,7 +1278,8 @@ class WC_Reepay_Renewals {
 
         self::log( [
             'log' => [
-                'source' => 'WC_Reepay_Renewals::create_child_invoice_data',
+                'source' => 'WC_Reepay_Renewals::create_child_order',
+                'line'   => __LINE__,
                 'data'   => $invoice_data,
             ]
         ] );
@@ -1250,6 +1400,7 @@ class WC_Reepay_Renewals {
             [
                 'log' => [
                     'source'        => 'WC_Reepay_Renewals::create_child_order_items',
+                    'line'          => __LINE__,
                     'items_count'   => count( $items ),
                     '$parent_order' => ! empty( $parent_order ) ? $parent_order->get_id() : null,
                     '$data'         => $data,
@@ -1299,6 +1450,7 @@ class WC_Reepay_Renewals {
         self::log( [
             'log' => [
                 'source'  => 'WC_Reepay_Renewals::update_subscription_status',
+                'line'    => __LINE__,
                 '$data'   => $data,
                 '$status' => $status
             ]
@@ -1668,6 +1820,14 @@ class WC_Reepay_Renewals {
             $main_order->save();
         }
 
+        self::log( [
+            'log' => [
+                'source'    => 'WC_Reepay_Renewals::create_order_copy',
+                'line'      => __LINE__,
+                'order_id'  => $new_order->get_id(),
+            ]
+        ] );
+
         $new_order->set_status( $status_to_set );
         $new_order->save();
         $new_order->calculate_totals( $calc_taxes );
@@ -1918,6 +2078,11 @@ class WC_Reepay_Renewals {
             return [];
         }
 
+        // Use shipping country for tax lookup (priority), billing country as fallback.
+        $shipping_country = $order->get_shipping_country();
+        $tax_country      = ! empty( $shipping_country ) ? $shipping_country : $order->get_billing_country();
+
+
         return [
             [
                 'name'          => $shm_data['reepay_shipping_addon_name'],
@@ -1925,7 +2090,9 @@ class WC_Reepay_Renewals {
                 'type'          => 'on_off',
                 'fixed_amount ' => true,
                 'amount'        => $shm_data['cost'] ? ($shm_data['cost'] * 100) :  0,
-                'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
+                // 'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
+                // 'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping( $order->get_billing_country() ),
+                'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping( $tax_country ),
                 'vat_type'      => wc_prices_include_tax(),
                 'handle'        => $shm_data['reepay_shipping_addon'],
                 'exist'         => $shm_data['reepay_shipping_addon'],

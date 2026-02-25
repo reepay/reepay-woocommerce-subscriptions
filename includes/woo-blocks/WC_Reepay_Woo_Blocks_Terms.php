@@ -8,7 +8,11 @@ class WC_Reepay_Woo_Blocks_Terms {
 	 * Constructor.
 	 */
     public function __construct(){
-        add_action( 'woocommerce_blocks_loaded', array( $this, 'wc_reepay_woo_blocks_terms_init' ) );
+        if ( did_action( 'woocommerce_blocks_loaded' ) ) {
+            $this->wc_reepay_woo_blocks_terms_init();
+        } else {
+            add_action( 'woocommerce_blocks_loaded', array( $this, 'wc_reepay_woo_blocks_terms_init' ) );
+        }
     }
 
     /**
@@ -58,6 +62,31 @@ class WC_Reepay_Woo_Blocks_Terms {
             // Add hooks relevant to extending the Woo core experience.
             $extend_core = new WC_Reepay_Woo_Blocks_Terms_Extend_Woo_Core();
             $extend_core->init();
+
+            register_block_type( 'wc-reepay-woo-blocks-terms/checkbox', array(
+                'api_version'            => 3,
+                'title'                  => 'Subscription terms checkbox',
+                'parent'                 => array( 'woocommerce/checkout-fields-block' ),
+                'category'               => 'woocommerce',
+                'supports'               => array(
+                    'html'     => false,
+                    'align'    => false,
+                    'multiple' => false,
+                    'reusable' => false,
+                ),
+                'attributes'             => array(
+                    'lock' => array(
+                        'type'    => 'object',
+                        'default' => array(
+                            'remove' => true,
+                            'move'   => true,
+                        ),
+                    ),
+                ),
+                'textdomain'             => 'reepay-subscriptions-for-woocommerce',
+                'editor_script_handles'  => array( 'wc-reepay-woo-blocks-terms-editor' ),
+                'style_handles'          => array( 'wc-reepay-woo-blocks-terms-style' ),
+            ) );
 
             add_action( 'admin_enqueue_scripts', array( $this, 'wc_reepay_woo_blocks_terms_style' ) );
             add_action( 'wp_enqueue_scripts', array( $this, 'wc_reepay_woo_blocks_terms_style' ) );
