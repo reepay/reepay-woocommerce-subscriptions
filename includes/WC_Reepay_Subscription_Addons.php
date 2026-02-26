@@ -121,12 +121,16 @@ class WC_Reepay_Subscription_Addons {
 	public function add_cart_item( $cart_item ) {
 
 		if ( ! empty( $cart_item['addons'] ) && apply_filters( 'woocommerce_product_addons_adjust_price', true, $cart_item ) ) {
-			$price = $cart_item['data']->get_price();
+			$price    = $cart_item['data']->get_price();
+			$cart_qty = max( 1, (int) ( $cart_item['quantity'] ?? 1 ) );
 
 			foreach ( $cart_item['addons'] as $addon ) {
 				if ( (float) $addon['amount'] > 0 ) {
 					if ( ! empty( $addon['quantity'] ) ) {
-						$price += (float) $addon['amount'] * (int) $addon['quantity'];
+						// BWSM-84: quantity-type addon is a flat cost independent of product quantity.
+						// Divide by cart qty so WC line total (price × qty) gives the correct flat amount.
+						$addon_total = (float) $addon['amount'] * (int) $addon['quantity'];
+						$price      += $addon_total / $cart_qty;
 					} else {
 						$price += (float) $addon['amount'];
 					}
