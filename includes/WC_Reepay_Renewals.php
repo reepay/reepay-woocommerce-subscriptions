@@ -899,7 +899,20 @@ class WC_Reepay_Renewals {
         }
 
         if ( ! empty( $data['addons'] ) ) {
-            $sub_data['add_ons'] = $data['addons'];
+            // BWSM-84: Since subscription uses amount_incl_vat=false, override each addon's
+            // amount_incl_vat to false as well. Without this, Billwerk+ uses the addon's own
+            // config (amount_incl_vat=true) and treats the amount as incl. VAT, extracting
+            // VAT out of it. But WooCommerce displays the addon amount as excl. VAT, so the
+            // values don't match. By sending amount_incl_vat=false for addons, Billwerk+
+            // treats the amount as excl. VAT and applies VAT on top — matching WooCommerce.
+            $addons_for_api = $data['addons'];
+            foreach ( $addons_for_api as &$addon_item ) {
+                $addon_item['amount_incl_vat'] = false;
+                // Remove legacy vat_type field (not used by Billwerk+ API)
+                unset( $addon_item['vat_type'] );
+            }
+            unset( $addon_item );
+            $sub_data['add_ons'] = $addons_for_api;
         }
 
         // Disable add coupon discount double time in secound order.
