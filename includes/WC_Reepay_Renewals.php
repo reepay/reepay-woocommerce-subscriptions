@@ -801,11 +801,18 @@ class WC_Reepay_Renewals {
          */
         $product  = $order_item->get_product();
         $order_item_quantity = $order_item->get_quantity();
-          // Calculate the excl. VAT per-unit price from the WC order item.
+          // Calculate the per-unit price from the WC order item.
         // This ensures Frisbii Tax Management applies the correct country-specific VAT
         // instead of using the plan's default amount (which may include the store's base VAT).
         $order_item_data   = $order_item->get_data();
-        $item_subtotal     = (float) ( $order_item_data['subtotal'] ?? 0 ); // excl. tax total
+        $prices_incl_tax   = wc_prices_include_tax();
+
+        // Use incl. or excl. tax total based on WooCommerce "Prices entered with tax" setting.
+        if ( $prices_incl_tax ) {
+            $item_subtotal = (float) ( $order_item_data['subtotal'] ?? 0 ) + (float) ( $order_item_data['subtotal_tax'] ?? 0 );
+        } else {
+            $item_subtotal = (float) ( $order_item_data['subtotal'] ?? 0 );
+        }
 
         // BWSM-84: Subtract addon amounts from item_subtotal before computing per-unit price.
         // add_cart_item() adds addon prices into the product price, so WC order item subtotal
@@ -845,7 +852,7 @@ class WC_Reepay_Renewals {
             ]
         ] );
 
-        $per_unit_excl_vat = $order_item_quantity > 0
+        $per_unit_amount = $order_item_quantity > 0
             ? $item_subtotal_product_only / $order_item_quantity
             : $item_subtotal_product_only;
 
@@ -860,8 +867,7 @@ class WC_Reepay_Renewals {
             'source'          => $data['source'],
             //					'create_customer' => null,
             //					'plan_version'    => null,
-            // 'amount_incl_vat' => wc_prices_include_tax(),
-            'amount_incl_vat' => false,
+            'amount_incl_vat' => $prices_incl_tax,
             //					'generate_handle' => null,
             'grace_duration'  => 172800,
             //					'no_trial' => null,
@@ -874,18 +880,20 @@ class WC_Reepay_Renewals {
         ];
 
         
-        // Override amount with excl. VAT price so Frisbii Tax Management adds the correct VAT.
-        if ( function_exists( 'rp_prepare_amount' ) && $per_unit_excl_vat > 0 ) {
-            $sub_data['amount'] = rp_prepare_amount( $per_unit_excl_vat, $main_order->get_currency() );
+        // Override amount with per-unit price so Frisbii Tax Management applies the correct VAT.
+        // The amount follows WC's "Prices entered with tax" setting (wc_prices_include_tax()).
+        if ( function_exists( 'rp_prepare_amount' ) && $per_unit_amount > 0 ) {
+            $sub_data['amount'] = rp_prepare_amount( $per_unit_amount, $main_order->get_currency() );
 
             self::log( [
                 'log' => [
                     'source'                    => 'WC_Reepay_Renewals::subscription_amount_override',
-                    'per_unit_excl_vat'         => $per_unit_excl_vat,
+                    'per_unit_amount'           => $per_unit_amount,
                     'amount_cents'              => $sub_data['amount'],
-                    'amount_incl_vat'           => false,
+                    'amount_incl_vat'           => $prices_incl_tax,
+                    'prices_incl_tax_setting'   => $prices_incl_tax,
                     'order_item_subtotal_raw'   => $item_subtotal,
-                    'addon_deducted_per_unit'   => $addon_total_in_subtotal,
+                    'addon_deducted_total'      => $addon_total_in_subtotal,
                     'order_item_subtotal_clean' => $item_subtotal_product_only,
                     'quantity'                  => $order_item_quantity,
                     'currency'                  => $main_order->get_currency(),
@@ -899,15 +907,13 @@ class WC_Reepay_Renewals {
         }
 
         if ( ! empty( $data['addons'] ) ) {
-            // BWSM-84: Since subscription uses amount_incl_vat=false, override each addon's
-            // amount_incl_vat to false as well. Without this, Billwerk+ uses the addon's own
-            // config (amount_incl_vat=true) and treats the amount as incl. VAT, extracting
-            // VAT out of it. But WooCommerce displays the addon amount as excl. VAT, so the
-            // values don't match. By sending amount_incl_vat=false for addons, Billwerk+
-            // treats the amount as excl. VAT and applies VAT on top — matching WooCommerce.
+            // BWSM-84: Override each addon's amount_incl_vat to match the WC tax setting.
+            // The addon amount was added to the WC product price by add_cart_item() and WC
+            // treats it according to "Prices entered with tax". So the addon's amount_incl_vat
+            // sent to Billwerk+ must match this WC setting for correct VAT calculation.
             $addons_for_api = $data['addons'];
             foreach ( $addons_for_api as &$addon_item ) {
-                $addon_item['amount_incl_vat'] = false;
+                $addon_item['amount_incl_vat'] = $prices_incl_tax;
                 // Remove legacy vat_type field (not used by Billwerk+ API)
                 unset( $addon_item['vat_type'] );
             }
