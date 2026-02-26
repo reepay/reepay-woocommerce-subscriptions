@@ -124,6 +124,19 @@ class WC_Reepay_Subscription_Addons {
 			$price    = $cart_item['data']->get_price();
 			$cart_qty = max( 1, (int) ( $cart_item['quantity'] ?? 1 ) );
 
+			// BWSM-84 DEBUG: log raw values to diagnose incl-tax pricing
+			WC_Reepay_Renewals::log( [
+				'log' => [
+					'source'               => 'WC_Reepay_Subscription_Addons::add_cart_item_debug',
+					'line'				   => __LINE__,
+					'prices_incl_tax'      => wc_prices_include_tax(),
+					'cart_qty'             => $cart_qty,
+					'raw_cart_quantity'    => $cart_item['quantity'] ?? 'not_set',
+					'product_price'        => $price,
+					'addons_raw'           => $cart_item['addons'],
+				]
+			] );
+
 			foreach ( $cart_item['addons'] as $addon ) {
 				if ( (float) $addon['amount'] > 0 ) {
 					if ( ! empty( $addon['quantity'] ) ) {
@@ -137,6 +150,15 @@ class WC_Reepay_Subscription_Addons {
 
 				}
 			}
+
+			// BWSM-84 DEBUG: log computed price
+			WC_Reepay_Renewals::log( [
+				'log' => [
+					'source'          		=> 'WC_Reepay_Subscription_Addons::add_cart_item_debug_result',
+					'line'				   	=> __LINE__,
+					'price_after_addons'	=> $price,
+				]
+			] );
 
 			$cart_item['data']->set_price( $price );
 		}
