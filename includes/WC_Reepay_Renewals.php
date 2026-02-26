@@ -806,7 +806,48 @@ class WC_Reepay_Renewals {
         // instead of using the plan's default amount (which may include the store's base VAT).
         $order_item_data   = $order_item->get_data();
         $item_subtotal     = (float) ( $order_item_data['subtotal'] ?? 0 ); // excl. tax total
-        $per_unit_excl_vat = $order_item_quantity > 0 ? $item_subtotal / $order_item_quantity : $item_subtotal;
+
+        // BWSM-84: Subtract addon amounts from item_subtotal before computing per-unit price.
+        // add_cart_item() adds addon prices into the product price, so WC order item subtotal
+        // includes addon costs. But addons are also sent separately in the add_ons array to
+        // Billwerk+ API, causing double-counting. We must deduct the addon contribution here.
+        //
+        // quantity-type addons: flat cost in subtotal = addon_amount × addon_qty
+        // on_off-type addons:   per-unit cost in subtotal = addon_amount × product_qty
+        $addon_flat_contribution     = 0;
+        $addon_per_unit_contribution = 0;
+        $order_item_addons = $order_item->get_meta( 'addons' );
+        if ( ! empty( $order_item_addons ) && is_array( $order_item_addons ) ) {
+            foreach ( $order_item_addons as $addon ) {
+                if ( (float) ( $addon['amount'] ?? 0 ) > 0 ) {
+                    if ( ! empty( $addon['quantity'] ) ) {
+                        // quantity-type addon: flat contribution (not multiplied by product qty)
+                        $addon_flat_contribution += (float) $addon['amount'] * (int) $addon['quantity'];
+                    } else {
+                        // on_off addon: per product unit
+                        $addon_per_unit_contribution += (float) $addon['amount'];
+                    }
+                }
+            }
+        }
+        $addon_total_in_subtotal    = $addon_flat_contribution + ( $addon_per_unit_contribution * $order_item_quantity );
+        $item_subtotal_product_only = $item_subtotal - $addon_total_in_subtotal;
+
+        self::log( [
+            'log' => [
+                'source'                    => 'WC_Reepay_Renewals::addon_deduction_debug',
+                'item_subtotal_original'    => $item_subtotal,
+                'addon_flat_contribution'   => $addon_flat_contribution,
+                'addon_per_unit_contribution' => $addon_per_unit_contribution,
+                'product_quantity'          => $order_item_quantity,
+                'addon_total_in_subtotal'   => $addon_total_in_subtotal,
+                'item_subtotal_product_only'=> $item_subtotal_product_only,
+            ]
+        ] );
+
+        $per_unit_excl_vat = $order_item_quantity > 0
+            ? $item_subtotal_product_only / $order_item_quantity
+            : $item_subtotal_product_only;
 
         $sub_data = [
             'customer'        => $data['customer'],
@@ -839,13 +880,15 @@ class WC_Reepay_Renewals {
 
             self::log( [
                 'log' => [
-                    'source'              => 'WC_Reepay_Renewals::subscription_amount_override',
-                    'per_unit_excl_vat'   => $per_unit_excl_vat,
-                    'amount_cents'        => $sub_data['amount'],
-                    'amount_incl_vat'     => false,
-                    'order_item_subtotal' => $item_subtotal,
-                    'quantity'            => $order_item_quantity,
-                    'currency'            => $main_order->get_currency(),
+                    'source'                    => 'WC_Reepay_Renewals::subscription_amount_override',
+                    'per_unit_excl_vat'         => $per_unit_excl_vat,
+                    'amount_cents'              => $sub_data['amount'],
+                    'amount_incl_vat'           => false,
+                    'order_item_subtotal_raw'   => $item_subtotal,
+                    'addon_deducted_per_unit'   => $addon_total_in_subtotal,
+                    'order_item_subtotal_clean' => $item_subtotal_product_only,
+                    'quantity'                  => $order_item_quantity,
+                    'currency'                  => $main_order->get_currency(),
                 ]
             ] );
         }
