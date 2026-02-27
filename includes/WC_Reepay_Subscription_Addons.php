@@ -145,7 +145,9 @@ class WC_Reepay_Subscription_Addons {
 						$addon_total = (float) $addon['amount'] * (int) $addon['quantity'];
 						$price      += $addon_total / $cart_qty;
 					} else {
-						$price += (float) $addon['amount'];
+						// BWSM-84: on_off-type addon is also a flat cost (added once to the subscription).
+						// Divide by cart qty so WC line total (price × qty) gives the correct flat amount.
+						$price += (float) $addon['amount'] / $cart_qty;
 					}
 
 				}
