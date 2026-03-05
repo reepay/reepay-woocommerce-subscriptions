@@ -18,6 +18,8 @@ class WC_Reepay_Subscription_Addons {
 		add_filter( 'woocommerce_get_item_data', [ $this, 'get_item_data' ], 10, 2 );
 		// Add meta to order.
 		add_action( 'woocommerce_checkout_create_order_line_item', [ $this, 'order_line_item' ], 10, 3 );
+		// BWSM-84: Recalculate addon-adjusted prices when cart quantities change (AJAX update).
+		add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 20, 1 );
 	}
 
 
@@ -95,6 +97,27 @@ class WC_Reepay_Subscription_Addons {
 	}
 
 	/**
+	 * BWSM-84: Recalculate addon-adjusted prices when cart quantities change.
+	 *
+	 * woocommerce_add_cart_item and woocommerce_get_cart_item_from_session do NOT
+	 * fire on AJAX cart quantity updates. This hook ensures prices stay correct
+	 * whenever WooCommerce recalculates totals (including AJAX qty changes).
+	 *
+	 * @param WC_Cart $cart
+	 */
+	public function before_calculate_totals( $cart ) {
+		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+			return;
+		}
+
+		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+			if ( ! empty( $cart_item['addons'] ) ) {
+				$this->add_cart_item( $cart_item );
+			}
+		}
+	}
+
+	/**
 	 * Get cart item from session.
 	 *
 	 * @param array $cart_item Cart item data.
@@ -121,7 +144,13 @@ class WC_Reepay_Subscription_Addons {
 	public function add_cart_item( $cart_item ) {
 
 		if ( ! empty( $cart_item['addons'] ) && apply_filters( 'woocommerce_product_addons_adjust_price', true, $cart_item ) ) {
-			$price    = $cart_item['data']->get_price();
+			// BWSM-84: Always start from the original product price (before addon adjustment).
+			// On AJAX cart qty updates, get_price() returns the previously-modified value;
+			// _addon_base_price ensures we never double-add addon costs.
+			if ( ! isset( $cart_item['_addon_base_price'] ) ) {
+				$cart_item['_addon_base_price'] = (float) $cart_item['data']->get_price();
+			}
+			$price    = $cart_item['_addon_base_price'];
 			$cart_qty = max( 1, (int) ( $cart_item['quantity'] ?? 1 ) );
 
 			// BWSM-84 DEBUG: log raw values to diagnose incl-tax pricing
@@ -145,7 +174,7 @@ class WC_Reepay_Subscription_Addons {
 						$addon_total = (float) $addon['amount'] * (int) $addon['quantity'];
 						$price      += $addon_total / $cart_qty;
 					} else {
-						// BWSM-84: on_off-type addon is also a flat cost (added once to the subscription).
+						// BWSM-84: on_off-type addon is a flat cost (once per subscription).
 						// Divide by cart qty so WC line total (price × qty) gives the correct flat amount.
 						$price += (float) $addon['amount'] / $cart_qty;
 					}
