@@ -442,10 +442,18 @@ class WC_Reepay_Renewals {
             $tax_country = $billing_country;
         }
 
-        // Ensure customer country is set in Frisbii for correct Tax Management VAT calculation.
+        // Ensure customer data is fully updated in Frisbii for correct Tax Management VAT calculation.
+        // All customer fields must be included to prevent the PUT endpoint from clearing omitted fields.
         $billing_country = $main_order->get_billing_country();
         if ( ! empty( $tax_country ) && function_exists( 'reepay' ) ) {
-             $update_data = [ 'country' => $tax_country ];
+            $update_data = [
+                'email'       => $main_order->get_billing_email(),
+                'first_name'  => $main_order->get_billing_first_name(),
+                'last_name'   => $main_order->get_billing_last_name(),
+                'phone'       => $main_order->get_billing_phone(),
+                'company'     => $main_order->get_billing_company(),
+                'country'     => $tax_country,
+            ];
 
             // Use shipping address fields if available, otherwise billing.
             if ( ! empty( $shipping_country ) ) {
@@ -459,21 +467,16 @@ class WC_Reepay_Renewals {
                 $update_data['city']        = $main_order->get_billing_city();
                 $update_data['postal_code'] = $main_order->get_billing_postcode();
             }
-             // try {
-            //     reepay()->api( 'reepay_subscriptions' )->request(
-            //         'PUT',
-            //         'https://api.reepay.com/v1/customer/' . $data['customer'],
-            //         // [
-            //         //     'country'     => $billing_country,
-            //         //     'address'     => $main_order->get_billing_address_1(),
-            //         //     'address2'    => $main_order->get_billing_address_2(),
-            //         //     'city'        => $main_order->get_billing_city(),
-            //         //     'postal_code' => $main_order->get_billing_postcode(),
-            //         // ]
-            //         $update_data
-            //     );
-            // } 
+
             try {
+                self::log( [
+                    'log' => [
+                        'source'   => 'WC_Reepay_Renewals::create_subscriptions',
+                        'line'    => __LINE__,
+                        'customer' => $data['customer'],
+                        'update_data' => $update_data,
+                    ]
+                ] );
                 reepay_s()->api()->request(
                     'customer/' . $data['customer'],
                     'PUT',
@@ -483,7 +486,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log' => [
                         'source'   => 'WC_Reepay_Renewals::create_subscriptions',
-                        'warning'  => 'Failed to update customer country in Frisbii',
+                        'warning'  => 'Failed to update customer in Frisbii',
                         'error'    => $e->getMessage(),
                         'customer' => $data['customer'],
                         'country'  => $tax_country,
