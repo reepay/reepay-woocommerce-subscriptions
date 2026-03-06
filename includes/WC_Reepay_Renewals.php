@@ -442,10 +442,18 @@ class WC_Reepay_Renewals {
             $tax_country = $billing_country;
         }
 
-        // Ensure customer country is set in Frisbii for correct Tax Management VAT calculation.
+        // Ensure customer data is fully updated in Frisbii for correct Tax Management VAT calculation.
+        // All customer fields must be included to prevent the PUT endpoint from clearing omitted fields.
         $billing_country = $main_order->get_billing_country();
         if ( ! empty( $tax_country ) && function_exists( 'reepay' ) ) {
-             $update_data = [ 'country' => $tax_country ];
+            $update_data = [
+                'email'       => $main_order->get_billing_email(),
+                'first_name'  => $main_order->get_billing_first_name(),
+                'last_name'   => $main_order->get_billing_last_name(),
+                'phone'       => $main_order->get_billing_phone(),
+                'company'     => $main_order->get_billing_company(),
+                'country'     => $tax_country,
+            ];
 
             // Use shipping address fields if available, otherwise billing.
             if ( ! empty( $shipping_country ) ) {
@@ -459,21 +467,16 @@ class WC_Reepay_Renewals {
                 $update_data['city']        = $main_order->get_billing_city();
                 $update_data['postal_code'] = $main_order->get_billing_postcode();
             }
-             // try {
-            //     reepay()->api( 'reepay_subscriptions' )->request(
-            //         'PUT',
-            //         'https://api.reepay.com/v1/customer/' . $data['customer'],
-            //         // [
-            //         //     'country'     => $billing_country,
-            //         //     'address'     => $main_order->get_billing_address_1(),
-            //         //     'address2'    => $main_order->get_billing_address_2(),
-            //         //     'city'        => $main_order->get_billing_city(),
-            //         //     'postal_code' => $main_order->get_billing_postcode(),
-            //         // ]
-            //         $update_data
-            //     );
-            // } 
+
             try {
+                self::log( [
+                    'log' => [
+                        'source'   => 'WC_Reepay_Renewals::create_subscriptions',
+                        'line'    => __LINE__,
+                        'customer' => $data['customer'],
+                        'update_data' => $update_data,
+                    ]
+                ] );
                 reepay_s()->api()->request(
                     'customer/' . $data['customer'],
                     'PUT',
@@ -483,7 +486,7 @@ class WC_Reepay_Renewals {
                 self::log( [
                     'log' => [
                         'source'   => 'WC_Reepay_Renewals::create_subscriptions',
-                        'warning'  => 'Failed to update customer country in Frisbii',
+                        'warning'  => 'Failed to update customer in Frisbii',
                         'error'    => $e->getMessage(),
                         'customer' => $data['customer'],
                         'country'  => $tax_country,
@@ -614,7 +617,6 @@ class WC_Reepay_Renewals {
             $product                    = $order_item->get_product();
             $order_item_quantity        = $order_item->get_quantity();
             $addons                     = $order_item->get_meta( 'addons' );
-            $is_exist_addon_type_on_off = self::is_exist_addon_type_on_off_in_addons( $addons );
             $order_items_count          = count( $order_items );
 
             if ( $product->is_type('woosb') ) {
@@ -654,77 +656,24 @@ class WC_Reepay_Renewals {
                 }
             }
 
-            $order_direct_quantity = $order_item_quantity;
-            if ( $order_item_quantity > 1 && $is_exist_addon_type_on_off ) {
-                $addons_amount = 0;
-                foreach ( $addons as $addon ) {
-                    $addons_amount += (float) $addon['amount'];
-                }
-                for ( $i = 1; $i < $order_item_quantity; $i ++ ) {
-                    $new_product_item = new WC_Order_Item_Product();
-                    $new_product_item->set_name( $order_item->get_name() );
-                    $new_product_item->set_quantity( 1 );
-                    $new_product_item->set_product_id( $order_item->get_product_id() );
-                    $product = wc_get_product( $order_item->get_product_id() );
-                    $total   = (string) ( (float) $product->get_price() + $addons_amount );
-                    $new_product_item->set_variation_id( $order_item->get_variation_id() );
-                    $new_product_item->set_subtotal( $total );
-                    if (WC_Reepay_Checkout::is_reepay_product($product)) {
-                    if ( $discount !== null ) {
-                        $new_product_item->set_total( $total - $discount );
-                    } else {
-                            $new_product_item->set_total( $total );
-                        }
-                    }else{
-                        $new_product_item->set_total( $total );
-                    }
-                    $order_direct_quantity --;
-
-                    foreach ( $order_item->get_formatted_meta_data() as $meta_data ) {
-                        $new_product_item->add_meta_data( $meta_data->key, $meta_data->value );
-                    }
-                    $new_product_item->add_meta_data( 'addons', $addons );
-
-                    $created_order = self::create_order_copy( [
-                        'status' => $main_order->get_status( '' ),
-                        'customer_id' => $main_order->get_customer_id(),
-                    ], $main_order, $items_to_create );
-                    $created_order->set_customer_id( $main_order->get_customer_id() );
-                    $created_order->update_meta_data( '_reepay_is_subscription', 1 );
-                    $created_order->update_meta_data( '_reepay_order', '');
-                    $created_order->save();
-
-                    $new_product_item->set_order_id( $created_order->get_id() );
-                    $new_product_item->save();
-
-                    $order_item->set_quantity( $order_direct_quantity );
-                    $order_item->set_total( $order_item->get_total() - $total );
-                    $order_item->set_subtotal( $order_item->get_subtotal() - $total );
-                    $order_item->save();
-
-                    $orders[]            = wc_get_order( $created_order ); // otherwise cached
-                    $created_order_ids[] = $created_order->get_id();
-                }
-            } else {
-                // if last order item
-                if ( $order_items_count <= 1 ) {
-                    break;
-                }
-                $main_order->remove_item( $order_item_key );
-                unset( $order_items[ $order_item_key ] );
-
-                $items_to_create[] = $order_item;
-                $created_order     = self::create_order_copy( [
-                    'status' => $main_order->get_status( '' ),
-                    'customer_id' => $main_order->get_customer_id(),
-                ], $main_order, $items_to_create );
-                $created_order->set_customer_id( $main_order->get_customer_id() );
-                $created_order->update_meta_data( '_reepay_is_subscription', 1 );
-                $created_order->update_meta_data( '_reepay_order', '');
-                $created_order->save();
-                $orders[]            = $created_order;
-                $created_order_ids[] = $created_order->get_id();
+            // if last order item
+            if ( $order_items_count <= 1 ) {
+                break;
             }
+            $main_order->remove_item( $order_item_key );
+            unset( $order_items[ $order_item_key ] );
+
+            $items_to_create[] = $order_item;
+            $created_order     = self::create_order_copy( [
+                'status' => $main_order->get_status( '' ),
+                'customer_id' => $main_order->get_customer_id(),
+            ], $main_order, $items_to_create );
+            $created_order->set_customer_id( $main_order->get_customer_id() );
+            $created_order->update_meta_data( '_reepay_is_subscription', 1 );
+            $created_order->update_meta_data( '_reepay_order', '');
+            $created_order->save();
+            $orders[]            = $created_order;
+            $created_order_ids[] = $created_order->get_id();
         }
 
         self::log( [
@@ -801,12 +750,57 @@ class WC_Reepay_Renewals {
          */
         $product  = $order_item->get_product();
         $order_item_quantity = $order_item->get_quantity();
-          // Calculate the excl. VAT per-unit price from the WC order item.
+          // Calculate the per-unit price from the WC order item.
         // This ensures Frisbii Tax Management applies the correct country-specific VAT
         // instead of using the plan's default amount (which may include the store's base VAT).
         $order_item_data   = $order_item->get_data();
-        $item_subtotal     = (float) ( $order_item_data['subtotal'] ?? 0 ); // excl. tax total
-        $per_unit_excl_vat = $order_item_quantity > 0 ? $item_subtotal / $order_item_quantity : $item_subtotal;
+        $prices_incl_tax   = wc_prices_include_tax();
+
+        // Use incl. or excl. tax total based on WooCommerce "Prices entered with tax" setting.
+        if ( $prices_incl_tax ) {
+            $item_subtotal = (float) ( $order_item_data['subtotal'] ?? 0 ) + (float) ( $order_item_data['subtotal_tax'] ?? 0 );
+        } else {
+            $item_subtotal = (float) ( $order_item_data['subtotal'] ?? 0 );
+        }
+
+        // BWSM-84: Subtract addon amounts from item_subtotal before computing per-unit price.
+        // add_cart_item() adds addon prices into the product price, so WC order item subtotal
+        // includes addon costs. But addons are also sent separately in the add_ons array to
+        // Billwerk+ API, causing double-counting. We must deduct the addon contribution here.
+        //
+        // Both quantity-type and on_off-type addons are flat costs (independent of product qty):
+        //   quantity-type: flat cost = addon_amount × addon_qty
+        //   on_off-type:   flat cost = addon_amount (added once regardless of product qty)
+        $addon_flat_contribution = 0;
+        $order_item_addons = $order_item->get_meta( 'addons' );
+        if ( ! empty( $order_item_addons ) && is_array( $order_item_addons ) ) {
+            foreach ( $order_item_addons as $addon ) {
+                if ( (float) ( $addon['amount'] ?? 0 ) > 0 ) {
+                    if ( ! empty( $addon['quantity'] ) ) {
+                        // quantity-type addon: flat contribution = amount × qty
+                        $addon_flat_contribution += (float) $addon['amount'] * (int) $addon['quantity'];
+                    } else {
+                        // on_off addon: flat contribution = amount (once per subscription)
+                        $addon_flat_contribution += (float) $addon['amount'];
+                    }
+                }
+            }
+        }
+        $item_subtotal_product_only = $item_subtotal - $addon_flat_contribution;
+
+        self::log( [
+            'log' => [
+                'source'                    => 'WC_Reepay_Renewals::addon_deduction_debug',
+                'item_subtotal_original'    => $item_subtotal,
+                'addon_flat_contribution'   => $addon_flat_contribution,
+                'product_quantity'          => $order_item_quantity,
+                'item_subtotal_product_only'=> $item_subtotal_product_only,
+            ]
+        ] );
+
+        $per_unit_amount = $order_item_quantity > 0
+            ? $item_subtotal_product_only / $order_item_quantity
+            : $item_subtotal_product_only;
 
         $sub_data = [
             'customer'        => $data['customer'],
@@ -819,8 +813,7 @@ class WC_Reepay_Renewals {
             'source'          => $data['source'],
             //					'create_customer' => null,
             //					'plan_version'    => null,
-            // 'amount_incl_vat' => wc_prices_include_tax(),
-            'amount_incl_vat' => false,
+            'amount_incl_vat' => $prices_incl_tax,
             //					'generate_handle' => null,
             'grace_duration'  => 172800,
             //					'no_trial' => null,
@@ -833,19 +826,23 @@ class WC_Reepay_Renewals {
         ];
 
         
-        // Override amount with excl. VAT price so Frisbii Tax Management adds the correct VAT.
-        if ( function_exists( 'rp_prepare_amount' ) && $per_unit_excl_vat > 0 ) {
-            $sub_data['amount'] = rp_prepare_amount( $per_unit_excl_vat, $main_order->get_currency() );
+        // Override amount with per-unit price so Frisbii Tax Management applies the correct VAT.
+        // The amount follows WC's "Prices entered with tax" setting (wc_prices_include_tax()).
+        if ( function_exists( 'rp_prepare_amount' ) && $per_unit_amount > 0 ) {
+            $sub_data['amount'] = rp_prepare_amount( $per_unit_amount, $main_order->get_currency() );
 
             self::log( [
                 'log' => [
-                    'source'              => 'WC_Reepay_Renewals::subscription_amount_override',
-                    'per_unit_excl_vat'   => $per_unit_excl_vat,
-                    'amount_cents'        => $sub_data['amount'],
-                    'amount_incl_vat'     => false,
-                    'order_item_subtotal' => $item_subtotal,
-                    'quantity'            => $order_item_quantity,
-                    'currency'            => $main_order->get_currency(),
+                    'source'                    => 'WC_Reepay_Renewals::subscription_amount_override',
+                    'per_unit_amount'           => $per_unit_amount,
+                    'amount_cents'              => $sub_data['amount'],
+                    'amount_incl_vat'           => $prices_incl_tax,
+                    'prices_incl_tax_setting'   => $prices_incl_tax,
+                    'order_item_subtotal_raw'   => $item_subtotal,
+                    'addon_deducted_total'      => $addon_flat_contribution,
+                    'order_item_subtotal_clean' => $item_subtotal_product_only,
+                    'quantity'                  => $order_item_quantity,
+                    'currency'                  => $main_order->get_currency(),
                 ]
             ] );
         }
@@ -856,7 +853,18 @@ class WC_Reepay_Renewals {
         }
 
         if ( ! empty( $data['addons'] ) ) {
-            $sub_data['add_ons'] = $data['addons'];
+            // BWSM-84: Override each addon's amount_incl_vat to match the WC tax setting.
+            // The addon amount was added to the WC product price by add_cart_item() and WC
+            // treats it according to "Prices entered with tax". So the addon's amount_incl_vat
+            // sent to Billwerk+ must match this WC setting for correct VAT calculation.
+            $addons_for_api = $data['addons'];
+            foreach ( $addons_for_api as &$addon_item ) {
+                $addon_item['amount_incl_vat'] = $prices_incl_tax;
+                // Remove legacy vat_type field (not used by Billwerk+ API)
+                unset( $addon_item['vat_type'] );
+            }
+            unset( $addon_item );
+            $sub_data['add_ons'] = $addons_for_api;
         }
 
         // Disable add coupon discount double time in secound order.
