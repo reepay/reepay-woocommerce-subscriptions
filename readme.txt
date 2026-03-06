@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.4
+Stable tag: 1.3.4.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,10 @@ Standard Frisbii Billing features:
 3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.3.4.1
+- [Fix] - Orders with multiple subscription plans and add-ons got wrong amounts in Frisbii since version 1.3.4.
+- [Fix] - Some customer data updated with blank on the Frisbii account upon subscription purchase.
+
 v 1.3.4
 - [Fix] - Shows subscription terms checkbox on the Customer payment page (for payment links).
 - [Fix] - Sends country for VAT with the invoice info based on customer shipping address.
