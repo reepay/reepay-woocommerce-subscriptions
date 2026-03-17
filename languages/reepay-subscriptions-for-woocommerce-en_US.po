@@ -1,12 +1,12 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Plural-Forms: nplurals=INTEGER; plural=EXPRESSION;\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
 "Project-Id-Version: Reepay Subscriptions for WooCommerce\n"
 "POT-Creation-Date: 2023-02-15 13:51+0300\n"
-"PO-Revision-Date: 2023-02-15 13:50+0300\n"
+"PO-Revision-Date: 2026-03-11 00:00+0000\n"
 "Last-Translator: \n"
-"Language-Team: \n"
+"Language-Team: English\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -1562,14 +1562,16 @@ msgstr ""
 msgid "https://reepay.com/"
 msgstr ""
 
+#: reepay-subscriptions-for-woocommerce.php:449
+msgid "Frisbii Billing"
+msgstr ""
+
 #: reepay-subscriptions-for-woocommerce.php:289
 msgid "— Select —"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:308
-msgid ""
-"The plugin Frisbii Pay is required for Frisbii Billing for WooCommerce. <a "
-"target=\"_blank\" href=\"%s\">Please install and activate the plugin.</a>"
+msgid "The plugin Frisbii Pay is required for Frisbii Billing for WooCommerce. <a target=\"_blank\" href=\"%s\">Please install and activate the plugin.</a>"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:535
@@ -1577,9 +1579,7 @@ msgid "Disable Subscription order mails"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:537
-msgid ""
-"Disable Subscription order mails <p class=\"description\">This option will "
-"disable order mails for subscriptions</p>"
+msgid "Disable Subscription order mails <p class=\"description\">This option will disable order mails for subscriptions</p>"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:542
@@ -1587,9 +1587,7 @@ msgid "Disable Renewals order mails"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:544
-msgid ""
-"Disable Renewals order mails <p class=\"description\">This option will "
-"disable order mails for renewals</p>"
+msgid "Disable Renewals order mails <p class=\"description\">This option will disable order mails for renewals</p>"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:549
@@ -1601,9 +1599,7 @@ msgid "Enable Frisbii Billing Terms and Conditions"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:551
-msgid ""
-"If you use WC \"Blocks\" for checkout please unlock in the front end and "
-"adjust the position and save and lock it again."
+msgid "If you use WC \"Blocks\" for checkout please unlock in the front end and adjust the position and save and lock it again."
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:555
@@ -1611,10 +1607,7 @@ msgid "Page Terms and Conditions"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:558
-msgid ""
-"Select the page for Frisbii Billing terms and conditions.<br><a "
-"href=\"%1$s\">Check out our privacy policy guide</a> for recommendations on "
-"what content to include."
+msgid "Select the page for Frisbii Billing terms and conditions.<br><a href=\"%1$s\">Check out our privacy policy guide</a> for recommendations on what content to include."
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:564
@@ -1622,9 +1615,7 @@ msgid "Checkout Frisbii Billing Terms and Conditions"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:567
-msgid ""
-"<p class=\"description\">Use this shortcode to automatically link to the "
-"Frisbii Billing terms and conditions page : [frisbii_billing_terms]"
+msgid "<p class=\"description\">Use this shortcode to automatically link to the Frisbii Billing terms and conditions page : [frisbii_billing_terms]"
 msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:566
