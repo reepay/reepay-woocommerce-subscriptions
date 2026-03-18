@@ -265,19 +265,35 @@ class WC_Reepay_Renewals {
             return;
         }
 
+        // FIX: Early exit for non-subscription orders before child_order lookup
+        if ( ! self::is_order_contain_subscription( $order ) ) {
+            self::log( [
+                'log' => [
+                    'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                    'line'   => __LINE__,
+                    'info'   => 'Order does not contain subscription, skipping',
+                    'order'  => $order->get_id(),
+                ],
+            ], 'debug' );
+
+            return;
+        }
+
         if ( ! empty( $data['invoice'] ) ) {
             $child_order = $this->get_child_order( $order, $data['invoice'] );
         }
 
-        self::log( [
-            'log' => [
-                'source'  => 'WC_Reepay_Renewals::child_order',
-                'line'    => __LINE__,
-                'error'   => '',
-                'data'    => $child_order ?? '-',
-                'invoice' => $data['invoice'] ?? 'empty'
-            ],
-        ] );
+        // FIX: Only log when child_order is not found, at debug level
+        if ( empty( $child_order ) ) {
+            self::log( [
+                'log' => [
+                    'source'  => 'WC_Reepay_Renewals::child_order',
+                    'line'    => __LINE__,
+                    'info'    => 'No child order found',
+                    'invoice' => $data['invoice'] ?? 'empty'
+                ],
+            ], 'debug' );
+        }
 
         if ( ! empty( $child_order ) && $child_order->get_status() == 'wc-failed' && $data['event_type'] == 'invoice_settled' ) {
             $child_order->set_status( reepay_s()->settings( '_reepay_suborders_default_renew_status' ) );
@@ -289,19 +305,6 @@ class WC_Reepay_Renewals {
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_subscription',
                     'error'  => 'Subscription allready exist',
-                    'data'   => $data
-                ],
-            ] );
-
-            return;
-        }
-
-        if ( ! self::is_order_contain_subscription( $order ) ) {
-            self::log( [
-                'log' => [
-                    'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
-                    'line'   => __LINE__,
-                    'error'  => 'Order not contain subscription',
                     'data'   => $data
                 ],
             ] );
@@ -617,7 +620,12 @@ class WC_Reepay_Renewals {
             $product                    = $order_item->get_product();
             $order_item_quantity        = $order_item->get_quantity();
             $addons                     = $order_item->get_meta( 'addons' );
+            $is_exist_addon_type_on_off = self::is_exist_addon_type_on_off_in_addons( $addons );
             $order_items_count          = count( $order_items );
+
+            if ( ! $product instanceof WC_Product ) {
+                continue;
+            }
 
             if ( $product->is_type('woosb') ) {
                 unset( $order_items[ $order_item_key ] );
@@ -749,6 +757,14 @@ class WC_Reepay_Renewals {
          * @see https://reference.reepay.com/api/#create-subscription
          */
         $product  = $order_item->get_product();
+        if ( ! $product instanceof WC_Product ) {
+            throw new Exception(
+                sprintf(
+                    __( 'Product not found for order item #%d. The product may have been deleted.', 'reepay-subscriptions-for-woocommerce' ),
+                    $order_item->get_id()
+                )
+            );
+        }
         $order_item_quantity = $order_item->get_quantity();
           // Calculate the per-unit price from the WC order item.
         // This ensures Frisbii Tax Management applies the correct country-specific VAT
@@ -902,6 +918,15 @@ class WC_Reepay_Renewals {
         array $data
     ) {
         $product          = $order_item->get_product();
+        if ( ! $product instanceof WC_Product ) {
+            $split_order->add_order_note(
+                sprintf(
+                    __( 'Unable to create subscription: product not found for order item #%d. The product may have been deleted.', 'reepay-subscriptions-for-woocommerce' ),
+                    $order_item->get_id()
+                )
+            );
+            return null;
+        }
         $new_subscription = null;
         try {
             /**
@@ -2148,11 +2173,16 @@ class WC_Reepay_Renewals {
     }
 
     /**
-     * @param  array  $data
+     * @param  array       $data
+     * @param  string|null $level  Log level: 'error', 'warning', 'info', 'debug'. Auto-detected if null.
      */
-    public static function log( $data ) {
+    public static function log( $data, $level = null ) {
         if ( ! empty( $data['log'] ) ) {
-            reepay_s()->log()->log( $data['log'], 'error' );
+            if ( $level === null ) {
+                $has_error = isset( $data['log']['error'] ) && ! empty( $data['log']['error'] );
+                $level     = $has_error ? 'error' : 'info';
+            }
+            reepay_s()->log()->log( $data['log'], $level );
         }
 
         if ( ! empty( $data['notice'] ) ) {
