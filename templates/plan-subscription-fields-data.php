@@ -22,7 +22,7 @@ if ( empty( $post ) ) {
 	<?php if ( $_reepay_subscription_schedule_type === WC_Reepay_Subscription_Plan_Simple::TYPE_DAILY ) : ?>
         <p class="form-field">
             <label for="#"><?php _e( 'Charge every', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php echo ! empty( $_reepay_subscription_daily ) ? $_reepay_subscription_daily . ' ' . __( 'Days', 'reepay-subscriptions-for-woocommerce' ) : __( 'Day', 'reepay-subscriptions-for-woocommerce' ) ?></span>
+            <span><?php echo esc_html( ! empty( $_reepay_subscription_daily ) ? $_reepay_subscription_daily . ' ' . __( 'Days', 'reepay-subscriptions-for-woocommerce' ) : __( 'Day', 'reepay-subscriptions-for-woocommerce' ) ); ?></span>
         </p>
 	<?php endif; ?>
 
@@ -61,11 +61,11 @@ if ( empty( $post ) ) {
         <?php endif; ?>
         <p class="form-field">
             <label for="#"><?php _e( 'Partial period handling', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php echo WC_Reepay_Subscription_Plan_Simple::$bill_types[ $month_data['period'] ?? '' ] ?? '' ?></span>
+            <span><?php echo esc_html( WC_Reepay_Subscription_Plan_Simple::$bill_types[ $month_data['period'] ?? '' ] ?? '' ); ?></span>
         </p>
         <p class="form-field">
             <label for="#"><?php _e( 'Proration setting', 'reepay-subscriptions-for-woocommerce' ); ?>: </label>
-            <span><?php echo WC_Reepay_Subscription_Plan_Simple::$proration_types[ $month_data['proration'] ?? '' ] ?? '' ?></span>
+            <span><?php echo esc_html( WC_Reepay_Subscription_Plan_Simple::$proration_types[ $month_data['proration'] ?? '' ] ?? '' ); ?></span>
         </p>
         <p class="form-field">
             <label for="#"><?php _e( 'Minimum prorated amount', 'reepay-subscriptions-for-woocommerce' ); ?></label>

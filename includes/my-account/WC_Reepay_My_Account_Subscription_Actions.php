@@ -15,6 +15,12 @@ class WC_Reepay_My_Account_Subscription_Actions {
 	}
 
 	public function do_action() {
+		// Security: Check user is logged in
+		if ( ! is_user_logged_in() ) {
+			wc_add_notice( __( 'You must be logged in to perform this action.', 'reepay-subscriptions-for-woocommerce' ), 'error' );
+			return;
+		}
+
 		if ( ! isset( $_GET['reepay_subscriptions_action'] ) ) {
 			return;
 		}
@@ -29,11 +35,16 @@ class WC_Reepay_My_Account_Subscription_Actions {
 				continue;
 			}
 
-			$subscription_handle = urlencode( sanitize_text_field( $_GET[ $subscription_action ] ) );
+			$subscription_handle = sanitize_text_field( $_GET[ $subscription_action ] );
 
 			try {
 				$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
-				WC_Reepay_My_Account_Subscription_Page::customer_has_access_to_subscription( $subscription );
+
+				// Security: Verify subscription ownership
+				if ( ! WC_Reepay_My_Account_Subscription_Page::customer_has_access_to_subscription( $subscription ) ) {
+					throw new Exception( __( 'You do not have permission to perform this action.', 'reepay-subscriptions-for-woocommerce' ) );
+				}
+
 				call_user_func( array( $this, "do_action_$subscription_action" ), $subscription_handle );
 			} catch ( Exception $exception ) {
 				reepay_s()->log()->log(array(
@@ -75,6 +86,18 @@ class WC_Reepay_My_Account_Subscription_Actions {
 	private function do_action_change_payment_method( $handle ) {
 		if ( ! empty( $_GET['token_id'] ) ) {
 			$token_id = sanitize_text_field( wp_unslash( $_GET['token_id'] ) );
+
+			// Security: Validate token format (alphanumeric, dashes, underscores only)
+			if ( ! preg_match( '/^[a-zA-Z0-9_-]{10,64}$/', $token_id ) ) {
+				throw new Exception( __( 'Invalid token format.', 'reepay-subscriptions-for-woocommerce' ) );
+			}
+
+			// Security: Verify token belongs to current user
+			$token = WC_Payment_Tokens::get( $token_id );
+			if ( ! $token || $token->get_user_id() !== get_current_user_id() ) {
+				throw new Exception( __( 'Invalid payment method.', 'reepay-subscriptions-for-woocommerce' ) );
+			}
+
 			reepay_s()->api()->request( "subscription/{$handle}/pm", 'POST', [
 				'source' => $token_id,
 			] );

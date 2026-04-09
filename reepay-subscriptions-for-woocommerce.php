@@ -1009,7 +1009,7 @@ class WooCommerce_Reepay_Subscriptions
                 $page      = get_post( $page_subscription_terms );
 
                 if ( $page && 'publish' === $page->post_status && $page->post_content && ! has_shortcode( $page->post_content, 'woocommerce_checkout' ) ) {
-                    echo '<div class="billwerk-optimize-terms-and-conditions" style="display: none; max-height: 200px; overflow: auto; padding: 1em; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2); margin-bottom: 16px;background-color: rgba(0, 0, 0, .05);">' . wc_format_content( $sanitizer->styled_post_content( $page->post_content ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    echo '<div class="billwerk-optimize-terms-and-conditions" style="display: none; max-height: 200px; overflow: auto; padding: 1em; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2); margin-bottom: 16px;background-color: rgba(0, 0, 0, .05);">' . wc_kses_post( $sanitizer->styled_post_content( $page->post_content ) ) . '</div>';
                 }
             }
 

@@ -68,7 +68,7 @@
 							<?php if ( ! empty($payment_methods['current']) && $payment_methods['current']['id'] === $card['id'] ): ?>
                                 <?php _e( 'Current card', 'reepay-subscriptions-for-woocommerce' ); ?>
                             <?php else: ?>
-                                <a href="?reepay_subscriptions_action&change_payment_method=<?php _e( $subscription['handle'] ) ?>&token_id=<?php esc_html_e( $card['id'] ) ?>" class="button">
+                                <a href="?reepay_subscriptions_action&change_payment_method=<?php echo esc_attr( $subscription['handle'] ); ?>&token_id=<?php echo esc_attr( $card['id'] ); ?>" class="button">
                                     <?php _e( 'Use this card', 'reepay-subscriptions-for-woocommerce' ); ?>
                                 </a>
 							<?php endif; ?>
@@ -83,7 +83,7 @@
 							<?php if ( ! empty($payment_methods['current']) && $payment_methods['current']['id'] === $mps['id'] ): ?>
 								<?php _e( 'Current payment method', 'reepay-subscriptions-for-woocommerce' ); ?>
 							<?php else: ?>
-                                <a href="?reepay_subscriptions_action&change_payment_method=<?php _e( $subscription['handle'] ) ?>&token_id=<?php esc_html_e( $mps['id'] ) ?>" class="button">
+                                <a href="?reepay_subscriptions_action&change_payment_method=<?php echo esc_attr( $subscription['handle'] ); ?>&token_id=<?php echo esc_attr( $mps['id'] ); ?>" class="button">
 									<?php _e( 'Use this payment method', 'reepay-subscriptions-for-woocommerce' ); ?>
                                 </a>
 							<?php endif; ?>
