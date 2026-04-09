@@ -12,6 +12,9 @@
 		exit; // Exit if accessed directly.
 	}
 
+	// Security: Generate nonce for subscription actions
+	$subscription_nonce = wp_create_nonce( 'reepay_subscription_action' );
+
 ?>
 <table class="shop_table subscription_details">
     <tbody>
@@ -21,7 +24,7 @@
     </tr>
     <tr>
         <td><?php esc_html_e( 'Plan', 'reepay-subscriptions-for-woocommerce' ); ?></td>
-        <td><?php echo ucfirst( $plan['name'] ) ?>
+        <td><?php echo esc_html( ucfirst( $plan['name'] ) ); ?>
         </td>
     </tr>
 
@@ -40,15 +43,15 @@
                 <td><?php _e( 'Actions:', 'reepay-subscriptions-for-woocommerce' ); ?></td>
                 <td>
 					<?php if ( $subscription['state'] === 'on_hold' ): ?>
-                        <a href="?reepay_subscriptions_action&reactivate=<?php echo esc_attr( $subscription['handle'] ) ?>" class="button"><?php _e( 'Reactivate', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+                        <a href="?reepay_subscriptions_action&reactivate=<?php echo esc_attr( $subscription['handle'] ); ?>&_wpnonce=<?php echo esc_attr( $subscription_nonce ); ?>" class="button"><?php _e( 'Reactivate', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php else: ?><?php if ( reepay_s()->settings( '_reepay_enable_on_hold' ) ): ?>
-                        <a href="?reepay_subscriptions_action&put_on_hold=<?php echo esc_attr( $subscription['handle'] ) ?>" class="button"><?php _e( 'Put on hold', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+                        <a href="?reepay_subscriptions_action&put_on_hold=<?php echo esc_attr( $subscription['handle'] ); ?>&_wpnonce=<?php echo esc_attr( $subscription_nonce ); ?>" class="button"><?php _e( 'Put on hold', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php endif; ?><?php endif; ?>
 
 					<?php if ( $subscription['state'] !== 'on_hold' ): ?><?php if ( $subscription['is_cancelled'] === true ): ?>
-                        <a href="?reepay_subscriptions_action&uncancel_subscription=<?php echo esc_attr( $subscription['handle'] ) ?>" class="button"><?php _e( 'Uncancel', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+                        <a href="?reepay_subscriptions_action&uncancel_subscription=<?php echo esc_attr( $subscription['handle'] ); ?>&_wpnonce=<?php echo esc_attr( $subscription_nonce ); ?>" class="button"><?php _e( 'Uncancel', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php else: ?><?php if ( reepay_s()->settings( '_reepay_enable_cancel' ) ): ?>
-                        <a href="?reepay_subscriptions_action&cancel_subscription=<?php echo esc_attr( $subscription['handle'] ) ?>" class="button"><?php _e( 'Cancel Subscription', 'reepay-subscriptions-for-woocommerce' ); ?></a>
+                        <a href="?reepay_subscriptions_action&cancel_subscription=<?php echo esc_attr( $subscription['handle'] ); ?>&_wpnonce=<?php echo esc_attr( $subscription_nonce ); ?>" class="button"><?php _e( 'Cancel Subscription', 'reepay-subscriptions-for-woocommerce' ); ?></a>
 					<?php endif; ?><?php endif; ?><?php endif; ?>
                 </td>
             </tr>
@@ -68,7 +71,7 @@
 							<?php if ( ! empty($payment_methods['current']) && $payment_methods['current']['id'] === $card['id'] ): ?>
                                 <?php _e( 'Current card', 'reepay-subscriptions-for-woocommerce' ); ?>
                             <?php else: ?>
-                                <a href="?reepay_subscriptions_action&change_payment_method=<?php echo esc_attr( $subscription['handle'] ); ?>&token_id=<?php echo esc_attr( $card['id'] ); ?>" class="button">
+                                <a href="?reepay_subscriptions_action&change_payment_method=<?php echo esc_attr( $subscription['handle'] ); ?>&token_id=<?php echo esc_attr( $card['id'] ); ?>&_wpnonce=<?php echo esc_attr( $subscription_nonce ); ?>" class="button">
                                     <?php _e( 'Use this card', 'reepay-subscriptions-for-woocommerce' ); ?>
                                 </a>
 							<?php endif; ?>
@@ -83,7 +86,7 @@
 							<?php if ( ! empty($payment_methods['current']) && $payment_methods['current']['id'] === $mps['id'] ): ?>
 								<?php _e( 'Current payment method', 'reepay-subscriptions-for-woocommerce' ); ?>
 							<?php else: ?>
-                                <a href="?reepay_subscriptions_action&change_payment_method=<?php echo esc_attr( $subscription['handle'] ); ?>&token_id=<?php echo esc_attr( $mps['id'] ); ?>" class="button">
+                                <a href="?reepay_subscriptions_action&change_payment_method=<?php echo esc_attr( $subscription['handle'] ); ?>&token_id=<?php echo esc_attr( $mps['id'] ); ?>&_wpnonce=<?php echo esc_attr( $subscription_nonce ); ?>" class="button">
 									<?php _e( 'Use this payment method', 'reepay-subscriptions-for-woocommerce' ); ?>
                                 </a>
 							<?php endif; ?>
@@ -94,7 +97,7 @@
             <tr>
                 <td></td>
                 <td>
-                    <a href="<?php echo wc_get_endpoint_url( 'add-payment-method' ) . '?reepay_subscription=' . esc_attr( $subscription['handle'] ) ?>" class="button">
+                    <a href="<?php echo esc_url( wp_nonce_url( wc_get_endpoint_url( 'add-payment-method' ) . '?reepay_subscription=' . esc_attr( $subscription['handle'] ), 'reepay_add_payment_method', '_wpnonce' ) ); ?>" class="button">
 						<?php _e( 'Add payment method', 'reepay-subscriptions-for-woocommerce' ); ?>
                     </a>
                 </td>

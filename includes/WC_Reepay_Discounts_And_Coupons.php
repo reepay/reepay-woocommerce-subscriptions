@@ -319,6 +319,11 @@ class WC_Reepay_Discounts_And_Coupons
 
     function save_coupon_text_field($post_id, WC_Coupon $coupon)
     {
+        // Security: Check user capability
+        if ( ! current_user_can( 'edit_shop_coupons' ) ) {
+            return;
+        }
+
         $type = $coupon->get_discount_type();
 
         if ($type !== 'reepay_type') {
@@ -343,11 +348,20 @@ class WC_Reepay_Discounts_And_Coupons
 
         $data = array_merge($data, $couponData);
 
-
-        if ($_REQUEST['use_existing_discount'] === 'true') {
-            $discountData = static::get_existing_discount(sanitize_text_field($_REQUEST['_reepay_discount_use_existing_discount_id']));
-            update_post_meta($post_id, '_reepay_discount_handle', $discountData['discount_handle']);
-            $data = array_merge($data, $discountData);
+        // Security: Improved validation for existing discount
+        $use_existing = isset( $_REQUEST['use_existing_discount'] ) && $_REQUEST['use_existing_discount'] === 'true';
+        if ( $use_existing ) {
+            $discount_id = isset( $_REQUEST['_reepay_discount_use_existing_discount_id'] ) 
+                ? sanitize_text_field( wp_unslash( $_REQUEST['_reepay_discount_use_existing_discount_id'] ) ) 
+                : '';
+            
+            if ( ! empty( $discount_id ) ) {
+                $discountData = static::get_existing_discount( $discount_id );
+                if ( ! empty( $discountData ) ) {
+                    update_post_meta($post_id, '_reepay_discount_handle', $discountData['discount_handle']);
+                    $data = array_merge($data, $discountData);
+                }
+            }
         }
 
         $data['_reepay_discount_name'] = isset($_REQUEST['_reepay_discount_name']) ? sanitize_text_field($_REQUEST['_reepay_discount_name']) : '';

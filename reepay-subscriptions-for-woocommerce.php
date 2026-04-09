@@ -347,7 +347,10 @@ class WooCommerce_Reepay_Subscriptions
 
     public function admin_customer_report()
     {
-        if (isset($_GET['path']) && $_GET['path'] == '/customers') {
+        // Security: Sanitize path parameter
+        $path = isset( $_GET['path'] ) ? sanitize_text_field( wp_unslash( $_GET['path'] ) ) : '';
+        
+        if ( $path === '/customers' ) {
             $script_path       = 'assets/js/analytics/build/index.js';
             $script_asset_path = $this->settings('plugin_url').'assets/js/analytics/build/index.asset.php';
             $script_asset      = file_exists($script_asset_path)

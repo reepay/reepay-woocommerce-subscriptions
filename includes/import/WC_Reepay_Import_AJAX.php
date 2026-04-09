@@ -67,6 +67,11 @@ class WC_Reepay_Import_AJAX {
 	 * AJAX handler to get objects that can be imported
 	 */
 	public function get_objects() {
+		// Security: Check user capability
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+
 		$this->check_nonce();
 
 		$result            = [];
@@ -92,6 +97,11 @@ class WC_Reepay_Import_AJAX {
 	 * AJAX handler to save objects from request
 	 */
 	public function save_objects() {
+		// Security: Check user capability
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+
 		$this->check_nonce();
 
 		$res = [];
