@@ -63,7 +63,7 @@
 					[ $month, $year ] = explode( '-', $card['exp_date'] );
 					?>
                     <tr>
-                        <td><?php echo $card['masked_card'] ?> <?php echo "$month/$year" ?></td>
+                        <td><?php echo esc_html( $card['masked_card'] ) ?> <?php echo esc_html( "$month/$year" ) ?></td>
                         <td>
 							<?php if ( ! empty($payment_methods['current']) && $payment_methods['current']['id'] === $card['id'] ): ?>
                                 <?php _e( 'Current card', 'reepay-subscriptions-for-woocommerce' ); ?>
@@ -78,7 +78,7 @@
 				<?php foreach ( $payment_methods['mps_subscriptions'] as $mps ):
 					?>
                     <tr>
-                        <td><?php echo $mps['id'] ?></td>
+                        <td><?php echo esc_html( $mps['id'] ) ?></td>
                         <td>
 							<?php if ( ! empty($payment_methods['current']) && $payment_methods['current']['id'] === $mps['id'] ): ?>
 								<?php _e( 'Current payment method', 'reepay-subscriptions-for-woocommerce' ); ?>

@@ -67,7 +67,7 @@ class WC_Reepay_Import_AJAX {
 	 * AJAX handler to get objects that can be imported
 	 */
 	public function get_objects() {
-		$this->chech_nonce();
+		$this->check_nonce();
 
 		$result            = [];
 		$objects_to_import = $this->get_objects_to_import_from_get();
@@ -92,7 +92,7 @@ class WC_Reepay_Import_AJAX {
 	 * AJAX handler to save objects from request
 	 */
 	public function save_objects() {
-		$this->chech_nonce();
+		$this->check_nonce();
 
 		$res = [];
 
@@ -101,10 +101,12 @@ class WC_Reepay_Import_AJAX {
 				continue;
 			}
 
+			$selected = array_map( 'sanitize_text_field', wp_unslash( $_POST['selected'][ $object ] ) );
+
 			$objects_data = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
 
 			if ( ! empty( $objects_data ) ) {
-				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data, $_POST['selected'][ $object ] );
+				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data, $selected );
 			}
 		}
 
@@ -142,11 +144,19 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	/**
-	 * Prevent AJAX request if nonce fails check
+	 * Prevent AJAX request if nonce fails check or user lacks permissions
 	 *
 	 * @return true
 	 */
-	public function chech_nonce() {
+	public function check_nonce() {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error(
+				[
+					'error' => __( 'You do not have permission to perform this action.', 'reepay-subscriptions-for-woocommerce' ),
+				]
+			);
+		}
+
 		if ( ! check_ajax_referer( self::$ajax_nonce, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
@@ -156,5 +166,12 @@ class WC_Reepay_Import_AJAX {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @deprecated Use check_nonce() instead.
+	 */
+	public function chech_nonce() {
+		return $this->check_nonce();
 	}
 }

@@ -101,14 +101,14 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 		if ( ! empty( $_POST['_reepay_subscription_customer_role'][ $i ] ) && $_POST['_reepay_subscription_customer_role'][ $i ] !== 'without_changes' ) {
 			update_post_meta( $post_id, '_reepay_subscription_customer_role',
-				$_POST['_reepay_subscription_customer_role'][ $i ] );
+				sanitize_text_field( wp_unslash( $_POST['_reepay_subscription_customer_role'][ $i ] ) ) );
 		} else {
 			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
 		}
 
 		if ( ! empty( $_POST['_reepay_subscription_customer_role_expired'][ $i ] ) && $_POST['_reepay_subscription_customer_role_expired'][ $i ] !== 'without_changes' ) {
 			update_post_meta( $post_id, '_reepay_subscription_customer_role_expired',
-				$_POST['_reepay_subscription_customer_role_expired'][ $i ] );
+				sanitize_text_field( wp_unslash( $_POST['_reepay_subscription_customer_role_expired'][ $i ] ) ) );
 		} else {
 			delete_post_meta( $post_id, '_reepay_subscription_customer_role_expired' );
 		}
@@ -125,7 +125,7 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 	public function is_reepay_product_saving() {
 		return ! empty( $_REQUEST ) &&
 		       ! empty( $_REQUEST['product-type'] ) &&
-		       $_REQUEST['product-type'] == 'reepay_variable_subscriptions' &&
+		       $_REQUEST['product-type'] === 'reepay_variable_subscriptions' &&
 		       ! empty( $_REQUEST['_reepay_subscription_handle'] );
 	}
 

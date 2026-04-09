@@ -325,7 +325,15 @@ class WC_Reepay_Discounts_And_Coupons
             return;
         }
 
-        $data = $_REQUEST;
+        $data = array();
+        // Safely populate $data from $_REQUEST by sanitizing each field
+        foreach ( $_REQUEST as $key => $value ) {
+            if ( is_array( $value ) ) {
+                $data[ $key ] = array_map( 'sanitize_text_field', wp_unslash( $value ) );
+            } else {
+                $data[ $key ] = sanitize_text_field( wp_unslash( $value ) );
+            }
+        }
 
         $couponData = static::get_existing_coupon(sanitize_text_field($_REQUEST['_reepay_discount_use_existing_coupon_id']));
 

@@ -18,7 +18,12 @@ class WC_Reepay_My_Account_Subscription_Actions {
 		if ( ! isset( $_GET['reepay_subscriptions_action'] ) ) {
 			return;
 		}
-		
+
+		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'reepay_subscription_action' ) ) {
+			wc_add_notice( __( 'Security check failed. Please try again.', 'reepay-subscriptions-for-woocommerce' ), 'error' );
+			return;
+		}
+
 		foreach ( $this->subscription_actions as $subscription_action ) {
 			if ( empty( $_GET[ $subscription_action ] ) ) {
 				continue;
@@ -69,8 +74,9 @@ class WC_Reepay_My_Account_Subscription_Actions {
 
 	private function do_action_change_payment_method( $handle ) {
 		if ( ! empty( $_GET['token_id'] ) ) {
+			$token_id = sanitize_text_field( wp_unslash( $_GET['token_id'] ) );
 			reepay_s()->api()->request( "subscription/{$handle}/pm", 'POST', [
-				'source' => $_GET['token_id'],
+				'source' => $token_id,
 			] );
 		}
 	}

@@ -11,7 +11,7 @@ if ( empty( $post ) ) {
 <div class="options_group reepay_subscription_pricing show_if_reepay_subscription">
     <p class="form-field">
         <label for="#"><?php _e( 'Price', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-        <span><?php echo ( ! empty( $_reepay_subscription_price ) ? esc_attr( $_reepay_subscription_price ) : 0 ) . ' ' . $_reepay_subscription_currency ?></span>
+        <span><?php echo esc_html( ( ! empty( $_reepay_subscription_price ) ? $_reepay_subscription_price : 0 ) . ' ' . $_reepay_subscription_currency ) ?></span>
     </p>
 
     <p class="form-field">
@@ -50,13 +50,13 @@ if ( empty( $post ) ) {
 
         <p class="form-field">
             <label for="#"><?php _e( 'Charge every', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php echo $month_data['month'] ?></span>
+            <span><?php echo esc_html( $month_data['month'] ) ?></span>
             <span><?php _e( 'Month', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
 		<?php if ( ! empty( $month_data['day'] ) ) : ?>
             <p class="form-field">
                 <label for="#"><?php _e( 'On this day of the month', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-                <span><?php echo $month_data['day'] ?></span>
+                <span><?php echo esc_html( $month_data['day'] ) ?></span>
             </p>
         <?php endif; ?>
         <p class="form-field">
@@ -166,7 +166,7 @@ if ( empty( $post ) ) {
 	<?php if ( $_reepay_subscription_schedule_type === WC_Reepay_Subscription_Plan_Simple::TYPE_WEEKLY_FIXED_DAY ) : ?>
         <p class="form-field">
             <label for="#"><?php _e( 'Charge every', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-            <span><?php echo $_reepay_subscription_weekly_fixedday['week'] ?></span>
+            <span><?php echo esc_html( $_reepay_subscription_weekly_fixedday['week'] ) ?></span>
             <span><?php _e( 'Week', 'reepay-subscriptions-for-woocommerce' ); ?></span>
         </p>
         <p class="form-field">
@@ -247,7 +247,7 @@ if ( empty( $post ) ) {
 		<?php if ( ! empty( $_reepay_subscription_fee['enabled'] ) ) : ?>
             <p class="form-field">
                 <label for="#"><?php _e( 'Setup fee', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-                <span><?php echo ( ! empty( $_reepay_subscription_fee['amount'] ) ? esc_attr( $_reepay_subscription_fee['amount'] ) : 0 ) . ' ' . $_reepay_subscription_currency ?></span>
+                <span><?php echo esc_html( ( ! empty( $_reepay_subscription_fee['amount'] ) ? $_reepay_subscription_fee['amount'] : 0 ) . ' ' . $_reepay_subscription_currency ) ?></span>
             </p>
             <p class="form-field">
                 <label for="#"><?php _e( 'Text', 'reepay-subscriptions-for-woocommerce' ); ?></label>
@@ -278,7 +278,7 @@ if ( empty( $post ) ) {
             if ( $_reepay_subscription_trial['type'] != 'customize' ) {
 	           _e( WC_Reepay_Subscription_Plan_Simple::$trial[ $_reepay_subscription_trial['type'] ], 'reepay-subscriptions-for-woocommerce' );
             } else {
-	           echo $_reepay_subscription_trial['length'] . ' ' . $_reepay_subscription_trial['unit'];
+	           echo esc_html( $_reepay_subscription_trial['length'] . ' ' . $_reepay_subscription_trial['unit'] );
             }
             ?>
         </span>
