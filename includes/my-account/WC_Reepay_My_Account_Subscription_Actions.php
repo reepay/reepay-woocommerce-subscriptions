@@ -37,6 +37,13 @@ class WC_Reepay_My_Account_Subscription_Actions {
 
 			$subscription_handle = sanitize_text_field( $_GET[ $subscription_action ] );
 
+			// Security: Validate subscription handle format
+			if ( ! preg_match( '/^[a-zA-Z0-9_-]{1,64}$/', $subscription_handle ) ) {
+				wc_add_notice( __( 'Invalid subscription handle format.', 'reepay-subscriptions-for-woocommerce' ), 'error' );
+				wp_redirect( wc_get_endpoint_url( WC_Reepay_My_Account_Subscription_Page::$menu_item_slug ) );
+				exit();
+			}
+
 			try {
 				$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
 
@@ -45,7 +52,26 @@ class WC_Reepay_My_Account_Subscription_Actions {
 					throw new Exception( __( 'You do not have permission to perform this action.', 'reepay-subscriptions-for-woocommerce' ) );
 				}
 
-				call_user_func( array( $this, "do_action_$subscription_action" ), $subscription_handle );
+				// Security: Use switch instead of call_user_func for better security
+				switch ( $subscription_action ) {
+					case 'cancel_subscription':
+						$this->do_action_cancel_subscription( $subscription_handle );
+						break;
+					case 'uncancel_subscription':
+						$this->do_action_uncancel_subscription( $subscription_handle );
+						break;
+					case 'put_on_hold':
+						$this->do_action_put_on_hold( $subscription_handle );
+						break;
+					case 'reactivate':
+						$this->do_action_reactivate( $subscription_handle );
+						break;
+					case 'change_payment_method':
+						$this->do_action_change_payment_method( $subscription_handle );
+						break;
+					default:
+						throw new Exception( __( 'Invalid subscription action.', 'reepay-subscriptions-for-woocommerce' ) );
+				}
 			} catch ( Exception $exception ) {
 				reepay_s()->log()->log(array(
 					'source' => 'WC_Reepay_My_Account_Subscription_Page::do_action',

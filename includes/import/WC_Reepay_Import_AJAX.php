@@ -80,7 +80,24 @@ class WC_Reepay_Import_AJAX {
 
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
 			if ( ! empty( $objects_to_import[ $object ] ) ) {
-				$res = call_user_func( "WC_Reepay_Import::get_reepay_$object", $objects_to_import[ $object ], $debug );
+				// Security: Use switch instead of call_user_func
+				switch ( $object ) {
+					case 'plans':
+						$res = WC_Reepay_Import::get_reepay_plans( $objects_to_import[ $object ], $debug );
+						break;
+					case 'addons':
+						$res = WC_Reepay_Import::get_reepay_addons( $objects_to_import[ $object ], $debug );
+						break;
+					case 'coupons':
+						$res = WC_Reepay_Import::get_reepay_coupons( $objects_to_import[ $object ], $debug );
+						break;
+					case 'discounts':
+						$res = WC_Reepay_Import::get_reepay_discounts( $objects_to_import[ $object ], $debug );
+						break;
+					default:
+						wp_send_json_error( 'Invalid object type' );
+						return;
+				}
 
 				if ( is_wp_error( $res ) ) {
 					wp_send_json_error( $res );
@@ -113,10 +130,39 @@ class WC_Reepay_Import_AJAX {
 
 			$selected = array_map( 'sanitize_text_field', wp_unslash( $_POST['selected'][ $object ] ) );
 
-			$objects_data = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
+			// Security: Use switch instead of call_user_func
+			switch ( $object ) {
+				case 'plans':
+					$objects_data = WC_Reepay_Import::get_reepay_plans( [ 'all' ] );
+					break;
+				case 'addons':
+					$objects_data = WC_Reepay_Import::get_reepay_addons( [ 'all' ] );
+					break;
+				case 'coupons':
+					$objects_data = WC_Reepay_Import::get_reepay_coupons( [ 'all' ] );
+					break;
+				case 'discounts':
+					$objects_data = WC_Reepay_Import::get_reepay_discounts( [ 'all' ] );
+					break;
+				default:
+					continue 2;
+			}
 
 			if ( ! empty( $objects_data ) ) {
-				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data, $selected );
+				switch ( $object ) {
+					case 'plans':
+						$res[ $object ] = WC_Reepay_Import::import_plans( $objects_data, $selected );
+						break;
+					case 'addons':
+						$res[ $object ] = WC_Reepay_Import::import_addons( $objects_data, $selected );
+						break;
+					case 'coupons':
+						$res[ $object ] = WC_Reepay_Import::import_coupons( $objects_data, $selected );
+						break;
+					case 'discounts':
+						$res[ $object ] = WC_Reepay_Import::import_discounts( $objects_data, $selected );
+						break;
+				}
 			}
 		}
 

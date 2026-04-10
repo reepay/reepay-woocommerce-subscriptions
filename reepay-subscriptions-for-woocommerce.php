@@ -904,6 +904,12 @@ class WooCommerce_Reepay_Subscriptions
      * Add subscripton terms value to meta data
      */
     public function subscription_terms_checkbox_order_meta($order_id){
+        // Security: Verify nonce (WooCommerce checkout process already validates this)
+        if ( ! isset( $_POST['woocommerce-process-checkout-nonce'] ) || 
+             ! wp_verify_nonce( $_POST['woocommerce-process-checkout-nonce'], 'woocommerce-process_checkout' ) ) {
+            return;
+        }
+        
         if (isset($_POST['subscription_terms'])) {
             $order = wc_get_order( $order_id );
             $order->update_meta_data( '_subscription_terms', sanitize_text_field($_POST['subscription_terms']) );
@@ -1053,6 +1059,7 @@ class WooCommerce_Reepay_Subscriptions
         if ( $has_reepay_product && !isset($_POST['subscription_terms']) ) {
             wc_add_notice(__('Please read and accept the subscription terms to proceed', 'reepay-subscriptions-for-woocommerce'), 'error');
         } else if ( $has_reepay_product && isset($_POST['subscription_terms']) ) {
+            // Security: Nonce verification (already done by WooCommerce for checkout process)
             // Save the subscription terms acceptance to order meta
             $order->update_meta_data( '_subscription_terms', sanitize_text_field($_POST['subscription_terms']) );
             $order->save();
