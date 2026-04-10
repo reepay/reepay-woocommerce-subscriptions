@@ -21,8 +21,8 @@ class WC_Reepay_Subscription_Addons_Rest extends WC_Reepay_Subscription_Plan_Sim
 			$addons = WC_Reepay_Subscription_Addons::get_reepay_addons_list( false, true );
 
 			foreach ( $addons['content'] ?? [] as $addon ) {
-				$html .= '<option value="' . $addon['handle'] . '" ' . selected( $addon['handle'], $request['handle'],
-						false ) . '>' . esc_attr( $addon['name'] ) . '</option>';
+				$html .= '<option value="' . esc_attr( $addon['handle'] ) . '" ' . selected( $addon['handle'], $request['handle'],
+						false ) . '>' . esc_html( $addon['name'] ) . '</option>';
 			}
 
 			return new WP_REST_Response( [

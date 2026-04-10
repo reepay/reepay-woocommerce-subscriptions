@@ -324,6 +324,12 @@ class WC_Reepay_Discounts_And_Coupons
             return;
         }
 
+        // Security: Verify nonce
+        if ( ! isset( $_POST['woocommerce_meta_nonce'] ) || 
+             ! wp_verify_nonce( $_POST['woocommerce_meta_nonce'], 'woocommerce_save_data' ) ) {
+            return;
+        }
+
         $type = $coupon->get_discount_type();
 
         if ($type !== 'reepay_type') {

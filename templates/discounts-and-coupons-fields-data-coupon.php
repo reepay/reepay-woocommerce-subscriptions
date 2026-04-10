@@ -33,7 +33,7 @@
 		if ( ! empty( $meta['_reepay_discount_eligible_plans'] ) ): ?>
 			<?php
 			foreach ( $meta['_reepay_discount_eligible_plans'][0] as $eligible_plan ) {
-				echo '<br>' . $eligible_plan;
+				echo '<br>' . esc_html( $eligible_plan );
 			} ?>
 		<?php
 		endif; ?>
