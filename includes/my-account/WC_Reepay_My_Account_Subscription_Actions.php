@@ -15,13 +15,13 @@ class WC_Reepay_My_Account_Subscription_Actions {
 	}
 
 	public function do_action() {
-		// Security: Check user is logged in
-		if ( ! is_user_logged_in() ) {
-			wc_add_notice( __( 'You must be logged in to perform this action.', 'reepay-subscriptions-for-woocommerce' ), 'error' );
+		if ( ! isset( $_GET['reepay_subscriptions_action'] ) ) {
 			return;
 		}
 
-		if ( ! isset( $_GET['reepay_subscriptions_action'] ) ) {
+		// Security: Check user is logged in
+		if ( ! is_user_logged_in() ) {
+			wc_add_notice( __( 'You must be logged in to perform this action.', 'reepay-subscriptions-for-woocommerce' ), 'error' );
 			return;
 		}
 
