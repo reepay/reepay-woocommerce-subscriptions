@@ -48,9 +48,7 @@ class WC_Reepay_My_Account_Subscription_Actions {
 				$subscription = reepay_s()->api()->request( "subscription/{$subscription_handle}" );
 
 				// Security: Verify subscription ownership
-				if ( ! WC_Reepay_My_Account_Subscription_Page::customer_has_access_to_subscription( $subscription ) ) {
-					throw new Exception( __( 'You do not have permission to perform this action.', 'reepay-subscriptions-for-woocommerce' ) );
-				}
+				WC_Reepay_My_Account_Subscription_Page::customer_has_access_to_subscription( $subscription );
 
 				// Security: Use switch instead of call_user_func for better security
 				switch ( $subscription_action ) {
@@ -118,9 +116,18 @@ class WC_Reepay_My_Account_Subscription_Actions {
 				throw new Exception( __( 'Invalid token format.', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
-			// Security: Verify token belongs to current user
-			$token = WC_Payment_Tokens::get( $token_id );
-			if ( ! $token || $token->get_user_id() !== get_current_user_id() ) {
+			// Security: Verify token belongs to current user by matching against their saved WC tokens.
+			// token_id is a Reepay card ID (ca_...) stored as the WC token value — not a WC token numeric ID.
+			$user_tokens = WC_Payment_Tokens::get_customer_tokens( get_current_user_id() );
+			$token_owned = false;
+			foreach ( $user_tokens as $user_token ) {
+				if ( $user_token->get_token() === $token_id ) {
+					$token_owned = true;
+					break;
+				}
+			}
+
+			if ( ! $token_owned ) {
 				throw new Exception( __( 'Invalid payment method.', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
