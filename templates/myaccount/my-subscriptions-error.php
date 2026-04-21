@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 ?>
 <div class="woocommerce_account_subscriptions">
     <p class="no_subscriptions woocommerce-message woocommerce-message--info woocommerce-Message woocommerce-Message--info woocommerce-info">
-		<?php echo $error; ?>
+		<?php echo esc_html( $error ); ?>
 
 		<?php if ( ! empty( $show_return_to_shop_btn ) ) : ?>
             <a class="woocommerce-Button button"

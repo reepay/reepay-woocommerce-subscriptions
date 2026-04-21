@@ -36,7 +36,7 @@
             <input disabled type="checkbox" id="<?php echo esc_attr( $value ) ?>"
                    name="_reepay_discount_apply_to_items[]"
                    required
-				<?php echo $is_update ? 'disabled="disabled"' : '' ?>
+				<?php disabled( $is_update, true ); ?>
                    value="<?php echo esc_attr( $value ) ?>" <?php checked( in_array( $value, $meta['_reepay_discount_apply_to_items'][0] ?? [] ), true ); ?>/> &nbsp<?php esc_html_e( $label, 'reepay-subscriptions-for-woocommerce' ); ?>
             &nbsp
 		<?php endforeach; ?>

@@ -60,7 +60,7 @@ class WC_Reepay_My_Account_Subscription_Page {
 	}
 
 	public function get_customer_payment_methods( string $subscription_handle, string $customer_handle = '' ): array {
-		if ( empty( $customer ) ) {
+		if ( empty( $customer_handle ) ) {
 			$customer_handle = rp_get_customer_handle( get_current_user_id() );
 		}
 
@@ -106,7 +106,7 @@ class WC_Reepay_My_Account_Subscription_Page {
 	}
 
 	public static function customer_has_access_to_subscription( $subscription, $customer_handle = '' ) {
-		if ( empty( $customer ) ) {
+		if ( empty( $customer_handle ) ) {
 			$customer_handle = rp_get_customer_handle( get_current_user_id() );
 		}
 

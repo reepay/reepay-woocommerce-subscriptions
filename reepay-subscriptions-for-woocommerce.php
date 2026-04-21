@@ -347,7 +347,10 @@ class WooCommerce_Reepay_Subscriptions
 
     public function admin_customer_report()
     {
-        if (isset($_GET['path']) && $_GET['path'] == '/customers') {
+        // Security: Sanitize path parameter
+        $path = isset( $_GET['path'] ) ? sanitize_text_field( wp_unslash( $_GET['path'] ) ) : '';
+        
+        if ( $path === '/customers' ) {
             $script_path       = 'assets/js/analytics/build/index.js';
             $script_asset_path = $this->settings('plugin_url').'assets/js/analytics/build/index.asset.php';
             $script_asset      = file_exists($script_asset_path)
@@ -901,6 +904,12 @@ class WooCommerce_Reepay_Subscriptions
      * Add subscripton terms value to meta data
      */
     public function subscription_terms_checkbox_order_meta($order_id){
+        // Security: Verify nonce (WooCommerce checkout process already validates this)
+        if ( ! isset( $_POST['woocommerce-process-checkout-nonce'] ) || 
+             ! wp_verify_nonce( $_POST['woocommerce-process-checkout-nonce'], 'woocommerce-process_checkout' ) ) {
+            return;
+        }
+        
         if (isset($_POST['subscription_terms'])) {
             $order = wc_get_order( $order_id );
             $order->update_meta_data( '_subscription_terms', sanitize_text_field($_POST['subscription_terms']) );
@@ -1009,7 +1018,7 @@ class WooCommerce_Reepay_Subscriptions
                 $page      = get_post( $page_subscription_terms );
 
                 if ( $page && 'publish' === $page->post_status && $page->post_content && ! has_shortcode( $page->post_content, 'woocommerce_checkout' ) ) {
-                    echo '<div class="billwerk-optimize-terms-and-conditions" style="display: none; max-height: 200px; overflow: auto; padding: 1em; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2); margin-bottom: 16px;background-color: rgba(0, 0, 0, .05);">' . wc_format_content( $sanitizer->styled_post_content( $page->post_content ) ) . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    echo '<div class="billwerk-optimize-terms-and-conditions" style="display: none; max-height: 200px; overflow: auto; padding: 1em; box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2); margin-bottom: 16px;background-color: rgba(0, 0, 0, .05);">' . wc_kses_post( $sanitizer->styled_post_content( $page->post_content ) ) . '</div>';
                 }
             }
 
@@ -1050,6 +1059,7 @@ class WooCommerce_Reepay_Subscriptions
         if ( $has_reepay_product && !isset($_POST['subscription_terms']) ) {
             wc_add_notice(__('Please read and accept the subscription terms to proceed', 'reepay-subscriptions-for-woocommerce'), 'error');
         } else if ( $has_reepay_product && isset($_POST['subscription_terms']) ) {
+            // Security: Nonce verification (already done by WooCommerce for checkout process)
             // Save the subscription terms acceptance to order meta
             $order->update_meta_data( '_subscription_terms', sanitize_text_field($_POST['subscription_terms']) );
             $order->save();

@@ -8,15 +8,15 @@ class WC_Reepay_My_Account_Payment_Method {
 	}
 
 	public function add_subscription_arg( $url ) {
-		if ( $_GET['reepay_subscription'] ) {
-			$url = sanitize_url( add_query_arg( 'reepay_subscription', $_GET['reepay_subscription'], $url ) );
+		if ( ! empty( $_GET['reepay_subscription'] ) ) {
+			$url = sanitize_url( add_query_arg( 'reepay_subscription', sanitize_text_field( wp_unslash( $_GET['reepay_subscription'] ) ), $url ) );
 		}
 
 		return $url;
 	}
 
 	public function payment_method_added( WC_Payment_Token $token ) {
-		$handle = sanitize_text_field( $_GET['reepay_subscription'] ) ?? '';
+		$handle = isset( $_GET['reepay_subscription'] ) ? sanitize_text_field( wp_unslash( $_GET['reepay_subscription'] ) ) : '';
 
 		if ( ! empty( $handle ) ) {
 			try {
