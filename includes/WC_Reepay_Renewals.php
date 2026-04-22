@@ -102,7 +102,7 @@ class WC_Reepay_Renewals {
         $subscriptions_in_cart = $this->reepay_cart_subscription_count();
 
         //filter reepay type subscriptions
-        if ( empty( $subscriptions_in_cart ) && ( ! isset( $_GET['order_id'] ) || ! $this->reepay_order_contains_subscription( $_GET['order_id'] ) ) ) {
+        if ( empty( $subscriptions_in_cart ) && ( ! isset( $_GET['order_id'] ) || ! $this->reepay_order_contains_subscription( absint( $_GET['order_id'] ) ) ) ) {
             return $available_gateways;
         }
 

@@ -26,7 +26,9 @@ class WC_Reepay_Subscription_Plan_Simple_Rest extends WP_REST_Controller {
 		register_rest_route( $this->namespace, $this->rest_base, [
 			"methods"             => WP_REST_Server::READABLE,
 			"callback"            => array( $this, "get_item" ),
-			"permission_callback" => '__return_true',
+			"permission_callback" => function () {
+				return current_user_can( 'manage_woocommerce' );
+			},
 			"args"                => array(
 				"handle" => array(
 					"type"              => "string",

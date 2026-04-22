@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.5
+Stable tag: 1.3.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,9 @@ Standard Frisbii Billing features:
 3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.3.6
+- [Improvement] - General security patches.
+
 v 1.3.5
 - [Fix] - various API-errors
 - [Improvement] - Gracefully handle order capture if products are deleted or inactive in WooCommerce

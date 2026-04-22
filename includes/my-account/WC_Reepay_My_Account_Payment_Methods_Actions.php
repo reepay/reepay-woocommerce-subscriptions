@@ -27,7 +27,7 @@ class WC_Reepay_My_Account_Payment_Methods_Actions {
 
 		wc_nocache_headers();
 
-		if ( get_current_user_id() !== $token->get_user_id() || ! isset( $_REQUEST['_wpnonce'] ) || false === wp_verify_nonce( wp_unslash( $_REQUEST['_wpnonce'] ), 'delete-payment-method-' . $token_id ) ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		if ( get_current_user_id() !== $token->get_user_id() || ! isset( $_GET['_wpnonce'] ) || false === wp_verify_nonce( sanitize_text_field( wp_unslash( $_GET['_wpnonce'] ) ), 'delete-payment-method-' . $token_id ) ) {
 			wc_add_notice( __( 'Invalid payment method.', 'reepay-checkout-gateway' ), 'error' );
 		} else {
 			$deleted = false;

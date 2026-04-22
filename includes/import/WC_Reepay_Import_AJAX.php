@@ -67,7 +67,12 @@ class WC_Reepay_Import_AJAX {
 	 * AJAX handler to get objects that can be imported
 	 */
 	public function get_objects() {
-		$this->chech_nonce();
+		// Security: Check user capability
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+
+		$this->check_nonce();
 
 		$result            = [];
 		$objects_to_import = $this->get_objects_to_import_from_get();
@@ -75,7 +80,24 @@ class WC_Reepay_Import_AJAX {
 
 		foreach ( array_keys( WC_Reepay_Import::$import_objects ) as $object ) {
 			if ( ! empty( $objects_to_import[ $object ] ) ) {
-				$res = call_user_func( "WC_Reepay_Import::get_reepay_$object", $objects_to_import[ $object ], $debug );
+				// Security: Use switch instead of call_user_func
+				switch ( $object ) {
+					case 'plans':
+						$res = WC_Reepay_Import::get_reepay_plans( $objects_to_import[ $object ], $debug );
+						break;
+					case 'addons':
+						$res = WC_Reepay_Import::get_reepay_addons( $objects_to_import[ $object ], $debug );
+						break;
+					case 'coupons':
+						$res = WC_Reepay_Import::get_reepay_coupons( $objects_to_import[ $object ], $debug );
+						break;
+					case 'discounts':
+						$res = WC_Reepay_Import::get_reepay_discounts( $objects_to_import[ $object ], $debug );
+						break;
+					default:
+						wp_send_json_error( 'Invalid object type' );
+						return;
+				}
 
 				if ( is_wp_error( $res ) ) {
 					wp_send_json_error( $res );
@@ -92,7 +114,12 @@ class WC_Reepay_Import_AJAX {
 	 * AJAX handler to save objects from request
 	 */
 	public function save_objects() {
-		$this->chech_nonce();
+		// Security: Check user capability
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error( 'Unauthorized', 403 );
+		}
+
+		$this->check_nonce();
 
 		$res = [];
 
@@ -101,10 +128,41 @@ class WC_Reepay_Import_AJAX {
 				continue;
 			}
 
-			$objects_data = call_user_func( "WC_Reepay_Import::get_reepay_$object", [ 'all' ] );
+			$selected = array_map( 'sanitize_text_field', wp_unslash( $_POST['selected'][ $object ] ) );
+
+			// Security: Use switch instead of call_user_func
+			switch ( $object ) {
+				case 'plans':
+					$objects_data = WC_Reepay_Import::get_reepay_plans( [ 'all' ] );
+					break;
+				case 'addons':
+					$objects_data = WC_Reepay_Import::get_reepay_addons( [ 'all' ] );
+					break;
+				case 'coupons':
+					$objects_data = WC_Reepay_Import::get_reepay_coupons( [ 'all' ] );
+					break;
+				case 'discounts':
+					$objects_data = WC_Reepay_Import::get_reepay_discounts( [ 'all' ] );
+					break;
+				default:
+					continue 2;
+			}
 
 			if ( ! empty( $objects_data ) ) {
-				$res[ $object ] = call_user_func( "WC_Reepay_Import::import_$object", $objects_data, $_POST['selected'][ $object ] );
+				switch ( $object ) {
+					case 'plans':
+						$res[ $object ] = WC_Reepay_Import::import_plans( $objects_data, $selected );
+						break;
+					case 'addons':
+						$res[ $object ] = WC_Reepay_Import::import_addons( $objects_data, $selected );
+						break;
+					case 'coupons':
+						$res[ $object ] = WC_Reepay_Import::import_coupons( $objects_data, $selected );
+						break;
+					case 'discounts':
+						$res[ $object ] = WC_Reepay_Import::import_discounts( $objects_data, $selected );
+						break;
+				}
 			}
 		}
 
@@ -142,11 +200,19 @@ class WC_Reepay_Import_AJAX {
 	}
 
 	/**
-	 * Prevent AJAX request if nonce fails check
+	 * Prevent AJAX request if nonce fails check or user lacks permissions
 	 *
 	 * @return true
 	 */
-	public function chech_nonce() {
+	public function check_nonce() {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			wp_send_json_error(
+				[
+					'error' => __( 'You do not have permission to perform this action.', 'reepay-subscriptions-for-woocommerce' ),
+				]
+			);
+		}
+
 		if ( ! check_ajax_referer( self::$ajax_nonce, 'nonce', false ) ) {
 			wp_send_json_error(
 				[
@@ -156,5 +222,12 @@ class WC_Reepay_Import_AJAX {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @deprecated Use check_nonce() instead.
+	 */
+	public function chech_nonce() {
+		return $this->check_nonce();
 	}
 }

@@ -50,7 +50,7 @@ global $post;
 				<?php
 				if ( ! empty( $addons_list ) ): ?>
                     <select name="addon_choose_exist[<?php
-					echo $loop; ?>]"
+					echo esc_attr( $loop ); ?>]"
                             class="wc_input_subscription_period_interval js-subscription_choose_exist">
                         <option value=""><?php
 							_e( 'Select add-on', 'reepay-subscriptions-for-woocommerce' ); ?></option>

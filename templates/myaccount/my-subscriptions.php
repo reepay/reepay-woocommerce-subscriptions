@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 </td>
                 <td class="subscription-total order-total woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-total woocommerce-orders-table__cell-order-total"
                     data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'reepay-subscriptions-for-woocommerce' ); ?>">
-	                <?php echo $subscription['amount'] . ' / ' . $subscription['billing_period'] ?>
+	                <?php echo wp_kses_post( $subscription['amount'] ) . ' / ' . esc_html( $subscription['billing_period'] ) ?>
                 </td>
                 <td class="subscription-actions order-actions woocommerce-orders-table__cell woocommerce-orders-table__cell-subscription-actions woocommerce-orders-table__cell-order-actions">
                     <a href="<?php echo esc_url( $subscription['link'] ) ?>"

@@ -21,7 +21,7 @@ class WC_Reepay_Subscription_Coupons_Rest extends WC_Reepay_Subscription_Plan_Si
 			$addons = WC_Reepay_Discounts_And_Coupons::get_coupons();
 
 			foreach ( $addons ?? [] as $addon ) {
-				$html .= '<option value="' . $addon['handle'] . '">' . esc_attr( $addon['name'] ) . '</option>';
+				$html .= '<option value="' . esc_attr( $addon['handle'] ) . '">' . esc_html( $addon['name'] ) . '</option>';
 			}
 
 			return new WP_REST_Response( [
