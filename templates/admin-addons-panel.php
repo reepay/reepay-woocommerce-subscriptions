@@ -142,7 +142,9 @@
 							reepay_s()->settings( 'rest_api_namespace' ) . "/addon/" ) . reepay_s()->settings( 'query_string' ) . 'product_id=' . ( intval( $_GET['post'] ?? 0 ) ) ?>' + `&handle=${handle}`,
                     method: 'GET',
                     beforeSend: function (xhr) {
-
+                        if (window.reepay && window.reepay.nonce) {
+                            xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
+                        }
                     },
                     success: function (response_data) {
                         if (!response_data.success) {

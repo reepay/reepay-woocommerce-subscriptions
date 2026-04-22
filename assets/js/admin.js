@@ -1,6 +1,14 @@
 jQuery(function ($) {
     const $body = $('body');
 
+    if (window.reepay && window.reepay.nonce) {
+        $.ajaxSetup({
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
+            }
+        });
+    }
+
     var linksToMenu = $('a[href="admin.php?page=reepay-subscriptions-for-woocommerce"]');
     linksToMenu.attr("href", "https://admin.billwerk.plus/#/rp/subscriptions")
     linksToMenu.attr("target", "_blank")
@@ -61,6 +69,9 @@ jQuery(function ($) {
                 $.ajax({
                     url: window.reepay.rest_urls.get_addon + window.reepay.query_string + `amount=true&handle=${addon_field.val()}`,
                     method: 'GET',
+                    beforeSend: function (xhr) {
+                        xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
+                    },
                     success: function (response_data) {
                         if (!response_data && !response_data.success) {
                             console.log(response_data);
@@ -111,7 +122,7 @@ jQuery(function ($) {
                 url,
                 method: 'GET',
                 beforeSend: function (xhr) {
-
+                    xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
                 },
                 success: function (response_data) {
                     if (!response_data.success) {
@@ -158,7 +169,7 @@ jQuery(function ($) {
                 url,
                 method: 'GET',
                 beforeSend: function (xhr) {
-
+                    xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
                 },
                 success: function (response_data) {
                     if (!response_data.success) {
@@ -482,7 +493,7 @@ jQuery(function ($) {
             url,
             method: 'GET',
             beforeSend: function (xhr) {
-
+                xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
             },
             success: function (response_data) {
                 if (!response_data.success) {
@@ -530,7 +541,7 @@ jQuery(function ($) {
             url: window.reepay.rest_urls.get_coupon + window.reepay.query_string + `handle=${handle}`,
             method: 'GET',
             beforeSend: function (xhr) {
-
+                xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
             },
             success: function (response_data) {
                 if (!response_data.success) {
@@ -556,8 +567,13 @@ jQuery(function ($) {
             return;
         }
         
-        $.get(window.reepay.rest_urls.get_discount + window.reepay.query_string + `handle=${handle}`)
-            .then(function (response_data) {
+        $.ajax({
+            url: window.reepay.rest_urls.get_discount + window.reepay.query_string + `handle=${handle}`,
+            method: 'GET',
+            beforeSend: function (xhr) {
+                xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
+            },
+        }).then(function (response_data) {
                 if (!response_data.success) {
                     return;
                 }
@@ -614,7 +630,7 @@ jQuery(function ($) {
             url,
             method: 'GET',
             beforeSend: function (xhr) {
-
+                xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
             },
             success: function (response_data) {
                 if (!response_data.success) {
@@ -666,7 +682,7 @@ jQuery(function ($) {
                 url,
                 method: 'GET',
                 beforeSend: function (xhr) {
-
+                    xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
                 },
                 success: function (response_data) {
                     if (!response_data.success) {
@@ -708,7 +724,7 @@ jQuery(function ($) {
                 url,
                 method: 'GET',
                 beforeSend: function (xhr) {
-
+                    xhr.setRequestHeader('X-WP-Nonce', window.reepay.nonce);
                 },
                 success: function (response_data) {
                     if (!response_data.success) {

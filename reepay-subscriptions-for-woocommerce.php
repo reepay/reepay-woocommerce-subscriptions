@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Frisbii Billing while still keeping your usual WooCommerce tools. The Frisbii Billing for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: Frisbii
  * Author URI: https://frisbii.com
- * Version: 1.3.5
+ * Version: 1.3.6
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -55,7 +55,7 @@ class WooCommerce_Reepay_Subscriptions
     /**
      * @var string
      */
-    public static $version = '1.3.5';
+    public static $version = '1.3.6';
 
     /**
      * @var string
@@ -693,6 +693,7 @@ class WooCommerce_Reepay_Subscriptions
                 'get_addon'    => get_rest_url(0, reepay_s()->settings('rest_api_namespace')."/addon/"),
             ],
             'query_string' => !empty(get_option( 'permalink_structure' )) ? '?' : '&',
+            'nonce'                 => wp_create_nonce( 'wp_rest' ),
             'i18n'                  => $i18n
         ]);
     }
