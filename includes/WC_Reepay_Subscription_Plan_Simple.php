@@ -921,8 +921,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 					if ( ! $exist_fee ) {
 						WC()->cart->add_fee( $product->get_name() . ' - ' . $fee["text"], $amount );
-						$price = $product->get_price();
-						$product->set_price( floatval( $price ) + floatval( $amount ) );
 					}
 				}
 			}

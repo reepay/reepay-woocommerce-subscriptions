@@ -20,6 +20,11 @@ class WC_Reepay_Subscription_Addons {
 		add_action( 'woocommerce_checkout_create_order_line_item', [ $this, 'order_line_item' ], 10, 3 );
 		// BWSM-84: Recalculate addon-adjusted prices when cart quantities change (AJAX update).
 		add_action( 'woocommerce_before_calculate_totals', [ $this, 'before_calculate_totals' ], 20, 1 );
+		// BWPM-235: Restore base price after totals are calculated so the displayed
+		// unit price reflects the original product price, not the addon-inflated price.
+		// Line totals (line_subtotal, line_total) are already stored by WC_Cart_Totals
+		// and are not affected by restoring the product price afterwards.
+		add_action( 'woocommerce_after_calculate_totals', [ $this, 'restore_base_prices_for_display' ], 20, 1 );
 	}
 
 
@@ -113,6 +118,33 @@ class WC_Reepay_Subscription_Addons {
 		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
 			if ( ! empty( $cart_item['addons'] ) ) {
 				$this->add_cart_item( $cart_item );
+			}
+		}
+	}
+
+	/**
+	 * BWPM-235: Restore the original product price after WC_Cart_Totals has finished
+	 * computing line totals.
+	 *
+	 * add_cart_item() inflates the product price via set_price() so that
+	 * (inflated_price × qty) yields the correct line total including flat addon costs.
+	 * However, this corrupts the displayed unit price in both the classic cart template
+	 * and the WooCommerce Blocks / Store API cart.
+	 *
+	 * Because WC_Cart_Totals already persists the calculated values in each cart item's
+	 * line_subtotal / line_total fields, resetting the product price here only affects
+	 * display — totals remain correct.
+	 *
+	 * @param WC_Cart $cart
+	 */
+	public function restore_base_prices_for_display( $cart ) {
+		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
+			return;
+		}
+
+		foreach ( $cart->get_cart() as $cart_item_key => $cart_item ) {
+			if ( ! empty( $cart_item['addons'] ) && isset( $cart_item['_addon_base_price'] ) ) {
+				$cart_item['data']->set_price( $cart_item['_addon_base_price'] );
 			}
 		}
 	}
