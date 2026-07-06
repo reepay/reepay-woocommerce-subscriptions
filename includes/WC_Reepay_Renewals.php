@@ -1346,10 +1346,15 @@ class WC_Reepay_Renewals {
             foreach ( $invoice_data['order_lines'] as $invoice_lines ) {
                 // Check if this line item has VAT data
                 $line_has_vat = $invoice_has_vat
-                    && isset( $invoice_lines['vat'] ) 
+                    && isset( $invoice_lines['vat'] )
                     && floatval( $invoice_lines['vat'] ) > 0
                     && isset( $invoice_lines['amount_vat'] )
                     && isset( $invoice_lines['amount_ex_vat'] );
+
+                // BWPM-254: Frisbii says this line is VAT-free (e.g. an add-on with no VAT).
+                // Such items must be marked non-taxable, otherwise calculate_totals( true )
+                // adds the store tax rate on top of the Frisbii amount.
+                $line_is_zero_vat = ! isset( $invoice_lines['vat'] ) || floatval( $invoice_lines['vat'] ) <= 0;
 
                 if ( $invoice_lines['origin'] == 'surcharge_fee' ) {
                     $fees_item = new WC_Order_Item_Fee();
@@ -1365,7 +1370,11 @@ class WC_Reepay_Renewals {
                         $fees_item->set_amount( floatval( $invoice_lines['unit_amount'] ) / 100 );
                         $fees_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                     }
-                    
+
+                    if ( $line_is_zero_vat ) {
+                        $fees_item->set_tax_status( 'none' );
+                    }
+
                     $fees_item->add_meta_data( '_is_card_fee', true );
                     $new_items[] = $fees_item;
                     
@@ -1421,7 +1430,12 @@ class WC_Reepay_Renewals {
                             $product_item->set_total( floatval( $invoice_lines['amount'] ) / 100 );
                         }
                     }
-                    
+
+                    if ( $line_is_zero_vat ) {
+                        // Tax class '0' makes WC_Order_Item::calculate_taxes() skip this line.
+                        $product_item->set_tax_class( '0' );
+                    }
+
                     $new_items[] = $product_item;
                 }
             }
@@ -1781,6 +1795,7 @@ class WC_Reepay_Renewals {
                 $product_item->set_variation_id( $item->get_variation_id() );
                 $product_item->set_subtotal( $item->get_subtotal() );
                 $product_item->set_total( $item->get_total() );
+                $product_item->set_tax_class( $item->get_tax_class() );
 
                 foreach ( $item->get_formatted_meta_data('_', true) as $value ) {
                     $product_item->add_meta_data( $value->key, $value->value );
@@ -1810,6 +1825,8 @@ class WC_Reepay_Renewals {
                 $fees_item->set_name( $item->get_name() );
                 $fees_item->set_amount( $item->get_amount() );
                 $fees_item->set_total( $item->get_total() );
+                $fees_item->set_tax_class( $item->get_tax_class() );
+                $fees_item->set_tax_status( $item->get_tax_status() );
                 $new_order->add_item( $fees_item );
             }
 
