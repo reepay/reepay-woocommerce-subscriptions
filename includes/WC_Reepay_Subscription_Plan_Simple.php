@@ -733,7 +733,8 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$vat                = 0;
 		$shipping_tax_class = get_option( 'woocommerce_shipping_tax_class' );
 
-		$tax_class = $shipping_tax_class;
+		// 'inherit' means "based on cart items" — no actual tax class, so use standard ('').
+		$tax_class = ( $shipping_tax_class === 'inherit' ) ? '' : $shipping_tax_class;
 
 		if ( ! is_null( $tax_class ) ) {
 			$matched_tax_rates = WC_Tax::find_shipping_rates(

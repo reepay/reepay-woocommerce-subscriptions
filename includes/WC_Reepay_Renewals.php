@@ -875,7 +875,15 @@ class WC_Reepay_Renewals {
             // sent to Billwerk+ must match this WC setting for correct VAT calculation.
             $addons_for_api = $data['addons'];
             foreach ( $addons_for_api as &$addon_item ) {
-                $addon_item['amount_incl_vat'] = $prices_incl_tax;
+                if ( ! empty( $addon_item['is_shipping'] ) ) {
+                    // WC shipping costs are always entered excl. tax, so shipping add-ons
+                    // must be sent as excl. VAT regardless of the product price setting —
+                    // otherwise Frisbii charges cost incl. VAT while checkout charges cost + VAT.
+                    $addon_item['amount_incl_vat'] = false;
+                    unset( $addon_item['is_shipping'] );
+                } else {
+                    $addon_item['amount_incl_vat'] = $prices_incl_tax;
+                }
                 // Remove legacy vat_type field (not used by Billwerk+ API)
                 unset( $addon_item['vat_type'] );
             }
@@ -1397,7 +1405,7 @@ class WC_Reepay_Renewals {
                     $product_item = new WC_Order_Item_Product();
                     $product_item->set_name( $invoice_lines['ordertext'] );
                     $product_item->set_quantity( $invoice_lines['quantity'] );
-                    
+
                     if ( $line_has_vat ) {
                         // Set subtotal with VAT data
                         $product_item->set_subtotal( floatval( $invoice_lines['unit_amount_ex_vat'] ) / 100 );
@@ -2133,6 +2141,9 @@ class WC_Reepay_Renewals {
         $tax_country      = ! empty( $shipping_country ) ? $shipping_country : $order->get_billing_country();
 
 
+        // No VAT on the add-on when the shipping method itself is not taxable in WC.
+        $shipping_is_taxable = ( $shm_data['tax_status'] ?? 'taxable' ) !== 'none';
+
         return [
             [
                 'name'          => $shm_data['reepay_shipping_addon_name'],
@@ -2140,10 +2151,9 @@ class WC_Reepay_Renewals {
                 'type'          => 'on_off',
                 'fixed_amount ' => true,
                 'amount'        => $shm_data['cost'] ? ($shm_data['cost'] * 100) :  0,
-                // 'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping(),
-                // 'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping( $order->get_billing_country() ),
-                'vat'           => WC_Reepay_Subscription_Plan_Simple::get_vat_shipping( $tax_country ),
+                'vat'           => $shipping_is_taxable ? WC_Reepay_Subscription_Plan_Simple::get_vat_shipping( $tax_country ) : 0,
                 'vat_type'      => wc_prices_include_tax(),
+                'is_shipping'   => true,
                 'handle'        => $shm_data['reepay_shipping_addon'],
                 'exist'         => $shm_data['reepay_shipping_addon'],
                 'add_on'        => $shm_data['reepay_shipping_addon'],
