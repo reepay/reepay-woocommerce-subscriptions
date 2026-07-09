@@ -382,6 +382,7 @@ jQuery(function ($) {
 
         function sync_expiry_date() {
             let $expiryInput = $('input#expiry_date');
+            let $usageLimitInput = $('input#usage_limit');
             let type = $('#discount_type').val();
 
             if (type !== 'reepay_type') {
@@ -389,9 +390,22 @@ jQuery(function ($) {
                 if ($expiryInput.hasClass('hasDatepicker')) {
                     $expiryInput.datepicker('option', 'beforeShow', null);
                 }
+                $usageLimitInput.prop('readonly', false).css('background-color', '');
                 return;
             }
 
+            // --- usage_limit ---
+            let maxRedemptions = $('.reepay_coupon_settings_exist .js-reepay-max-redemptions').val()
+                || $('.reepay_coupon_new .js-reepay-max-redemptions').val()
+                || '';
+
+            if (maxRedemptions) {
+                $usageLimitInput.val(maxRedemptions).prop('readonly', true).css('background-color', '#f0f0f0');
+            } else {
+                $usageLimitInput.prop('readonly', false).css('background-color', '');
+            }
+
+            // --- expiry_date ---
             let validUntil = $('.reepay_coupon_settings_exist .js-reepay-valid-until').val()
                 || $('.reepay_coupon_new .js-reepay-valid-until').val()
                 || '';

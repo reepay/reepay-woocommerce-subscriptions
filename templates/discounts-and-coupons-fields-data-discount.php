@@ -77,4 +77,7 @@
     $ts  = $raw ? strtotime( $raw ) : 0;
     echo $ts ? esc_attr( date( 'Y-m-d', $ts ) ) : '';
 ?>">
+<input type="hidden" class="js-reepay-max-redemptions" value="<?php
+    echo esc_attr( $meta['_reepay_coupon_max_redemptions'][0] ?? '' );
+?>">
 <!--End Duration-->
