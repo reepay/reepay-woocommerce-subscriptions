@@ -72,4 +72,9 @@
         ?></span>
     </p>
 <?php endif; ?>
+<input type="hidden" class="js-reepay-valid-until" value="<?php
+    $raw = $meta['_reepay_coupon_valid_until'][0] ?? '';
+    $ts  = $raw ? strtotime( $raw ) : 0;
+    echo $ts ? esc_attr( date( 'Y-m-d', $ts ) ) : '';
+?>">
 <!--End Duration-->

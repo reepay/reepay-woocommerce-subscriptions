@@ -322,7 +322,7 @@ p.form-field span.form-field_time-type {
     padding: 5px 20px 5px 162px !important;
 }
 
-.reepay_coupon_new .form-field label {
+.reepay_coupon_new .form-field label, .reepay_coupon_settings_exist .form-field label{
     float: left;
     width: 150px;
     padding: 0;
