@@ -25,6 +25,8 @@ class WC_Reepay_Discounts_And_Coupons
         '_reepay_discount_fixed_period_unit',
         '_reepay_discount_use_existing_coupon_id',
         '_reepay_discount_use_existing_discount_id',
+        '_reepay_coupon_max_redemptions',
+        '_reepay_coupon_valid_until',
     ];
 
     /**
@@ -157,6 +159,8 @@ class WC_Reepay_Discounts_And_Coupons
         $coupon_data['_reepay_discount_all_plans']      = $couponObj['all_plans'] ? '1' : '0';
         $coupon_data['_reepay_discount_eligible_plans'] = $couponObj['eligible_plans'];
         $coupon_data['coupon_handle']                   = $handle;
+        $coupon_data['_reepay_coupon_max_redemptions']  = $couponObj['max_redemptions'] ?? null;
+        $coupon_data['_reepay_coupon_valid_until']       = $couponObj['valid_until'] ?? null;
 
         return $coupon_data;
     }
@@ -384,24 +388,17 @@ class WC_Reepay_Discounts_And_Coupons
             }
         }
 
-        $duration = sanitize_text_field($data['_reepay_discount_duration'] ?? 'forever');
-
-        if ($duration === 'fixed_number') {
-            $coupon->set_usage_limit(intval($data['_reepay_discount_fixed_count']));
+        if ( ! empty($data['_reepay_coupon_max_redemptions'])) {
+            $coupon->set_usage_limit(intval($data['_reepay_coupon_max_redemptions']));
         }
 
-        if ($duration === 'limited_time') {
-            $length = intval($data['_reepay_discount_fixed_period']);
-            $units  = sanitize_text_field($data['_reepay_discount_fixed_period_unit']);
-            $date   = new DateTime();
-            if ($units === 'months') {
-                $date->modify("+$length months");
+        if ( ! empty($data['_reepay_coupon_valid_until'])) {
+            try {
+                $date = new DateTime($data['_reepay_coupon_valid_until']);
+                $coupon->set_date_expires($date->getTimestamp());
+            } catch (Exception $e) {
+                // Invalid date format from Frisbii — skip setting expiry
             }
-
-            if ($units === 'days') {
-                $date->modify("+$length days");
-            }
-            $coupon->set_date_expires($date->getTimestamp());
         }
 
         if ( ! empty($data['_reepay_discount_amount'])) {

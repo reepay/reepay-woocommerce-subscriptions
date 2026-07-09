@@ -56,18 +56,20 @@
 	<?php endif; ?>
 </p>
 
-<?php if ( $meta['_reepay_discount_duration'][0] == 'fixed_number' ): ?>
+<?php if ( ! empty( $meta['_reepay_coupon_max_redemptions'][0] ) ): ?>
     <p class="form-field">
-        <label for="_reepay_discount_fixed_count"><?php _e( 'Times', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-        <span><?php echo esc_attr( $meta['_reepay_discount_fixed_count'][0] ?? '1' ) ?></span>
+        <label><?php _e( 'Usage Limit', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <span><?php echo esc_attr( $meta['_reepay_coupon_max_redemptions'][0] ) ?></span>
     </p>
 <?php endif; ?>
 
-<?php if ( $meta['_reepay_discount_duration'][0] == 'limited_time' || $meta['_reepay_discount_duration'][0] == 'limited_duration' ): ?>
+<?php if ( ! empty( $meta['_reepay_coupon_valid_until'][0] ) ): ?>
     <p class="form-field">
-        <label for="_reepay_discount_fixed_count"><?php _e( 'Limited Time', 'reepay-subscriptions-for-woocommerce' ); ?></label>
-        <span><?php echo esc_attr( $meta['_reepay_discount_fixed_period'][0] ?? '1' ) ?></span>
-        <span><?php echo esc_attr( $meta['_reepay_discount_fixed_period_unit'][0] ?? '1' ) ?></span>
+        <label><?php _e( 'Expiry Date', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+        <span><?php
+            $ts = strtotime( $meta['_reepay_coupon_valid_until'][0] );
+            echo $ts ? esc_html( date_i18n( get_option( 'date_format' ), $ts ) ) : esc_html( $meta['_reepay_coupon_valid_until'][0] );
+        ?></span>
     </p>
 <?php endif; ?>
 <!--End Duration-->

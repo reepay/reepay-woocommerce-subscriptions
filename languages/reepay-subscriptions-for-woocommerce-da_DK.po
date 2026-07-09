@@ -1141,6 +1141,14 @@ msgstr "For altid"
 msgid "Duration"
 msgstr "Varighed"
 
+#: templates/discounts-and-coupons-fields-data-discount.php:61
+msgid "Usage Limit"
+msgstr "Brugsgrænse"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:68
+msgid "Expiry Date"
+msgstr "Udløbsdato"
+
 #: templates/discounts-and-coupons-fields-data-discount.php:30
 msgid "Custom"
 msgstr "Tilpasset"
@@ -1417,10 +1425,6 @@ msgstr "Få alle de avancerede abonnementsfunktioner fra Frisbii Billing, mens d
 #: reepay-subscriptions-for-woocommerce.php:449
 msgid "Frisbii Billing"
 msgstr "Frisbii Billing"
-
-#: reepay-subscriptions-for-woocommerce.php:289
-msgid "— Select —"
-msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:308
 msgid "The plugin Frisbii Pay is required for Frisbii Billing for WooCommerce. <a target=\"_blank\" href=\"%s\">Please install and activate the plugin.</a>"
