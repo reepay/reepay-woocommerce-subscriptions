@@ -1479,12 +1479,21 @@ class WC_Reepay_Renewals {
             && floatval( $invoice_data['amount_vat'] ) > 0;
         $calc_taxes = $invoice_has_vat;
 
-        self::create_order_copy( [
+        $renewal_order = self::create_order_copy( [
             'status'       => $status,
             'parent'       => ! empty( $parent_order ) ? $parent_order->get_id() : null,
             'customer_id'  => $customer,
             'subscription' => ! empty( $data['subscription'] ) ? $data['subscription'] : null,
         ], ! empty( $parent_order ) ? $parent_order : false, $items, $calc_taxes, $invoice_data );
+
+        // BWPM-256: Prevent WooCommerce from counting coupon usage on renewal orders.
+        // The initial subscription order already incremented the usage count.
+        // Setting this flag to true tells WC's wc_update_coupon_usage_counts() to skip
+        // the increase action when the renewal order transitions to a paid status.
+        if ( $renewal_order instanceof WC_Order ) {
+            $renewal_order->set_recorded_coupon_usage_counts( true );
+            $renewal_order->save();
+        }
     }
 
     /**

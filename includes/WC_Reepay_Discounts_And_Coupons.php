@@ -55,6 +55,11 @@ class WC_Reepay_Discounts_And_Coupons
 
         // add_action('reepay_subscriptions_orders_created', [$this,"add_billwerk_coupon_to_reepay_sub_orders"], 10, 2);
         add_action('reepay_subscriptions_orders_created', [$this,"remove_billwerk_coupon_main_order_after_subscriptions_orders_created"], 20, 2);
+
+        // BWPM-256: Prevent WooCommerce from decrementing coupon usage when a renewal
+        // order is cancelled or fails (the usage count was never incremented for renewals,
+        // so a decrement would push the count below the correct value).
+        add_action( 'woocommerce_order_status_changed', [ $this, 'prevent_renewal_coupon_decrement' ], 1, 4 );
     }
 
     public function init()
@@ -646,10 +651,11 @@ class WC_Reepay_Discounts_And_Coupons
         if (empty($customer_handle)) {
             $customer_handle = get_user_meta(get_current_user_id())['reepay_customer_id'] ?? null;
             $customer_handle = is_array($customer_handle) ? $customer_handle[0] : $customer_handle;
+        }
 
-            if ( ! empty($customer_handle)) {
-                $request_url .= "&customer=$customer_handle";
-            }
+        // Append customer handle regardless of whether it was passed explicitly or resolved from user meta.
+        if ( ! empty($customer_handle)) {
+            $request_url .= "&customer=$customer_handle";
         }
 
         if ( ! empty($plan)) {
@@ -720,5 +726,38 @@ class WC_Reepay_Discounts_And_Coupons
                 $order->save();
             }
         }
+    }
+
+    /**
+     * BWPM-256: Prevent WooCommerce from decrementing coupon usage count when a Frisbii
+     * renewal order transitions to cancelled or failed.
+     *
+     * Background: renewal orders have _recorded_coupon_usage_counts = true (set at creation
+     * by create_child_order) so that WC never increments usage on renewal. However, WC would
+     * also try to DECREMENT usage when such an order is cancelled (because has_recorded = true
+     * + invalid status triggers the reduce branch). Since usage was never incremented for the
+     * renewal, decrementing would corrupt the count. This hook resets the flag to false before
+     * WC's wc_update_coupon_usage_counts fires, causing WC to skip both the increment and
+     * the decrement for the cancellation.
+     *
+     * @param int    $order_id
+     * @param string $from
+     * @param string $to
+     * @param WC_Order $order
+     */
+    public function prevent_renewal_coupon_decrement( $order_id, $from, $to, $order ) {
+        $invalid_statuses = [ 'cancelled', 'failed' ];
+        if ( ! in_array( $to, $invalid_statuses, true ) ) {
+            return;
+        }
+        if ( ! $order->get_parent_id() ) {
+            return;
+        }
+        $parent = wc_get_order( $order->get_parent_id() );
+        if ( ! $parent || empty( $parent->get_meta( '_reepay_subscription_handle' ) ) ) {
+            return;
+        }
+        // Reset the flag so WC's reduce branch is not triggered for this renewal order.
+        $order->get_data_store()->set_recorded_coupon_usage_counts( $order, false );
     }
 }
