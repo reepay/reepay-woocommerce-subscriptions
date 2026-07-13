@@ -1630,3 +1630,11 @@ msgstr ""
 #: reepay-subscriptions-for-woocommerce.php:566
 msgid "I have read and agree to the [frisbii_billing_terms]"
 msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:61
+msgid "Usage Limit"
+msgstr "Brugsgrænse"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:68
+msgid "Expiry Date"
+msgstr "Udløbsdato"

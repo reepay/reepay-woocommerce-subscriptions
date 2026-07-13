@@ -56,10 +56,12 @@ class WC_Reepay_Discounts_And_Coupons
         // add_action('reepay_subscriptions_orders_created', [$this,"add_billwerk_coupon_to_reepay_sub_orders"], 10, 2);
         add_action('reepay_subscriptions_orders_created', [$this,"remove_billwerk_coupon_main_order_after_subscriptions_orders_created"], 20, 2);
 
-        // BWPM-256: Prevent WooCommerce from decrementing coupon usage when a renewal
-        // order is cancelled or fails (the usage count was never incremented for renewals,
-        // so a decrement would push the count below the correct value).
-        add_action( 'woocommerce_order_status_changed', [ $this, 'prevent_renewal_coupon_decrement' ], 1, 4 );
+        // BWPM-257: When a renewal order is cancelled or fails, reset _recorded_coupon_usage_counts
+        // to false BEFORE wc_update_coupon_usage_counts fires (priority 10) on the same hook.
+        // Without this, WC would attempt to decrement usage for a count that was never incremented.
+        foreach ( [ 'cancelled', 'failed', 'trash' ] as $_status ) {
+            add_action( 'woocommerce_order_status_' . $_status, [ $this, 'prevent_renewal_coupon_decrement' ], 1, 2 );
+        }
     }
 
     public function init()
@@ -745,10 +747,12 @@ class WC_Reepay_Discounts_And_Coupons
      * @param string $to
      * @param WC_Order $order
      */
-    public function prevent_renewal_coupon_decrement( $order_id, $from, $to, $order ) {
-        $invalid_statuses = [ 'cancelled', 'failed' ];
-        if ( ! in_array( $to, $invalid_statuses, true ) ) {
-            return;
+    public function prevent_renewal_coupon_decrement( $order_id, $order = null ) {
+        if ( ! $order instanceof WC_Order ) {
+            $order = wc_get_order( $order_id );
+            if ( ! $order ) {
+                return;
+            }
         }
         if ( ! $order->get_parent_id() ) {
             return;
@@ -757,7 +761,9 @@ class WC_Reepay_Discounts_And_Coupons
         if ( ! $parent || empty( $parent->get_meta( '_reepay_subscription_handle' ) ) ) {
             return;
         }
-        // Reset the flag so WC's reduce branch is not triggered for this renewal order.
+        // Reset the flag to false. wc_update_coupon_usage_counts (priority 10 on the same hook)
+        // will read a fresh order from DB and see has_recorded = false. With an invalid status
+        // and has_recorded = false, WC takes the no-op branch → no decrement.
         $order->get_data_store()->set_recorded_coupon_usage_counts( $order, false );
     }
 }
