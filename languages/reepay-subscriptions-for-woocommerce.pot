@@ -1631,10 +1631,30 @@ msgstr ""
 msgid "I have read and agree to the [frisbii_billing_terms]"
 msgstr ""
 
-#: templates/discounts-and-coupons-fields-data-discount.php:61
-msgid "Usage Limit"
-msgstr "Brugsgrænse"
+#: templates/discounts-and-coupons-fields-data-discount.php:7
+msgid "Apply to"
+msgstr ""
 
-#: templates/discounts-and-coupons-fields-data-discount.php:68
-msgid "Expiry Date"
-msgstr "Udløbsdato"
+#: templates/discounts-and-coupons-fields-data-discount.php:47
+msgid "Discount duration"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:49
+msgid "Unlimited"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:51
+msgid "Limited count"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:53
+msgid "Limited period"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:59
+msgid "Coupon usage limit"
+msgstr ""
+
+#: templates/discounts-and-coupons-fields-data-discount.php:66
+msgid "Coupon expiry date"
+msgstr ""

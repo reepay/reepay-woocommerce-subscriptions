@@ -1141,13 +1141,29 @@ msgstr "For altid"
 msgid "Duration"
 msgstr "Varighed"
 
-#: templates/discounts-and-coupons-fields-data-discount.php:61
-msgid "Usage Limit"
-msgstr "Brugsgrænse"
+#: templates/discounts-and-coupons-fields-data-discount.php:47
+msgid "Discount duration"
+msgstr "Rabatvarighed"
 
-#: templates/discounts-and-coupons-fields-data-discount.php:68
-msgid "Expiry Date"
-msgstr "Udløbsdato"
+#: templates/discounts-and-coupons-fields-data-discount.php:49
+msgid "Unlimited"
+msgstr "Ubegrænset"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:51
+msgid "Limited count"
+msgstr "Begrænset antal"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:53
+msgid "Limited period"
+msgstr "Begrænset periode"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:59
+msgid "Coupon usage limit"
+msgstr "Grænse for kuponforbrug"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:66
+msgid "Coupon expiry date"
+msgstr "Kuponens udløbsdato"
 
 #: templates/discounts-and-coupons-fields-data-discount.php:30
 msgid "Custom"
