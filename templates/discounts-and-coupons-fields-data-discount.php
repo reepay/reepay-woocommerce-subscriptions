@@ -2,9 +2,9 @@
 /** @var Bool $is_update */
 ?>
 
-<!--Apply to-->
+<!--Discount application-->
 <p class="form-field">
-    <label for="_reepay_discount_apply_to"><?php _e( 'Apply to', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_apply_to"><?php _e( 'Discount application', 'reepay-subscriptions-for-woocommerce' ); ?></label>
     <?php
     $apply_to_value = $meta['_reepay_discount_apply_to'][0] ?? '';
     $apply_to_items = $meta['_reepay_discount_apply_to_items'][0] ?? [];
@@ -28,7 +28,7 @@
     }
     ?>
 </p>
-<!--End Apply to-->
+<!--End Discount application-->
 
 <!--Discount type-->
 <p class="form-field">
@@ -43,7 +43,7 @@
 
 <!-- Amount -->
 <p class="form-field">
-    <label for="_reepay_discount_amount"><?php _e( 'Amount', 'reepay-subscriptions-for-woocommerce' ); ?></label>
+    <label for="_reepay_discount_amount"><?php _e( 'Size', 'reepay-subscriptions-for-woocommerce' ); ?></label>
     <span><?php echo esc_attr( $meta['_reepay_discount_amount'][0] ?? '0' ) ?></span>
 </p>
 <!-- End Amount -->

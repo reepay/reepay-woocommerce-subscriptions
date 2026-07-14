@@ -1177,8 +1177,8 @@ msgid "All"
 msgstr "Alle"
 
 #: templates/discounts-and-coupons-fields-data-discount.php:26
-msgid "Apply to"
-msgstr "Anvend til"
+msgid "Discount application"
+msgstr "Rabat anvendelse"
 
 #: templates/discounts-and-coupons-fields-data-discount.php:16
 msgid "Fixed amount"
@@ -1223,8 +1223,8 @@ msgstr "Vælg tilkøb"
 
 #: templates/admin-addon-single.php:30
 #: templates/discounts-and-coupons-fields-data-discount.php:7
-msgid "Amount"
-msgstr "Beløb"
+msgid "Size"
+msgstr "Størrelse"
 
 #: includes/WC_Reepay_Discounts_And_Coupons.php:65
 #: templates/admin-addon-single.php:20
