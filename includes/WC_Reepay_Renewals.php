@@ -1733,6 +1733,32 @@ class WC_Reepay_Renewals {
                     $new_order->update_meta_data( $field_name, $field_value );
                 }
             }
+
+            // BWPM-264: for a renewal order, the main order already has the
+            // verification result stored (it was set right after the original
+            // invoice_authorized was processed), so a plain copy is enough.
+            // For the initial split of an order into per-subscription orders,
+            // this runs inside the *same* invoice_authorized webhook call, but
+            // earlier than Webhook::save_age_verification_result() - the main
+            // order does not have the result yet, so it has to be fetched here.
+            $age_verification_result = $main_order->get_meta( '_reepay_age_verification_result' );
+            if ( empty( $age_verification_result ) ) {
+                $session_id = $main_order->get_meta( 'reepay_session_id' );
+                if ( ! empty( $session_id ) && function_exists( 'reepay' ) ) {
+                    $events = reepay()->api( $main_order )->get_session_events( $session_id );
+                    if ( ! is_wp_error( $events ) ) {
+                        foreach ( (array) $events as $event ) {
+                            if ( isset( $event['name'] ) && 'EXTERNAL_AGE_VERIFICATION_RESULT' === $event['name'] ) {
+                                $age_verification_result = $event['data'] ?? array();
+                            }
+                        }
+                    }
+                }
+            }
+            if ( ! empty( $age_verification_result ) ) {
+                $new_order->update_meta_data( '_reepay_age_verification_result', $age_verification_result );
+            }
+
             $new_order->save_meta_data();
             $new_order->set_currency( $main_order->get_currency() ?? '' );
         } elseif ( ! empty( $invoice_data ) && ! empty( $invoice_data['customer'] ) ) {
