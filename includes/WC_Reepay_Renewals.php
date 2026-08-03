@@ -1751,7 +1751,7 @@ class WC_Reepay_Renewals {
                     if ( ! is_wp_error( $events ) ) {
                         foreach ( (array) $events as $event ) {
                             if ( isset( $event['name'] ) && 'EXTERNAL_AGE_VERIFICATION_RESULT' === $event['name'] ) {
-                                $age_verification_result = $event['data'] ?? array();
+                                $age_verification_result = wp_json_encode( $event['data'] ?? array() );
                             }
                         }
                     }
