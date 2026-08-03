@@ -275,6 +275,11 @@ jQuery(function ($) {
 
         function show_existing_select($container) {
             let handle = $container.find('[name=_reepay_discount_use_existing_coupon_id]').val()
+            if (!handle) {
+                $('.reepay_coupon_settings_exist').html('');
+                sync_expiry_date();
+                return;
+            }
             load_coupon(handle, $('.reepay_coupon_settings_exist'))
         }
 
@@ -360,19 +365,62 @@ jQuery(function ($) {
             if (type === 'reepay_type') {
                 $('.show_if_reepay').show();
                 $('.coupon_amount_field').hide();
-                $('.expiry_date_field').hide();
                 check_required()
             } else {
                 $('.show_if_reepay').hide();
                 $('.expiry_date_field').show();
                 check_required()
             }
+            sync_expiry_date()
         }
 
         function check_required() {
             $('.reepay-required').attr('required', false)
             $('.reepay-required:visible').attr('required', true)
             $('.select2-container:visible').prev('.reepay-required').attr('required', true)
+        }
+
+        function sync_expiry_date() {
+            let $expiryInput = $('input#expiry_date');
+            let $usageLimitInput = $('input#usage_limit');
+            let type = $('#discount_type').val();
+
+            if (type !== 'reepay_type') {
+                $expiryInput.prop('readonly', false).css('background-color', '');
+                if ($expiryInput.hasClass('hasDatepicker')) {
+                    $expiryInput.datepicker('option', 'beforeShow', null);
+                }
+                $usageLimitInput.prop('readonly', false).css('background-color', '');
+                return;
+            }
+
+            // --- usage_limit ---
+            let maxRedemptions = $('.reepay_coupon_settings_exist .js-reepay-max-redemptions').val()
+                || $('.reepay_coupon_new .js-reepay-max-redemptions').val()
+                || '';
+
+            if (maxRedemptions) {
+                $usageLimitInput.val(maxRedemptions).prop('readonly', true).css('background-color', '#f0f0f0');
+            } else {
+                $usageLimitInput.prop('readonly', false).css('background-color', '');
+            }
+
+            // --- expiry_date ---
+            let validUntil = $('.reepay_coupon_settings_exist .js-reepay-valid-until').val()
+                || $('.reepay_coupon_new .js-reepay-valid-until').val()
+                || '';
+
+            if (validUntil) {
+                $expiryInput.val(validUntil).prop('readonly', true).css('background-color', '#f0f0f0');
+                if ($expiryInput.hasClass('hasDatepicker')) {
+                    $expiryInput.datepicker('option', 'beforeShow', function() { return false; });
+                }
+            } else {
+                $expiryInput.prop('readonly', false).css('background-color', '');
+                if ($expiryInput.hasClass('hasDatepicker')) {
+                    $expiryInput.datepicker('option', 'beforeShow', null);
+                }
+            }
         }
 
         function coupon_type_percentage($container) {
@@ -551,6 +599,7 @@ jQuery(function ($) {
                 $container.append($(`<div style="width: 100%">${response_data.html}</div>`))
                 $container.find('.wc-enhanced-select').select2()
                 updateCouponContainer($container)
+                sync_expiry_date()
             },
             error: function (request, status, error) {
 

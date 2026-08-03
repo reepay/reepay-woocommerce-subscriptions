@@ -1479,6 +1479,8 @@ class WC_Reepay_Renewals {
             && floatval( $invoice_data['amount_vat'] ) > 0;
         $calc_taxes = $invoice_has_vat;
 
+        // BWPM-257: The flag is set inside create_order_copy() before the final save()
+        // (when $order_args['parent'] is present), so no post-return handling is needed here.
         self::create_order_copy( [
             'status'       => $status,
             'parent'       => ! empty( $parent_order ) ? $parent_order->get_id() : null,
@@ -1911,6 +1913,15 @@ class WC_Reepay_Renewals {
                 'order_id'  => $new_order->get_id(),
             ]
         ] );
+
+        // BWPM-257: For renewal orders (identified by having a parent subscription order),
+        // pre-mark coupon usage as already recorded BEFORE save() triggers status_transition().
+        // WC's wc_update_coupon_usage_counts() fires inside save() → status_transition() at
+        // priority 10. By setting this flag in memory first, save() will persist it to DB
+        // before the hook reads it, so the increment branch is never entered.
+        if ( ! empty( $order_args['parent'] ) ) {
+            $new_order->set_recorded_coupon_usage_counts( true );
+        }
 
         $new_order->set_status( $status_to_set );
         $new_order->save();
