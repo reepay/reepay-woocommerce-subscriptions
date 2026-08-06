@@ -1756,6 +1756,13 @@ class WC_Reepay_Renewals {
                         }
                     }
                 }
+
+                // Backfill onto the main order too, so that splitting the same
+                // order into further sub-orders does not re-fetch from the API.
+                if ( ! empty( $age_verification_result ) ) {
+                    $main_order->update_meta_data( '_reepay_age_verification_result', $age_verification_result );
+                    $main_order->save_meta_data();
+                }
             }
             if ( ! empty( $age_verification_result ) ) {
                 $new_order->update_meta_data( '_reepay_age_verification_result', $age_verification_result );
