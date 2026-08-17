@@ -2,7 +2,7 @@
 Contributors: reepaydenmark
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
 Stable tag: 1.3.9.1
 License: GPLv3
