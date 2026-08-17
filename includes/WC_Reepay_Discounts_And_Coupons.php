@@ -25,6 +25,8 @@ class WC_Reepay_Discounts_And_Coupons
         '_reepay_discount_fixed_period_unit',
         '_reepay_discount_use_existing_coupon_id',
         '_reepay_discount_use_existing_discount_id',
+        '_reepay_coupon_max_redemptions',
+        '_reepay_coupon_valid_until',
     ];
 
     /**
@@ -53,6 +55,13 @@ class WC_Reepay_Discounts_And_Coupons
 
         // add_action('reepay_subscriptions_orders_created', [$this,"add_billwerk_coupon_to_reepay_sub_orders"], 10, 2);
         add_action('reepay_subscriptions_orders_created', [$this,"remove_billwerk_coupon_main_order_after_subscriptions_orders_created"], 20, 2);
+
+        // BWPM-257: When a renewal order is cancelled or fails, reset _recorded_coupon_usage_counts
+        // to false BEFORE wc_update_coupon_usage_counts fires (priority 10) on the same hook.
+        // Without this, WC would attempt to decrement usage for a count that was never incremented.
+        foreach ( [ 'cancelled', 'failed', 'trash' ] as $_status ) {
+            add_action( 'woocommerce_order_status_' . $_status, [ $this, 'prevent_renewal_coupon_decrement' ], 1, 2 );
+        }
     }
 
     public function init()
@@ -157,6 +166,8 @@ class WC_Reepay_Discounts_And_Coupons
         $coupon_data['_reepay_discount_all_plans']      = $couponObj['all_plans'] ? '1' : '0';
         $coupon_data['_reepay_discount_eligible_plans'] = $couponObj['eligible_plans'];
         $coupon_data['coupon_handle']                   = $handle;
+        $coupon_data['_reepay_coupon_max_redemptions']  = $couponObj['max_redemptions'] ?? null;
+        $coupon_data['_reepay_coupon_valid_until']       = $couponObj['valid_until'] ?? null;
 
         return $coupon_data;
     }
@@ -384,24 +395,17 @@ class WC_Reepay_Discounts_And_Coupons
             }
         }
 
-        $duration = sanitize_text_field($data['_reepay_discount_duration'] ?? 'forever');
-
-        if ($duration === 'fixed_number') {
-            $coupon->set_usage_limit(intval($data['_reepay_discount_fixed_count']));
+        if ( ! empty($data['_reepay_coupon_max_redemptions'])) {
+            $coupon->set_usage_limit(intval($data['_reepay_coupon_max_redemptions']));
         }
 
-        if ($duration === 'limited_time') {
-            $length = intval($data['_reepay_discount_fixed_period']);
-            $units  = sanitize_text_field($data['_reepay_discount_fixed_period_unit']);
-            $date   = new DateTime();
-            if ($units === 'months') {
-                $date->modify("+$length months");
+        if ( ! empty($data['_reepay_coupon_valid_until'])) {
+            try {
+                $date = new DateTime($data['_reepay_coupon_valid_until']);
+                $coupon->set_date_expires($date->getTimestamp());
+            } catch (Exception $e) {
+                // Invalid date format from Frisbii — skip setting expiry
             }
-
-            if ($units === 'days') {
-                $date->modify("+$length days");
-            }
-            $coupon->set_date_expires($date->getTimestamp());
         }
 
         if ( ! empty($data['_reepay_discount_amount'])) {
@@ -649,10 +653,11 @@ class WC_Reepay_Discounts_And_Coupons
         if (empty($customer_handle)) {
             $customer_handle = get_user_meta(get_current_user_id())['reepay_customer_id'] ?? null;
             $customer_handle = is_array($customer_handle) ? $customer_handle[0] : $customer_handle;
+        }
 
-            if ( ! empty($customer_handle)) {
-                $request_url .= "&customer=$customer_handle";
-            }
+        // Append customer handle regardless of whether it was passed explicitly or resolved from user meta.
+        if ( ! empty($customer_handle)) {
+            $request_url .= "&customer=$customer_handle";
         }
 
         if ( ! empty($plan)) {
@@ -723,5 +728,42 @@ class WC_Reepay_Discounts_And_Coupons
                 $order->save();
             }
         }
+    }
+
+    /**
+     * BWPM-256: Prevent WooCommerce from decrementing coupon usage count when a Frisbii
+     * renewal order transitions to cancelled or failed.
+     *
+     * Background: renewal orders have _recorded_coupon_usage_counts = true (set at creation
+     * by create_child_order) so that WC never increments usage on renewal. However, WC would
+     * also try to DECREMENT usage when such an order is cancelled (because has_recorded = true
+     * + invalid status triggers the reduce branch). Since usage was never incremented for the
+     * renewal, decrementing would corrupt the count. This hook resets the flag to false before
+     * WC's wc_update_coupon_usage_counts fires, causing WC to skip both the increment and
+     * the decrement for the cancellation.
+     *
+     * @param int    $order_id
+     * @param string $from
+     * @param string $to
+     * @param WC_Order $order
+     */
+    public function prevent_renewal_coupon_decrement( $order_id, $order = null ) {
+        if ( ! $order instanceof WC_Order ) {
+            $order = wc_get_order( $order_id );
+            if ( ! $order ) {
+                return;
+            }
+        }
+        if ( ! $order->get_parent_id() ) {
+            return;
+        }
+        $parent = wc_get_order( $order->get_parent_id() );
+        if ( ! $parent || empty( $parent->get_meta( '_reepay_subscription_handle' ) ) ) {
+            return;
+        }
+        // Reset the flag to false. wc_update_coupon_usage_counts (priority 10 on the same hook)
+        // will read a fresh order from DB and see has_recorded = false. With an invalid status
+        // and has_recorded = false, WC takes the no-op branch → no decrement.
+        $order->get_data_store()->set_recorded_coupon_usage_counts( $order, false );
     }
 }

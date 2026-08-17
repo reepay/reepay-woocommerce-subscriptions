@@ -1141,6 +1141,30 @@ msgstr "For altid"
 msgid "Duration"
 msgstr "Varighed"
 
+#: templates/discounts-and-coupons-fields-data-discount.php:47
+msgid "Discount duration"
+msgstr "Rabatvarighed"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:49
+msgid "Unlimited"
+msgstr "Ubegrænset"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:51
+msgid "Limited count"
+msgstr "Begrænset antal"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:53
+msgid "Limited period"
+msgstr "Begrænset periode"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:59
+msgid "Coupon usage limit"
+msgstr "Grænse for kuponforbrug"
+
+#: templates/discounts-and-coupons-fields-data-discount.php:66
+msgid "Coupon expiry date"
+msgstr "Kuponens udløbsdato"
+
 #: templates/discounts-and-coupons-fields-data-discount.php:30
 msgid "Custom"
 msgstr "Tilpasset"
@@ -1153,8 +1177,8 @@ msgid "All"
 msgstr "Alle"
 
 #: templates/discounts-and-coupons-fields-data-discount.php:26
-msgid "Apply to"
-msgstr "Anvend til"
+msgid "Discount application"
+msgstr "Rabat anvendelse"
 
 #: templates/discounts-and-coupons-fields-data-discount.php:16
 msgid "Fixed amount"
@@ -1199,8 +1223,8 @@ msgstr "Vælg tilkøb"
 
 #: templates/admin-addon-single.php:30
 #: templates/discounts-and-coupons-fields-data-discount.php:7
-msgid "Amount"
-msgstr "Beløb"
+msgid "Size"
+msgstr "Størrelse"
 
 #: includes/WC_Reepay_Discounts_And_Coupons.php:65
 #: templates/admin-addon-single.php:20
@@ -1417,10 +1441,6 @@ msgstr "Få alle de avancerede abonnementsfunktioner fra Frisbii Billing, mens d
 #: reepay-subscriptions-for-woocommerce.php:449
 msgid "Frisbii Billing"
 msgstr "Frisbii Billing"
-
-#: reepay-subscriptions-for-woocommerce.php:289
-msgid "— Select —"
-msgstr ""
 
 #: reepay-subscriptions-for-woocommerce.php:308
 msgid "The plugin Frisbii Pay is required for Frisbii Billing for WooCommerce. <a target=\"_blank\" href=\"%s\">Please install and activate the plugin.</a>"

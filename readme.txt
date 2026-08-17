@@ -2,9 +2,9 @@
 Contributors: reepaydenmark
 Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
-Tested up to: 6.8
+Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.8
+Stable tag: 1.3.9.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,14 @@ Standard Frisbii Billing features:
 3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.3.9.1
+- [Feature] – Supports age verification result data added to order meta data.
+
+v 1.3.9
+- [Fix] - Clarifies labels on the Frisbii coupons and their linked discounts.
+- [Fix] - Frisbii coupons gets their limitations from the linked Frisbii coupon, not from the Frisbii discount settings.
+- [Fix] - Renewal orders won't count as more uses of a Frisbii coupon in WooCommerce. Frisbii tracks the usages.
+
 v 1.3.8
 - [Fix] - VAT exempt add-ons won't show with VAT added on renewal orders in backend.
 
