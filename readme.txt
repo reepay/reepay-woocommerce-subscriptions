@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.9.1
+Stable tag: 1.3.10
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,9 @@ Standard Frisbii Billing features:
 3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.3.10
+- [Fix] - Cart and backend order page shows correct currency for non-default currency products.
+
 v 1.3.9.1
 - [Feature] – Supports age verification result data added to order meta data.
 
