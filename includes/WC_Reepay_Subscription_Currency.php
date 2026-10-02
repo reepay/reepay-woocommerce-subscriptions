@@ -221,7 +221,7 @@ class WC_Reepay_Subscription_Currency {
 		if ( isset( $_REQUEST['wc-ajax'] ) ) {
 			return in_array(
 				wp_unslash( $_REQUEST['wc-ajax'] ),
-				array( 'update_order_review', 'checkout', 'get_refreshed_fragments', 'apply_coupon', 'remove_coupon' ),
+				array( 'update_order_review', 'checkout', 'get_refreshed_fragments', 'apply_coupon', 'remove_coupon', 'update_shipping_method', 'get_cart_totals' ),
 				true
 			);
 		}

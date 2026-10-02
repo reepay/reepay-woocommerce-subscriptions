@@ -868,7 +868,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$fee = $product->get_meta( '_reepay_subscription_fee' );
 		$ret = '';
 		if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
-			$ret = $fee["text"] . ': ' . wc_price( $fee["amount"], array( 'currency' => $product->get_currency() ) );
+			$currency = get_class( $product ) === 'WC_Product_Variation'
+				? WC_Product_Reepay_Variable_Subscription::get_currency( $product )
+				: $product->get_currency();
+
+			$ret = $fee["text"] . ': ' . wc_price( $fee["amount"], array( 'currency' => $currency ) );
 		}
 
 		return $ret;
