@@ -272,7 +272,6 @@ class WC_Reepay_Subscription_Plan_Simple {
 			return WC_Product_Reepay_Simple_Subscription::format_price( $product->get_price_html(), $product );
 		}
 
-
 		return $product->get_price_html();
 	}
 
@@ -869,7 +868,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 		$fee = $product->get_meta( '_reepay_subscription_fee' );
 		$ret = '';
 		if ( ! empty( $fee ) && ! empty( $fee['enabled'] ) && $fee['enabled'] == 'yes' ) {
-			$ret = $fee["text"] . ': ' . wc_price( $fee["amount"] );
+			$currency = get_class( $product ) === 'WC_Product_Variation'
+				? WC_Product_Reepay_Variable_Subscription::get_currency( $product )
+				: $product->get_currency();
+
+			$ret = $fee["text"] . ': ' . wc_price( $fee["amount"], array( 'currency' => $currency ) );
 		}
 
 		return $ret;
@@ -951,11 +954,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 
 			$total_rows['cart_subtotal'] = [
 				'label' => __( 'Subtotal:', 'woocommerce' ),
-				'value' => wc_price( $total )
+				'value' => wc_price( $total, array( 'currency' => $order->get_currency() ) )
 			];
 			$total_rows['order_total']   = [
 				'label' => __( 'Total:', 'woocommerce' ),
-				'value' => wc_price( $total )
+				'value' => wc_price( $total, array( 'currency' => $order->get_currency() ) )
 			];
 		}
 
