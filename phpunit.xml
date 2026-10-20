@@ -13,6 +13,7 @@
 			<file>./tests/unit/CheckoutTest.php</file>
 			<file>./tests/unit/CurrencyTest.php</file>
 			<file>./tests/unit/SubscriptionApiTest.php</file>
+			<file>./tests/unit/WebhookEventTypesTest.php</file>
 		</testsuite>
 		<testsuite name="Supporting commerce tested">
 			<directory suffix="Test.php">./tests/unit/rest</directory>
