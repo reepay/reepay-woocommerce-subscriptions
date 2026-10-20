@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'reepay/reepay-subscriptions-for-woocommerce',
-        'pretty_version' => 'dev-main',
-        'version' => 'dev-main',
-        'reference' => '1d72b0f6aad131e249b51a39e4a6ffd63c6f0dff',
+        'pretty_version' => '1.3.10',
+        'version' => '1.3.10.0',
+        'reference' => null,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -101,9 +101,9 @@
             'dev_requirement' => true,
         ),
         'reepay/reepay-subscriptions-for-woocommerce' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => '1d72b0f6aad131e249b51a39e4a6ffd63c6f0dff',
+            'pretty_version' => '1.3.10',
+            'version' => '1.3.10.0',
+            'reference' => null,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

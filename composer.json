@@ -1,6 +1,7 @@
 {
   "name": "reepay/reepay-subscriptions-for-woocommerce",
   "description": "description",
+  "version": "1.3.10",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
