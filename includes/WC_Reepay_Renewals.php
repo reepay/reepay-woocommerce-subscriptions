@@ -1973,8 +1973,7 @@ class WC_Reepay_Renewals {
                     // Instead, push the drift into the underlying WC_Order_Item_Tax line (what
                     // actually drives the "Moms:" row) and the first taxable product line's own
                     // tax (its public WC_Order_Item_Product::set_total_tax(), unrelated to the
-                    // protected order-level method above), then let calculate_totals(false)
-                    // re-aggregate the order-level tax/total from those corrected items.
+                    // protected order-level method above).
                     foreach ( $new_order->get_items( 'tax' ) as $tax_item ) {
                         $tax_item->set_tax_total( round( (float) $tax_item->get_tax_total() + $total_drift, wc_get_price_decimals() ) );
                         $tax_item->save();
@@ -1989,7 +1988,15 @@ class WC_Reepay_Renewals {
                         }
                     }
 
-                    // Re-aggregate order-level totals/tax from the corrected items (no fresh
+                    // calculate_totals(false) skips calculate_taxes(), and set_cart_tax() is the
+                    // only thing that writes the order-level cart_tax/total_tax props - it's
+                    // normally called from inside calculate_taxes(). Without this, get_total_tax()
+                    // (the "Moms:" row read from _order_tax) would stay one minor unit off even
+                    // though the item-level tax above was corrected. set_cart_tax() is public and
+                    // updates total_tax itself, so call it directly with the same drift.
+                    $new_order->set_cart_tax( round( (float) $new_order->get_cart_tax() + $total_drift, wc_get_price_decimals() ) );
+
+                    // Re-aggregate order-level totals from the corrected items (no fresh
                     // tax-rate recalculation - just summing what we just set), then force the
                     // final total to Frisbii's authoritative figure as a safety net in case the
                     // re-aggregated sum still lands a cent off.
