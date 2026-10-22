@@ -1934,6 +1934,79 @@ class WC_Reepay_Renewals {
         $new_order->save();
         $new_order->calculate_totals( $calc_taxes );
 
+        // BWSM-114: for coupon-based Frisbii Billing subscriptions, the discount/VAT split
+        // is computed server-side by Frisbii (via coupon_codes sent at subscription creation),
+        // not by this plugin. Reconstructing line items locally and calling calculate_totals()
+        // can round independently of Frisbii's own total, drifting by exactly one minor unit
+        // (the same half-öre ambiguity as BWSM-114, just happening on Frisbii's side). Reconcile
+        // both the order total AND the tax line to Frisbii's authoritative invoice amount, so
+        // the displayed breakdown (Subtotal - Discount + Moms) still arithmetically matches the
+        // headline total/paid amount instead of just patching the total in isolation.
+        if ( ! empty( $invoice_data ) && function_exists( 'rp_make_initial_amount' ) ) {
+            $authoritative_amount = null;
+            if ( ! empty( $invoice_data['settled_amount'] ) ) {
+                $authoritative_amount = $invoice_data['settled_amount'];
+            } elseif ( ! empty( $invoice_data['amount'] ) ) {
+                $authoritative_amount = $invoice_data['amount'];
+            }
+
+            if ( null !== $authoritative_amount ) {
+                $authoritative_total = rp_make_initial_amount( $authoritative_amount, $new_order->get_currency() );
+                $minor_unit          = 1 / ( 10 ** wc_get_price_decimals() );
+                $total_drift         = $authoritative_total - (float) $new_order->get_total();
+
+                // Only correct a drift of exactly one minor unit - the signature of this
+                // rounding ambiguity. A bigger mismatch means something else is wrong and
+                // should surface rather than be silently masked.
+                if ( 0.0 !== $total_drift && abs( $total_drift ) <= $minor_unit + 0.0001 ) {
+                    self::log( [
+                        'log' => [
+                            'source'              => 'WC_Reepay_Renewals::create_order_copy::reconcile_total',
+                            'order_id'            => $new_order->get_id(),
+                            'calculated_total'    => $new_order->get_total(),
+                            'authoritative_total' => $authoritative_total,
+                            'total_drift'         => $total_drift,
+                        ],
+                    ] );
+
+                    // WC_Abstract_Order::set_total_tax() is protected - can't call it directly.
+                    // Instead, push the drift into the underlying WC_Order_Item_Tax line (what
+                    // actually drives the "Moms:" row) and the first taxable product line's own
+                    // tax (its public WC_Order_Item_Product::set_total_tax(), unrelated to the
+                    // protected order-level method above).
+                    foreach ( $new_order->get_items( 'tax' ) as $tax_item ) {
+                        $tax_item->set_tax_total( round( (float) $tax_item->get_tax_total() + $total_drift, wc_get_price_decimals() ) );
+                        $tax_item->save();
+                        break;
+                    }
+
+                    foreach ( $new_order->get_items( 'line_item' ) as $line_item ) {
+                        if ( (float) $line_item->get_total_tax() > 0 ) {
+                            $line_item->set_total_tax( round( (float) $line_item->get_total_tax() + $total_drift, wc_get_price_decimals() ) );
+                            $line_item->save();
+                            break;
+                        }
+                    }
+
+                    // calculate_totals(false) skips calculate_taxes(), and set_cart_tax() is the
+                    // only thing that writes the order-level cart_tax/total_tax props - it's
+                    // normally called from inside calculate_taxes(). Without this, get_total_tax()
+                    // (the "Moms:" row read from _order_tax) would stay one minor unit off even
+                    // though the item-level tax above was corrected. set_cart_tax() is public and
+                    // updates total_tax itself, so call it directly with the same drift.
+                    $new_order->set_cart_tax( round( (float) $new_order->get_cart_tax() + $total_drift, wc_get_price_decimals() ) );
+
+                    // Re-aggregate order-level totals from the corrected items (no fresh
+                    // tax-rate recalculation - just summing what we just set), then force the
+                    // final total to Frisbii's authoritative figure as a safety net in case the
+                    // re-aggregated sum still lands a cent off.
+                    $new_order->calculate_totals( false );
+                    $new_order->set_total( $authoritative_total );
+                    $new_order->save();
+                }
+            }
+        }
+
         return $new_order;
     }
 

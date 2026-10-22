@@ -5,7 +5,7 @@
  * Description: Get all the advanced subscription features from Frisbii Billing while still keeping your usual WooCommerce tools. The Frisbii Billing for WooCommerce plugins gives you the best prerequisites to succeed with your subscription business.
  * Author: Frisbii
  * Author URI: https://frisbii.com
- * Version: 1.3.10
+ * Version: 1.3.11
  * Text Domain: reepay-subscriptions-for-woocommerce
  * Domain Path: /languages
  * WC requires at least: 3.0.0
@@ -68,41 +68,25 @@ class WooCommerce_Reepay_Subscriptions
     public static $compensation_methods = [];
 
     /**
+     * Webhook event types this plugin's own sync/renewal handlers act on with
+     * a real effect (subscription/customer state changes) — excluding the 7
+     * events already owned and activated by the Frisbii Pay plugin
+     * (Reepay\Checkout\Gateways\ReepayGateway::IMPLEMENTED_WEBHOOK_EVENT_TYPES
+     * in reepay-woocommerce-payment). Keep this list in sync with that
+     * constant by hand if it ever changes — no shared package between the
+     * two repos.
+     *
      * @var <string>
      */
-    public static $webhook_event_types = [
-        "subscription_reactivated",
-        "invoice_cancelled",
-        "subscription_on_hold_dunning",
-        "subscription_created",
-        "invoice_failed",
-        "subscription_renewal",
-        "invoice_dunning",
-        "subscription_on_hold",
-        "invoice_credited",
-        "subscription_changed",
-        "invoice_adjustment",
-        "invoice_created",
-        "subscription_cancelled",
-        "subscription_payment_method_changed",
-        "invoice_changed",
-        "invoice_dunning_cancelled",
-        "subscription_payment_method_added",
-        "subscription_trial_end",
-        "subscription_uncancelled",
-        "subscription_trial_end_reminder",
-        "customer_created",
-        "customer_payment_method_added",
-        "invoice_dunning_notification",
-        "invoice_reactivate",
-        "subscription_renewal_reminder",
-        "customer_changed",
-        "subscription_expired",
-        "subscription_expired_dunning",
-        "invoice_authorized",
-        "customer_deleted",
-        "invoice_settled",
-        "invoice_refund"
+    const IMPLEMENTED_WEBHOOK_EVENT_TYPES = [
+        'subscription_renewal',
+        'subscription_on_hold',
+        'subscription_cancelled',
+        'subscription_uncancelled',
+        'subscription_expired',
+        'subscription_created',
+        'customer_changed',
+        'customer_deleted',
     ];
 
     public static string $db_version = '1.0.2';
@@ -425,23 +409,87 @@ class WooCommerce_Reepay_Subscriptions
         $this->enable_all_webhook_event_types();
     }
 
+    /**
+     * Decide whether this plugin's implemented webhook event types need to be
+     * activated on the Frisbii account.
+     *
+     * Only activates them when NONE of the implemented event types are
+     * currently enabled — if even one is already enabled, the merchant's
+     * configuration is assumed deliberate and is left untouched. Existing
+     * event types (ours, the payment plugin's, or third-party) are always
+     * preserved, never removed.
+     *
+     * @param array $existing_event_types Event types currently enabled on the Frisbii account.
+     *
+     * @return array{needs_update: bool, event_types: array} needs_update is true when
+     *               none of the implemented event types were present; event_types is
+     *               the full array to send on the next PUT either way.
+     */
+    public function resolve_webhook_event_types(array $existing_event_types): array
+    {
+        $needs_update = empty(array_intersect($existing_event_types, static::IMPLEMENTED_WEBHOOK_EVENT_TYPES));
+
+        $event_types = $needs_update
+            ? array_values(array_unique(array_merge($existing_event_types, static::IMPLEMENTED_WEBHOOK_EVENT_TYPES)))
+            : array_values(array_unique($existing_event_types));
+
+        return [
+            'needs_update' => $needs_update,
+            'event_types'  => $event_types,
+        ];
+    }
+
     public function enable_all_webhook_event_types()
     {
-        $webhook_settings = reepay_s()->api()->request('account/webhook_settings');
+        try {
+            $webhook_settings = reepay_s()->api()->request('account/webhook_settings');
+        } catch (Exception $e) {
+            reepay_s()->log()->log([
+                'source'  => 'WooCommerce_Reepay_Subscriptions::enable_all_webhook_event_types',
+                'message' => 'Fetching webhook settings',
+                'error'   => $e
+            ], 'error');
 
-        if (count($webhook_settings['event_types']) < count(static::$webhook_event_types)) {
-            $webhook_settings['event_types'] = static::$webhook_event_types;
+            return;
+        }
 
-            try {
-                reepay_s()->api()->request('account/webhook_settings', 'PUT', $webhook_settings);
-            } catch (Exception $e) {
-                reepay_s()->log()->log([
-                    'source'  => 'WooCommerce_Reepay_Subscriptions::update_settings',
-                    'message' => 'Updating webhook settings',
-                    'request' => $webhook_settings,
-                    'error'   => $e
-                ], 'error');
-            }
+        $existing_event_types = $webhook_settings['event_types'] ?? [];
+        $resolution = $this->resolve_webhook_event_types($existing_event_types);
+
+        reepay_s()->log()->log([
+            'source'               => 'WooCommerce_Reepay_Subscriptions::enable_all_webhook_event_types',
+            'message'              => 'Resolved webhook event_types',
+            'existing_event_types' => $existing_event_types,
+            'needs_update'         => $resolution['needs_update'],
+            'resolved_event_types' => $resolution['event_types'],
+        ]);
+
+        if (!$resolution['needs_update']) {
+            reepay_s()->log()->log([
+                'source'  => 'WooCommerce_Reepay_Subscriptions::enable_all_webhook_event_types',
+                'message' => 'At least one implemented event type already active, no update needed',
+            ]);
+
+            return;
+        }
+
+        $webhook_settings['event_types'] = $resolution['event_types'];
+
+        try {
+            reepay_s()->api()->request('account/webhook_settings', 'PUT', $webhook_settings);
+
+            reepay_s()->log()->log([
+                'source'      => 'WooCommerce_Reepay_Subscriptions::enable_all_webhook_event_types',
+                'message'     => 'Webhook event_types successfully updated',
+                'event_types' => $resolution['event_types'],
+            ]);
+        } catch (Exception $e) {
+            reepay_s()->log()->log([
+                'source'  => 'WooCommerce_Reepay_Subscriptions::update_settings',
+                'message' => 'Updating webhook settings',
+                'request' => $webhook_settings,
+                'error'   => $e
+            ], 'error');
         }
     }
 
