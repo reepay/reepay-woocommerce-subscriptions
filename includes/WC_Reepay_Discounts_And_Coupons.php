@@ -597,13 +597,13 @@ class WC_Reepay_Discounts_And_Coupons
 
         $apply_to_items = [];
         if ( ! empty($meta['_reepay_discount_apply_to_items'][0])) {
-            $apply_to_items = unserialize($meta['_reepay_discount_apply_to_items'][0]);
+            $apply_to_items = unserialize($meta['_reepay_discount_apply_to_items'][0], ['allowed_classes' => false]);
         }
         $meta['_reepay_discount_apply_to_items'][0] = $apply_to_items;
 
         $apply_to_plans = [];
         if ( ! empty($meta['_reepay_discount_eligible_plans'][0])) {
-            $apply_to_plans = unserialize($meta['_reepay_discount_eligible_plans'][0]);
+            $apply_to_plans = unserialize($meta['_reepay_discount_eligible_plans'][0], ['allowed_classes' => false]);
         }
         $meta['_reepay_discount_eligible_plans'][0] = $apply_to_plans;
 
