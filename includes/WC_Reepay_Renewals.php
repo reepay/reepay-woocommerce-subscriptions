@@ -455,6 +455,7 @@ class WC_Reepay_Renewals {
                 'last_name'   => $main_order->get_billing_last_name(),
                 'phone'       => $main_order->get_billing_phone(),
                 'company'     => $main_order->get_billing_company(),
+                'vat'         => function_exists( 'rp_get_order_vat_number' ) ? rp_get_order_vat_number( $main_order ) : '',
                 'country'     => $tax_country,
             ];
 
