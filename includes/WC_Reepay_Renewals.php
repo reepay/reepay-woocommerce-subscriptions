@@ -283,7 +283,15 @@ class WC_Reepay_Renewals {
         // customer-handle fallback, which does not check payment state. Require the matched
         // order to actually be paid before creating a subscription for it. invoice_authorized/
         // invoice_settled already matched the order by exact invoice handle, so they skip this.
-        if ( 'customer_payment_method_added' === $data['event_type'] && ! self::order_payment_verified( $order ) ) {
+        //
+        // An order matched by its own session id (reepay_session_id equals the webhook's
+        // payment_method_reference) is the exact order of this checkout. At this point the Frisbii
+        // subscription, and with it the invoice, does not exist yet, so an invoice check would always
+        // fail and no subscription would ever be created. Only fallback matches are verified.
+        $matched_by_session = ! empty( $data['payment_method_reference'] )
+            && (string) $order->get_meta( 'reepay_session_id' ) === (string) $data['payment_method_reference'];
+
+        if ( 'customer_payment_method_added' === $data['event_type'] && ! $matched_by_session && ! self::order_payment_verified( $order ) ) {
             self::log( [
                 'log' => [
                     'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
