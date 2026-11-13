@@ -12,7 +12,7 @@
 			<?php if ( $addon['type'] == 'on_off' ): ?>
                 <input type="checkbox" name="addon-<?php echo esc_attr( $addon['handle'] ) ?>" value="yes">
 			<?php elseif ( $addon['type'] == 'quantity' ): ?>
-                <input type="number" min="0" name="addon-<?php echo esc_attr( $addon['handle'] ) ?>" value="0">
+                <input type="number" min="0" step="1" name="addon-<?php echo esc_attr( $addon['handle'] ) ?>" value="0">
 			<?php endif; ?>
 			<?php echo esc_attr( $addon['name'] ) ?> +<?php echo wc_price( esc_attr( $addon['amount'] ) ) ?>
             / <?php echo esc_attr( $billing_plan ) ?> <?php echo ! empty( $addon['description'] ) ? '(' . esc_attr( $addon['description'] ) . ')' : '' ?>

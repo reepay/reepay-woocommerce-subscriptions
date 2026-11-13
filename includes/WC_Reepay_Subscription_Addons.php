@@ -2,6 +2,8 @@
 
 class WC_Reepay_Subscription_Addons {
 
+	const DEFAULT_MAX_ADDON_QUANTITY = 999;
+
 	/**
 	 * Constructor
 	 */
@@ -159,11 +161,52 @@ class WC_Reepay_Subscription_Addons {
 	 */
 	public function get_cart_item_from_session( $cart_item, $values ) {
 		if ( ! empty( $values['addons'] ) ) {
-			$cart_item['addons'] = $values['addons'];
+			$cart_item['addons'] = $this->filter_valid_cart_addons( $values['addons'] );
 			$cart_item           = $this->add_cart_item( $cart_item );
 		}
 
 		return $cart_item;
+	}
+
+	/**
+	 * Whether the value is a whole number between 1 and the allowed maximum.
+	 *
+	 * @param mixed $quantity Quantity to check.
+	 *
+	 * @return bool
+	 */
+	private function is_valid_addon_quantity( $quantity ) {
+		if ( is_string( $quantity ) ) {
+			$quantity = trim( $quantity );
+		}
+
+		if ( is_int( $quantity ) ) {
+			$quantity_int = $quantity;
+		} elseif ( is_string( $quantity ) && ctype_digit( $quantity ) ) {
+			$quantity_int = (int) $quantity;
+		} else {
+			return false;
+		}
+
+		$max = max( 1, (int) apply_filters( 'reepay_subscriptions_addon_max_quantity', self::DEFAULT_MAX_ADDON_QUANTITY ) );
+
+		return $quantity_int >= 1 && $quantity_int <= $max;
+	}
+
+	/**
+	 * Drop add-ons that carry an invalid quantity (e.g. stored in an older session).
+	 *
+	 * @param array $addons Cart item add-ons.
+	 *
+	 * @return array
+	 */
+	private function filter_valid_cart_addons( $addons ) {
+		return array_filter(
+			(array) $addons,
+			function ( $addon ) {
+				return ! array_key_exists( 'quantity', $addon ) || $this->is_valid_addon_quantity( $addon['quantity'] );
+			}
+		);
 	}
 
 	/**
@@ -198,7 +241,7 @@ class WC_Reepay_Subscription_Addons {
 				]
 			] );
 
-			foreach ( $cart_item['addons'] as $addon ) {
+			foreach ( $this->filter_valid_cart_addons( $cart_item['addons'] ) as $addon ) {
 				if ( (float) $addon['amount'] > 0 ) {
 					if ( ! empty( $addon['quantity'] ) ) {
 						// BWSM-84: quantity-type addon is a flat cost independent of product quantity.
@@ -258,9 +301,27 @@ class WC_Reepay_Subscription_Addons {
 
 				if ( isset( $_POST[ 'addon-' . $addon['handle'] ] ) ) {
 					$data  = [];
-					$value = sanitize_text_field( $_POST[ 'addon-' . $addon['handle'] ] );
+					$value = is_scalar( $_POST[ 'addon-' . $addon['handle'] ] ) ? trim( sanitize_text_field( wp_unslash( $_POST[ 'addon-' . $addon['handle'] ] ) ) ) : '';
+					$type  = $addon['type'] ?? '';
 
-					if ( $value != 'yes' && ! intval( $value ) ) {
+					// Empty or "0" means the add-on was not selected.
+					if ( '' === $value || '0' === $value ) {
+						continue;
+					}
+
+					$is_on_off   = 'on_off' === $type && 'yes' === $value;
+					$is_quantity = 'quantity' === $type && $this->is_valid_addon_quantity( $value );
+					$is_valid    = $is_on_off || $is_quantity;
+
+					if ( ! $is_valid ) {
+						wc_add_notice(
+							sprintf(
+								/* translators: %s: add-on name */
+								__( 'Invalid value for add-on "%s".', 'reepay-subscriptions-for-woocommerce' ),
+								esc_html( $addon['name'] )
+							),
+							'error'
+						);
 						continue;
 					}
 
@@ -274,9 +335,8 @@ class WC_Reepay_Subscription_Addons {
 						'amount_incl_vat' => $addon['vat_type'] == 'include',
 					];
 
-					if ( $value != 'yes' && intval( $value ) != 0 ) {
-
-						$data[ $i ]['quantity'] = intval( $value );
+					if ( 'quantity' === $type ) {
+						$data[ $i ]['quantity'] = (int) $value;
 					}
 
 					$cart_item_data['addons'] = array_merge( $cart_item_data['addons'], $data );

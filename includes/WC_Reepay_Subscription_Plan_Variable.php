@@ -99,19 +99,8 @@ class WC_Reepay_Subscription_Plan_Variable extends WC_Reepay_Subscription_Plan_S
 
 		parent::save_subscription_meta( $post_id );
 
-		if ( ! empty( $_POST['_reepay_subscription_customer_role'][ $i ] ) && $_POST['_reepay_subscription_customer_role'][ $i ] !== 'without_changes' ) {
-			update_post_meta( $post_id, '_reepay_subscription_customer_role',
-				sanitize_text_field( wp_unslash( $_POST['_reepay_subscription_customer_role'][ $i ] ) ) );
-		} else {
-			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
-		}
-
-		if ( ! empty( $_POST['_reepay_subscription_customer_role_expired'][ $i ] ) && $_POST['_reepay_subscription_customer_role_expired'][ $i ] !== 'without_changes' ) {
-			update_post_meta( $post_id, '_reepay_subscription_customer_role_expired',
-				sanitize_text_field( wp_unslash( $_POST['_reepay_subscription_customer_role_expired'][ $i ] ) ) );
-		} else {
-			delete_post_meta( $post_id, '_reepay_subscription_customer_role_expired' );
-		}
+		$this->save_customer_role_meta( $post_id, '_reepay_subscription_customer_role', $_POST['_reepay_subscription_customer_role'][ $i ] ?? '' );
+		$this->save_customer_role_meta( $post_id, '_reepay_subscription_customer_role_expired', $_POST['_reepay_subscription_customer_role_expired'][ $i ] ?? '' );
 	}
 
 	public function get_subscription_handle_from_request() {

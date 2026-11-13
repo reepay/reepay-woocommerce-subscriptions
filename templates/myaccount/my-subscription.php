@@ -97,7 +97,7 @@
             <tr>
                 <td></td>
                 <td>
-                    <a href="<?php echo esc_url( wp_nonce_url( wc_get_endpoint_url( 'add-payment-method' ) . '?reepay_subscription=' . esc_attr( $subscription['handle'] ), 'reepay_add_payment_method', '_wpnonce' ) ); ?>" class="button">
+                    <a href="<?php echo esc_url( wp_nonce_url( wc_get_endpoint_url( 'add-payment-method' ) . '?reepay_subscription=' . rawurlencode( $subscription['handle'] ), 'reepay_add_payment_method_' . $subscription['handle'], '_wpnonce' ) ); ?>" class="button">
 						<?php _e( 'Add payment method', 'reepay-subscriptions-for-woocommerce' ); ?>
                     </a>
                 </td>
