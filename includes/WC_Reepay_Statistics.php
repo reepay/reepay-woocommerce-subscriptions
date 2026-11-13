@@ -19,10 +19,14 @@ class WC_Reepay_Statistics
 
     public static function send_event($event)
     {
+        // Read the option directly: on uninstall the plugin settings are not loaded.
+        if (get_option('_reepay_statistics') !== 'yes') {
+            return null;
+        }
+
         $params = [
             'plugin' => 'WOOCOMMERCE-SUBSCRIPTION',
             'version' => reepay_s()->settings('version'),
-            'privatekey' => reepay_s()->settings('api_private_key'),
             'url' => home_url(),
             'event' => $event,
         ];
@@ -32,7 +36,9 @@ class WC_Reepay_Statistics
             'headers' => [
                 'Content-Type' => 'application/json',
             ],
-            'body' => json_encode($params, JSON_PRETTY_PRINT),
+            'body' => wp_json_encode($params),
+            'timeout' => 3,
+            'blocking' => false,
         ]);
 
         return $res;
@@ -48,16 +54,11 @@ class WC_Reepay_Statistics
         static::send_event('deleted');
     }
 
-    public static function private_key_activated()
-    {
-        static::send_event('activated');
-    }
-
     public static function upgrade_completed($upgrader_object, $options)
     {
         if (!empty($options['plugins'])) {
             foreach ($options['plugins'] as $plugin) {
-                if (strpos($plugin, REEPAY_PLUGIN_FILE)) {
+                if ($plugin === plugin_basename(REEPAY_PLUGIN_FILE)) {
                     static::send_event('updated');
                 }
             }

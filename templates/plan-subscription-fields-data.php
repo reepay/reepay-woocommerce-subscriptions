@@ -318,7 +318,7 @@ if ( empty( $post ) ) {
 </div>
 
 <?php
-$roles = apply_filters( 'editable_roles', wp_roles()->roles );
+$roles = get_editable_roles();
 array_walk($roles, function (&$item, $key) {
     $item = $item['name'];
 });

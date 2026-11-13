@@ -666,18 +666,28 @@ class WC_Reepay_Subscription_Plan_Simple {
 			update_post_meta( $post_id, '_price', $plan_data['_reepay_subscription_price'] );
 		}
 
-		if ( ! empty( $_POST['_reepay_subscription_customer_role'] ) && $_POST['_reepay_subscription_customer_role'] !== 'without_changes' ) {
-			update_post_meta( $post_id, '_reepay_subscription_customer_role',
-				sanitize_text_field( wp_unslash( $_POST['_reepay_subscription_customer_role'] ) ) );
-		} else {
-			delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
+		$this->save_customer_role_meta( $post_id, '_reepay_subscription_customer_role', $_POST['_reepay_subscription_customer_role'] ?? '' );
+		$this->save_customer_role_meta( $post_id, '_reepay_subscription_customer_role_expired', $_POST['_reepay_subscription_customer_role_expired'] ?? '' );
+	}
+
+	/**
+	 * Save a role setting; only roles the current user may grant are accepted.
+	 *
+	 * @param int   $post_id  Product or variation ID.
+	 * @param string $meta_key Role meta key.
+	 * @param mixed $posted   Raw posted value.
+	 */
+	protected function save_customer_role_meta( $post_id, $meta_key, $posted ) {
+		if ( ! current_user_can( 'promote_users' ) ) {
+			return;
 		}
 
-		if ( ! empty( $_POST['_reepay_subscription_customer_role_expired'] ) && $_POST['_reepay_subscription_customer_role_expired'] !== 'without_changes' ) {
-			update_post_meta( $post_id, '_reepay_subscription_customer_role_expired',
-				sanitize_text_field( wp_unslash( $_POST['_reepay_subscription_customer_role_expired'] ) ) );
-		} else {
-			delete_post_meta( $post_id, '_reepay_subscription_customer_role_expired' );
+		$role = is_string( $posted ) ? sanitize_text_field( wp_unslash( $posted ) ) : '';
+
+		if ( '' === $role || 'without_changes' === $role ) {
+			delete_post_meta( $post_id, $meta_key );
+		} elseif ( array_key_exists( $role, get_editable_roles() ) ) {
+			update_post_meta( $post_id, $meta_key, $role );
 		}
 	}
 

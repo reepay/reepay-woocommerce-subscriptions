@@ -279,6 +279,23 @@ class WC_Reepay_Renewals {
             return;
         }
 
+        // customer_payment_method_added matches the order via rp_get_order_by_session()'s
+        // customer-handle fallback, which does not check payment state. Require the matched
+        // order to actually be paid before creating a subscription for it. invoice_authorized/
+        // invoice_settled already matched the order by exact invoice handle, so they skip this.
+        if ( 'customer_payment_method_added' === $data['event_type'] && ! self::order_payment_verified( $order ) ) {
+            self::log( [
+                'log' => [
+                    'source' => 'WC_Reepay_Renewals::create_subscriptions_handle',
+                    'line'   => __LINE__,
+                    'info'   => 'Order matched via customer fallback is not verified as paid, skipping',
+                    'order'  => $order->get_id(),
+                ],
+            ], 'debug' );
+
+            return;
+        }
+
         if ( ! empty( $data['invoice'] ) ) {
             $child_order = $this->get_child_order( $order, $data['invoice'] );
         }
@@ -353,6 +370,55 @@ class WC_Reepay_Renewals {
     }
 
     /**
+     * Verify that an order genuinely received payment before a
+     * customer_payment_method_added webhook is allowed to create a Frisbii
+     * subscription for it.
+     *
+     * rp_get_order_by_session() can fall back to matching purely by customer
+     * handle (rp_get_order_by_customer()) when the webhook's session
+     * reference does not belong to any order. That fallback does not check
+     * payment state, so without this verification any pending order of the
+     * customer that happens to contain a subscription would get a Frisbii
+     * subscription created for it for free.
+     *
+     * @param WC_Order $order order matched for the webhook.
+     *
+     * @return bool
+     */
+    private static function order_payment_verified( $order ) {
+        if ( ! $order->needs_payment() ) {
+            return true;
+        }
+
+        $handle = $order->get_meta( '_reepay_order' );
+
+        if ( empty( $handle ) ) {
+            return false;
+        }
+
+        try {
+            $invoice = reepay_s()->api()->request( 'invoice/' . $handle );
+        } catch ( Exception $e ) {
+            return false;
+        }
+
+        if ( empty( $invoice['state'] ) || ! in_array( $invoice['state'], [ 'authorized', 'settled' ], true ) ) {
+            return false;
+        }
+
+        if ( ! function_exists( 'rp_prepare_amount' ) ) {
+            return false;
+        }
+
+        $expected = rp_prepare_amount( (float) $order->get_total(), $order->get_currency() );
+        $received = 'settled' === $invoice['state']
+            ? (float) ( $invoice['settled_amount'] ?? 0 )
+            : (float) ( $invoice['amount'] ?? 0 );
+
+        return $received >= $expected;
+    }
+
+    /**
      *
      * @param array $data [
      *     'id' => string
@@ -410,9 +476,29 @@ class WC_Reepay_Renewals {
         }
 
         $user = get_user_by( 'email', $main_order->get_billing_email() );
-        if ( $user ) {
+        if ( $user && ! $main_order->get_customer_id() ) {
             $main_order->set_customer_id( $user->ID );
+            // The e-mail is unverified, so roles must not be applied to this account.
+            $main_order->update_meta_data( '_reepay_customer_linked_by_email', 'yes' );
             $main_order->save();
+
+            self::log( [
+                'log' => [
+                    'source'      => 'WC_Reepay_Renewals::create_subscriptions',
+                    'message'     => 'Order without customer linked to account by billing e-mail',
+                    'order_id'    => $main_order->get_id(),
+                    'customer_id' => $user->ID,
+                ]
+            ] );
+        } elseif ( $user && $user->ID !== $main_order->get_customer_id() ) {
+            self::log( [
+                'log' => [
+                    'source'      => 'WC_Reepay_Renewals::create_subscriptions',
+                    'message'     => 'E-mail link skipped: order already has a different customer',
+                    'order_id'    => $main_order->get_id(),
+                    'customer_id' => $main_order->get_customer_id(),
+                ]
+            ] );
         }
 
         self::log( [
@@ -678,6 +764,9 @@ class WC_Reepay_Renewals {
             ], $main_order, $items_to_create );
             $created_order->set_customer_id( $main_order->get_customer_id() );
             $created_order->update_meta_data( '_reepay_is_subscription', 1 );
+            if ( $main_order->get_meta( '_reepay_customer_linked_by_email' ) ) {
+                $created_order->update_meta_data( '_reepay_customer_linked_by_email', 'yes' );
+            }
             $created_order->update_meta_data( '_reepay_order', '');
             $created_order->save();
             $orders[]            = $created_order;
@@ -2051,10 +2140,48 @@ class WC_Reepay_Renewals {
             return new WP_Error( __( 'No customer in order', 'reepay-subscriptions-for-woocommerce' ) );
         }
 
+        if ( $order->get_meta( '_reepay_customer_linked_by_email' ) ) {
+            self::log( [
+                'log' => [
+                    'source'      => 'WC_Reepay_Renewals::change_user_role',
+                    'message'     => 'Role change skipped: customer was linked by unverified billing e-mail',
+                    'order_id'    => $order->get_id(),
+                    'customer_id' => $customer_id,
+                ]
+            ] );
+
+            return new WP_Error( __( 'Role change skipped for e-mail linked customer', 'reepay-subscriptions-for-woocommerce' ) );
+        }
+
         $user = get_userdata( $customer_id );
 
         if ( empty( $user ) ) {
             return new WP_Error( __( 'Wrong customer id', 'reepay-subscriptions-for-woocommerce' ) );
+        }
+
+        $role_object = wp_roles()->get_role( $new_role );
+
+        if ( ! $role_object ) {
+            return new WP_Error( __( 'Role does not exist', 'reepay-subscriptions-for-woocommerce' ) );
+        }
+
+        // Products saved before validation existed may still hold a privileged role.
+        if ( $role_object->has_cap( 'manage_options' ) ) {
+            return new WP_Error( __( 'Role change to a privileged role is not allowed', 'reepay-subscriptions-for-woocommerce' ) );
+        }
+
+        if ( in_array( 'administrator', (array) $user->roles, true ) ) {
+            self::log( [
+                'log' => [
+                    'source'      => 'WC_Reepay_Renewals::change_user_role',
+                    'message'     => 'Role change skipped: customer is an administrator',
+                    'order_id'    => $order->get_id(),
+                    'customer_id' => $customer_id,
+                    'new_role'    => $new_role,
+                ]
+            ] );
+
+            return new WP_Error( __( 'Role change skipped for administrator', 'reepay-subscriptions-for-woocommerce' ) );
         }
 
         $user->set_role( $new_role );
