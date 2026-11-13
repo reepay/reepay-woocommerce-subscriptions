@@ -7,7 +7,8 @@ class WC_Reepay_My_Account_Payment_Method {
 		add_action( 'woocommerce_reepay_payment_method_added', [ $this, 'payment_method_added' ] );
 	}
 
-	const HANDLE_PATTERN = '/^[A-Za-z0-9_-]{1,64}$/';
+	// Frisbii handles may contain letters, digits, "_", "-", "." and "@" (up to 255 characters). A handle made only of dots is refused so it cannot act as a "." or ".." path segment.
+	const HANDLE_PATTERN = '/^(?!\.+$)[A-Za-z0-9_.@-]{1,255}$/';
 
 	public function add_subscription_arg( $url ) {
 		$handle = isset( $_GET['reepay_subscription'] ) ? sanitize_text_field( wp_unslash( $_GET['reepay_subscription'] ) ) : '';
@@ -45,10 +46,10 @@ class WC_Reepay_My_Account_Payment_Method {
 				throw new Exception( __( 'Permission denied', 'reepay-subscriptions-for-woocommerce' ) );
 			}
 
-			$subscription = reepay_s()->api()->request( 'subscription/' . $handle );
+			$subscription = reepay_s()->api()->request( 'subscription/' . rawurlencode( $handle ) );
 			WC_Reepay_My_Account_Subscription_Page::customer_has_access_to_subscription( $subscription );
 
-			reepay_s()->api()->request( 'subscription/' . $handle . '/pm', 'POST', [
+			reepay_s()->api()->request( 'subscription/' . rawurlencode( $handle ) . '/pm', 'POST', [
 				'source' => $token->get_token(),
 			] );
 			wc_add_notice( __( 'Payment method successfully added.', 'reepay-subscriptions-for-woocommerce' ) );

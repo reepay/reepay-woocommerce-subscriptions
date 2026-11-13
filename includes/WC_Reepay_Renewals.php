@@ -394,8 +394,14 @@ class WC_Reepay_Renewals {
      * @return bool
      */
     private static function order_payment_verified( $order ) {
-        if ( ! $order->needs_payment() ) {
+        // needs_payment() is false for cancelled, refunded and zero-total pending orders as well, so it
+        // does not prove payment. Only an order WooCommerce already counts as paid skips the invoice check.
+        if ( $order->is_paid() ) {
             return true;
+        }
+
+        if ( $order->has_status( [ 'cancelled', 'refunded' ] ) ) {
+            return false;
         }
 
         $handle = $order->get_meta( '_reepay_order' );

@@ -309,8 +309,9 @@ class WC_Reepay_Subscription_Addons {
 						continue;
 					}
 
-					$is_valid = ( 'on_off' === $type && 'yes' === $value )
-					            || ( 'quantity' === $type && $this->is_valid_addon_quantity( $value ) );
+					$is_on_off   = 'on_off' === $type && 'yes' === $value;
+					$is_quantity = 'quantity' === $type && $this->is_valid_addon_quantity( $value );
+					$is_valid    = $is_on_off || $is_quantity;
 
 					if ( ! $is_valid ) {
 						wc_add_notice(
