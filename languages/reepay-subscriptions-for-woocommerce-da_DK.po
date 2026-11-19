@@ -57,9 +57,12 @@ msgstr "Det er ikke tilladt at betale for flere produkter med forskellige valuta
 msgid "Frisbii Billing: API key not specified. Specify it in <a href=\"%s\" target=\"_blank\">gateway settings</a>"
 msgstr "Frisbii Billing: API-nøgle ikke specificeret. Angiv den i <a href=\"%s\" target=\"_blank\">gateway-indstillinger</a>."
 
-#: includes/WC_Reepay_Subscription_Plan_Simple.php:792
-msgid "Billed every %s month on %s day of the month"
-msgstr "Faktureret hver %s måned på %s dag i måneden"
+#. translators: 1: number of months, 2: ordinal day of the month in the site language, e.g. "1st" or "1."
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:851
+msgid "Billed on the %2$s day of every month"
+msgid_plural "Billed every %1$d months on the %2$s day of the month"
+msgstr[0] "Faktureres d. %2$s hver måned"
+msgstr[1] "Faktureres hver %1$d. måned d. %2$s"
 
 #: templates/myaccount/my-subscriptions.php:27
 msgctxt "table heading"
