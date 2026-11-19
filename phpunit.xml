@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<phpunit
+	bootstrap="tests/unit/bootstrap.php"
+	colors="true"
+	convertErrorsToExceptions="true"
+	convertNoticesToExceptions="true"
+	convertWarningsToExceptions="true"
+	>
+	<testsuites>
+		<testsuite name="Core lifecycle tested">
+			<directory suffix="Test.php">./tests/unit/renewals</directory>
+			<directory suffix="Test.php">./tests/unit/plans</directory>
+			<file>./tests/unit/CheckoutTest.php</file>
+			<file>./tests/unit/CurrencyTest.php</file>
+			<file>./tests/unit/SubscriptionApiTest.php</file>
+			<file>./tests/unit/WebhookEventTypesTest.php</file>
+		</testsuite>
+		<testsuite name="Supporting commerce tested">
+			<directory suffix="Test.php">./tests/unit/rest</directory>
+			<directory suffix="Test.php">./tests/unit/addons</directory>
+			<directory suffix="Test.php">./tests/unit/products</directory>
+			<file>./tests/unit/DiscountsAndCouponsTest.php</file>
+		</testsuite>
+		<testsuite name="Admin and integrations tested">
+			<directory suffix="Test.php">./tests/unit/admin</directory>
+			<directory suffix="Test.php">./tests/unit/myaccount</directory>
+			<directory suffix="Test.php">./tests/unit/import</directory>
+			<directory suffix="Test.php">./tests/unit/sync</directory>
+			<directory suffix="Test.php">./tests/unit/memberships</directory>
+			<directory suffix="Test.php">./tests/unit/wooblocks</directory>
+			<directory suffix="Test.php">./tests/unit/update</directory>
+			<file>./tests/unit/PrivacyTest.php</file>
+			<file>./tests/unit/LogTest.php</file>
+		</testsuite>
+	</testsuites>
+	<filter>
+		<whitelist>
+			<directory suffix=".php">./includes</directory>
+		</whitelist>
+	</filter>
+</phpunit>

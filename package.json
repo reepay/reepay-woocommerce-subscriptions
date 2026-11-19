@@ -1,0 +1,11 @@
+{
+  "name": "reepay-subscriptions-for-woocommerce",
+  "version": "1.3.10",
+  "description": "Frisbii Billing unit test tooling",
+  "private": true,
+  "scripts": {
+    "phpunit": "set PHPUNIT_PLUGINS=woo,woo_subs,reepay_pay & set HPOS_ENABLED=no & php ./vendor/bin/phpunit",
+    "phpunit:full": "bash bin/phpunit-test-with-plugins.sh",
+    "phpunit:init": "bash bin/install-wp-tests.sh wp_phpunit root ''"
+  }
+}

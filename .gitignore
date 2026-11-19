@@ -50,3 +50,23 @@ Thumbs.db
 /composer.phar
 /composer.lock
 /debug
+
+# Composer dev-dependencies (phpunit + its transitive deps) pulled in by
+# require-dev for the test suite. The plugin's own classmap/PSR-4 autoloader
+# (vendor/autoload.php, vendor/composer/*) stays tracked per this repo's
+# existing convention — only the third-party dev packages are ignored.
+/vendor/bin/
+/vendor/doctrine/
+/vendor/myclabs/
+/vendor/phar-io/
+/vendor/phpunit/
+/vendor/sebastian/
+/vendor/theseer/
+/vendor/yoast/
+
+# PHPUnit result cache
+.phpunit.result.cache
+
+# Stray artifact from cmd.exe misinterpreting a UNC-path redirect as a
+# literal filename instead of the null device.
+NUL
