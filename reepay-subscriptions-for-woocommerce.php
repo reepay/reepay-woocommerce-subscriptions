@@ -1029,7 +1029,7 @@ class WooCommerce_Reepay_Subscriptions
             if ($subscription_terms) {
                 echo '<p><strong>' . __('Subscription Terms Accepted') . ' :</strong> ' . __('Yes') . '</p>';
             } else {
-                echo '<p><strong>' . __('Subscription Terms Accepted:') . ' :</strong> ' . __('No') . '</p>';
+                echo '<p><strong>' . __('Subscription Terms Accepted') . ' :</strong> ' . __('No') . '</p>';
             }
         }
     }

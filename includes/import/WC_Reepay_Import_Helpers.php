@@ -12,15 +12,53 @@ class WC_Reepay_Import_Helpers {
 	}
 
 	/**
+	 * Users who can do more than a shop customer must never be changed by Frisbii data.
+	 *
+	 * @param  int  $user_id
+	 *
+	 * @return bool
+	 */
+	public static function is_privileged_user( $user_id ) {
+		$user = get_userdata( $user_id );
+
+		if ( ! $user ) {
+			return false;
+		}
+
+		return user_can( $user, 'manage_options' )
+			|| user_can( $user, 'manage_woocommerce' )
+			|| user_can( $user, 'edit_posts' );
+	}
+
+	/**
 	 * @param  array  $customer_data  https://reference.reepay.com/api/#the-customer-object
+	 * @param  bool  $from_webhook  true when triggered by a Frisbii webhook instead of a manual admin import
 	 *
 	 * @return int|WP_Error created user id or error object
 	 */
-	public static function import_reepay_customer( $customer_data ) {
-		$maybe_wp_user = ! empty( $customer_data['email'] ) ? get_user_by_email( $customer_data['email'] ) : false;
+	public static function import_reepay_customer( $customer_data, $from_webhook = false ) {
+		$maybe_wp_user = ! empty( $customer_data['email'] ) ? get_user_by( 'email', $customer_data['email'] ) : false;
 
 		//Repay customer has email and customer with that email exists in Woo.
 		if ( ! empty( $maybe_wp_user ) ) {
+			if ( $from_webhook ) {
+				$existing_handle = get_user_meta( $maybe_wp_user->ID, 'reepay_customer_id', true );
+
+				if ( ! empty( $existing_handle ) && $existing_handle !== $customer_data['handle'] ) {
+					return new WP_Error(
+						'reepay_customer_already_linked',
+						sprintf( 'User %d is already linked to Frisbii customer %s', $maybe_wp_user->ID, $existing_handle )
+					);
+				}
+
+				if ( self::is_privileged_user( $maybe_wp_user->ID ) ) {
+					return new WP_Error(
+						'reepay_customer_privileged_user',
+						sprintf( 'User %d is a privileged user and cannot be linked from a webhook', $maybe_wp_user->ID )
+					);
+				}
+			}
+
 			update_user_meta( $maybe_wp_user->ID, 'reepay_customer_id', $customer_data['handle'] );
 
 			return $maybe_wp_user->ID;
@@ -46,8 +84,9 @@ class WC_Reepay_Import_Helpers {
 	/**
 	 * @param  int  $user_id
 	 * @param  array  $customer_data  https://reference.reepay.com/api/#the-customer-object
+	 * @param  bool  $from_webhook  true: keep the login email and do not overwrite existing data with empty values
 	 */
-	public static function import_user_data( $user_id, $customer_data ) {
+	public static function import_user_data( $user_id, $customer_data, $from_webhook = false ) {
 		$meta_to_data = [
 			"first_name" => $customer_data['first_name'] ?? '',
 			"last_name"  => $customer_data['last_name'] ?? '',
@@ -76,8 +115,32 @@ class WC_Reepay_Import_Helpers {
 			"reepay_customer_id" => $customer_data['handle'],
 		];
 
+		if ( $from_webhook ) {
+			$meta_to_data = array_filter( $meta_to_data, function ( $datum ) {
+				return '' !== $datum && null !== $datum;
+			} );
+		}
+
 		foreach ( $meta_to_data as $meta_key => $datum ) {
 			update_user_meta( $user_id, $meta_key, $datum );
+		}
+
+		if ( $from_webhook ) {
+			$userdata = [ 'ID' => $user_id ];
+
+			if ( ! empty( $customer_data['first_name'] ) ) {
+				$userdata['first_name'] = $customer_data['first_name'];
+			}
+
+			if ( ! empty( $customer_data['last_name'] ) ) {
+				$userdata['last_name'] = $customer_data['last_name'];
+			}
+
+			if ( count( $userdata ) > 1 ) {
+				wp_update_user( $userdata );
+			}
+
+			return;
 		}
 
 		wp_update_user(

@@ -106,7 +106,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	}
 
 	public function column_id( $item ) {
-		return $item['handle'];
+		return esc_html( $item['handle'] );
 	}
 
 	public function column_status( $item ) {
@@ -114,7 +114,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	}
 
 	public function column_plan( $item ) {
-		$output = '<a href="' . $this->dashboard_url . 'plans/plans/plan/' . $item['plan'] . '" target="_blank">' . $item['plan'] . '</a>';
+		$output = '<a href="' . esc_url( $this->dashboard_url . 'plans/plans/plan/' . rawurlencode( $item['plan'] ) ) . '" target="_blank">' . esc_html( $item['plan'] ) . '</a>';
 
 		return $output;
 	}
@@ -127,7 +127,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	 * @return string
 	 */
 	public function column_handle( $item ) {
-		$output = '<a href="' . $this->dashboard_url . 'subscriptions/subscription/' . $item['handle'] . '" target="_blank">' . $item['id'] . '</a>';
+		$output = '<a href="' . esc_url( $this->dashboard_url . 'subscriptions/subscription/' . rawurlencode( $item['handle'] ) ) . '" target="_blank">' . esc_html( $item['id'] ) . '</a>';
 
 		return $output;
 	}
@@ -145,7 +145,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 	}
 
 	public function column_customer_handle( $item ) {
-		$output = '<a href="' . $this->dashboard_url . 'customers/customers/customer/' . $item['customer_handle'] . '" target="_blank">' . $item['customer_handle'] . '</a>';
+		$output = '<a href="' . esc_url( $this->dashboard_url . 'customers/customers/customer/' . rawurlencode( $item['customer_handle'] ) ) . '" target="_blank">' . esc_html( $item['customer_handle'] ) . '</a>';
 
 		return $output;
 	}
@@ -178,7 +178,7 @@ class WC_Reepay_Subscriptions_Table extends \WP_List_Table {
 			return '<mark class="active"><span>Active</span></mark>';
 		}
 
-		return '<mark class="' . $subscription['state'] . '"><span>' . ucfirst( $subscription['state'] ) . '</span></mark>';
+		return '<mark class="' . esc_attr( $subscription['state'] ) . '"><span>' . esc_html( ucfirst( $subscription['state'] ) ) . '</span></mark>';
 	}
 
 	/**
