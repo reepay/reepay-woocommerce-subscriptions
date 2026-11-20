@@ -1,6 +1,7 @@
 {
   "name": "reepay/reepay-subscriptions-for-woocommerce",
   "description": "description",
+  "version": "1.3.14",
   "minimum-stability": "stable",
   "license": "proprietary",
   "authors": [
@@ -18,6 +19,15 @@
       "includes/sync",
       "includes/woo-blocks",
       "includes/my-account"
-    ]
+    ],
+    "psr-4": {
+      "Reepay\\Subscriptions\\Tests\\Helpers\\": "tests/helpers/",
+      "Reepay\\Subscriptions\\Tests\\Mocks\\": "tests/mocks/",
+      "Reepay\\Subscriptions\\Tests\\Unit\\": "tests/unit/"
+    }
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^8",
+    "yoast/phpunit-polyfills": "^1.0"
   }
 }

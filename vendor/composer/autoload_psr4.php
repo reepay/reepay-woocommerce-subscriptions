@@ -6,4 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Reepay\\Subscriptions\\Tests\\Unit\\' => array($baseDir . '/tests/unit'),
+    'Reepay\\Subscriptions\\Tests\\Mocks\\' => array($baseDir . '/tests/mocks'),
+    'Reepay\\Subscriptions\\Tests\\Helpers\\' => array($baseDir . '/tests/helpers'),
+    'Doctrine\\Instantiator\\' => array($vendorDir . '/doctrine/instantiator/src/Doctrine/Instantiator'),
+    'DeepCopy\\' => array($vendorDir . '/myclabs/deep-copy/src/DeepCopy'),
 );

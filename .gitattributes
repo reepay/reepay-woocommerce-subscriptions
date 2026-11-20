@@ -1,0 +1,40 @@
+# Normalize all text files to LF line endings, regardless of the host OS or
+# editor that last touched them, so composer/npm regenerating files on Windows
+# (or under WSL) can't reintroduce CRLF noise across the whole repo.
+* text=auto eol=lf
+
+# Explicit text types
+*.php text eol=lf
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.html text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.sh text eol=lf
+*.po text eol=lf
+*.pot text eol=lf
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Binary files - never touch line endings
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.zip binary
+*.gz binary
+*.phar binary

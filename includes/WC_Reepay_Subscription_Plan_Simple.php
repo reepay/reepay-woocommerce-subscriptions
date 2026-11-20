@@ -13,6 +13,14 @@ class WC_Reepay_Subscription_Plan_Simple {
 	const TYPE_WEEKLY_FIXED_DAY = 'weekly_fixedday';
 	const TYPE_MANUAL = 'manual';
 
+	/**
+	 * Role settings saved from the product form by save_customer_role_meta(), not from the Frisbii plan.
+	 */
+	const CUSTOMER_ROLE_META_KEYS = [
+		'_reepay_subscription_customer_role',
+		'_reepay_subscription_customer_role_expired',
+	];
+
 	public static $schedule_types = [];
 
 	public static $trial = [];
@@ -475,6 +483,12 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		foreach ( self::$meta_fields as $key ) {
+			// The role settings are not part of the Frisbii plan; save_customer_role_meta() owns them.
+			// Resetting them here would wipe them whenever a user who may not grant roles saves the product.
+			if ( in_array( $key, self::CUSTOMER_ROLE_META_KEYS, true ) ) {
+				continue;
+			}
+
 			delete_post_meta( $post_id, $key );
 
 			if ( isset( $data[ $key ] ) ) {
@@ -810,22 +824,11 @@ class WC_Reepay_Subscription_Plan_Simple {
 			return '';
 		}
 
+		if ( ! $is_short && $type == self::TYPE_MONTH_FIXED_DAY && ! empty( $type_data['month'] ) && ! empty( $type_data['day'] ) ) {
+			return self::get_month_fixed_day_text( (int) $type_data['month'], (int) $type_data['day'] );
+		}
+
 		$types_arr = self::$types_info;
-
-		if ( $type == self::TYPE_MONTH_FIXED_DAY && ! empty( $type_data['month'] ) && ! empty( $type_data['day'] ) ) {
-			$types_arr[ $type ] = sprintf(
-				__( 'Billed every %s month on %s day of the month', 'reepay-subscriptions-for-woocommerce' ),
-				$type_data['month'],
-				$type_data['day']
-			);
-		}
-
-		if ( $type == self::TYPE_MONTH_FIXED_DAY && ! empty( $type_data['month'] ) ) {
-			$types_arr[ $type ] = sprintf(
-				__( 'Billed every %s month on the last day of the month', 'reepay-subscriptions-for-woocommerce' ),
-				$type_data['month']
-			);
-		}
 
 		if ( $type == self::TYPE_MONTH_START_DATE && ! empty( $type_data ) ) {
 			$types_arr[ $type ] = sprintf(
@@ -847,6 +850,62 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		return $ret;
+	}
+
+	/**
+	 * Billing text for a "fixed day of month" schedule, e.g. "Billed on the 1st day of every month".
+	 *
+	 * @param  int  $months  Billing interval in months.
+	 * @param  int  $day  Day of the month the billing happens on.
+	 *
+	 * @return string
+	 */
+	public static function get_month_fixed_day_text( int $months, int $day ): string {
+		/* translators: 1: number of months, 2: ordinal day of the month in the site language, e.g. "1st" or "1." */
+		$singular = 'Billed on the %2$s day of every month';
+		$plural   = 'Billed every %1$d months on the %2$s day of the month';
+
+		$format = _n( $singular, $plural, $months, 'reepay-subscriptions-for-woocommerce' );
+
+		// If the sentence is not translated yet it is still English, so the ordinal must be English too ("1st", not "1.").
+		$is_untranslated = ( $format === $singular || $format === $plural );
+		$ordinal_locale  = $is_untranslated ? 'en_US' : determine_locale();
+
+		return sprintf( $format, $months, self::format_ordinal( $day, $ordinal_locale ) );
+	}
+
+	/**
+	 * Format a number as an ordinal, e.g. "1st" (English) or "1." (Danish).
+	 *
+	 * Uses NumberFormatter when the PHP intl extension is available, otherwise a simple fallback.
+	 *
+	 * @param  int  $number  Number to format.
+	 * @param  string  $locale  Locale to format for, e.g. "en_US" or "da_DK".
+	 *
+	 * @return string
+	 */
+	private static function format_ordinal( int $number, string $locale ): string {
+		if ( class_exists( 'NumberFormatter' ) ) {
+			$formatter = new NumberFormatter( $locale, NumberFormatter::ORDINAL );
+			$formatted = $formatter->format( $number );
+
+			if ( false !== $formatted ) {
+				return $formatted;
+			}
+		}
+
+		// Fallback without the intl extension: English suffixes for English sites, "15." style otherwise.
+		if ( 0 === strpos( $locale, 'en' ) ) {
+			if ( $number % 100 >= 11 && $number % 100 <= 13 ) {
+				return $number . 'th';
+			}
+
+			$suffixes = [ 1 => 'st', 2 => 'nd', 3 => 'rd' ];
+
+			return $number . ( $suffixes[ $number % 10 ] ?? 'th' );
+		}
+
+		return $number . '.';
 	}
 
 	/**

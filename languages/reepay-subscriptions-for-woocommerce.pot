@@ -380,10 +380,13 @@ msgstr ""
 msgid "Billed every %s months on the last day of the month"
 msgstr ""
 
-#: includes/WC_Reepay_Subscription_Plan_Simple.php:745
+#. translators: 1: number of months, 2: ordinal day of the month in the site language, e.g. "1st" or "1."
+#: includes/WC_Reepay_Subscription_Plan_Simple.php:851
 #, php-format
-msgid "Billed every %s month on %s day of the month"
-msgstr ""
+msgid "Billed on the %2$s day of every month"
+msgid_plural "Billed every %1$d months on the %2$s day of the month"
+msgstr[0] ""
+msgstr[1] ""
 
 #: includes/WC_Reepay_Subscription_Plan_Simple.php:138
 #, php-format

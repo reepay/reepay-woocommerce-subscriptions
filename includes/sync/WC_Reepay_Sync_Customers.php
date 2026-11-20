@@ -39,7 +39,11 @@ class WC_Reepay_Sync_Customers {
 			return;
 		}
 
-		WC_Reepay_Import_Helpers::import_reepay_customer( $full_data['customer_data'] );
+		$result = WC_Reepay_Import_Helpers::import_reepay_customer( $full_data['customer_data'], true );
+
+		if ( is_wp_error( $result ) ) {
+			self::log_skip( 'created', $data['customer'], $result->get_error_message() );
+		}
 	}
 
 	/**
@@ -59,7 +63,13 @@ class WC_Reepay_Sync_Customers {
 			return;
 		}
 
-		WC_Reepay_Import_Helpers::import_user_data( $full_data['user_id'], $full_data['customer_data'] );
+		if ( WC_Reepay_Import_Helpers::is_privileged_user( $full_data['user_id'] ) ) {
+			self::log_skip( 'changed', $data['customer'], sprintf( 'User %d is a privileged user', $full_data['user_id'] ) );
+
+			return;
+		}
+
+		WC_Reepay_Import_Helpers::import_user_data( $full_data['user_id'], $full_data['customer_data'], true );
 	}
 
 	/**
@@ -73,15 +83,34 @@ class WC_Reepay_Sync_Customers {
 	 *     ] $data
 	 */
 	public function deleted( $data ) {
-		$full_data = self::get_customer_data( $data['customer'] );
+		$user_id = rp_get_user_id_by_handle( $data['customer'] );
 
-		if ( empty( $full_data['user_id'] ) ) {
+		if ( empty( $user_id ) ) {
 			return;
 		}
 
-		require_once( ABSPATH . 'wp-admin/includes/user.php' );
+		// Only unlink: a Frisbii customer deletion must never delete the WordPress account.
+		delete_user_meta( $user_id, 'reepay_customer_id', $data['customer'] );
 
-		wp_delete_user( $full_data['user_id'] );
+		reepay_s()->log()->log( [
+			'source'  => 'WC_Reepay_Sync_Customers::deleted',
+			'message' => 'Frisbii customer deleted: handle unlinked, WordPress user kept',
+			'handle'  => $data['customer'],
+			'user_id' => $user_id,
+		] );
+	}
+
+	/**
+	 * @param  string  $event
+	 * @param  string  $handle
+	 * @param  string  $reason
+	 */
+	private static function log_skip( $event, $handle, $reason ) {
+		reepay_s()->log()->log( [
+			'source'  => "WC_Reepay_Sync_Customers::$event",
+			'message' => 'Skipped customer webhook sync: ' . $reason,
+			'handle'  => $handle,
+		] );
 	}
 
 	/**
