@@ -1246,4 +1246,81 @@ class DiscountsAndCouponsTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 		$child = wc_get_order( $child->get_id() );
 		$this->assertTrue( $child->get_recorded_coupon_usage_counts(), 'Flag must remain untouched when parent has no subscription handle.' );
 	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * add_coupon_text_field() - unserialize() without objects
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Discounts_And_Coupons::add_coupon_text_field
+	 * unserializes the '_reepay_discount_apply_to_items' and
+	 * '_reepay_discount_eligible_plans' coupon meta with
+	 * allowed_classes => false: plain values survive, but a serialized object
+	 * is never instantiated (no __wakeup()), it becomes __PHP_Incomplete_Class.
+	 *
+	 * get_post_meta( $id ) without a key returns the RAW (still serialized)
+	 * values, which is why the method calls unserialize() itself. The
+	 * template is swapped for an empty file via the 'wc_get_template' filter
+	 * so only the data passed to it is inspected.
+	 */
+	public function test_add_coupon_text_field_does_not_instantiate_serialized_objects() {
+		DiscountsAndCouponsTest_Wakeup_Probe::$woken = false;
+
+		$coupon_id = self::factory()->post->create( array( 'post_type' => 'shop_coupon' ) );
+		update_post_meta( $coupon_id, '_reepay_discount_apply_to_items', array( 'plan-a', new DiscountsAndCouponsTest_Wakeup_Probe() ) );
+		update_post_meta( $coupon_id, '_reepay_discount_eligible_plans', array( 'plan-b', new DiscountsAndCouponsTest_Wakeup_Probe() ) );
+
+		$GLOBALS['post'] = get_post( $coupon_id );
+
+		ApiResponseMock::respond_with( array( 'content' => array() ) );
+
+		$empty_template = wp_tempnam( 'reepay-empty-template' );
+		$template_args  = null;
+		$swap_template  = function ( $template, $template_name, $args ) use ( &$template_args, $empty_template ) {
+			if ( 'discounts-and-coupons-fields.php' !== $template_name ) {
+				return $template;
+			}
+
+			$template_args = $args;
+
+			return $empty_template;
+		};
+		add_filter( 'wc_get_template', $swap_template, 10, 3 );
+
+		ob_start();
+		$this->subject->add_coupon_text_field();
+		ob_end_clean();
+
+		remove_filter( 'wc_get_template', $swap_template, 10 );
+		unlink( $empty_template );
+		unset( $GLOBALS['post'] );
+
+		$this->assertFalse( DiscountsAndCouponsTest_Wakeup_Probe::$woken, 'A serialized object must not be instantiated.' );
+		$this->assertIsArray( $template_args );
+
+		foreach ( array(
+			'_reepay_discount_apply_to_items' => 'plan-a',
+			'_reepay_discount_eligible_plans' => 'plan-b',
+		) as $meta_key => $plain_value ) {
+			$value = $template_args['meta'][ $meta_key ][0];
+			$this->assertSame( $plain_value, $value[0], $meta_key );
+			$this->assertInstanceOf( '__PHP_Incomplete_Class', $value[1], $meta_key );
+		}
+	}
+}
+
+/**
+ * Records whether unserialize() instantiated it (via __wakeup()).
+ */
+class DiscountsAndCouponsTest_Wakeup_Probe {
+	/**
+	 * @var bool
+	 */
+	public static bool $woken = false;
+
+	public function __wakeup() {
+		self::$woken = true;
+	}
 }

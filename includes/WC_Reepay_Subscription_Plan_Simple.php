@@ -13,6 +13,14 @@ class WC_Reepay_Subscription_Plan_Simple {
 	const TYPE_WEEKLY_FIXED_DAY = 'weekly_fixedday';
 	const TYPE_MANUAL = 'manual';
 
+	/**
+	 * Role settings saved from the product form by save_customer_role_meta(), not from the Frisbii plan.
+	 */
+	const CUSTOMER_ROLE_META_KEYS = [
+		'_reepay_subscription_customer_role',
+		'_reepay_subscription_customer_role_expired',
+	];
+
 	public static $schedule_types = [];
 
 	public static $trial = [];
@@ -475,6 +483,12 @@ class WC_Reepay_Subscription_Plan_Simple {
 		}
 
 		foreach ( self::$meta_fields as $key ) {
+			// The role settings are not part of the Frisbii plan; save_customer_role_meta() owns them.
+			// Resetting them here would wipe them whenever a user who may not grant roles saves the product.
+			if ( in_array( $key, self::CUSTOMER_ROLE_META_KEYS, true ) ) {
+				continue;
+			}
+
 			delete_post_meta( $post_id, $key );
 
 			if ( isset( $data[ $key ] ) ) {

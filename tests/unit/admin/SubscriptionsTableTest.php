@@ -403,4 +403,64 @@ class SubscriptionsTableTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 
 		$this->assertSame( '20 Apr 2025', $result );
 	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * Output escaping - values come from the Frisbii API
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Markup injection attempt used for every escaping test.
+	 */
+	const XSS = '"><script>alert(1)</script>';
+
+	/**
+	 * Test @see WC_Reepay_Subscriptions_Table::column_plan,
+	 * column_handle and column_customer_handle escape the link text and
+	 * URL-encode the handle in the link.
+	 */
+	public function test_link_columns_escape_text_and_encode_handle() {
+		$results = array(
+			'column_plan'            => $this->table->column_plan( array( 'plan' => self::XSS ) ),
+			'column_handle'          => $this->table->column_handle( array( 'id' => self::XSS, 'handle' => self::XSS ) ),
+			'column_customer_handle' => $this->table->column_customer_handle( array( 'customer_handle' => self::XSS ) ),
+		);
+
+		foreach ( $results as $column => $html ) {
+			$this->assertStringNotContainsString( '<script>', $html, $column );
+			$this->assertStringContainsString( '&lt;script&gt;', $html, $column );
+			$this->assertStringContainsString( rawurlencode( self::XSS ), $html, $column . ': handle must be URL-encoded in the href.' );
+			$this->assertSame( 1, substr_count( $html, '<a ' ), $column . ': exactly one link element expected.' );
+		}
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscriptions_Table::column_handle URL-encodes
+	 * path characters so a handle cannot change the dashboard path.
+	 */
+	public function test_column_handle_encodes_path_characters() {
+		$result = $this->table->column_handle( array( 'id' => 'sub', 'handle' => '../../customers/x' ) );
+
+		$this->assertStringContainsString( 'subscriptions/subscription/..%2F..%2Fcustomers%2Fx', $result );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscriptions_Table::column_id escapes the handle.
+	 */
+	public function test_column_id_escapes_handle() {
+		$this->assertSame( esc_html( self::XSS ), $this->table->column_id( array( 'handle' => self::XSS ) ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscriptions_Table::format_status escapes an
+	 * unknown state in both the class attribute and the label.
+	 */
+	public function test_format_status_escapes_unknown_state() {
+		$result = $this->table->format_status( array( 'is_cancelled' => false, 'state' => self::XSS ) );
+
+		$this->assertStringNotContainsString( '<script>', $result );
+		$this->assertSame( 1, substr_count( $result, '<mark ' ) );
+		$this->assertStringContainsString( 'class="&quot;&gt;&lt;script&gt;', $result );
+	}
 }

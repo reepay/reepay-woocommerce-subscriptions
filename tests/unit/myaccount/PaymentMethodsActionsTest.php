@@ -42,6 +42,11 @@ class PaymentMethodsActionsTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
+		// The tests below assert that no notice is added. WC notices live in
+		// the session and are not reset between tests, so clear anything an
+		// earlier test in the full run left behind.
+		wc_clear_notices();
+
 		new WC_Reepay_My_Account_Payment_Methods_Actions();
 	}
 

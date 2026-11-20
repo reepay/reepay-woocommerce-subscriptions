@@ -61,6 +61,12 @@ class PlanVariableTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 
 		$this->set_fake_private_key( WC_Reepay_Subscription_API::get_instance(), 'private_key_test', 'test-key-reepay' );
 		$this->set_fake_private_key( WC_Reepay_Subscription_API::get_instance(), 'test_mode', true );
+
+		// save_customer_role_meta() only saves when the current user can
+		// 'promote_users' and the role is in get_editable_roles() - act as an
+		// administrator, and load get_editable_roles() (wp-admin only).
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 	}
 
 	public function tear_down() {
@@ -122,22 +128,20 @@ class PlanVariableTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 	 * save_subscription_meta( $post_id, $i ) - customer-role / expired
 	 * ------------------------------------------------------------------
 	 *
-	 * Real behavior (WC_Reepay_Subscription_Plan_Variable.php:97-115):
+	 * Real behavior (WC_Reepay_Subscription_Plan_Variable::save_subscription_meta()):
 	 *
 	 *   public function save_subscription_meta( $post_id, $i = null ) {
 	 *       $this->loop = $i;
 	 *       parent::save_subscription_meta( $post_id );
-	 *       if ( ! empty( $_POST['_reepay_subscription_customer_role'][ $i ] ) && ...[ $i ] !== 'without_changes' ) {
-	 *           update_post_meta( ... );
-	 *       } else {
-	 *           delete_post_meta( ... );
-	 *       }
-	 *       // same shape for _expired
+	 *       $this->save_customer_role_meta( $post_id, '_reepay_subscription_customer_role', $_POST[...][ $i ] ?? '' );
+	 *       // same for _expired
 	 *   }
 	 *
 	 * The role values are read from the POST array AT INDEX $i (the explicit
-	 * parameter), confirming per-variation-index handling. 'without_changes'
-	 * takes the delete branch, same as Plan_Simple.
+	 * parameter), confirming per-variation-index handling. save_customer_role_meta()
+	 * requires 'promote_users' (set_up() logs in as an administrator) and only
+	 * saves roles from get_editable_roles(); 'without_changes' takes the
+	 * delete branch, same as Plan_Simple.
 	 */
 
 	/**
@@ -177,9 +181,11 @@ class PlanVariableTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 			0 => 'plan-handle-var-1',
 			1 => 'plan-handle-var-1',
 		);
+		// Two different real (editable) roles - only roles from
+		// get_editable_roles() are saved.
 		$_POST['_reepay_subscription_customer_role'] = array(
-			0 => 'role-for-index-0',
-			1 => 'role-for-index-1',
+			0 => 'subscriber',
+			1 => 'contributor',
 		);
 
 		// Save post A using index 0, post B using index 1 - different rows,
@@ -187,8 +193,8 @@ class PlanVariableTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 		$this->plan->save_subscription_meta( $post_id_a, 0 );
 		$this->plan->save_subscription_meta( $post_id_b, 1 );
 
-		$this->assertSame( 'role-for-index-0', get_post_meta( $post_id_a, '_reepay_subscription_customer_role', true ) );
-		$this->assertSame( 'role-for-index-1', get_post_meta( $post_id_b, '_reepay_subscription_customer_role', true ) );
+		$this->assertSame( 'subscriber', get_post_meta( $post_id_a, '_reepay_subscription_customer_role', true ) );
+		$this->assertSame( 'contributor', get_post_meta( $post_id_b, '_reepay_subscription_customer_role', true ) );
 	}
 
 	/**
@@ -210,6 +216,31 @@ class PlanVariableTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 		$this->plan->save_subscription_meta( $post_id, 2 );
 
 		$this->assertSame( '', get_post_meta( $post_id, '_reepay_subscription_customer_role', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Variable::save_subscription_meta
+	 * keeps a variation's existing role settings when the current user cannot
+	 * 'promote_users' (shop manager). Regression test for the role keys being
+	 * wiped by save_remote_plan() before the capability check.
+	 */
+	public function test_save_subscription_meta_without_promote_users_keeps_existing_roles_at_index() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'shop_manager' ) ) );
+
+		$post_id = $this->create_real_product_post();
+		update_post_meta( $post_id, '_reepay_subscription_customer_role', 'customer' );
+		update_post_meta( $post_id, '_reepay_subscription_customer_role_expired', 'subscriber' );
+		$this->mock_valid_plan_response();
+
+		$_REQUEST['product-type']                            = 'reepay_variable_subscriptions';
+		$_REQUEST['_reepay_subscription_handle']             = array( 0 => 'plan-handle-var-1' );
+		$_POST['_reepay_subscription_customer_role']         = array( 0 => 'administrator' );
+		$_POST['_reepay_subscription_customer_role_expired'] = array( 0 => '' );
+
+		$this->plan->save_subscription_meta( $post_id, 0 );
+
+		$this->assertSame( 'customer', get_post_meta( $post_id, '_reepay_subscription_customer_role', true ) );
+		$this->assertSame( 'subscriber', get_post_meta( $post_id, '_reepay_subscription_customer_role_expired', true ) );
 	}
 
 	/**

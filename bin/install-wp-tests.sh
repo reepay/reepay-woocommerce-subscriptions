@@ -177,29 +177,19 @@ install_dependencies() {
 	# Its own repo gitignores vendor/, so a plain zip download never includes
 	# vendor/autoload.php -- run composer install there before activating, or the
 	# plugin fatals immediately (Class "Reepay\Checkout\Plugin\Statistics" not found).
-	# GitHub's codeload zip endpoint intermittently fails wp-cli's unzip step
-	# with PCLZIP_ERR_BAD_FORMAT (confirmed, recurring, unrelated to this
-	# script or environment -- a GitHub-side quirk). Don't let `set -e` abort
-	# the whole script on that one flaky download -- try the fast path, and
-	# if it didn't actually produce the plugin folder, fall back to a manual
-	# curl+unzip, which has never failed the same way.
-	set +e
-	php wp-cli.phar plugin install https://github.com/reepay/reepay-woocommerce-payment/archive/refs/heads/master.zip --force
-	set -e
-
-	if [ ! -d wp-content/plugins/reepay-woocommerce-payment ]; then
-		echo "wp-cli's zip install didn't produce wp-content/plugins/reepay-woocommerce-payment -- falling back to a manual download."
-		curl -sL -o /tmp/reepay-pay-download.zip https://github.com/reepay/reepay-woocommerce-payment/archive/refs/heads/master.zip
-		unzip -q -o /tmp/reepay-pay-download.zip -d wp-content/plugins/
-		# Remove any stale folder from a previous run first -- `mv src dest`
-		# moves INTO an existing non-empty dest instead of replacing it,
-		# which fails with "Directory not empty" when this script is
-		# re-run on top of an already-populated /tmp/wordpress (the normal,
-		# expected case -- not everyone wipes it every time).
-		rm -rf wp-content/plugins/reepay-woocommerce-payment
-		mv wp-content/plugins/reepay-woocommerce-payment-master wp-content/plugins/reepay-woocommerce-payment
-		rm -f /tmp/reepay-pay-download.zip
-	fi
+	# Download with curl + unzip rather than `wp plugin install <url>`: wp-cli's
+	# built-in unzipper (PclZip) rejects GitHub's codeload zip with
+	# PCLZIP_ERR_BAD_FORMAT on some setups, even though the archive is valid.
+	curl -sL -o /tmp/reepay-pay-download.zip https://github.com/reepay/reepay-woocommerce-payment/archive/refs/heads/master.zip
+	unzip -q -o /tmp/reepay-pay-download.zip -d wp-content/plugins/
+	# Remove any stale folder from a previous run first -- `mv src dest`
+	# moves INTO an existing non-empty dest instead of replacing it,
+	# which fails with "Directory not empty" when this script is
+	# re-run on top of an already-populated /tmp/wordpress (the normal,
+	# expected case -- not everyone wipes it every time).
+	rm -rf wp-content/plugins/reepay-woocommerce-payment
+	mv wp-content/plugins/reepay-woocommerce-payment-master wp-content/plugins/reepay-woocommerce-payment
+	rm -f /tmp/reepay-pay-download.zip
 
 	( cd wp-content/plugins/reepay-woocommerce-payment && composer install --no-dev --no-interaction )
 	php wp-cli.phar plugin activate reepay-woocommerce-payment

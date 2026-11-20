@@ -273,14 +273,8 @@ class ImportTest extends Reepay_Subscriptions_UnitTestCase {
 	 * Test @see WC_Reepay_Import::import_customers happy path for a customer
 	 * present in the source array, with no WP user matching that email -
 	 * import_reepay_customer() creates a brand-new user.
-	 *
-	 * import_reepay_customer() calls the deprecated get_user_by_email()
-	 * (confirmed by actually running this test) - setExpectedDeprecated()
-	 * documents this real, pre-existing production behavior.
 	 */
 	public function test_import_customers_happy_path_creates_user() {
-		$this->setExpectedDeprecated( 'get_user_by_email' );
-
 		add_filter( 'wp_mail', '__return_false' );
 
 		$customers = array(

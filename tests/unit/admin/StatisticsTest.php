@@ -3,44 +3,29 @@
  * Class StatisticsTest
  *
  * Covers WC_Reepay_Statistics (includes/WC_Reepay_Statistics.php): send_event,
- * plugin_deactivated, plugin_deleted, private_key_activated and
- * upgrade_completed.
+ * plugin_deactivated, plugin_deleted and upgrade_completed.
  *
  * Phase 5 scope: baseline regression coverage per requirements.md §3.4 - this
- * is a thin (66-line) class, so a lighter checklist applies per the brief.
+ * is a thin class, so a lighter checklist applies per the brief.
  *
  * Confirmed real behavior (read from source):
- * - send_event($event) (static) makes a REAL outbound wp_remote_post() call
- *   to a hardcoded third-party analytics webhook URL
- *   (https://hook.reepay.integromat.celonis.com/...) - mocked here with
- *   ApiResponseMock, whose `pre_http_request` filter is generic (no
- *   URL-based exclusion) and intercepts this call just like the plugin's
- *   own API client. The real URL is never hit in this suite. Reads
- *   reepay_s()->settings('version')/reepay_s()->settings('api_private_key')
- *   (a simple static-array lookup, returns null if unset, never fatals) and
- *   home_url().
- * - plugin_deactivated()/plugin_deleted()/private_key_activated() are thin
- *   static wrappers calling send_event() with a fixed event name
- *   ('deactivated'/'deleted'/'activated' respectively) - captured here via a
- *   custom `pre_http_request` callback that inspects the posted JSON body.
+ * - send_event($event) (static) is opt-in: it returns null and sends nothing
+ *   unless the '_reepay_statistics' option is exactly 'yes' (set_up() turns
+ *   it on; dedicated tests cover the opted-out case). When enabled it makes
+ *   a non-blocking wp_remote_post() call to a hardcoded third-party
+ *   analytics webhook URL (https://hook.reepay.integromat.celonis.com/...) -
+ *   mocked here with ApiResponseMock, whose `pre_http_request` filter is
+ *   generic (no URL-based exclusion). The real URL is never hit in this
+ *   suite. The payload holds plugin, version, url and event - no private key.
+ * - plugin_deactivated()/plugin_deleted() are thin static wrappers calling
+ *   send_event() with a fixed event name ('deactivated'/'deleted') - captured
+ *   here via a custom `pre_http_request` callback that inspects the posted
+ *   JSON body. (private_key_activated() was removed from production.)
  * - upgrade_completed($upgrader_object, $options) only calls
- *   send_event('updated') if $options['plugins'] is non-empty AND contains a
- *   string matching REEPAY_PLUGIN_FILE (an absolute path, defined as
- *   __FILE__ in the main plugin file) via strpos(). CONFIRMED GOTCHA: the
- *   condition is `if (strpos($plugin, REEPAY_PLUGIN_FILE))` with NO `!==
- *   false` / `=== 0` comparison - strpos() returns int|false, and PHP's
- *   loose truthiness means a match at position 0 (i.e. $plugin being
- *   exactly equal to, or starting exactly with, REEPAY_PLUGIN_FILE) is
- *   FALSY and will NOT trigger send_event(), even though the string
- *   genuinely matches. This is a real latent bug reproduced by this suite's
- *   test_upgrade_completed_sends_event_for_matching_plugin test (which
- *   deliberately uses a haystack where REEPAY_PLUGIN_FILE appears at a
- *   non-zero offset to exercise the intended/working case), with a
- *   dedicated test
- *   (test_upgrade_completed_exact_path_match_is_falsy_due_to_strpos_bug)
- *   documenting the exact-match falsy case as it actually behaves - per the
- *   "no production code changes" constraint, this is reported rather than
- *   fixed.
+ *   send_event('updated') when $options['plugins'] contains an entry
+ *   strictly equal to plugin_basename(REEPAY_PLUGIN_FILE) - the
+ *   "folder/file.php" form WordPress passes to upgrader_process_complete.
+ *   (This replaced an older strpos() check whose exact-match case was falsy.)
  * - The constructor calls register_deactivation_hook()/register_uninstall_hook()
  *   with REEPAY_PLUGIN_FILE - both idempotent WordPress API calls. Confirmed
  *   safe to call repeatedly: register_deactivation_hook()/register_uninstall_hook()
@@ -62,7 +47,15 @@ use Reepay\Subscriptions\Tests\Mocks\ApiResponseMock;
  */
 class StatisticsTest extends Reepay_Subscriptions_UnitTestCase {
 
+	public function set_up() {
+		parent::set_up();
+
+		// send_event() only sends when the merchant opted in.
+		update_option( '_reepay_statistics', 'yes' );
+	}
+
 	public function tear_down() {
+		delete_option( '_reepay_statistics' );
 		ApiResponseMock::clear();
 
 		parent::tear_down();
@@ -125,6 +118,65 @@ class StatisticsTest extends Reepay_Subscriptions_UnitTestCase {
 	}
 
 	/**
+	 * Test @see WC_Reepay_Statistics::send_event posts only plugin, version,
+	 * url and event - never the private key - as a non-blocking request
+	 * with a 3 second timeout.
+	 */
+	public function test_send_event_payload_contains_no_private_key_and_is_non_blocking() {
+		$captured_args = null;
+		$callback      = function ( $preempt, $args ) use ( &$captured_args ) {
+			$captured_args = $args;
+
+			return array(
+				'headers'  => array(),
+				'body'     => '',
+				'response' => array( 'code' => 200, 'message' => 'OK' ),
+				'cookies'  => array(),
+				'filename' => null,
+			);
+		};
+		add_filter( 'pre_http_request', $callback, 5, 2 );
+
+		WC_Reepay_Statistics::send_event( 'payload_check' );
+
+		remove_filter( 'pre_http_request', $callback, 5 );
+
+		$this->assertIsArray( $captured_args );
+		$body = json_decode( $captured_args['body'], true );
+		$this->assertSame( array( 'plugin', 'version', 'url', 'event' ), array_keys( $body ) );
+		$this->assertArrayNotHasKey( 'privatekey', $body );
+		$this->assertFalse( $captured_args['blocking'] );
+		$this->assertSame( 3, $captured_args['timeout'] );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Statistics::send_event sends nothing and returns
+	 * null unless the merchant opted in ('_reepay_statistics' === 'yes') -
+	 * covers the option being absent, 'no', and any other value.
+	 */
+	public function test_send_event_sends_nothing_when_not_opted_in() {
+		foreach ( array( null, 'no', '1' ) as $option ) {
+			if ( null === $option ) {
+				delete_option( '_reepay_statistics' );
+			} else {
+				update_option( '_reepay_statistics', $option );
+			}
+
+			$captured_body = null;
+			$callback      = $this->capture_request_body( $captured_body );
+
+			$result = WC_Reepay_Statistics::send_event( 'opted_out_event' );
+			WC_Reepay_Statistics::plugin_deactivated();
+
+			remove_filter( 'pre_http_request', $callback, 5 );
+
+			$label = var_export( $option, true );
+			$this->assertNull( $result, "Option: $label" );
+			$this->assertNull( $captured_body, "Option: $label" );
+		}
+	}
+
+	/**
 	 * Test @see WC_Reepay_Statistics::send_event never reaches the real
 	 * analytics webhook URL - ApiResponseMock intercepts it via the generic
 	 * `pre_http_request` filter, confirmed by asserting the mocked response
@@ -177,21 +229,6 @@ class StatisticsTest extends Reepay_Subscriptions_UnitTestCase {
 		$this->assertSame( 'deleted', $captured_body['event'] );
 	}
 
-	/**
-	 * Test @see WC_Reepay_Statistics::private_key_activated sends the
-	 * 'activated' event.
-	 */
-	public function test_private_key_activated_sends_activated_event() {
-		$captured_body = null;
-		$callback      = $this->capture_request_body( $captured_body );
-
-		WC_Reepay_Statistics::private_key_activated();
-
-		remove_filter( 'pre_http_request', $callback, 5 );
-
-		$this->assertSame( 'activated', $captured_body['event'] );
-	}
-
 	/*
 	 * ------------------------------------------------------------------
 	 * upgrade_completed()
@@ -200,13 +237,9 @@ class StatisticsTest extends Reepay_Subscriptions_UnitTestCase {
 
 	/**
 	 * Test @see WC_Reepay_Statistics::upgrade_completed sends the 'updated'
-	 * event when $options['plugins'] contains a string matching
-	 * REEPAY_PLUGIN_FILE at a non-zero offset (the normal/working case for
-	 * this plugin's own update, where the plugins array holds a relative
-	 * "folder/file.php" style path from a context that happens to contain
-	 * REEPAY_PLUGIN_FILE's basename further into the string - here
-	 * reproduced directly with REEPAY_PLUGIN_FILE prefixed by a non-empty
-	 * marker so strpos() returns a truthy non-zero offset).
+	 * event when $options['plugins'] contains this plugin's basename
+	 * ("folder/file.php") - the form WordPress passes to
+	 * upgrader_process_complete for this plugin's own update.
 	 */
 	public function test_upgrade_completed_sends_event_for_matching_plugin() {
 		$captured_body = null;
@@ -214,7 +247,7 @@ class StatisticsTest extends Reepay_Subscriptions_UnitTestCase {
 
 		WC_Reepay_Statistics::upgrade_completed(
 			null,
-			array( 'plugins' => array( 'prefix/' . REEPAY_PLUGIN_FILE ) )
+			array( 'plugins' => array( 'some-other-plugin/some-other-plugin.php', plugin_basename( REEPAY_PLUGIN_FILE ) ) )
 		);
 
 		remove_filter( 'pre_http_request', $callback, 5 );
@@ -256,26 +289,27 @@ class StatisticsTest extends Reepay_Subscriptions_UnitTestCase {
 	}
 
 	/**
-	 * Test @see WC_Reepay_Statistics::upgrade_completed CONFIRMED GOTCHA: an
-	 * EXACT match (the plugin string being identical to REEPAY_PLUGIN_FILE,
-	 * so strpos() returns 0) is loose-falsy in the method's
-	 * `if (strpos($plugin, REEPAY_PLUGIN_FILE))` check and therefore does
-	 * NOT trigger send_event() - a real latent bug in production code,
-	 * documented here rather than fixed (no production code changes per
-	 * this task's constraints) or silently ignored.
+	 * Test @see WC_Reepay_Statistics::upgrade_completed matches the basename
+	 * strictly: the absolute REEPAY_PLUGIN_FILE path, or a string that only
+	 * contains the basename, is not treated as this plugin's update.
 	 */
-	public function test_upgrade_completed_exact_path_match_is_falsy_due_to_strpos_bug() {
+	public function test_upgrade_completed_no_event_for_non_exact_match() {
 		$captured_body = null;
 		$callback      = $this->capture_request_body( $captured_body );
 
-		WC_Reepay_Statistics::upgrade_completed( null, array( 'plugins' => array( REEPAY_PLUGIN_FILE ) ) );
+		WC_Reepay_Statistics::upgrade_completed(
+			null,
+			array(
+				'plugins' => array(
+					REEPAY_PLUGIN_FILE,
+					'prefix/' . plugin_basename( REEPAY_PLUGIN_FILE ),
+				),
+			)
+		);
 
 		remove_filter( 'pre_http_request', $callback, 5 );
 
-		$this->assertNull(
-			$captured_body,
-			'Confirmed gotcha: strpos() returning 0 for an exact match is falsy in the unguarded if() check, so no event is sent.'
-		);
+		$this->assertNull( $captured_body );
 	}
 
 	/*

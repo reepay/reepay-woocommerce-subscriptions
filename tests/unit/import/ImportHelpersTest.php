@@ -102,17 +102,10 @@ class ImportHelpersTest extends Reepay_Subscriptions_UnitTestCase {
 
 	/**
 	 * Test @see WC_Reepay_Import_Helpers::import_reepay_customer links to an
-	 * EXISTING WP user (matched by email) rather than creating a new one.
-	 *
-	 * import_reepay_customer() calls the deprecated get_user_by_email()
-	 * (confirmed by actually running this test: WordPress's test framework
-	 * turns the deprecation notice into a failure unless expected) -
-	 * setExpectedDeprecated() documents this real, pre-existing production
-	 * behavior rather than working around it.
+	 * EXISTING WP user (matched by email via get_user_by( 'email', ... ))
+	 * rather than creating a new one.
 	 */
 	public function test_import_reepay_customer_links_existing_user_by_email() {
-		$this->setExpectedDeprecated( 'get_user_by_email' );
-
 		$existing_user_id = self::factory()->user->create( array( 'user_email' => 'existing-cust@example.com' ) );
 
 		$result = WC_Reepay_Import_Helpers::import_reepay_customer(
@@ -133,8 +126,6 @@ class ImportHelpersTest extends Reepay_Subscriptions_UnitTestCase {
 	 * never attempts any outbound mail regardless of bootstrap wiring.
 	 */
 	public function test_import_reepay_customer_creates_new_user_when_none_exists() {
-		$this->setExpectedDeprecated( 'get_user_by_email' );
-
 		add_filter( 'wp_mail', '__return_false' );
 
 		$result = WC_Reepay_Import_Helpers::import_reepay_customer(
@@ -391,5 +382,194 @@ class ImportHelpersTest extends Reepay_Subscriptions_UnitTestCase {
 		$this->assertSame( 'sub-happy-1', $order->get_meta( '_reepay_order' ) );
 		$this->assertSame( 'sub-happy-1', $order->get_meta( '_reepay_subscription_handle' ) );
 		$this->assertEquals( 1, $order->get_meta( '_reepay_imported' ) );
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * is_privileged_user()
+	 * ------------------------------------------------------------------
+	 *
+	 * Real behavior: true when the user can 'manage_options',
+	 * 'manage_woocommerce' or 'edit_posts' (anything more than a shop
+	 * customer); false for unknown user IDs.
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::is_privileged_user returns true for
+	 * roles with admin, shop or editing capabilities.
+	 */
+	public function test_is_privileged_user_true_for_staff_roles() {
+		foreach ( array( 'administrator', 'shop_manager', 'editor', 'contributor' ) as $role ) {
+			$user_id = self::factory()->user->create( array( 'role' => $role ) );
+
+			$this->assertTrue( WC_Reepay_Import_Helpers::is_privileged_user( $user_id ), "Role: $role" );
+		}
+	}
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::is_privileged_user returns false for
+	 * shop customers and subscribers, and for a user ID that does not exist.
+	 */
+	public function test_is_privileged_user_false_for_customers_and_unknown_user() {
+		foreach ( array( 'customer', 'subscriber' ) as $role ) {
+			$user_id = self::factory()->user->create( array( 'role' => $role ) );
+
+			$this->assertFalse( WC_Reepay_Import_Helpers::is_privileged_user( $user_id ), "Role: $role" );
+		}
+
+		$this->assertFalse( WC_Reepay_Import_Helpers::is_privileged_user( 999999 ) );
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * import_reepay_customer( $customer_data, $from_webhook = true )
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::import_reepay_customer from a webhook
+	 * refuses to re-link a user already linked to a different Frisbii customer.
+	 */
+	public function test_import_reepay_customer_from_webhook_refuses_user_linked_to_other_handle() {
+		$user_id = self::factory()->user->create( array( 'user_email' => 'already-linked@example.com' ) );
+		update_user_meta( $user_id, 'reepay_customer_id', 'cust-original' );
+
+		$result = WC_Reepay_Import_Helpers::import_reepay_customer(
+			array(
+				'handle' => 'cust-other',
+				'email'  => 'already-linked@example.com',
+			),
+			true
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'reepay_customer_already_linked', $result->get_error_code() );
+		$this->assertSame( 'cust-original', get_user_meta( $user_id, 'reepay_customer_id', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::import_reepay_customer from a webhook
+	 * accepts a user already linked to the SAME handle.
+	 */
+	public function test_import_reepay_customer_from_webhook_accepts_same_handle() {
+		$user_id = self::factory()->user->create( array( 'user_email' => 'same-handle@example.com' ) );
+		update_user_meta( $user_id, 'reepay_customer_id', 'cust-same' );
+
+		$result = WC_Reepay_Import_Helpers::import_reepay_customer(
+			array(
+				'handle' => 'cust-same',
+				'email'  => 'same-handle@example.com',
+			),
+			true
+		);
+
+		$this->assertSame( $user_id, $result );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::import_reepay_customer from a webhook
+	 * refuses to link a privileged user (e.g. an administrator) matched by
+	 * e-mail.
+	 */
+	public function test_import_reepay_customer_from_webhook_refuses_privileged_user() {
+		$admin_id = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_email' => 'admin-by-email@example.com',
+			)
+		);
+
+		$result = WC_Reepay_Import_Helpers::import_reepay_customer(
+			array(
+				'handle' => 'cust-admin-attempt',
+				'email'  => 'admin-by-email@example.com',
+			),
+			true
+		);
+
+		$this->assertWPError( $result );
+		$this->assertSame( 'reepay_customer_privileged_user', $result->get_error_code() );
+		$this->assertSame( '', get_user_meta( $admin_id, 'reepay_customer_id', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::import_reepay_customer from a manual
+	 * admin import ($from_webhook = false) still links a privileged user -
+	 * the guards only apply to webhook-triggered imports.
+	 */
+	public function test_import_reepay_customer_manual_import_links_privileged_user() {
+		$admin_id = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_email' => 'admin-manual@example.com',
+			)
+		);
+
+		$result = WC_Reepay_Import_Helpers::import_reepay_customer(
+			array(
+				'handle' => 'cust-admin-manual',
+				'email'  => 'admin-manual@example.com',
+			)
+		);
+
+		$this->assertSame( $admin_id, $result );
+		$this->assertSame( 'cust-admin-manual', get_user_meta( $admin_id, 'reepay_customer_id', true ) );
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * import_user_data( $user_id, $customer_data, $from_webhook = true )
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::import_user_data from a webhook keeps
+	 * the login e-mail, does not overwrite existing data with empty values,
+	 * and still updates non-empty fields (meta and the user's own names).
+	 */
+	public function test_import_user_data_from_webhook_keeps_email_and_existing_values() {
+		$user_id = self::factory()->user->create( array( 'user_email' => 'login@example.com' ) );
+		update_user_meta( $user_id, 'billing_city', 'Aarhus' );
+		update_user_meta( $user_id, 'billing_phone', '11223344' );
+
+		WC_Reepay_Import_Helpers::import_user_data(
+			$user_id,
+			array(
+				'handle'     => 'cust-webhook-data',
+				'email'      => 'changed-in-frisbii@example.com',
+				'first_name' => 'Webhook',
+				'city'       => '',
+			),
+			true
+		);
+
+		$user = get_userdata( $user_id );
+		$this->assertSame( 'login@example.com', $user->user_email );
+		$this->assertSame( 'Webhook', $user->first_name );
+		$this->assertSame( 'Aarhus', get_user_meta( $user_id, 'billing_city', true ) );
+		$this->assertSame( '11223344', get_user_meta( $user_id, 'billing_phone', true ) );
+		$this->assertSame( 'changed-in-frisbii@example.com', get_user_meta( $user_id, 'billing_email', true ) );
+		$this->assertSame( 'cust-webhook-data', get_user_meta( $user_id, 'reepay_customer_id', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Import_Helpers::import_user_data from a manual
+	 * import ($from_webhook = false) still overwrites the login e-mail and
+	 * empty fields - the webhook-only protections do not apply.
+	 */
+	public function test_import_user_data_manual_import_overwrites_email_and_empties() {
+		$user_id = self::factory()->user->create( array( 'user_email' => 'old-login@example.com' ) );
+		update_user_meta( $user_id, 'billing_city', 'Aarhus' );
+
+		WC_Reepay_Import_Helpers::import_user_data(
+			$user_id,
+			array(
+				'handle' => 'cust-manual-data',
+				'email'  => 'new-login@example.com',
+			)
+		);
+
+		$this->assertSame( 'new-login@example.com', get_userdata( $user_id )->user_email );
+		$this->assertSame( '', get_user_meta( $user_id, 'billing_city', true ) );
 	}
 }

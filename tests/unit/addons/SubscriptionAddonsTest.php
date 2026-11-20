@@ -41,10 +41,13 @@
  *   inline during session restore too), returning the result.
  * - add_cart_item_data() reads $this->get_product_addons($product_id) (the
  *   product's _product_addons meta) and, for each addon whose
- *   $_POST['addon-{handle}'] is set to 'yes' or a positive integer, appends a
- *   row (keyed by the addon's index in $product_addons) to
+ *   $_POST['addon-{handle}'] is set, validates the value against the addon's
+ *   'type': an 'on_off' addon needs 'yes', a 'quantity' addon needs a whole
+ *   number from 1 to the max quantity. '' / '0' are skipped silently; any
+ *   other value is skipped with an "Invalid value" error notice. A valid
+ *   addon appends a row (keyed by the addon's index in $product_addons) to
  *   $cart_item_data['addons'] built from the product_addons entry (NOT from
- *   the posted value itself, aside from an optional 'quantity').
+ *   the posted value itself, aside from 'quantity' for quantity addons).
  * - get_reepay_addons_list($plan_handle, $drop_cache): reads the
  *   'reepay_s_addons_list' option as a cache UNLESS $drop_cache is true. On
  *   cache miss/drop, calls the real add_on list API, filters out
@@ -511,6 +514,7 @@ class SubscriptionAddonsTest extends Reepay_Subscriptions_UnitTestCase {
 				array(
 					'handle'      => 'addon-1',
 					'name'        => 'Extra Service',
+					'type'        => 'on_off',
 					'amount'      => 10,
 					'description' => 'desc',
 					'vat_type'    => 'exclude',
@@ -536,8 +540,8 @@ class SubscriptionAddonsTest extends Reepay_Subscriptions_UnitTestCase {
 
 	/**
 	 * Test @see WC_Reepay_Subscription_Addons::add_cart_item_data sets a
-	 * 'quantity' key on the row when the posted value is a positive integer
-	 * (not 'yes').
+	 * 'quantity' key on the row when a 'quantity' type addon is posted with a
+	 * positive integer.
 	 */
 	public function test_add_cart_item_data_sets_quantity_for_numeric_post_value() {
 		$product = ( new ProductGenerator( 'simple' ) )->product();
@@ -547,6 +551,7 @@ class SubscriptionAddonsTest extends Reepay_Subscriptions_UnitTestCase {
 				array(
 					'handle'      => 'addon-metered',
 					'name'        => 'Metered',
+					'type'        => 'quantity',
 					'amount'      => 2,
 					'description' => '',
 					'vat_type'    => 'include',
@@ -579,6 +584,7 @@ class SubscriptionAddonsTest extends Reepay_Subscriptions_UnitTestCase {
 				array(
 					'handle'      => 'addon-skip',
 					'name'        => 'Skip me',
+					'type'        => 'quantity',
 					'amount'      => 1,
 					'description' => '',
 					'vat_type'    => 'exclude',
@@ -594,6 +600,179 @@ class SubscriptionAddonsTest extends Reepay_Subscriptions_UnitTestCase {
 		$this->assertSame( array(), $result['addons'] );
 
 		unset( $_POST['addon-addon-skip'] );
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * add_cart_item_data() - value validation per add-on type
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Create a product with one add-on of the given type.
+	 *
+	 * @param string $handle add-on handle.
+	 * @param string $type 'on_off' or 'quantity'.
+	 *
+	 * @return int product ID.
+	 */
+	private function create_product_with_addon( string $handle, string $type ): int {
+		$product = ( new ProductGenerator( 'simple' ) )->product();
+		$product->update_meta_data(
+			'_product_addons',
+			array(
+				array(
+					'handle'      => $handle,
+					'name'        => 'Addon ' . $handle,
+					'type'        => $type,
+					'amount'      => 2,
+					'description' => '',
+					'vat_type'    => 'include',
+				),
+			)
+		);
+		$product->save();
+
+		return $product->get_id();
+	}
+
+	/**
+	 * Post $value for the add-on and run add_cart_item_data().
+	 *
+	 * @param int    $product_id product ID.
+	 * @param string $handle add-on handle.
+	 * @param mixed  $value posted value.
+	 *
+	 * @return array cart item data.
+	 */
+	private function add_with_posted_value( int $product_id, string $handle, $value ): array {
+		$_POST[ 'addon-' . $handle ] = $value;
+
+		$result = $this->addons->add_cart_item_data( array(), $product_id, 0, 1 );
+
+		unset( $_POST[ 'addon-' . $handle ] );
+
+		return $result;
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Addons::add_cart_item_data rejects
+	 * quantity values that are not whole numbers from 1 to the maximum, and
+	 * adds an "Invalid value" error notice for each.
+	 */
+	public function test_add_cart_item_data_rejects_invalid_quantities_with_notice() {
+		$product_id = $this->create_product_with_addon( 'addon-qty-invalid', 'quantity' );
+
+		foreach ( array( '1.5', '-1', 'abc', '1000', '1e2', array( '3' ) ) as $value ) {
+			wc_clear_notices();
+
+			$result = $this->add_with_posted_value( $product_id, 'addon-qty-invalid', $value );
+
+			$label = is_array( $value ) ? 'array' : $value;
+			$this->assertSame( array(), $result['addons'], "Value: $label" );
+
+			if ( is_array( $value ) ) {
+				// Non-scalar posts are treated as "not selected" - no notice.
+				$this->assertEmpty( wc_get_notices( 'error' ), "Value: $label" );
+			} else {
+				$this->assertCount( 1, wc_get_notices( 'error' ), "Value: $label" );
+			}
+		}
+
+		wc_clear_notices();
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Addons::add_cart_item_data accepts the
+	 * boundary quantities 1 and 999 (the default maximum), trimming whitespace.
+	 */
+	public function test_add_cart_item_data_accepts_boundary_quantities() {
+		$product_id = $this->create_product_with_addon( 'addon-qty-bounds', 'quantity' );
+
+		foreach ( array( '1' => 1, '999' => 999, ' 7 ' => 7 ) as $value => $expected ) {
+			$result = $this->add_with_posted_value( $product_id, 'addon-qty-bounds', (string) $value );
+
+			$row = current( $result['addons'] );
+			$this->assertSame( $expected, $row['quantity'], "Value: '$value'" );
+		}
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Addons::add_cart_item_data honours the
+	 * 'reepay_subscriptions_addon_max_quantity' filter.
+	 */
+	public function test_add_cart_item_data_respects_max_quantity_filter() {
+		$product_id = $this->create_product_with_addon( 'addon-qty-filter', 'quantity' );
+
+		$max = function () {
+			return 5;
+		};
+		add_filter( 'reepay_subscriptions_addon_max_quantity', $max );
+
+		$accepted = $this->add_with_posted_value( $product_id, 'addon-qty-filter', '5' );
+		$rejected = $this->add_with_posted_value( $product_id, 'addon-qty-filter', '6' );
+
+		remove_filter( 'reepay_subscriptions_addon_max_quantity', $max );
+		wc_clear_notices();
+
+		$this->assertSame( 5, current( $accepted['addons'] )['quantity'] );
+		$this->assertSame( array(), $rejected['addons'] );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Addons::add_cart_item_data rejects a
+	 * value that does not match the add-on's type: a number for an on/off
+	 * add-on, 'yes' for a quantity add-on.
+	 */
+	public function test_add_cart_item_data_rejects_value_of_wrong_type() {
+		$on_off   = $this->create_product_with_addon( 'addon-type-onoff', 'on_off' );
+		$quantity = $this->create_product_with_addon( 'addon-type-qty', 'quantity' );
+
+		wc_clear_notices();
+
+		$this->assertSame( array(), $this->add_with_posted_value( $on_off, 'addon-type-onoff', '3' )['addons'] );
+		$this->assertSame( array(), $this->add_with_posted_value( $quantity, 'addon-type-qty', 'yes' )['addons'] );
+		$this->assertCount( 2, wc_get_notices( 'error' ) );
+
+		wc_clear_notices();
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * get_cart_item_from_session() - invalid stored quantities
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Addons::get_cart_item_from_session drops
+	 * add-ons whose stored quantity is invalid (e.g. from an older session),
+	 * keeps valid quantity add-ons, and keeps on/off add-ons (no quantity).
+	 */
+	public function test_get_cart_item_from_session_drops_invalid_quantity_addons() {
+		$product = ( new ProductGenerator( 'simple' ) )->product();
+		$product->set_regular_price( 10 );
+		$product->set_price( 10 );
+		$product->save();
+
+		$cart_item = array(
+			'data'     => $product,
+			'quantity' => 1,
+		);
+		$values    = array(
+			'addons' => array(
+				'valid_qty' => array( 'name' => 'Valid qty', 'amount' => 1, 'quantity' => 2 ),
+				'zero_qty'  => array( 'name' => 'Zero qty', 'amount' => 100, 'quantity' => 0 ),
+				'float_qty' => array( 'name' => 'Float qty', 'amount' => 100, 'quantity' => 1.5 ),
+				'huge_qty'  => array( 'name' => 'Huge qty', 'amount' => 100, 'quantity' => 100000 ),
+				'on_off'    => array( 'name' => 'On/off', 'type' => 'on_off', 'amount' => 3 ),
+			),
+		);
+
+		$result = $this->addons->get_cart_item_from_session( $cart_item, $values );
+
+		$this->assertSame( array( 'valid_qty', 'on_off' ), array_keys( $result['addons'] ) );
+		// 10 base + 1 * 2 (valid quantity add-on) + 3 (on/off) - the dropped ones add nothing.
+		$this->assertSame( 15.0, (float) $result['data']->get_price() );
 	}
 
 	/*

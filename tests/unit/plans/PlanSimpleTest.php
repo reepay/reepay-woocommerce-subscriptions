@@ -51,6 +51,12 @@ class PlanSimpleTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 
 		$this->set_fake_private_key( WC_Reepay_Subscription_API::get_instance(), 'private_key_test', 'test-key-reepay' );
 		$this->set_fake_private_key( WC_Reepay_Subscription_API::get_instance(), 'test_mode', true );
+
+		// save_customer_role_meta() only saves when the current user can
+		// 'promote_users' and the role is in get_editable_roles() - act as an
+		// administrator, and load get_editable_roles() (wp-admin only).
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'administrator' ) ) );
 	}
 
 	public function tear_down() {
@@ -112,18 +118,20 @@ class PlanSimpleTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 	 * save_subscription_meta() - customer-role / customer-role-expired
 	 * ------------------------------------------------------------------
 	 *
-	 * Real behavior (WC_Reepay_Subscription_Plan_Simple.php:669-681):
+	 * Real behavior (WC_Reepay_Subscription_Plan_Simple::save_customer_role_meta()):
 	 *
-	 *   if ( ! empty( $_POST['_reepay_subscription_customer_role'] ) && $_POST[...] !== 'without_changes' ) {
-	 *       update_post_meta( $post_id, '_reepay_subscription_customer_role', sanitize_text_field( wp_unslash( $_POST[...] ) ) );
-	 *   } else {
-	 *       delete_post_meta( $post_id, '_reepay_subscription_customer_role' );
+	 *   if ( ! current_user_can( 'promote_users' ) ) return;
+	 *   if ( '' === $role || 'without_changes' === $role ) {
+	 *       delete_post_meta( $post_id, $meta_key );
+	 *   } elseif ( array_key_exists( $role, get_editable_roles() ) ) {
+	 *       update_post_meta( $post_id, $meta_key, $role );
 	 *   }
 	 *
-	 * Same shape for '_reepay_subscription_customer_role_expired'. So the
-	 * literal string 'without_changes' takes the ELSE branch - it is not a
-	 * pure no-op, it actively deletes the meta key if one was previously set.
-	 * A real role value takes the IF branch and calls update_post_meta.
+	 * Used for both '_reepay_subscription_customer_role' and
+	 * '_reepay_subscription_customer_role_expired'. The literal string
+	 * 'without_changes' actively deletes the meta key; a real, editable role
+	 * calls update_post_meta. set_up() logs in as an administrator so the
+	 * capability check passes.
 	 */
 
 	/**
@@ -300,5 +308,197 @@ class PlanSimpleTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 		unset( $_REQUEST['product-type'] );
 
 		$this->assertFalse( $this->plan->is_reepay_product_saving() );
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * save_subscription_meta() - role validation guards
+	 * ------------------------------------------------------------------
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::save_subscription_meta
+	 * keeps the existing role settings when the current user cannot
+	 * 'promote_users' (a shop manager can edit products but cannot promote
+	 * users): the posted role is ignored and the admin-configured roles are
+	 * not wiped. Regression test - save_remote_plan() used to reset the role
+	 * keys together with the plan fields, so saving the product as a shop
+	 * manager silently removed both roles.
+	 */
+	public function test_save_subscription_meta_without_promote_users_keeps_existing_roles() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'shop_manager' ) ) );
+		$this->assertFalse( current_user_can( 'promote_users' ), 'Fixture user must not be able to promote users.' );
+
+		$post_id = $this->create_real_product_post();
+		update_post_meta( $post_id, '_reepay_subscription_customer_role', 'customer' );
+		update_post_meta( $post_id, '_reepay_subscription_customer_role_expired', 'subscriber' );
+		$this->mock_valid_plan_response();
+
+		$_REQUEST['product-type']                            = 'reepay_simple_subscriptions';
+		$_REQUEST['_reepay_subscription_handle']             = 'plan-handle-1';
+		$_POST['_reepay_subscription_customer_role']         = 'administrator';
+		$_POST['_reepay_subscription_customer_role_expired'] = '';
+
+		$this->plan->save_subscription_meta( $post_id );
+
+		$this->assertSame( 'customer', get_post_meta( $post_id, '_reepay_subscription_customer_role', true ) );
+		$this->assertSame( 'subscriber', get_post_meta( $post_id, '_reepay_subscription_customer_role_expired', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::save_subscription_meta
+	 * still refreshes the plan fields from Frisbii when the current user
+	 * cannot 'promote_users' - only the role keys are left alone.
+	 */
+	public function test_save_subscription_meta_without_promote_users_still_saves_plan_fields() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'shop_manager' ) ) );
+
+		$post_id = $this->create_real_product_post();
+		update_post_meta( $post_id, '_reepay_subscription_name', 'Stale name' );
+		$this->mock_valid_plan_response();
+
+		$_REQUEST['product-type']                = 'reepay_simple_subscriptions';
+		$_REQUEST['_reepay_subscription_handle'] = 'plan-handle-1';
+
+		$this->plan->save_subscription_meta( $post_id );
+
+		$this->assertSame( 'Plan One', get_post_meta( $post_id, '_reepay_subscription_name', true ) );
+		$this->assertSame( 'plan-handle-1', get_post_meta( $post_id, '_reepay_subscription_handle', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::save_subscription_meta
+	 * does not save a role that is not in get_editable_roles() (unknown
+	 * role), keeping the previous value.
+	 */
+	public function test_save_subscription_meta_rejects_unknown_role() {
+		$post_id = $this->create_real_product_post();
+		update_post_meta( $post_id, '_reepay_subscription_customer_role', 'subscriber' );
+		$this->mock_valid_plan_response();
+
+		$_REQUEST['product-type']                    = 'reepay_simple_subscriptions';
+		$_REQUEST['_reepay_subscription_handle']     = 'plan-handle-1';
+		$_POST['_reepay_subscription_customer_role'] = 'no-such-role';
+
+		$this->plan->save_subscription_meta( $post_id );
+
+		$this->assertSame( 'subscriber', get_post_meta( $post_id, '_reepay_subscription_customer_role', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::save_remote_plan does not
+	 * touch the role keys (they are not part of the Frisbii plan).
+	 */
+	public function test_save_remote_plan_leaves_role_keys_alone() {
+		$post_id = $this->create_real_product_post();
+		update_post_meta( $post_id, '_reepay_subscription_customer_role', 'customer' );
+		update_post_meta( $post_id, '_reepay_subscription_customer_role_expired', 'subscriber' );
+		$this->mock_valid_plan_response();
+
+		$this->plan->save_remote_plan( $post_id, 'plan-handle-1' );
+
+		$this->assertSame( 'customer', get_post_meta( $post_id, '_reepay_subscription_customer_role', true ) );
+		$this->assertSame( 'subscriber', get_post_meta( $post_id, '_reepay_subscription_customer_role_expired', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::save_subscription_meta
+	 * does not save a role the current user may not grant (removed from
+	 * get_editable_roles() via the 'editable_roles' filter).
+	 */
+	public function test_save_subscription_meta_rejects_role_not_editable_by_user() {
+		$hide_editor = function ( $roles ) {
+			unset( $roles['editor'] );
+
+			return $roles;
+		};
+		add_filter( 'editable_roles', $hide_editor );
+
+		$post_id = $this->create_real_product_post();
+		$this->mock_valid_plan_response();
+
+		$_REQUEST['product-type']                    = 'reepay_simple_subscriptions';
+		$_REQUEST['_reepay_subscription_handle']     = 'plan-handle-1';
+		$_POST['_reepay_subscription_customer_role'] = 'editor';
+
+		$this->plan->save_subscription_meta( $post_id );
+
+		remove_filter( 'editable_roles', $hide_editor );
+
+		$this->assertSame( '', get_post_meta( $post_id, '_reepay_subscription_customer_role', true ) );
+	}
+
+	/*
+	 * ------------------------------------------------------------------
+	 * get_month_fixed_day_text() / get_billing_plan() for fixed-day plans
+	 * ------------------------------------------------------------------
+	 *
+	 * The test site runs in English (untranslated strings), so the ordinal
+	 * is always English ("1st", "2nd", ...), via NumberFormatter when the
+	 * intl extension is available and the built-in fallback otherwise.
+	 */
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::get_month_fixed_day_text
+	 * uses the singular sentence for a 1-month interval, with English
+	 * ordinals including the 11th-13th exceptions.
+	 */
+	public function test_get_month_fixed_day_text_singular_with_english_ordinals() {
+		$expected = array(
+			1  => '1st',
+			2  => '2nd',
+			3  => '3rd',
+			4  => '4th',
+			11 => '11th',
+			12 => '12th',
+			13 => '13th',
+			21 => '21st',
+			22 => '22nd',
+			23 => '23rd',
+			31 => '31st',
+		);
+
+		foreach ( $expected as $day => $ordinal ) {
+			$this->assertSame(
+				"Billed on the $ordinal day of every month",
+				WC_Reepay_Subscription_Plan_Simple::get_month_fixed_day_text( 1, $day )
+			);
+		}
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::get_month_fixed_day_text
+	 * uses the plural sentence for intervals of more than one month.
+	 */
+	public function test_get_month_fixed_day_text_plural() {
+		$this->assertSame(
+			'Billed every 3 months on the 15th day of the month',
+			WC_Reepay_Subscription_Plan_Simple::get_month_fixed_day_text( 3, 15 )
+		);
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscription_Plan_Simple::get_billing_plan returns
+	 * the fixed-day sentence for a month_fixed_day plan (long form only).
+	 */
+	public function test_get_billing_plan_month_fixed_day_long_form() {
+		$plan = array(
+			'type'      => WC_Reepay_Subscription_Plan_Simple::TYPE_MONTH_FIXED_DAY,
+			'type_data' => array(
+				'month' => 1,
+				'day'   => 1,
+			),
+			'interval'  => 1,
+		);
+
+		$this->assertSame(
+			'Billed on the 1st day of every month',
+			WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $plan )
+		);
+		$this->assertNotSame(
+			'Billed on the 1st day of every month',
+			WC_Reepay_Subscription_Plan_Simple::get_billing_plan( $plan, true ),
+			'The short form must not use the fixed-day sentence.'
+		);
 	}
 }

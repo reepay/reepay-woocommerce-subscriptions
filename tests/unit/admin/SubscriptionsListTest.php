@@ -130,7 +130,7 @@ class SubscriptionsListTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( '<form action="" method="get" class="reepay-subscriptions-page">', $output );
-		$this->assertStringContainsString( 'name="page" value="reepay-subscriptions"', $output );
+		$this->assertStringContainsString( 'name="page" value="reepay-subscriptions-for-woocommerce"', $output );
 		$this->assertStringContainsString( '</form>', $output );
 	}
 
@@ -148,5 +148,41 @@ class SubscriptionsListTest extends Reepay_Subscriptions_Ajax_UnitTestCase {
 		$output = ob_get_clean();
 
 		$this->assertStringContainsString( '<form', $output );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Subscriptions_List::render_page refuses users
+	 * without 'manage_woocommerce' (wp_die) before rendering anything or
+	 * calling the Frisbii API with the merchant's private key.
+	 */
+	public function test_render_page_dies_for_user_without_manage_woocommerce() {
+		wp_set_current_user( self::factory()->user->create( array( 'role' => 'editor' ) ) );
+
+		$requests = 0;
+		$counter  = function ( $preempt ) use ( &$requests ) {
+			$requests++;
+
+			return $preempt;
+		};
+		add_filter( 'pre_http_request', $counter, 5 );
+
+		// The Ajax testcase's wp_die handler closes the current output buffer
+		// itself (appending it to $this->_last_response), so only close it
+		// here when render_page() did NOT die.
+		ob_start();
+		try {
+			$this->list->render_page();
+			$died   = false;
+			$output = ob_get_clean();
+		} catch ( WPDieException $e ) {
+			$died   = true;
+			$output = $this->_last_response;
+		}
+
+		remove_filter( 'pre_http_request', $counter, 5 );
+
+		$this->assertTrue( $died, 'Expected wp_die() for a user without manage_woocommerce.' );
+		$this->assertStringNotContainsString( '<form', $output );
+		$this->assertSame( 0, $requests );
 	}
 }

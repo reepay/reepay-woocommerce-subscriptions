@@ -5,9 +5,11 @@
  * Covers WC_Reepay_Sync_Customers (includes/sync/WC_Reepay_Sync_Customers.php).
  *
  * CONFIRMED by reading the full source:
- * - created()/changed()/deleted() have NO sleep() - they all call the shared
- *   static get_customer_data($handle) helper (one real, normally-mockable API
- *   call), then branch on whether a WP user / customer-data was found.
+ * - created()/changed()/deleted() have NO sleep(). created()/changed() call
+ *   the shared static get_customer_data($handle) helper (one real,
+ *   normally-mockable API call), then branch on whether a WP user /
+ *   customer-data was found. deleted() makes no API call: it looks the user
+ *   up with rp_get_user_id_by_handle() directly.
  * - get_customer_data($handle) catches Exception internally (logs via
  *   reepay_s()->log()->log(...), does not rethrow) and ALWAYS returns an
  *   array shape (['user_id' => ..., 'customer_data' => ...]) - customer_data
@@ -15,9 +17,9 @@
  *   different return-shape convention than WC_Reepay_Import's WP_Error-
  *   returning methods - confirmed directly by reading the method body, not
  *   assumed from naming similarity.
- * - deleted()'s happy path calls wp_delete_user() - confirmed safe to call
- *   on a real test-fixture user; WordPress's test framework handles user
- *   deletion cleanly.
+ * - deleted()'s happy path only UNLINKS the customer: it removes the user's
+ *   'reepay_customer_id' meta and keeps the WordPress account (a Frisbii
+ *   customer deletion must never delete the WP user).
  * - payment_method_added() calls sleep(5) UNCONDITIONALLY at the very top,
  *   before any branching (gotcha #5) - no early-return avoids it. Per the
  *   brief's guidance ("accept the cost for at most one or two tests"), two
@@ -145,18 +147,11 @@ class SyncCustomersTest extends Reepay_Subscriptions_UnitTestCase {
 	/**
 	 * Test @see WC_Reepay_Sync_Customers::created happy path imports a new
 	 * WP user from the fetched customer data.
-	 *
-	 * import_reepay_customer() calls the deprecated get_user_by_email() -
-	 * setExpectedDeprecated() documents this real, pre-existing production
-	 * behavior (same as ImportHelpersTest/ImportTest's happy-path tests for
-	 * the same underlying call).
 	 */
 	public function test_created_happy_path_imports_new_user() {
 		if ( ! PLUGINS_STATE::reepay_pay_activated() ) {
 			$this->markTestSkipped( 'rp_get_user_id_by_handle() requires the Frisbii Pay (reepay_pay) plugin.' );
 		}
-
-		$this->setExpectedDeprecated( 'get_user_by_email' );
 
 		add_filter( 'wp_mail', '__return_false' );
 
@@ -222,6 +217,89 @@ class SyncCustomersTest extends Reepay_Subscriptions_UnitTestCase {
 	}
 
 	/**
+	 * Test @see WC_Reepay_Sync_Customers::changed skips a privileged user
+	 * (e.g. an administrator) - Frisbii data must never change staff accounts.
+	 */
+	public function test_changed_skips_privileged_user() {
+		if ( ! PLUGINS_STATE::reepay_pay_activated() ) {
+			$this->markTestSkipped( 'rp_get_user_id_by_handle() requires the Frisbii Pay (reepay_pay) plugin.' );
+		}
+
+		$admin_id = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'first_name' => 'Original',
+			)
+		);
+		update_user_meta( $admin_id, 'reepay_customer_id', 'cust-changed-admin-1' );
+
+		ApiResponseMock::respond_with(
+			array(
+				'handle'     => 'cust-changed-admin-1',
+				'email'      => 'attacker@example.com',
+				'first_name' => 'Changed',
+			)
+		);
+
+		$this->sync_customers->changed( array( 'customer' => 'cust-changed-admin-1' ) );
+
+		$this->assertSame( 'Original', get_user_meta( $admin_id, 'first_name', true ) );
+		$this->assertSame( '', get_user_meta( $admin_id, 'billing_email', true ) );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Sync_Customers::changed keeps the user's login
+	 * e-mail when Frisbii reports a different e-mail (webhook import mode).
+	 */
+	public function test_changed_keeps_login_email() {
+		if ( ! PLUGINS_STATE::reepay_pay_activated() ) {
+			$this->markTestSkipped( 'rp_get_user_id_by_handle() requires the Frisbii Pay (reepay_pay) plugin.' );
+		}
+
+		$user_id = self::factory()->user->create( array( 'user_email' => 'keep-login@example.com' ) );
+		update_user_meta( $user_id, 'reepay_customer_id', 'cust-changed-email-1' );
+
+		ApiResponseMock::respond_with(
+			array(
+				'handle' => 'cust-changed-email-1',
+				'email'  => 'new-in-frisbii@example.com',
+			)
+		);
+
+		$this->sync_customers->changed( array( 'customer' => 'cust-changed-email-1' ) );
+
+		$this->assertSame( 'keep-login@example.com', get_userdata( $user_id )->user_email );
+	}
+
+	/**
+	 * Test @see WC_Reepay_Sync_Customers::created does not link an existing
+	 * privileged user matched by e-mail (the import is refused and logged).
+	 */
+	public function test_created_does_not_link_privileged_user() {
+		if ( ! PLUGINS_STATE::reepay_pay_activated() ) {
+			$this->markTestSkipped( 'rp_get_user_id_by_handle() requires the Frisbii Pay (reepay_pay) plugin.' );
+		}
+
+		$admin_id = self::factory()->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_email' => 'created-admin@example.com',
+			)
+		);
+
+		ApiResponseMock::respond_with(
+			array(
+				'handle' => 'cust-created-admin-1',
+				'email'  => 'created-admin@example.com',
+			)
+		);
+
+		$this->sync_customers->created( array( 'customer' => 'cust-created-admin-1' ) );
+
+		$this->assertSame( '', get_user_meta( $admin_id, 'reepay_customer_id', true ) );
+	}
+
+	/**
 	 * Small helper to reuse an existing user's current email as the mocked
 	 * API response's email, so wp_update_user() doesn't collide on a
 	 * duplicate-email error for this specific happy-path test.
@@ -259,10 +337,11 @@ class SyncCustomersTest extends Reepay_Subscriptions_UnitTestCase {
 	}
 
 	/**
-	 * Test @see WC_Reepay_Sync_Customers::deleted happy path actually
-	 * deletes the matched WP user via wp_delete_user().
+	 * Test @see WC_Reepay_Sync_Customers::deleted happy path unlinks the
+	 * matched WP user (removes its 'reepay_customer_id' meta) and keeps the
+	 * WordPress account itself.
 	 */
-	public function test_deleted_happy_path_deletes_user() {
+	public function test_deleted_happy_path_unlinks_handle_and_keeps_user() {
 		if ( ! PLUGINS_STATE::reepay_pay_activated() ) {
 			$this->markTestSkipped( 'rp_get_user_id_by_handle() requires the Frisbii Pay (reepay_pay) plugin.' );
 		}
@@ -270,11 +349,10 @@ class SyncCustomersTest extends Reepay_Subscriptions_UnitTestCase {
 		$user_id = self::factory()->user->create();
 		update_user_meta( $user_id, 'reepay_customer_id', 'cust-deleted-ok-1' );
 
-		ApiResponseMock::respond_with( array( 'handle' => 'cust-deleted-ok-1' ) );
-
 		$this->sync_customers->deleted( array( 'customer' => 'cust-deleted-ok-1' ) );
 
-		$this->assertFalse( get_userdata( $user_id ) );
+		$this->assertInstanceOf( WP_User::class, get_userdata( $user_id ) );
+		$this->assertSame( '', get_user_meta( $user_id, 'reepay_customer_id', true ) );
 	}
 
 	/*
