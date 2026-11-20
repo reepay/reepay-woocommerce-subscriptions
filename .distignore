@@ -1,0 +1,34 @@
+# Files and folders left out of the release zip built by `npm run zip`
+# (bin/zip.sh). One rsync exclude pattern per line; a leading "/" anchors the
+# pattern to the plugin root so e.g. "/tests/" never matches a nested folder.
+
+# Version control / tooling
+/.git/
+/.gitignore
+/.gitattributes
+/.distignore
+/.claude/
+/.serena/
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+
+# Tests and dev scripts
+/tests/
+/bin/
+/phpunit.xml
+/.phpunit.result.cache
+
+# Node tooling
+/node_modules/
+/package.json
+/package-lock.json
+
+# Build output and old archives
+/build/
+/*.zip
+
+# vendor/ is rebuilt from scratch in the staging copy with
+# `composer install --no-dev --optimize-autoloader`, never copied.
+/vendor/

@@ -70,3 +70,6 @@ Thumbs.db
 # Stray artifact from cmd.exe misinterpreting a UNC-path redirect as a
 # literal filename instead of the null device.
 NUL
+
+# Release zip output from `npm run zip` (bin/zip.sh)
+/build/

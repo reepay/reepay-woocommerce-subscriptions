@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'reepay/reepay-subscriptions-for-woocommerce',
-        'pretty_version' => '1.3.10',
-        'version' => '1.3.10.0',
+        'pretty_version' => '1.3.14',
+        'version' => '1.3.14.0',
         'reference' => null,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
@@ -101,8 +101,8 @@
             'dev_requirement' => true,
         ),
         'reepay/reepay-subscriptions-for-woocommerce' => array(
-            'pretty_version' => '1.3.10',
-            'version' => '1.3.10.0',
+            'pretty_version' => '1.3.14',
+            'version' => '1.3.14.0',
             'reference' => null,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',

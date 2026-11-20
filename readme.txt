@@ -4,7 +4,7 @@ Tags: woocommerce, subscriptions, ecommerce, e-commerce, commerce
 Requires at least: 5.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 1.3.13
+Stable tag: 1.3.14
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -74,6 +74,12 @@ Standard Frisbii Billing features:
 3. For correct plugin operation install and activate Frisbii Pay for WooCommerce. API keys for both plugins should be the same.
 
 == Changelog ==
+v 1.3.14
+- [Fix] - Payment improvements 2.
+- [Fix] - Print of billing schedule for fixed day of the month.
+- [Feature] - Supports submission of VAT numbers stored in _billing_eu_vat_number and _billing_vat_number meta field_ids. Requires 3rd party plugin.
+
+
 v 1.3.13
 - [Fix] - Payment improvements.
 
